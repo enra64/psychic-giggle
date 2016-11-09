@@ -10,3 +10,6 @@
 **/gradle.xml
 **/vcs.xml
 common.jar
+
+common/out/*
+server/out/*
