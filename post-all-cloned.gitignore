@@ -10,5 +10,9 @@
 **/gradle.xml
 **/vcs.xml
 **/modules.xml
-**/*.iml
 common.jar
+common/out/*
+server/out/*
+.fuse*
+
+**/*.iml

@@ -11,8 +11,8 @@
 **/vcs.xml
 **/modules.xml
 common.jar
-
 common/out/*
 server/out/*
+.fuse*
 
 .fuse*
