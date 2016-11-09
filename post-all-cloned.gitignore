@@ -14,5 +14,6 @@ common.jar
 common/out/*
 server/out/*
 .fuse*
+**/encodings.xml
 
 **/*.iml
