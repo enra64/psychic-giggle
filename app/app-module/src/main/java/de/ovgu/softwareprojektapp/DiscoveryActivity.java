@@ -12,12 +12,14 @@ import android.widget.ListView;
 import java.util.List;
 
 import de.ovgu.softwareprojektapp.server_discovery.Discovery;
+import de.ovgu.softwareprojektapp.server_discovery.OnDiscoveryListener;
+import de.ovgu.softwareprojektapp.server_discovery.Server;
 
-public class DiscoveryActivity extends AppCompatActivity implements Discovery.OnDiscoveryListener {
+public class DiscoveryActivity extends AppCompatActivity implements OnDiscoveryListener {
 
     Button mStartDiscovery;
     ListView mPossibleConnections;
-    List<Discovery.Server> mServerList;
+    List<Server> mServerList;
     Discovery mDiscovery;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,15 +51,15 @@ public class DiscoveryActivity extends AppCompatActivity implements Discovery.On
     }
 
     @Override
-    public void onServerListUpdated(List<Discovery.Server> serverNames) {
+    public void onServerListUpdated(List<Server> servers) {
 
-        mServerList = serverNames;             //save server names and ips for further use
+        mServerList = servers;             //save server names and ips for further use
 
-        String[] stringNames = new String[serverNames.size()];
+        String[] stringNames = new String[servers.size()];
 
 
-        for(int i = 0 ; i < serverNames.size(); i++){
-            stringNames[i] = serverNames.get(i).name;
+        for(int i = 0; i < servers.size(); i++){
+            stringNames[i] = servers.get(i).name;
 
         }
 
