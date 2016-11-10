@@ -15,5 +15,6 @@ common/out/*
 server/out/*
 .fuse*
 **/encodings.xml
+**/.idea/description.html
 
 **/*.iml
