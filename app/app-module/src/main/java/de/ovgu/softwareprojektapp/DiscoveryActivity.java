@@ -9,19 +9,18 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 
-import java.net.SocketException;
 import java.util.List;
 
-import de.ovgu.softwareprojekt.discovery.DeviceIdentification;
+import de.ovgu.softwareprojekt.discovery.NetworkDevice;
 import de.ovgu.softwareprojekt.discovery.OnDiscoveryListener;
-import de.ovgu.softwareprojektapp.server_discovery.DiscoveryThread;
+import de.ovgu.softwareprojektapp.server_discovery.DiscoveryClient;
 
 public class DiscoveryActivity extends AppCompatActivity implements OnDiscoveryListener {
 
     Button mStartDiscovery;
     ListView mPossibleConnections;
-    List<DeviceIdentification> mServerList;
-    DiscoveryThread mDiscovery;
+    List<NetworkDevice> mServerList;
+    DiscoveryClient mDiscovery;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,11 +28,7 @@ public class DiscoveryActivity extends AppCompatActivity implements OnDiscoveryL
         setContentView(R.layout.activity_discovery);
 
         // initialise discovery thread with listener, remote port, local port, name
-        try {
-            mDiscovery = new DiscoveryThread(this, 8888, "bond. _james_ bond");
-        } catch (SocketException e) {
-            e.printStackTrace();
-        }
+        mDiscovery = new DiscoveryClient(this, 8888, "bond. _james_ bond");
 
         mStartDiscovery = (Button) findViewById(R.id.startDiscovery);
         mStartDiscovery.setOnClickListener(new View.OnClickListener() {
@@ -61,7 +56,7 @@ public class DiscoveryActivity extends AppCompatActivity implements OnDiscoveryL
     }
 
     @Override
-    public void onServerListUpdated(List<DeviceIdentification> servers) {
+    public void onServerListUpdated(List<NetworkDevice> servers) {
         mServerList = servers;             //save server names and ips for further use
 
         final String[] stringNames = new String[servers.size()];
@@ -69,12 +64,9 @@ public class DiscoveryActivity extends AppCompatActivity implements OnDiscoveryL
 
         for (int i = 0; i < servers.size(); i++) {
             stringNames[i] = servers.get(i).name;
-
         }
 
-
-
-
+        // since this is called from a separate thread, we must use runOnUiThread to update the lits
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
