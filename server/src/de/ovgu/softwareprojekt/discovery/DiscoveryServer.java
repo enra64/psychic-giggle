@@ -6,37 +6,56 @@ import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 
+/**
+ * Use this class to wait for incoming discovery requests
+ */
 public class DiscoveryServer extends DiscoveryThread {
+    /**
+     * The port we should listen on for broadcasts by discovery clients
+     */
     private int mListenPort;
 
-    public DiscoveryServer(int localPort, String selfName) throws SocketException {
+    /**
+     * Create a new discovery server. The {@link #start()} function must be called in order to begin listening. Please
+     * call {@link #close()} after finishing the discovery phase
+     *
+     * @param localPort the local listening port. remotes must know it to find this server
+     * @param selfName how to announce this server to any remotes
+     */
+    public DiscoveryServer(int localPort, String selfName) {
         super(selfName);
         mListenPort = localPort;
     }
 
+    /**
+     * Listen for incoming discovery requests
+     */
     @Override
     public void run() {
-        // Create a broadcast UDP socket with a timeout of 50ms
         try {
+            // set our socket listen to broadcasts on the configured listen port
             setSocket(new DatagramSocket(mListenPort, InetAddress.getByName("0.0.0.0")));
 
-            while(isRunning()){
+            // continue running until close() is called
+            while (isRunning()) {
                 listen();
             }
 
-        } catch (SocketException e) {
-            e.printStackTrace();
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
+        // TODO: do something intelligent with exceptions
         } catch (IOException e) {
             e.printStackTrace();
         }
 
+        // after we finished running, our socket must be closed
         getSocket().close();
     }
 
+    /**
+     * When a new device announces itself, we respond with the information necessary to connect to this server
+     * @param device the device that was found
+     */
     @Override
-    protected void onDiscovery(DeviceIdentification device) {
+    protected void onDiscovery(NetworkDevice device) {
         try {
             // reply to the device
             sendSelfIdentification(device.getInetAddress(), device.port);

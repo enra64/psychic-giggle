@@ -38,7 +38,7 @@ public class NetworkDevice implements Serializable {
     }
 
     /**
-     * Create a new, NetworkDevice when only the name is known
+     * Create a new NetworkDevice when only the name is known
      * @param name human readable name
      */
     public NetworkDevice(String name){
