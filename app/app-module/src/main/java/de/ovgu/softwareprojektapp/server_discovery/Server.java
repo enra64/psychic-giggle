@@ -2,13 +2,14 @@ package de.ovgu.softwareprojektapp.server_discovery;
 
 import java.net.InetAddress;
 
+import de.ovgu.softwareprojekt.discovery.ServerIdentification;
+
 /**
  * Encapsulates all information gathered about a server by the discovery engine
  */
 public class Server {
     /**
      * Server name
-     * TODO: give servers names
      */
     public String name;
 
@@ -18,14 +19,19 @@ public class Server {
     public String address;
 
     /**
-     * not implemented as of yet; value will be "unknown"
-     * TODO: get port from discovery
+     * Contains the port the server announced
      */
     public String port;
 
-    public Server(InetAddress serverAddress) {
-        name = serverAddress.toString();
-        address = serverAddress.getHostAddress();
-        port = "unknown";
+    Server(ServerIdentification id, InetAddress addr) {
+        port = id.port;
+        name = id.name;
+        address = addr.getHostAddress();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        Server server = (Server) obj;
+        return address.equals(server.address) && name.equals(server.name) && port.equals(server.port);
     }
 }

@@ -2,14 +2,18 @@ package de.ovgu.softwareprojektapp.server_discovery;
 
 import android.util.Log;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketTimeoutException;
 
+import de.ovgu.softwareprojekt.discovery.ServerIdentification;
+
 /**
- * Created by arne on 11/10/16.
+ * This thread manages sending discovery request packages and receiving answers
  */
 class DiscoveryThread extends Thread {
     private int mPort;
@@ -84,10 +88,19 @@ class DiscoveryThread extends Thread {
         DatagramPacket receivePacket = new DatagramPacket(recvBuf, recvBuf.length);
         mSocket.receive(receivePacket);
 
-        // Check whether the message was sent from one of our servers
-        String message = new String(receivePacket.getData()).trim();
-        if (message.equals("DE_OVGU_SOFTWAREPROJEKT_SERVER_DISCOVERY_RESPONSE"))
-            mListener.onDiscovery(new Server(receivePacket.getAddress()));
+        // convert to object
+        ByteArrayInputStream input = new ByteArrayInputStream(recvBuf);
+        ObjectInputStream oinput = new ObjectInputStream(input);
+        ServerIdentification serverIdentification;
+
+        // we assume here that a server sending us our object is trying to communicate with us,
+        // so if casting to a ServerIdentification object does not throw, we can announce the server
+        try {
+            serverIdentification = (ServerIdentification) oinput.readObject();
+            mListener.onDiscovery(new Server(serverIdentification, receivePacket.getAddress()));
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
