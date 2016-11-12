@@ -6,83 +6,132 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
-import java.net.SocketException;
-import java.net.SocketTimeoutException;
-import java.util.LinkedList;
-import java.util.List;
-
-import sun.rmi.runtime.Log;
+import java.net.*;
 
 /**
- * This thread manages sending discovery request packages and receiving answers
+ * This abstract class serves as a skeleton for implementing both the discovery server implementation as well as the discovery
+ * client implementation
  */
+@SuppressWarnings("WeakerAccess")
 public abstract class DiscoveryThread extends Thread {
+    /**
+     * The socket this thread should use for all of its network operations
+     */
     private DatagramSocket mSocket;
-    private boolean mKeepRunning = true;
-    private DeviceIdentification mSelfDeviceId;
 
-    public DiscoveryThread(String selfName) throws SocketException {
-        mSelfDeviceId = new DeviceIdentification(selfName);
+    /**
+     * True if the thread should keep running
+     */
+    private boolean mKeepRunning = true;
+
+    /**
+     * A NetworkDevice that identifies the device this Object is running on
+     */
+    private NetworkDevice mSelfDeviceId;
+
+    /**
+     * Create a new DiscoveryThread.
+     *
+     * @param selfName the discovery thread will announce this name to other devices seeking partners in the network
+     */
+    public DiscoveryThread(String selfName) {
+        mSelfDeviceId = new NetworkDevice(selfName);
     }
 
     /**
-     * This will try and find servers on the network.
-     * TODO: send more than one packet if no response is registered
+     * This function must be overridden to complete the DiscoveryThread. You probably want to do something like
+     * <pre>
+     *     {@code
+     *     while(isRunning()){
+     *         listen();
+     *     }
+     *     }
+     * </pre>
      */
     @Override
     public abstract void run();
 
+    /**
+     * Send an object identifying the configured network device.
+     *
+     * @param targetHost to which target the message should be sent
+     * @param targetPort at which port the message should arrive on targetHost
+     * @throws IOException if the identification message could not be sent
+     */
     protected void sendSelfIdentification(InetAddress targetHost, int targetPort) throws IOException {
+        // create a new object output stream
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         ObjectOutputStream os = new ObjectOutputStream(outputStream);
-        os.writeObject(mSelfDeviceId) ;
+
+        // write the object into a byte buffer
+        os.writeObject(mSelfDeviceId);
         byte[] data = outputStream.toByteArray();
+
+        // create an UDP packet from the byte buffer and send it to the desired host/port combination
         DatagramPacket sendPacket = new DatagramPacket(data, data.length, targetHost, targetPort);
         mSocket.send(sendPacket);
     }
 
+    /**
+     * Wait for a NetworkDevice object to arrive on the set {@link DatagramSocket}. Other messages will be discarded.
+     *
+     * @throws IOException either a {@link SocketTimeoutException} if the wait times out, or any other IO exception that occurse
+     */
     protected void listen() throws IOException {
-        // wait for a response
+        // wait for a message on our socket
         byte[] recvBuf = new byte[1024];
         DatagramPacket receivePacket = new DatagramPacket(recvBuf, recvBuf.length);
         mSocket.receive(receivePacket);
 
-        // convert to object
+        // initialise an ObjectInputStream
         ByteArrayInputStream input = new ByteArrayInputStream(recvBuf);
         ObjectInputStream oinput = new ObjectInputStream(input);
-        DeviceIdentification identification;
 
-        // we assume here that a server sending us our object is trying to communicate with us,
-        // so if casting to a ServerIdentification object does not throw, we can announce the server
+        NetworkDevice identification;
         try {
-            identification = (DeviceIdentification) oinput.readObject();
+            // create the NetworkDevice describing our remote partner
+            identification = (NetworkDevice) oinput.readObject();
             identification.address = receivePacket.getAddress().getHostAddress();
 
+            // notify sub-class
             onDiscovery(identification);
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+
+        // if the cast to NetworkDevice fails, this message was not sent by the discovery system, and may be ignored
+        } catch (ClassNotFoundException ignored) {
         }
     }
 
-    protected abstract void onDiscovery(DeviceIdentification newDevice);
+    protected abstract void onDiscovery(NetworkDevice newDevice);
 
-
+    /**
+     * Check whether the server is set to stay running
+     * @return true if the server will continue running
+     */
     public boolean isRunning() {
         return mKeepRunning;
     }
 
-    protected DatagramSocket getSocket(){
+    /**
+     * Socket currently configured to be used by the discovery system
+     * @return the socket
+     */
+    protected DatagramSocket getSocket() {
         return mSocket;
     }
 
+    /**
+     * Set the socket to be used by this {@link DiscoveryThread}
+     * @param socket new socket configuration
+     * @throws SocketException if some of the internal configuration failed
+     */
     protected void setSocket(DatagramSocket socket) throws SocketException {
+        // socket must be broadcasting
         socket.setBroadcast(true);
+
+        // save socket
         mSocket = socket;
 
-        // the local port may be unknown at time of
+        // update our local port; this is the only definitive source
         mSelfDeviceId.port = socket.getLocalPort();
     }
 

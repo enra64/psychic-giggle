@@ -2,16 +2,14 @@ package de.ovgu.softwareprojekt.discovery;
 
 import java.util.List;
 
-import de.ovgu.softwareprojekt.discovery.DeviceIdentification;
-
 /**
- * Interface you want to implement to be notified of new discovery results
+ * This interface is used by the Discovery system to notify of changes to the server list
  */
 public interface OnDiscoveryListener {
 
     /**
-     * Called whenever the server list is changed
-     * @param servers list of all current servers
+     * Called when the list of current devices changed
+     * @param deviceList a list of current {@link NetworkDevice NetworkDevices}
      */
-    void onServerListUpdated(List<DeviceIdentification> servers);
+    void onServerListUpdated(List<NetworkDevice> deviceList);
 }
