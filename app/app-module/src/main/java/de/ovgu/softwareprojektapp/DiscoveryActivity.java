@@ -9,28 +9,38 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 
+import java.net.SocketException;
 import java.util.List;
 
-import de.ovgu.softwareprojektapp.server_discovery.Discovery;
-import de.ovgu.softwareprojektapp.server_discovery.OnDiscoveryListener;
-import de.ovgu.softwareprojektapp.server_discovery.Server;
+import de.ovgu.softwareprojekt.discovery.DeviceIdentification;
+import de.ovgu.softwareprojekt.discovery.OnDiscoveryListener;
+import de.ovgu.softwareprojektapp.server_discovery.DiscoveryThread;
 
 public class DiscoveryActivity extends AppCompatActivity implements OnDiscoveryListener {
 
     Button mStartDiscovery;
     ListView mPossibleConnections;
-    List<Server> mServerList;
-    Discovery mDiscovery;
+    List<DeviceIdentification> mServerList;
+    DiscoveryThread mDiscovery;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_discovery);
 
+        // initialise discovery thread with listener, remote port, local port, name
+        try {
+            mDiscovery = new DiscoveryThread(this, 8888, "bond. _james_ bond");
+        } catch (SocketException e) {
+            e.printStackTrace();
+        }
+
         mStartDiscovery = (Button) findViewById(R.id.startDiscovery);
         mStartDiscovery.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mDiscovery.startDiscovery(DiscoveryActivity.this);
+                // start discovering
+                mDiscovery.start();
             }
         });
 
@@ -41,7 +51,7 @@ public class DiscoveryActivity extends AppCompatActivity implements OnDiscoveryL
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Intent intent = new Intent(DiscoveryActivity.this, SendActivity.class);
                 intent.putExtra("Name", mServerList.get(i).name);
-                intent.putExtra("Address" , mServerList.get(i).address);
+                intent.putExtra("Address", mServerList.get(i).address);
                 intent.putExtra("Port", mServerList.get(i).port);
 
                 DiscoveryActivity.this.startActivity(intent);
@@ -51,19 +61,26 @@ public class DiscoveryActivity extends AppCompatActivity implements OnDiscoveryL
     }
 
     @Override
-    public void onServerListUpdated(List<Server> servers) {
-
+    public void onServerListUpdated(List<DeviceIdentification> servers) {
         mServerList = servers;             //save server names and ips for further use
 
-        String[] stringNames = new String[servers.size()];
+        final String[] stringNames = new String[servers.size()];
 
 
-        for(int i = 0; i < servers.size(); i++){
+        for (int i = 0; i < servers.size(); i++) {
             stringNames[i] = servers.get(i).name;
 
         }
 
-        ArrayAdapter<String> serverNameAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, stringNames);
-        mPossibleConnections.setAdapter(serverNameAdapter);
+
+
+
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                ArrayAdapter<String> serverNameAdapter = new ArrayAdapter<String>(DiscoveryActivity.this, android.R.layout.simple_list_item_1, stringNames);
+                mPossibleConnections.setAdapter(serverNameAdapter);
+            }
+        });
     }
 }
