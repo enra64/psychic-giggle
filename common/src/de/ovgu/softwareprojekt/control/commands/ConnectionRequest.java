@@ -1,12 +1,16 @@
 package de.ovgu.softwareprojekt.control.commands;
 
-/**
- * Created by arne on 11/13/16.
- */
-public class ConnectionRequest extends Command {
+import de.ovgu.softwareprojekt.discovery.NetworkDevice;
 
-    public ConnectionRequest() {
+public class ConnectionRequest extends Command {
+    /**
+     * identify who is even trying to connect
+     */
+    public NetworkDevice self;
+
+    public ConnectionRequest(NetworkDevice self) {
         super(CommandType.ConnectionRequest);
+        this.self = self;
     }
 
 }

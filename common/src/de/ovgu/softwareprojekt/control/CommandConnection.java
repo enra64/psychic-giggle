@@ -64,7 +64,7 @@ public class CommandConnection implements CommandSink, CommandSource {
      * @throws IOException most probably if the socket is blocked TODO: definitive answer here
      */
     @Override
-    public void inputCommand(Command command) throws IOException {
+    public void sendCommand(Command command) throws IOException {
         // ensure that the remote host is properly configured
         assert (mRemotePort >= 0 && mRemoteHost != null);
 
@@ -114,8 +114,8 @@ public class CommandConnection implements CommandSink, CommandSource {
     // this could have been implemented by CommandConnection implementing the OnCommandListener, but because it is an
     // interface, it would have polluted our public surface with a method that is destined to be used by inner class
     // workings only.
-    private void onCommand(Command command) {
-        mCommandListener.onCommand(command);
+    private void onCommand(InetAddress origin, Command command) {
+        mCommandListener.onCommand(origin, command);
     }
 
     /**
@@ -164,25 +164,23 @@ public class CommandConnection implements CommandSink, CommandSource {
             // declare objects that will need to be closed
             ObjectInputStream oinput = null;
 
-            try (Socket connection = mSocket.accept()) {
 
-                // notify user of working state
-                System.out.println("command connection on discoveryPort " + mSocket.getLocalPort());
+            while (mRunning) {
+                try (Socket connection = mSocket.accept()) {
+                    // notify user of working state
+                    System.out.println("command connection on discoveryPort " + mSocket.getLocalPort());
 
-                // get an object input stream; this is open as long as connection is open,
-                // so the tcp connection stays open as long as Data is transmitted
-                oinput = new ObjectInputStream(connection.getInputStream());
+                    // get an object input stream; this is open as long as connection is open,
+                    // so the tcp connection stays open as long as Data is transmitted
+                    oinput = new ObjectInputStream(connection.getInputStream());
 
-                // read objects on the same connection until shutdown() is called
-                while (mRunning) {
                     // call listener with new object
-                    mListener.onCommand((Command) oinput.readObject());
+                    mListener.onCommand(connection.getInetAddress(), (Command) oinput.readObject());
+
+                } catch (IOException | ClassNotFoundException e) {
+                    e.printStackTrace();
                 }
-
-            } catch (IOException | ClassNotFoundException e) {
-                e.printStackTrace();
             }
-
 
             try {
                 if (mSocket != null)

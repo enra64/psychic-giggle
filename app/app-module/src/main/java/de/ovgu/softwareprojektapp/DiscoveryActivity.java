@@ -22,13 +22,15 @@ public class DiscoveryActivity extends AppCompatActivity implements OnDiscoveryL
     List<NetworkDevice> mServerList;
     DiscoveryClient mDiscovery;
 
+    private static final String NAME = "bond. _james_ bond";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_discovery);
 
         // initialise discovery thread with listener, remote discovery listening port, name
-        mDiscovery = new DiscoveryClient(this, 8888, "bond. _james_ bond");
+        mDiscovery = new DiscoveryClient(this, 8888, NAME);
 
         mStartDiscovery = (Button) findViewById(R.id.startDiscovery);
         mStartDiscovery.setOnClickListener(new View.OnClickListener() {
@@ -52,6 +54,8 @@ public class DiscoveryActivity extends AppCompatActivity implements OnDiscoveryL
                 intent.putExtra(SendActivity.EXTRA_SERVER_PORT_DISCOVERY, mServerList.get(i).discoveryPort);
                 intent.putExtra(SendActivity.EXTRA_SERVER_PORT_COMMAND, mServerList.get(i).commandPort);
                 intent.putExtra(SendActivity.EXTRA_SERVER_PORT_DATA, mServerList.get(i).dataPort);
+
+                intent.putExtra(SendActivity.EXTRA_SELF_NAME, NAME);
 
                 DiscoveryActivity.this.startActivity(intent);
             }
