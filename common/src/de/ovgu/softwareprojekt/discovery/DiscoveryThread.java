@@ -10,7 +10,7 @@ import java.net.*;
 
 /**
  * This abstract class serves as a skeleton for implementing both the discovery server implementation as well as the discovery
- * client implementation
+ * client implementation.
  */
 @SuppressWarnings("WeakerAccess")
 public abstract class DiscoveryThread extends Thread {

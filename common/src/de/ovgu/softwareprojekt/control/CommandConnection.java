@@ -9,7 +9,20 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-
+/**
+ * <p>
+ * This class is able to both send and receive commands. (it is both a {@link CommandSource} and a {@link CommandSink})
+ * </p>
+ * <p>
+ * To receive commands with it, you must {@link #setCommandListener(OnCommandListener) set} an
+ * {@link de.ovgu.softwareprojekt.control.CommandSource.OnCommandListener} and then call {@link #start()} to start
+ * listening.
+ * </p>
+ * <p>
+ * When you want to send commands with it, you need to configure the remote host using {@link #setRemote(InetAddress, int)}
+ * first. Then you can use {@link #sendCommand(Command)} to send any command.
+ * </p>
+ */
 public class CommandConnection implements CommandSink, CommandSource {
     /**
      * This listener must be notified of new commands arriving
@@ -33,7 +46,7 @@ public class CommandConnection implements CommandSink, CommandSource {
 
     /**
      * New control connection. The local listening port can be retrieved using {@link #getLocalPort()} after calling {@link #start()}.
-     * The remote host and port may be set using {@link #setRemote(InetAddress, int)}
+     * The remote host and port may be set using {@link #setRemote(InetAddress, int)}, commands can then be sent there using {@link #sendCommand(Command)}
      */
     public CommandConnection() throws IOException {
     }
@@ -109,6 +122,7 @@ public class CommandConnection implements CommandSink, CommandSource {
     /**
      * Called whenever our CommandServer receives a command packet.
      *
+     * @param origin the host which sent the command
      * @param command the command we received
      */
     // this could have been implemented by CommandConnection implementing the OnCommandListener, but because it is an
@@ -118,12 +132,13 @@ public class CommandConnection implements CommandSink, CommandSource {
         mCommandListener.onCommand(origin, command);
     }
 
+
     /**
-     * The CommandServer class is the actual workhorse of the TcpServer class;
+     * The {@link CommandServer} class is used to listen to incoming commands.
      */
     private static class CommandServer extends Thread {
         /**
-         * Our listener; called whenever a new SensorData object is received
+         * This listener is called whenever a new command object is received.
          */
         CommandConnection mListener;
 
@@ -133,18 +148,29 @@ public class CommandConnection implements CommandSink, CommandSource {
         private boolean mRunning = true;
 
         /**
-         * Socket we are listening on
+         * Socket we use to listen
          */
         private ServerSocket mSocket;
 
+        /**
+         * A new CommandServer instance created will open a socket on a random free port to enable listening for commands.
+         * TODO: what if the instance is created, but never started? the socket will stay open...
+         *
+         * @param listener this class will be called when a new command object is received
+         * @throws IOException when an error occurs during binding of the socket
+         */
         CommandServer(CommandConnection listener) throws IOException {
+            // store listener
             mListener = listener;
 
-            // get a socket now so we know which port we are listening on
+            // get a socket now so we already know which port we will listen on
             mSocket = new ServerSocket(0);
         }
 
-        int getLocalPort(){
+        /**
+         * Returns the port the command server is listening on
+         */
+        int getLocalPort() {
             return mSocket.getLocalPort();
         }
 
@@ -161,20 +187,14 @@ public class CommandConnection implements CommandSink, CommandSource {
          * TODO: exception listener to handle exceptions in the thread more intelligently than "hopefully someone sees this just died"
          */
         public void run() {
-            // declare objects that will need to be closed
-            ObjectInputStream oinput = null;
-
-
+            // continue running till shutdown() is called
             while (mRunning) {
+                // try-with-resource: close the socket after accepting the connection
                 try (Socket connection = mSocket.accept()) {
-                    // notify user of working state
-                    System.out.println("command connection on discoveryPort " + mSocket.getLocalPort());
+                    // create an object input stream from the new connection
+                    ObjectInputStream oinput = new ObjectInputStream(connection.getInputStream());
 
-                    // get an object input stream; this is open as long as connection is open,
-                    // so the tcp connection stays open as long as Data is transmitted
-                    oinput = new ObjectInputStream(connection.getInputStream());
-
-                    // call listener with new object
+                    // call listener with new command
                     mListener.onCommand(connection.getInetAddress(), (Command) oinput.readObject());
 
                 } catch (IOException | ClassNotFoundException e) {
@@ -182,6 +202,7 @@ public class CommandConnection implements CommandSink, CommandSource {
                 }
             }
 
+            // try to close the socket after finishing running
             try {
                 if (mSocket != null)
                     mSocket.close();

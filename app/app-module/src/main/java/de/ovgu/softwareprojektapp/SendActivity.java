@@ -8,7 +8,6 @@ import android.view.View;
 import java.io.IOException;
 import java.net.InetAddress;
 
-import de.ovgu.softwareprojekt.DataSink;
 import de.ovgu.softwareprojekt.control.CommandConnection;
 import de.ovgu.softwareprojekt.control.CommandSource;
 import de.ovgu.softwareprojekt.control.commands.BooleanCommand;

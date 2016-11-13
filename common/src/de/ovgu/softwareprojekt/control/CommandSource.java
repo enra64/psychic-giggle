@@ -6,6 +6,10 @@ import de.ovgu.softwareprojekt.discovery.NetworkDevice;
 import java.io.IOException;
 import java.net.InetAddress;
 
+/**
+ *
+ */
+@SuppressWarnings("WeakerAccess")
 public interface CommandSource {
     public interface OnCommandListener {
         void onCommand(InetAddress origin, Command command);
