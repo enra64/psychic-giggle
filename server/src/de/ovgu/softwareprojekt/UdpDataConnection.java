@@ -7,20 +7,50 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketException;
 
-public class UdpDataConnection extends Thread implements DataSource {
+/**
+ * This class listens for udp packets containing {@link SensorData} objects, and notifies a listener of new data.
+ * The listener must be
+ */
+class UdpDataConnection extends Thread implements DataSource {
+    /**
+     * Incoming sensor data will be forwareded here
+     */
     private DataSink mDataSink;
+
+    /**
+     * true as long as the server should listen on the udp port
+     */
     private boolean mKeepRunning = true;
+
+    /**
+     * the port we should listen on
+     */
     private int mLocalPort;
 
-    public UdpDataConnection(int port){
-        mLocalPort = port;
+    /**
+     * Create a new UdpDataConnection that will start listening after {@link #start()} is called.
+     */
+    UdpDataConnection() throws SocketException {
+        mLocalPort = findFreePort();
     }
 
-    public static int findPort() throws SocketException {
+    /**
+     * Find a free port to listen on
+     * @return a currently (!) free port
+     * @throws SocketException when an error occurs during the search
+     */
+    private static int findFreePort() throws SocketException {
         DatagramSocket socket = new DatagramSocket();
         int freePort = socket.getLocalPort();
         socket.close();
         return freePort;
+    }
+
+    /**
+     * Returns the port this UdpDataConnection is listening on
+     */
+    public int getLocalPort(){
+        return mLocalPort;
     }
 
     @Override
@@ -38,7 +68,7 @@ public class UdpDataConnection extends Thread implements DataSource {
                 DatagramPacket appPacket = new DatagramPacket(appData, appData.length);
                 serverSocket.receive(appPacket);
 
-                // parse incoming SensorData object
+                // parse incoming object
                 ByteArrayInputStream input = new ByteArrayInputStream(appData);
                 ObjectInputStream oinput = new ObjectInputStream(input);
 

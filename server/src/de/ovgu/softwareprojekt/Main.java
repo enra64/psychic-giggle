@@ -2,14 +2,14 @@ package de.ovgu.softwareprojekt;
 
 import de.ovgu.softwareprojekt.control.CommandConnection;
 import de.ovgu.softwareprojekt.control.CommandSource;
-import de.ovgu.softwareprojekt.control.commands.BooleanCommand;
 import de.ovgu.softwareprojekt.control.commands.Command;
-import de.ovgu.softwareprojekt.control.commands.CommandType;
 import de.ovgu.softwareprojekt.control.commands.ConnectionRequest;
+import de.ovgu.softwareprojekt.control.commands.SetSensorCommand;
 import de.ovgu.softwareprojekt.discovery.DiscoveryServer;
 
 import java.io.IOException;
 import java.net.InetAddress;
+import java.net.SocketException;
 
 
 public class Main {
@@ -19,46 +19,40 @@ public class Main {
         Server server = new Server();
     }
 
+    /**
+     * This class encapsulates the whole server system:
+     * <p>
+     * 1) A DiscoveryServer used to make clients able to find us
+     * 2) A CommandConnection to be able to reliable communicate about important stuff, like enabling sensors
+     * 3) A DataConnection to rapidly transmit sensor data
+     */
     private static class Server implements CommandSource.OnCommandListener {
+        /**
+         * Useful when you want to transmit SensorData
+         */
         private UdpDataConnection mDataConnection;
+
+        /**
+         * Two-way communication for basically everything non-data, like enabling sensors or requesting connections
+         */
         private CommandConnection mCommandConnection;
 
+        /**
+         * Creates a new server object
+         *
+         * @throws IOException when something goes wrong...
+         */
         Server() throws IOException {
+            // initialise the command and data connections
+            initialiseCommandConnection();
+            initialiseDataConnection();
 
-            // begin a new command connection
-            mCommandConnection = new CommandConnection();
-
-            // start listening to the commands received by the connection
-            mCommandConnection.setCommandListener(this);
-            mCommandConnection.start();
-
-            // find a free port for the data connection
-            int dataPort = UdpDataConnection.findPort();
-
-            // begin listening for udp packets on that free port
-            mDataConnection = new UdpDataConnection(dataPort);
-            mDataConnection.start();
-
-            // register a callback for data objects
-            // TEMPORARY SOLUTION DO NOT PUT THE MOUSE CONTROL HERE
-            mDataConnection.setDataSink(new DataSink() {
-                @Override
-                public void onData(SensorData data) {
-                    System.out.println("received a data object!");
-                }
-
-                @Override
-                public void close() {}
-            });
-
-            // bad command-line logging
-            System.out.println("listening for commands on " + mCommandConnection.getLocalPort() + ", found a free port for data: " + dataPort);
-
-            // begin listening for discovery packets on port 8888, announcing our command and data ports
+            // the DiscoveryServer makes it possible for the client to find us, but it needs to know the command and
+            // data ports, which is why we had to initialise those connections first
             DiscoveryServer discoveryServer = new DiscoveryServer(
                     8888,
                     mCommandConnection.getLocalPort(),
-                    dataPort,
+                    mDataConnection.getLocalPort(),
                     "lessig. _christian_ lessig");
             discoveryServer.start();
 
@@ -66,8 +60,9 @@ public class Main {
         }
 
         /**
-         * Called when the command connection received a command packet
-         * @param origin host of the sender
+         * Called whenever a command packet has arrived
+         *
+         * @param origin  host of the sender
          * @param command the command issued
          */
         @Override
@@ -76,29 +71,63 @@ public class Main {
             System.out.println("command received, type " + command.getCommandType().toString());
 
             // decide what to do with the packet
-            switch(command.getCommandType()){
-
-                // TODO: check whether we actually want to connect with this client
+            switch (command.getCommandType()) {
                 case ConnectionRequest:
-                    // cast to ConnectionRequest type
+                    // TODO: check whether we actually want to connect with this client
+                    // since this commands CommandType is ConnectionRequest, we know to what to cast it
                     ConnectionRequest request = (ConnectionRequest) command;
 
                     try {
-                        // because the command connectino goes two ways, we need to register the new remotes command endpoint
+                        // know that we have a connection, we know who to talk to for the commands
                         mCommandConnection.setRemote(origin, request.self.commandPort);
 
-                        // used for debugging: let the remote begin sending gyroscope data
-                        mCommandConnection.sendCommand(new BooleanCommand(CommandType.SetGyroscope, true));
+                        // for now, immediately let the client begin sending gyroscope data
+                        mCommandConnection.sendCommand(new SetSensorCommand(SensorType.Gyroscope, true));
 
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
                     break;
 
-                // ignore unhandled commands
+                // ignore unhandled commands (like SetSensorCommand)
                 default:
                     break;
             }
+        }
+
+        /**
+         * Simply prepare the command connection and register us as listener
+         */
+        private void initialiseCommandConnection() throws IOException {
+            // begin a new command connection
+            mCommandConnection = new CommandConnection();
+
+            // begin listening for commands
+            mCommandConnection.setCommandListener(this);
+            mCommandConnection.start();
+        }
+
+        /**
+         * Prepare the data connection, and create a listener.
+         */
+        private void initialiseDataConnection() throws SocketException {
+            // begin a new data connection
+            mDataConnection = new UdpDataConnection();
+
+            // register a callback for data objects
+            mDataConnection.setDataSink(new DataSink() {
+                @Override
+                public void onData(SensorData data) {
+                    System.out.println("received a data object!");
+                }
+
+                @Override
+                public void close() {
+                }
+            });
+
+            // begin listening for SensorData objects
+            mDataConnection.start();
         }
     }
 }
