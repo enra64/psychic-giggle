@@ -45,6 +45,8 @@ public class NetworkDevice implements Serializable {
     public NetworkDevice(String name, int discoveryPort, int commandPort, int dataPort, String address){
         this.name = name;
         this.discoveryPort = discoveryPort;
+        this.commandPort = commandPort;
+        this.dataPort = dataPort;
         this.address = address;
     }
 

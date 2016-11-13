@@ -1,5 +1,6 @@
 package de.ovgu.softwareprojektapp;
 
+import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -9,6 +10,7 @@ import java.io.IOException;
 import de.ovgu.softwareprojekt.control.CommandConnection;
 import de.ovgu.softwareprojekt.control.CommandSource;
 import de.ovgu.softwareprojekt.control.commands.Command;
+import de.ovgu.softwareprojekt.control.commands.ConnectionRequest;
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
 
 public class SendActivity extends AppCompatActivity implements CommandSource.OnCommandListener {
@@ -69,7 +71,7 @@ public class SendActivity extends AppCompatActivity implements CommandSource.OnC
             mCommandConnection.start();
 
             // send a connection request
-            mCommandConnection.inputCommand(new ConnectionRequest());
+            new SendCommand().execute(new ConnectionRequest());
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -80,5 +82,18 @@ public class SendActivity extends AppCompatActivity implements CommandSource.OnC
     @Override
     public void onCommand(Command command) {
 
+    }
+
+    private class SendCommand extends AsyncTask<Command, Void, Void> {
+
+        @Override
+        protected Void doInBackground(Command... commands) {
+            try {
+                mCommandConnection.inputCommand(commands[0]);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
     }
 }

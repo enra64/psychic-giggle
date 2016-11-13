@@ -32,16 +32,10 @@ public class CommandConnection implements CommandSink, CommandSource {
     private int mRemotePort = -1;
 
     /**
-     * This is the discoveryPort where incoming commands are expected to arrive
-     */
-    private int mLocalPort = -1;
-
-    /**
-     * New control connection. The local listening port can be retrieved using getLocalPort(). The remote host and port
-     * may be set using {@link }
+     * New control connection. The local listening port can be retrieved using {@link #getLocalPort()} after calling {@link #start()}.
+     * The remote host and port may be set using {@link #setRemote(InetAddress, int)}
      */
     public CommandConnection() throws IOException {
-        mIncomingServer = new CommandServer(this);
     }
 
     /**
@@ -143,21 +137,15 @@ public class CommandConnection implements CommandSink, CommandSource {
          */
         private ServerSocket mSocket;
 
-        /**
-         * The discoveryPort we should listen on
-         */
-        private int mListeningPort;
-
         CommandServer(CommandConnection listener) throws IOException {
             mListener = listener;
 
             // get a socket now so we know which port we are listening on
-            mSocket = new ServerSocket();
-            mListeningPort = mSocket.getLocalPort();
+            mSocket = new ServerSocket(0);
         }
 
         int getLocalPort(){
-            return mListeningPort;
+            return mSocket.getLocalPort();
         }
 
         /**
@@ -176,11 +164,10 @@ public class CommandConnection implements CommandSink, CommandSource {
             // declare objects that will need to be closed
             ObjectInputStream oinput = null;
 
-            try (ServerSocket listenerSocket = new ServerSocket();
-                 Socket connection = listenerSocket.accept()) {
+            try (Socket connection = mSocket.accept()) {
 
                 // notify user of working state
-                System.out.println("command connection on discoveryPort " + listenerSocket.getLocalPort());
+                System.out.println("command connection on discoveryPort " + mSocket.getLocalPort());
 
                 // get an object input stream; this is open as long as connection is open,
                 // so the tcp connection stays open as long as Data is transmitted
@@ -189,7 +176,7 @@ public class CommandConnection implements CommandSink, CommandSource {
                 // read objects on the same connection until shutdown() is called
                 while (mRunning) {
                     // call listener with new object
-                    mListener.onCommand((Command) oinput.readUnshared());
+                    mListener.onCommand((Command) oinput.readObject());
                 }
 
             } catch (IOException | ClassNotFoundException e) {

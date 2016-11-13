@@ -19,6 +19,7 @@ public class Main {
             // TODO: the command connection
             CommandConnection commandConnection = new CommandConnection();
             commandConnection.setCommandListener(this);
+            commandConnection.start();
 
             System.out.println("listening for commands on " + commandConnection.getLocalPort());
 
@@ -31,7 +32,7 @@ public class Main {
 
         @Override
         public void onCommand(Command command) {
-            System.out.println("command received");
+            System.out.println("command received, type " + command.getCommandType().toString());
         }
     }
 }
