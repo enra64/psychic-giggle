@@ -1,4 +1,5 @@
-package de.ovgu.softwareprojekt.common;
+package de.ovgu.softwareprojekt;
+
 
 /**
  * Interface for sensor data sources
