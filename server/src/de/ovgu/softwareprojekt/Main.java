@@ -1,7 +1,7 @@
 package de.ovgu.softwareprojekt;
 
 import de.ovgu.softwareprojekt.control.CommandConnection;
-import de.ovgu.softwareprojekt.control.CommandSource;
+import de.ovgu.softwareprojekt.control.OnCommandListener;
 import de.ovgu.softwareprojekt.control.commands.Command;
 import de.ovgu.softwareprojekt.control.commands.ConnectionRequest;
 import de.ovgu.softwareprojekt.control.commands.SetSensorCommand;
@@ -26,7 +26,7 @@ public class Main {
      * 2) A CommandConnection to be able to reliable communicate about important stuff, like enabling sensors
      * 3) A DataConnection to rapidly transmit sensor data
      */
-    private static class Server implements CommandSource.OnCommandListener {
+    private static class Server implements OnCommandListener {
         /**
          * Useful when you want to transmit SensorData
          */
@@ -99,11 +99,10 @@ public class Main {
          * Simply prepare the command connection and register us as listener
          */
         private void initialiseCommandConnection() throws IOException {
-            // begin a new command connection
-            mCommandConnection = new CommandConnection();
+            // begin a new command connection, set this as callback
+            mCommandConnection = new CommandConnection(this);
 
             // begin listening for commands
-            mCommandConnection.setCommandListener(this);
             mCommandConnection.start();
         }
 
@@ -117,6 +116,7 @@ public class Main {
             // register a callback for data objects
             mDataConnection.setDataSink(new DataSink() {
                 @Override
+                // TODO: you probably want to listen here with the mousemover
                 public void onData(SensorData data) {
                     System.out.println("received a data object!");
                 }

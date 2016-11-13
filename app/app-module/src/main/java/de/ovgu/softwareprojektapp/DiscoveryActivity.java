@@ -20,8 +20,15 @@ public class DiscoveryActivity extends AppCompatActivity implements OnDiscoveryL
     Button mStartDiscovery;
     ListView mPossibleConnections;
     List<NetworkDevice> mServerList;
+
+    /**
+     * This discovery client enables us to find servers
+     */
     DiscoveryClient mDiscovery;
 
+    /**
+     * how we announce ourselves to servers
+     */
     private static final String NAME = "bond. _james_ bond";
 
     @Override
@@ -29,7 +36,7 @@ public class DiscoveryActivity extends AppCompatActivity implements OnDiscoveryL
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_discovery);
 
-        // initialise discovery thread with listener, remote discovery listening port, name
+        // initialise discovery thread with listener, remote discovery listening port, and our name
         mDiscovery = new DiscoveryClient(this, 8888, NAME);
 
         mStartDiscovery = (Button) findViewById(R.id.startDiscovery);
@@ -55,6 +62,7 @@ public class DiscoveryActivity extends AppCompatActivity implements OnDiscoveryL
                 intent.putExtra(SendActivity.EXTRA_SERVER_PORT_COMMAND, mServerList.get(i).commandPort);
                 intent.putExtra(SendActivity.EXTRA_SERVER_PORT_DATA, mServerList.get(i).dataPort);
 
+                // store our name, too
                 intent.putExtra(SendActivity.EXTRA_SELF_NAME, NAME);
 
                 DiscoveryActivity.this.startActivity(intent);

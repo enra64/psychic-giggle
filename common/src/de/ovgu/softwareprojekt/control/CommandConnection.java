@@ -11,19 +11,18 @@ import java.net.Socket;
 
 /**
  * <p>
- * This class is able to both send and receive commands. (it is both a {@link CommandSource} and a {@link CommandSink})
+ * This class is able to both send and receive commands.
  * </p>
  * <p>
- * To receive commands with it, you must {@link #setCommandListener(OnCommandListener) set} an
- * {@link de.ovgu.softwareprojekt.control.CommandSource.OnCommandListener} and then call {@link #start()} to start
- * listening.
+ * To receive commands with it, you must call {@link #start()} to start listening.
  * </p>
  * <p>
  * When you want to send commands with it, you need to configure the remote host using {@link #setRemote(InetAddress, int)}
  * first. Then you can use {@link #sendCommand(Command)} to send any command.
  * </p>
  */
-public class CommandConnection implements CommandSink, CommandSource {
+@SuppressWarnings("WeakerAccess")
+public class CommandConnection {
     /**
      * This listener must be notified of new commands arriving
      */
@@ -47,8 +46,11 @@ public class CommandConnection implements CommandSink, CommandSource {
     /**
      * New control connection. The local listening port can be retrieved using {@link #getLocalPort()} after calling {@link #start()}.
      * The remote host and port may be set using {@link #setRemote(InetAddress, int)}, commands can then be sent there using {@link #sendCommand(Command)}
+     *
+     * @param listener the listener that will be notified of new commands arriving at this CommandConnection
      */
-    public CommandConnection() throws IOException {
+    public CommandConnection(OnCommandListener listener) throws IOException {
+        mCommandListener = listener;
     }
 
     /**
@@ -76,7 +78,6 @@ public class CommandConnection implements CommandSink, CommandSource {
      * @param command this command will be received by the peer
      * @throws IOException most probably if the socket is blocked TODO: definitive answer here
      */
-    @Override
     public void sendCommand(Command command) throws IOException {
         // ensure that the remote host is properly configured
         assert (mRemotePort >= 0 && mRemoteHost != null);
@@ -91,7 +92,6 @@ public class CommandConnection implements CommandSink, CommandSource {
     /**
      * Use this to gracefully stop operations
      */
-    @Override
     public void close() {
         if (mIncomingServer != null)
             mIncomingServer.shutdown();
@@ -99,19 +99,8 @@ public class CommandConnection implements CommandSink, CommandSource {
     }
 
     /**
-     * Set the listener that will be notified of new commands arriving at this CommandConnection
-     *
-     * @param listener the listener that will be notified of new commands
-     */
-    @Override
-    public void setCommandListener(OnCommandListener listener) {
-        mCommandListener = listener;
-    }
-
-    /**
      * Use this to start operations. Does not throw if called multiple times.
      */
-    @Override
     public void start() throws IOException {
         if (mIncomingServer == null) {
             mIncomingServer = new CommandServer(this);
