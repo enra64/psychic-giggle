@@ -30,7 +30,19 @@ public abstract class DiscoveryThread extends Thread {
     private NetworkDevice mSelfDeviceId;
 
     /**
-     * Create a new DiscoveryThread.
+     * Create a new DiscoveryThread when you already know your command- and data port, for example for use in a server
+     * announcing where to connect.
+     * @param selfName the discovery thread will announce this name to other devices seeking partners in the network
+     * @param localCommandPort a command server must be listening on this port to receive further communication
+     * @param localDataPort a data server should be listening here to receive further communication
+     */
+    public DiscoveryThread(String selfName, int localCommandPort, int localDataPort) {
+        mSelfDeviceId = new NetworkDevice(selfName, localCommandPort, localDataPort);
+    }
+
+    /**
+     * Create a new DiscoveryThread. Only use this constructor if you do not yet know your command- and data port (!),
+     * most probably when you want to implement a client, as a server not responding with a valid command port is useless.
      *
      * @param selfName the discovery thread will announce this name to other devices seeking partners in the network
      */
@@ -55,7 +67,7 @@ public abstract class DiscoveryThread extends Thread {
      * Send an object identifying the configured network device.
      *
      * @param targetHost to which target the message should be sent
-     * @param targetPort at which port the message should arrive on targetHost
+     * @param targetPort at which discoveryPort the message should arrive on targetHost
      * @throws IOException if the identification message could not be sent
      */
     protected void sendSelfIdentification(InetAddress targetHost, int targetPort) throws IOException {
@@ -67,7 +79,7 @@ public abstract class DiscoveryThread extends Thread {
         os.writeObject(mSelfDeviceId);
         byte[] data = outputStream.toByteArray();
 
-        // create an UDP packet from the byte buffer and send it to the desired host/port combination
+        // create an UDP packet from the byte buffer and send it to the desired host/discoveryPort combination
         DatagramPacket sendPacket = new DatagramPacket(data, data.length, targetHost, targetPort);
         mSocket.send(sendPacket);
     }
@@ -131,8 +143,8 @@ public abstract class DiscoveryThread extends Thread {
         // save socket
         mSocket = socket;
 
-        // update our local port; this is the only definitive source
-        mSelfDeviceId.port = socket.getLocalPort();
+        // update our local discoveryPort; this is the only definitive source
+        mSelfDeviceId.discoveryPort = socket.getLocalPort();
     }
 
     /**

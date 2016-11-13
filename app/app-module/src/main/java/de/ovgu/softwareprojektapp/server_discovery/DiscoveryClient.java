@@ -15,7 +15,7 @@ import de.ovgu.softwareprojekt.discovery.*;
 /**
  * This thread manages sending discovery request packages and receiving answers from servers
  */
-public class DiscoveryClient extends de.ovgu.softwareprojekt.discovery.DiscoveryThread {
+public class DiscoveryClient extends DiscoveryThread {
     /**
      * Listener to be called when our list of servers changes
      */
@@ -32,7 +32,9 @@ public class DiscoveryClient extends de.ovgu.softwareprojekt.discovery.Discovery
     private int mRemotePort;
 
     /**
-     * Create a new DiscoveryClient.
+     * Create a new DiscoveryClient. In contrast to the DiscoveryServer, the DiscoveryClient does not
+     * have to know its command- and data port yet, because we can instantiate those when acutally
+     * connecting to the ports supplied in the discovery response sent by the sever.
      *
      * @param listener   this listener will be notified of changes in the list of known servers
      * @param remotePort the port the discovery server listens on

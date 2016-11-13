@@ -27,7 +27,7 @@ public class DiscoveryActivity extends AppCompatActivity implements OnDiscoveryL
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_discovery);
 
-        // initialise discovery thread with listener, remote port, local port, name
+        // initialise discovery thread with listener, remote discovery listening port, name
         mDiscovery = new DiscoveryClient(this, 8888, "bond. _james_ bond");
 
         mStartDiscovery = (Button) findViewById(R.id.startDiscovery);
@@ -44,10 +44,14 @@ public class DiscoveryActivity extends AppCompatActivity implements OnDiscoveryL
         mPossibleConnections.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+
+                // store the information of the selected server in the intent extras
                 Intent intent = new Intent(DiscoveryActivity.this, SendActivity.class);
-                intent.putExtra("Name", mServerList.get(i).name);
-                intent.putExtra("Address", mServerList.get(i).address);
-                intent.putExtra("Port", mServerList.get(i).port);
+                intent.putExtra(SendActivity.EXTRA_SERVER_NAME, mServerList.get(i).name);
+                intent.putExtra(SendActivity.EXTRA_SERVER_ADDRESS, mServerList.get(i).address);
+                intent.putExtra(SendActivity.EXTRA_SERVER_PORT_DISCOVERY, mServerList.get(i).discoveryPort);
+                intent.putExtra(SendActivity.EXTRA_SERVER_PORT_COMMAND, mServerList.get(i).commandPort);
+                intent.putExtra(SendActivity.EXTRA_SERVER_PORT_DATA, mServerList.get(i).dataPort);
 
                 DiscoveryActivity.this.startActivity(intent);
             }

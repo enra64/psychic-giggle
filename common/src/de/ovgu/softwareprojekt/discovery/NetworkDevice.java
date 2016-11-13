@@ -15,10 +15,19 @@ public class NetworkDevice implements Serializable {
     public String name;
 
     /**
-     * port the device uses
+     * discoveryPort the device is listening on this port for server discovery purposes
      */
-    public int port;
+    public int discoveryPort;
 
+    /**
+     * commandPort the device is listening on this port for incoming commands
+     */
+    public int commandPort;
+
+    /**
+     * dataPort the device is listening on this port for incoming data
+     */
+    public int dataPort;
 
     /**
      * ip address
@@ -28,13 +37,25 @@ public class NetworkDevice implements Serializable {
     /**
      * Create a new, fully defined, NetworkDevice using the given parameters
      * @param name human readable name
-     * @param port port the device uses
+     * @param discoveryPort discoveryPort the device is listening on this port for server discovery purposes
+     * @param commandPort the device is listening on this port for incoming commands
+     * @param dataPort the device is listening on this port for incoming data
      * @param address ip address
      */
-    public NetworkDevice(String name, int port, String address){
+    public NetworkDevice(String name, int discoveryPort, int commandPort, int dataPort, String address){
         this.name = name;
-        this.port = port;
+        this.discoveryPort = discoveryPort;
         this.address = address;
+    }
+
+    /**
+     * Create a new NetworkDevice which will announce itself as "name" who may be contacted using commandPort and dataPort
+     * @param name human readable name
+     * @param commandPort the device is listening on this port for incoming commands
+     * @param dataPort the device is listening on this port for incoming data
+     */
+    public NetworkDevice(String name, int commandPort, int dataPort){
+        this(name, -1, commandPort, dataPort, "invalid");
     }
 
     /**
@@ -42,7 +63,7 @@ public class NetworkDevice implements Serializable {
      * @param name human readable name
      */
     public NetworkDevice(String name){
-        this(name, -1, "invalid");
+        this(name, -1, -1, -1, "invalid");
     }
 
     /**
@@ -60,8 +81,8 @@ public class NetworkDevice implements Serializable {
     }
 
     /**
-     * Checks this device for total equivalence (eg name, port and address)
-     * @return true if this device identifies itself as the obj and uses the same address and port
+     * Checks this device for total equivalence (eg name, discoveryPort and address)
+     * @return true if this device identifies itself as the obj and uses the same address and discoveryPort
      */
     @Override
     public boolean equals(Object obj) {
@@ -69,8 +90,9 @@ public class NetworkDevice implements Serializable {
         if(!(obj instanceof NetworkDevice))
             return false;
 
-        // for equality, all server parameters must be the same
+        // for equality, only the name and address must be the same. thus, a device can have multiple servers,
+        // and a name may be used multiple times in the same network
         NetworkDevice server = (NetworkDevice) obj;
-        return address.equals(server.address) && name.equals(server.name) && port == server.port;
+        return address.equals(server.address) && name.equals(server.name);
     }
 }

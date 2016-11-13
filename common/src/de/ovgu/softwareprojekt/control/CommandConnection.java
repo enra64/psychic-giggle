@@ -2,7 +2,6 @@ package de.ovgu.softwareprojekt.control;
 
 import de.ovgu.softwareprojekt.control.commands.Command;
 
-import javax.naming.ldap.Control;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -11,7 +10,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 
-public class ControlConnection implements CommandSink, CommandSource {
+public class CommandConnection implements CommandSink, CommandSource {
     /**
      * This listener must be notified of new commands arriving
      */
@@ -25,39 +24,56 @@ public class ControlConnection implements CommandSink, CommandSource {
     /**
      * This host should receive the outbound commands
      */
-    private InetAddress mRemoteHost;
+    private InetAddress mRemoteHost = null;
 
     /**
-     * This is the port where outbound commands should arrive at {@link #mRemoteHost}
+     * This is the discoveryPort where outbound commands should arrive at {@link #mRemoteHost}
      */
-    private int mRemotePort;
+    private int mRemotePort = -1;
 
     /**
-     * This is the port where incoming commands are expected to arrive
+     * This is the discoveryPort where incoming commands are expected to arrive
      */
-    private int mLocalPort;
+    private int mLocalPort = -1;
 
     /**
-     * New control connection
-     *
-     * @param remoteHost         This host should receive the outbound commands
-     * @param remotePort         This is the port where outbound commands should arrive at remoteHost
-     * @param localListeningPort This is the port where incoming commands are expected to arrive
+     * New control connection. The local listening port can be retrieved using getLocalPort(). The remote host and port
+     * may be set using {@link }
      */
-    public ControlConnection(InetAddress remoteHost, int remotePort, int localListeningPort) {
-        mLocalPort = localListeningPort;
-        mRemoteHost = remoteHost;
-        mRemotePort = remotePort;
+    public CommandConnection() throws IOException {
+        mIncomingServer = new CommandServer(this);
     }
 
     /**
-     * Use this function to send a command to the peer
+     * Retrieve the port this command connection is listening on
+     */
+    public int getLocalPort() {
+        return mIncomingServer.getLocalPort();
+    }
+
+    /**
+     * Configure the remote host
+     *
+     * @param host host identification of the remote
+     * @param port port the remote is listening on
+     */
+    public void setRemote(InetAddress host, int port) {
+        mRemoteHost = host;
+        mRemotePort = port;
+    }
+
+    /**
+     * Use this function to send a command to the peer. It will assert that {@link #setRemote(InetAddress, int)} has been
+     * used.
      *
      * @param command this command will be received by the peer
      * @throws IOException most probably if the socket is blocked TODO: definitive answer here
      */
     @Override
     public void inputCommand(Command command) throws IOException {
+        // ensure that the remote host is properly configured
+        assert (mRemotePort >= 0 && mRemoteHost != null);
+
         // this is a try-with-resources; it will automatically close its resources when finished, whatever happens.
         try (Socket outboundSocket = new Socket(mRemoteHost, mRemotePort);
              ObjectOutputStream oos = new ObjectOutputStream(outboundSocket.getOutputStream())) {
@@ -70,13 +86,13 @@ public class ControlConnection implements CommandSink, CommandSource {
      */
     @Override
     public void close() {
-        if(mIncomingServer != null)
+        if (mIncomingServer != null)
             mIncomingServer.shutdown();
         mIncomingServer = null;
     }
 
     /**
-     * Set the listener that will be notified of new commands arriving at this ControlConnection
+     * Set the listener that will be notified of new commands arriving at this CommandConnection
      *
      * @param listener the listener that will be notified of new commands
      */
@@ -89,9 +105,9 @@ public class ControlConnection implements CommandSink, CommandSource {
      * Use this to start operations. Does not throw if called multiple times.
      */
     @Override
-    public void start() {
-        if(mIncomingServer == null){
-            mIncomingServer = new CommandServer(this, mLocalPort);
+    public void start() throws IOException {
+        if (mIncomingServer == null) {
+            mIncomingServer = new CommandServer(this);
             mIncomingServer.start();
         }
     }
@@ -101,7 +117,7 @@ public class ControlConnection implements CommandSink, CommandSource {
      *
      * @param command the command we received
      */
-    // this could have been implemented by ControlConnection implementing the OnCommandListener, but because it is an
+    // this could have been implemented by CommandConnection implementing the OnCommandListener, but because it is an
     // interface, it would have polluted our public surface with a method that is destined to be used by inner class
     // workings only.
     private void onCommand(Command command) {
@@ -115,7 +131,7 @@ public class ControlConnection implements CommandSink, CommandSource {
         /**
          * Our listener; called whenever a new SensorData object is received
          */
-        ControlConnection mListener;
+        CommandConnection mListener;
 
         /**
          * true if the server should continue running
@@ -123,13 +139,25 @@ public class ControlConnection implements CommandSink, CommandSource {
         private boolean mRunning = true;
 
         /**
-         * The port we should listen on
+         * Socket we are listening on
+         */
+        private ServerSocket mSocket;
+
+        /**
+         * The discoveryPort we should listen on
          */
         private int mListeningPort;
 
-        CommandServer(ControlConnection listener, int listenPort) {
+        CommandServer(CommandConnection listener) throws IOException {
             mListener = listener;
-            mListeningPort = listenPort;
+
+            // get a socket now so we know which port we are listening on
+            mSocket = new ServerSocket();
+            mListeningPort = mSocket.getLocalPort();
+        }
+
+        int getLocalPort(){
+            return mListeningPort;
         }
 
         /**
@@ -148,11 +176,11 @@ public class ControlConnection implements CommandSink, CommandSource {
             // declare objects that will need to be closed
             ObjectInputStream oinput = null;
 
-            try(ServerSocket listenerSocket = new ServerSocket(mListeningPort);
-                Socket connection = listenerSocket.accept()){
+            try (ServerSocket listenerSocket = new ServerSocket();
+                 Socket connection = listenerSocket.accept()) {
 
                 // notify user of working state
-                System.out.println("command connection on port " + listenerSocket.getLocalPort());
+                System.out.println("command connection on discoveryPort " + listenerSocket.getLocalPort());
 
                 // get an object input stream; this is open as long as connection is open,
                 // so the tcp connection stays open as long as Data is transmitted
@@ -165,6 +193,14 @@ public class ControlConnection implements CommandSink, CommandSource {
                 }
 
             } catch (IOException | ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+
+
+            try {
+                if (mSocket != null)
+                    mSocket.close();
+            } catch (IOException e) {
                 e.printStackTrace();
             }
         }

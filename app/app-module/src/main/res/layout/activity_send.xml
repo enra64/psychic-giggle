@@ -10,4 +10,12 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="de.ovgu.softwareprojektapp.SendActivity">
 
+    <Button
+        android:text="initiate command connection"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"
+        android:id="@+id/button"
+        android:onClick="initiateConnection" />
 </RelativeLayout>
