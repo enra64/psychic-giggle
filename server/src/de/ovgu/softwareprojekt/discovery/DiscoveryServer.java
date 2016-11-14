@@ -1,5 +1,6 @@
 package de.ovgu.softwareprojekt.discovery;
 
+import de.ovgu.softwareprojekt.UdpDataConnection;
 import de.ovgu.softwareprojekt.control.CommandConnection;
 
 import java.io.IOException;
@@ -25,7 +26,7 @@ public class DiscoveryServer extends DiscoveryThread {
      * @param localCommandPort   this port will be announced to any potential remote in the discovery phase. The correct
      *                           parameter can be most easily retrieved by requesting {@link CommandConnection#getLocalPort()}
      * @param localDataPort      this port will be announced to any potential remote in the discovery phase. The correct
-     *                           parameter is still unknown, since //TODO: no data flow has yet been implemented
+     *                           parameter can be most easily retrieved via {@link UdpDataConnection#getLocalPort()}.
      * @param selfName           how to announce this server to any remotes
      */
     public DiscoveryServer(int localDiscoveryPort, int localCommandPort, int localDataPort, String selfName) {

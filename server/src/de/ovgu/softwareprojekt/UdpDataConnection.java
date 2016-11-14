@@ -11,7 +11,7 @@ import java.net.SocketException;
  * This class listens for udp packets containing {@link SensorData} objects, and notifies a listener of new data.
  * The listener must be
  */
-class UdpDataConnection extends Thread implements DataSource {
+public class UdpDataConnection extends Thread implements DataSource {
     /**
      * Incoming sensor data will be forwareded here
      */
