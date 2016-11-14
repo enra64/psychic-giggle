@@ -6,6 +6,8 @@ import java.net.InetAddress;
 import java.net.SocketTimeoutException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import de.ovgu.softwareprojekt.discovery.*;
 
@@ -29,6 +31,11 @@ public class DiscoveryClient extends DiscoveryThread {
     private int mRemotePort;
 
     /**
+     * Timer used to schedule recurring broadcasts
+     */
+    private Timer mRecurringBroadcastTimer = new Timer();;
+
+    /**
      * Create a new DiscoveryClient. In contrast to the DiscoveryServer, the DiscoveryClient does not
      * have to know its command- and data port yet, because we can instantiate those when acutally
      * connecting to the ports supplied in the discovery response sent by the sever.
@@ -42,6 +49,9 @@ public class DiscoveryClient extends DiscoveryThread {
 
         mRemotePort = remotePort;
         mDiscoveryListener = listener;
+
+        // send a new broadcast every four seconds
+        mRecurringBroadcastTimer.scheduleAtFixedRate(new Broadcaster(), 0, 4000);
     }
 
     /**
@@ -53,8 +63,7 @@ public class DiscoveryClient extends DiscoveryThread {
         try {
             setSocket(new DatagramSocket());
 
-            // send our identification data via broadcast
-            sendSelfIdentification(InetAddress.getByName("255.255.255.255"), mRemotePort);
+
 
             // continously check if we should continue listening
             while (isRunning()) {
@@ -85,6 +94,30 @@ public class DiscoveryClient extends DiscoveryThread {
         if (!mCurrentServerList.contains(device)) {
             mCurrentServerList.add(device);
             mDiscoveryListener.onServerListUpdated(mCurrentServerList);
+        }
+    }
+
+    @Override
+    public void close() {
+        super.close();
+
+    }
+
+    /**
+     * This class can be used together with {@link java.util.Timer} to periodically send broadcasts
+     * into the network.
+     */
+    private class Broadcaster extends TimerTask {
+
+        @Override
+        public void run() {
+            // send our identification data via broadcast
+            try {
+                if(getSocket() != null)
+                    sendSelfIdentification(InetAddress.getByName("255.255.255.255"), mRemotePort);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 }

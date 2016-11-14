@@ -66,6 +66,9 @@ public class DiscoveryActivity extends AppCompatActivity implements OnDiscoveryL
                 intent.putExtra(SendActivity.EXTRA_SELF_NAME, NAME);
 
                 DiscoveryActivity.this.startActivity(intent);
+
+                // stop the discovery server
+                mDiscovery.close();
             }
         });
 
