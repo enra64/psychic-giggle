@@ -9,10 +9,13 @@ import java.net.InetAddress;
 
 import de.ovgu.softwareprojekt.control.OnCommandListener;
 import de.ovgu.softwareprojekt.control.commands.Command;
+import de.ovgu.softwareprojekt.control.commands.ConnectionRequestResponse;
 import de.ovgu.softwareprojekt.control.commands.SetSensorCommand;
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
 import de.ovgu.softwareprojektapp.networking.NetworkClient;
 import de.ovgu.softwareprojektapp.sensors.Gyroscope;
+
+import static de.ovgu.softwareprojekt.control.commands.CommandType.SetSensor;
 
 public class SendActivity extends AppCompatActivity implements OnCommandListener {
     // de-magic-stringify the intent extra keys
@@ -107,6 +110,10 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
     public void onCommand(InetAddress origin, Command command) {
         // decide what to do with the command
         switch (command.getCommandType()) {
+            case ConnectionRequestResponse:
+                ConnectionRequestResponse res = (ConnectionRequestResponse) command;
+                // res.grant is true if the connection was
+                // TODO: display connection success
             case SetSensor:
                 // enable or disable a sensor
                 SetSensorCommand com = (SetSensorCommand) command;

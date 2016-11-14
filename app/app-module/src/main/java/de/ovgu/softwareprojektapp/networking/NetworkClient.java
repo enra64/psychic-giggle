@@ -85,6 +85,9 @@ public class NetworkClient implements DataSink {
 
             // we want to send commands to the server
             mCommandConnection.setRemote(mServer);
+
+            // start the listening process
+            mCommandConnection.start();
         } catch (IOException e) {
             e.printStackTrace();
             //TODO: exception handling

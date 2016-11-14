@@ -37,6 +37,8 @@ public class Main {
          */
         private CommandConnection mCommandConnection;
 
+        private Mover mMover;
+
         /**
          * Creates a new server object
          *
@@ -57,6 +59,8 @@ public class Main {
             discoveryServer.start();
 
             System.out.println("discovery server started");
+
+            mMover = new MouseMover();
         }
 
         /**
@@ -119,6 +123,7 @@ public class Main {
                 // TODO: you probably want to listen here with the mousemover
                 public void onData(SensorData data) {
                     System.out.println("received a data object!");
+                    mMover.move(data.data);
                 }
 
                 @Override

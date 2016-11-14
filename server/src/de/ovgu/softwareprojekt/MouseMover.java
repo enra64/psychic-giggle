@@ -24,9 +24,11 @@ public class MouseMover extends Mover {
     public void move(float[] rawData) {
         mousePos = MouseInfo.getPointerInfo().getLocation();
 
+        int yAxis = (int) rawData[0];
+        int xAxis = (int) rawData[2];
         //TODO:
         //add or subtract gyroscop values
-        moveBot.mouseMove(mousePos.x, mousePos.y);
+        moveBot.mouseMove(mousePos.x + xAxis, mousePos.y + yAxis);
     }
 
     /**
