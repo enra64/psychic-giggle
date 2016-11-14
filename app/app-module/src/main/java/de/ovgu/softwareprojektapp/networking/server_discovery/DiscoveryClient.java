@@ -1,11 +1,8 @@
-package de.ovgu.softwareprojektapp.server_discovery;
-
-import android.util.Log;
+package de.ovgu.softwareprojektapp.networking.server_discovery;
 
 import java.io.IOException;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.util.LinkedList;
 import java.util.List;

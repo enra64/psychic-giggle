@@ -12,14 +12,14 @@ public class SetSensorCommand extends Command {
     public SensorType sensorType;
 
     /**
-     * Whether to enable or disable the sensor
+     * Whether to grant or disable the sensor
      */
     public boolean enable;
 
     /**
      * Create a new command to switch a sensor on or off
      * @param type The sensor that should be switched on or off
-     * @param enable Whether to enable or disable the sensor
+     * @param enable Whether to grant or disable the sensor
      */
     public SetSensorCommand(SensorType type, boolean enable) {
         super(CommandType.SetSensor);

@@ -153,7 +153,7 @@ public class CommandConnection {
         private ServerSocket mSocket;
 
         /**
-         * A new CommandServer instance created will open a socket on a random free port to enable listening for commands.
+         * A new CommandServer instance created will open a socket on a random free port to grant listening for commands.
          * TODO: what if the instance is created, but never started? the socket will stay open...
          *
          * @param listener this class will be called when a new command object is received
