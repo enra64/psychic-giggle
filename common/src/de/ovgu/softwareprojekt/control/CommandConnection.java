@@ -110,7 +110,7 @@ public class CommandConnection {
     }
 
     /**
-     * Use this to start operations. Does not throw if called multiple times.
+     * Use this to start listening for commands. Does not throw if called multiple times.
      */
     public void start() throws IOException {
         if (mIncomingServer == null) {

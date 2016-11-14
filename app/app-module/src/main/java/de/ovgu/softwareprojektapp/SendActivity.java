@@ -29,6 +29,9 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
      */
     private Gyroscope mGyroscope = null;
 
+    /**
+     * The network client organises all our communication with the server
+     */
     NetworkClient mNetworkClient;
 
     @Override
@@ -43,8 +46,6 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
                 this
         );
     }
-
-
 
     /**
      * Create a NetworkDevice object from the intent extras
