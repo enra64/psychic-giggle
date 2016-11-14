@@ -70,7 +70,7 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
             mCommandConnection = new CommandConnection(this);
 
             // we want to send commands to the server
-            mCommandConnection.setRemote(mServer.getInetAddress(), mServer.commandPort);
+            mCommandConnection.setRemote(mServer);
         } catch (IOException e) {
             e.printStackTrace();
             //TODO: exception handling
@@ -79,7 +79,7 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
         // create the outbound data connection
         try {
             // send all data to the server to the data port
-            mOutboundDataConnection = new UdpConnection(mServer.getInetAddress(), mServer.dataPort);
+            mOutboundDataConnection = new UdpConnection(mServer);
         } catch (IOException e) {
             e.printStackTrace();
             //TODO: exception handling

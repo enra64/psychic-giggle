@@ -1,6 +1,7 @@
 package de.ovgu.softwareprojekt.control;
 
 import de.ovgu.softwareprojekt.control.commands.Command;
+import de.ovgu.softwareprojekt.discovery.NetworkDevice;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -8,6 +9,7 @@ import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.UnknownHostException;
 
 /**
  * <p>
@@ -61,7 +63,7 @@ public class CommandConnection {
     }
 
     /**
-     * Configure the remote host
+     * Assigns a new remote target for commands
      *
      * @param host host identification of the remote
      * @param port port the remote is listening on
@@ -69,6 +71,15 @@ public class CommandConnection {
     public void setRemote(InetAddress host, int port) {
         mRemoteHost = host;
         mRemotePort = port;
+    }
+
+    /**
+     * Assigns a new remote target for commands
+     *
+     * @param device remote device. must have address and commandport configured!
+     */
+    public void setRemote(NetworkDevice device) throws UnknownHostException {
+        setRemote(device.getInetAddress(), device.commandPort);
     }
 
     /**

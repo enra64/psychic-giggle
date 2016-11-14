@@ -78,7 +78,7 @@ public class Main {
                     ConnectionRequest request = (ConnectionRequest) command;
 
                     try {
-                        // know that we have a connection, we know who to talk to for the commands
+                        // now that we have a connection, we know who to talk to for the commands
                         mCommandConnection.setRemote(origin, request.self.commandPort);
 
                         // for now, immediately let the client begin sending gyroscope data

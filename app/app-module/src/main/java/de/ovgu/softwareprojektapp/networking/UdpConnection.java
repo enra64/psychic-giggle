@@ -12,6 +12,7 @@ import java.nio.channels.DatagramChannel;
 
 import de.ovgu.softwareprojekt.DataSink;
 import de.ovgu.softwareprojekt.SensorData;
+import de.ovgu.softwareprojekt.discovery.NetworkDevice;
 
 /**
  * The UdpConnection class is an UDP implementation of the DataSink interface; it sends all input
@@ -37,10 +38,10 @@ public class UdpConnection implements DataSink {
     /**
      * Initialize the connection using specified port and host
      */
-    public UdpConnection(InetAddress host, int port) throws IOException {
+    public UdpConnection(NetworkDevice server) throws IOException {
         // save host(translated) and port
-        mPort = port;
-        mHost = host;
+        mPort = server.dataPort;
+        mHost = server.getInetAddress();
         mSocket = new DatagramSocket();
     }
 
