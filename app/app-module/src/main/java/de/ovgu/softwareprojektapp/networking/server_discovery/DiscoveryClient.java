@@ -33,7 +33,8 @@ public class DiscoveryClient extends DiscoveryThread {
     /**
      * Timer used to schedule recurring broadcasts
      */
-    private Timer mRecurringBroadcastTimer = new Timer();;
+    private Timer mRecurringBroadcastTimer = new Timer();
+    ;
 
     /**
      * Create a new DiscoveryClient. In contrast to the DiscoveryServer, the DiscoveryClient does not
@@ -49,21 +50,18 @@ public class DiscoveryClient extends DiscoveryThread {
 
         mRemotePort = remotePort;
         mDiscoveryListener = listener;
-
-        // send a new broadcast every four seconds
-        mRecurringBroadcastTimer.scheduleAtFixedRate(new Broadcaster(), 0, 4000);
     }
 
     /**
      * Broadcast our information into the network, and listen to responding servers
-     * TODO: do something intelligent when nothing answers
      */
     @Override
     public void run() {
         try {
             setSocket(new DatagramSocket());
 
-
+            // send a new broadcast every four seconds, beginning now
+            mRecurringBroadcastTimer.scheduleAtFixedRate(new Broadcaster(), 0, 4000);
 
             // continously check if we should continue listening
             while (isRunning()) {
@@ -99,8 +97,11 @@ public class DiscoveryClient extends DiscoveryThread {
 
     @Override
     public void close() {
+        // stop the listening loop
         super.close();
 
+        // stop sending broadcasts
+        mRecurringBroadcastTimer.cancel();
     }
 
     /**
@@ -113,7 +114,7 @@ public class DiscoveryClient extends DiscoveryThread {
         public void run() {
             // send our identification data via broadcast
             try {
-                if(getSocket() != null)
+                if (getSocket() != null)
                     sendSelfIdentification(InetAddress.getByName("255.255.255.255"), mRemotePort);
             } catch (IOException e) {
                 e.printStackTrace();
