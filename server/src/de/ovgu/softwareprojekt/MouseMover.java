@@ -11,7 +11,9 @@ import java.awt.event.InputEvent;
 public class MouseMover extends Mover {
 
     private Point mousePos;
-
+    //TODO: find the best sensitivity
+    private final float SENSITIVITY = 5f;
+    private float customSensitivity = 0f;
    public MouseMover()
    {
        super();
@@ -27,8 +29,8 @@ public class MouseMover extends Mover {
 
         rawData = filter(rawData);
 
-        int yAxis = (int) rawData[ZAXIS];   //Up down movement on screen is achieved my rotating phone by z-axis
-        int xAxis = (int) rawData[XAXIS];
+        int xAxis = (int) rawData[ZAXIS];   //Up down movement on screen is achieved my rotating phone by z-axis
+        int yAxis = (int) rawData[XAXIS];
 
         //TODO: Find out if addition or subtraction works better
         moveBot.mouseMove(mousePos.x + xAxis, mousePos.y + yAxis);
@@ -44,9 +46,9 @@ public class MouseMover extends Mover {
     public float[] filter(float[] rawData) {
         //Multiplying or adding numbers?
         //TODO: filter value should be customizable
-        rawData[XAXIS] *= 1;
-        rawData[YAXIS] *= 1;
-        rawData[ZAXIS] *= 1;
+        rawData[XAXIS] *= (SENSITIVITY +customSensitivity);
+        rawData[YAXIS] *= (SENSITIVITY +customSensitivity);
+        rawData[ZAXIS] *= (SENSITIVITY +customSensitivity);
         return rawData;
     }
 
