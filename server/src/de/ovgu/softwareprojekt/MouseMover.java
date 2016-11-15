@@ -18,26 +18,27 @@ public class MouseMover extends Mover {
 
     /**
      * moves Mouse according to rawData
-     * @param rawData x,y,zAxis of gyroscope
+     * @param rawData x-,y-,z-Axis of gyroscope
      */
     @Override
     public void move(float[] rawData) {
         mousePos = MouseInfo.getPointerInfo().getLocation();
 
-        int yAxis = (int) rawData[0];
-        int xAxis = (int) rawData[2];
-        //TODO:
-        //add or subtract gyroscop values
+        int yAxis = (int) rawData[ZAXIS];   //Up down movement on screen is achieved my moving phone by z-axis
+        int xAxis = (int) rawData[XAXIS];
+
+        //TODO: Find out if addition or subtraction works better
         moveBot.mouseMove(mousePos.x + xAxis, mousePos.y + yAxis);
     }
 
     /**
      *  takes rawData[] and turns it into useful data
      * @param rawData unfiltered gyroscope data
-     * @return  an array that can be turned into integer values
+     * @return  a float array which has useful axes values
      */
     @Override
+    //TODO: implement method
     public float[] filter(float[] rawData) {
-        return new float[0];
+        return rawData;
     }
 }

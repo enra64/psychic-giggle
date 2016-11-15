@@ -9,6 +9,12 @@ import java.awt.*;
  */
 public abstract class Mover{
 
+    //methods work with float arrays which contain various sensor data of directional axes
+    protected final int XAXIS = 0;
+    protected final int YAXIS = 1;
+    protected final int ZAXIS = 2;
+
+    //moveBot is responsible for emulating device inputs
     protected Robot moveBot;
 
     public Mover(){
@@ -20,9 +26,8 @@ public abstract class Mover{
         }
     }
 
-    //Maybe change parameters later?
+
     public abstract void move(float[] rawData);
 
     public abstract float[] filter(float[] rawData);
-
 }
