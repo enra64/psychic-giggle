@@ -27,5 +27,9 @@ dependencies {
     compile 'com.android.support:appcompat-v7:25.0.0'
     testCompile 'junit:junit:4.12'
     compile files('libs/common.jar')
+<<<<<<< HEAD
     compile files('/home/markus/AndroidStudioProjects/psychic-giggle/app/lib/common.jar')
+=======
+    compile files('C:/Users/Andre/Softwaretest/psychic-giggle/app/lib/common.jar')
+>>>>>>> 495061cee9ac745dc55d7a431b578b43a79cef0e
 }
