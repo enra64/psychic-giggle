@@ -1,6 +1,7 @@
 package de.ovgu.softwareprojekt;
 
 import java.awt.*;
+import java.awt.event.InputEvent;
 
 /**
  * Created by Ulrich on 11.11.2016.
@@ -24,7 +25,9 @@ public class MouseMover extends Mover {
     public void move(float[] rawData) {
         mousePos = MouseInfo.getPointerInfo().getLocation();
 
-        int yAxis = (int) rawData[ZAXIS];   //Up down movement on screen is achieved my moving phone by z-axis
+        rawData = filter(rawData);
+
+        int yAxis = (int) rawData[ZAXIS];   //Up down movement on screen is achieved my rotating phone by z-axis
         int xAxis = (int) rawData[XAXIS];
 
         //TODO: Find out if addition or subtraction works better
@@ -39,6 +42,25 @@ public class MouseMover extends Mover {
     @Override
     //TODO: implement method
     public float[] filter(float[] rawData) {
+        //Multiplying or adding numbers?
+        //TODO: filter value should be customizable
+        rawData[XAXIS] *= 1;
+        rawData[YAXIS] *= 1;
+        rawData[ZAXIS] *= 1;
         return rawData;
+    }
+
+    /**
+     * This Method recieves a boolean and if true presses the left mouseButton and releases the button again if false
+     * @param isClicked
+     */
+    public void click(boolean isClicked)
+    {
+        //TODO: Check later if this actually works as intended
+        if(isClicked)
+            moveBot.mousePress(InputEvent.BUTTON1_DOWN_MASK);
+
+        else
+            moveBot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
     }
 }
