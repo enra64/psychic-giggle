@@ -27,8 +27,8 @@ public class MouseMover extends Mover {
 
         rawData = filter(rawData);
 
-        int yAxis = (int) rawData[ZAXIS];   //Up down movement on screen is achieved my rotating phone by z-axis
-        int xAxis = (int) rawData[XAXIS];
+        int xAxis = (int) rawData[ZAXIS];   //Up down movement on screen is achieved my rotating phone by z-axis
+        int yAxis = (int) rawData[XAXIS];
 
         //TODO: Find out if addition or subtraction works better
         moveBot.mouseMove(mousePos.x + xAxis, mousePos.y + yAxis);
