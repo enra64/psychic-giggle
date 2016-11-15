@@ -13,56 +13,16 @@ import de.ovgu.softwareprojekt.SensorData;
 import de.ovgu.softwareprojekt.SensorType;
 
 /**
- * This class implements the DataSource interface for the accelerometer sensor
+ * {@link DataSource} feeding accelerometer data
  */
-class Accelerometer implements DataSource, SensorEventListener {
+class Accelerometer extends AbstractSensor {
     /**
-     * The android sensor manager used to connect to the accelerometer
+     * Create an accelerometer; does not start anything yet, use {@link #start()} or {@link #setRunning(boolean)}
+     * to start receiving events
+     *
+     * @param context    android system context needed for sensors
      */
-    private final SensorManager mSensorManager;
-
-    /**
-     * The sink data should be pushed into
-     */
-    private DataSink mSink;
-
-    Accelerometer(Context context){
-        mSensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
-    }
-
-    @Override
-    public void setDataSink(DataSink dataSink) {
-        mSink = dataSink;
-    }
-
-    @Override
-    public void start() {
-        Sensor sensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        mSensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_GAME);
-    }
-
-    @Override
-    public void close() {
-        mSensorManager.unregisterListener(this);
-    }
-
-    @Override
-    public void onSensorChanged(SensorEvent sensorEvent) {
-        // if no sink is set yet, discard the SensorEvent
-        if(mSink == null)
-            return;
-
-        // push data into sink
-        mSink.onData(
-                new SensorData(
-                        SensorType.Accelerometer,
-                        sensorEvent.values,
-                        sensorEvent.timestamp,
-                        sensorEvent.accuracy));
-    }
-
-    @Override
-    public void onAccuracyChanged(Sensor sensor, int i) {
-
+    Accelerometer(Context context) {
+        super(context, Sensor.TYPE_ACCELEROMETER);
     }
 }
