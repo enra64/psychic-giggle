@@ -4,18 +4,23 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 
+import java.io.IOException;
 import java.net.InetAddress;
 
 import de.ovgu.softwareprojekt.control.OnCommandListener;
 import de.ovgu.softwareprojekt.control.commands.Command;
+import de.ovgu.softwareprojekt.control.commands.CommandType;
 import de.ovgu.softwareprojekt.control.commands.ConnectionRequestResponse;
+import de.ovgu.softwareprojekt.control.commands.EndConnection;
 import de.ovgu.softwareprojekt.control.commands.SetSensorCommand;
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
 import de.ovgu.softwareprojekt.misc.ExceptionListener;
 import de.ovgu.softwareprojektapp.networking.NetworkClient;
 import de.ovgu.softwareprojektapp.sensors.Gyroscope;
 
-public class SendActivity extends AppCompatActivity implements OnCommandListener, ExceptionListener {
+import static de.ovgu.softwareprojekt.control.commands.CommandType.SetSensor;
+
+public class SendActivity extends AppCompatActivity implements OnCommandListener {
     // de-magic-stringify the intent extra keys
     static final String EXTRA_SERVER_NAME = "Name";
     static final String EXTRA_SERVER_ADDRESS = "Address";
@@ -126,10 +131,5 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
             default:
                 break;
         }
-    }
-
-    @Override
-    public void onException(Object origin, Exception exception, String info) {
-
     }
 }

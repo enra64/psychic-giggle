@@ -4,6 +4,7 @@ import de.ovgu.softwareprojekt.control.CommandConnection;
 import de.ovgu.softwareprojekt.control.OnCommandListener;
 import de.ovgu.softwareprojekt.control.commands.Command;
 import de.ovgu.softwareprojekt.control.commands.ConnectionRequest;
+import de.ovgu.softwareprojekt.control.commands.EndConnection;
 import de.ovgu.softwareprojekt.control.commands.SetSensorCommand;
 import de.ovgu.softwareprojekt.discovery.DiscoveryServer;
 
@@ -91,6 +92,13 @@ public class Main {
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
+                    break;
+                case EndConnection:
+
+                    mDataConnection.close();
+                    mCommandConnection.close();
+                    //TODO: implement behavior when closed
+
                     break;
 
                 // ignore unhandled commands (like SetSensorCommand)

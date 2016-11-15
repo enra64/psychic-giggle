@@ -13,6 +13,8 @@ public class MouseMover extends Mover {
     private Point mousePos;
     //TODO: find the best sensitivity
     private final float SENSITIVITY = 5f;
+    //TODO: user sensitivity feature in app
+    //allow user to set own sensitivity
     private float customSensitivity = 0f;
    public MouseMover()
    {
@@ -20,7 +22,7 @@ public class MouseMover extends Mover {
    }
 
     /**
-     * moves Mouse according to rawData
+     * moves Mouse atccording to rawData
      * @param rawData x-,y-,z-Axis of gyroscope
      */
     @Override
