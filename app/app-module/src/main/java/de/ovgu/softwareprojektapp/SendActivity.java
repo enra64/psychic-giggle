@@ -20,7 +20,7 @@ import de.ovgu.softwareprojektapp.sensors.Gyroscope;
 
 import static de.ovgu.softwareprojekt.control.commands.CommandType.SetSensor;
 
-public class SendActivity extends AppCompatActivity implements OnCommandListener {
+public class SendActivity extends AppCompatActivity implements OnCommandListener, ExceptionListener {
     // de-magic-stringify the intent extra keys
     static final String EXTRA_SERVER_NAME = "Name";
     static final String EXTRA_SERVER_ADDRESS = "Address";
@@ -131,5 +131,10 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
             default:
                 break;
         }
+    }
+
+    @Override
+    public void onException(Object origin, Exception exception, String info) {
+        //TODO: wörkwörk markus
     }
 }
