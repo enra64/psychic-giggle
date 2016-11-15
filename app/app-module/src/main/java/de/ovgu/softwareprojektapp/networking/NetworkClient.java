@@ -1,6 +1,7 @@
 package de.ovgu.softwareprojektapp.networking;
 
 import android.os.AsyncTask;
+import android.os.Build;
 
 import java.io.IOException;
 
@@ -12,6 +13,8 @@ import de.ovgu.softwareprojekt.control.OnCommandListener;
 import de.ovgu.softwareprojekt.control.commands.Command;
 import de.ovgu.softwareprojekt.control.commands.ConnectionRequest;
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
+import de.ovgu.softwareprojekt.misc.ExceptionListener;
+import de.ovgu.softwareprojektapp.BuildConfig;
 
 /**
  * The network client contains both the command and the data connection. Use {@link #sendCommand(Command)}
@@ -20,7 +23,7 @@ import de.ovgu.softwareprojekt.discovery.NetworkDevice;
  * so you can simply give it to {@link DataSource DataSources}. You will be notified of incoming commands
  * via the listener you had to supply in the constructor.
  */
-public class NetworkClient implements DataSink {
+public class NetworkClient implements DataSink, ExceptionListener {
     /**
      * Stores necessary information about our server, like data port, command port, and its address
      */
@@ -48,6 +51,11 @@ public class NetworkClient implements DataSink {
     private OnCommandListener mCommandListener;
 
     /**
+     * listener for exceptions interesting to the user
+     */
+    private ExceptionListener mExceptionListener = null;
+
+    /**
      * Create a new network client. To connect to a server, call {@link #requestConnection()}, and wait
      * for an answer from the server
      *
@@ -55,7 +63,7 @@ public class NetworkClient implements DataSink {
      * @param selfName        how to identify the client
      * @param commandListener who should be called back for incoming commands
      */
-    public NetworkClient(NetworkDevice server, String selfName, OnCommandListener commandListener) {
+    public NetworkClient(NetworkDevice server, String selfName, OnCommandListener commandListener, ExceptionListener exceptionListener) {
         // store the server device information
         mServer = server;
 
@@ -72,6 +80,9 @@ public class NetworkClient implements DataSink {
                 mCommandConnection.getLocalPort(),
                 mOutboundDataConnection.getLocalPort()
         );
+
+        // store who wants to be notified of exceptions
+        mExceptionListener = exceptionListener;
     }
 
     /**
@@ -89,8 +100,7 @@ public class NetworkClient implements DataSink {
             // start the listening process
             mCommandConnection.start();
         } catch (IOException e) {
-            e.printStackTrace();
-            //TODO: exception handling
+            mExceptionListener.onException(this, e, "NetworkClient: IOException when trying to initialise CommandConnection");
         }
     }
 
@@ -101,24 +111,28 @@ public class NetworkClient implements DataSink {
         // create the outbound data connection
         try {
             // send all data to the server to the data port
-            mOutboundDataConnection = new UdpConnection(mServer);
+            mOutboundDataConnection = new UdpConnection(mServer, this);
         } catch (IOException e) {
-            e.printStackTrace();
-            //TODO: exception handling
+            mExceptionListener.onException(this, e, "NetworkClient: IOException when trying to initialise DataConnection");
         }
     }
 
     /**
      * Request a connection with the configured server
-     *
-     * @throws IOException if the command connection could not be started
      */
-    public void requestConnection() throws IOException {
-        // start listening for incoming commands
-        mCommandConnection.start();
+    public void requestConnection() {
+        try {
+            // start listening for incoming commands
+            mCommandConnection.start();
 
-        // send a connection request
-        sendCommand(new ConnectionRequest(mSelf));
+            // send a connection request
+            sendCommand(new ConnectionRequest(mSelf));
+
+        } catch (IOException e) {
+            mExceptionListener.onException(this, e, "NetworkClient: could not start listening for commands");
+        }
+
+
     }
 
     /**
@@ -148,6 +162,12 @@ public class NetworkClient implements DataSink {
         mOutboundDataConnection.close();
     }
 
+    @Override
+    public void onException(Object origin, Exception exception, String info) {
+        // relay the exception, but set us as origin, because the UdpConnection instance is not known to users
+        mExceptionListener.onException(this, exception, origin.getClass().toString() + info);
+    }
+
     /**
      * This class is a wrapper for {@link CommandConnection#sendCommand(Command) sending commands}
      * to avoid dealing with network on the ui thread. Use as follows:
@@ -163,6 +183,10 @@ public class NetworkClient implements DataSink {
                 mCommandConnection.sendCommand(commands[0]);
             } catch (IOException e) {
                 e.printStackTrace();
+                mExceptionListener.onException(
+                        NetworkClient.this,
+                        e,
+                        "NetworkClient: exception when trying to send a command");
             }
             return null;
         }

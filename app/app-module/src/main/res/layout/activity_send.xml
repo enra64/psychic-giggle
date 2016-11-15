@@ -17,5 +17,15 @@
         android:layout_centerVertical="true"
         android:layout_centerHorizontal="true"
         android:id="@+id/button"
-        android:onClick="initiateConnection" />
+        android:onClick="initiateConnection (SendActivity)" />
+
+    <Button
+        android:text="Cancel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="72dp"
+        android:id="@+id/cancelButton"
+        android:onClick="endConnection()" />
 </RelativeLayout>

@@ -9,15 +9,18 @@ import java.net.InetAddress;
 
 import de.ovgu.softwareprojekt.control.OnCommandListener;
 import de.ovgu.softwareprojekt.control.commands.Command;
+import de.ovgu.softwareprojekt.control.commands.CommandType;
 import de.ovgu.softwareprojekt.control.commands.ConnectionRequestResponse;
+import de.ovgu.softwareprojekt.control.commands.EndConnection;
 import de.ovgu.softwareprojekt.control.commands.SetSensorCommand;
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
+import de.ovgu.softwareprojekt.misc.ExceptionListener;
 import de.ovgu.softwareprojektapp.networking.NetworkClient;
 import de.ovgu.softwareprojektapp.sensors.Gyroscope;
 
 import static de.ovgu.softwareprojekt.control.commands.CommandType.SetSensor;
 
-public class SendActivity extends AppCompatActivity implements OnCommandListener {
+public class SendActivity extends AppCompatActivity implements OnCommandListener, ExceptionListener {
     // de-magic-stringify the intent extra keys
     static final String EXTRA_SERVER_NAME = "Name";
     static final String EXTRA_SERVER_ADDRESS = "Address";
@@ -46,6 +49,7 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
         mNetworkClient = new NetworkClient(
                 parseServer(),
                 getIntent().getExtras().getString(EXTRA_SELF_NAME),
+                this,
                 this
         );
     }
@@ -68,13 +72,8 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
      * requests a connection with the server given as an intent extra
      */
     public void initiateConnection(View v) {
-        try {
-            // begin listening for commands
-            mNetworkClient.requestConnection();
-        } catch (IOException e) {
-            e.printStackTrace();
-            //TODO: exception handling
-        }
+        // begin listening for commands
+        mNetworkClient.requestConnection();
     }
 
     /**
@@ -132,5 +131,10 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
             default:
                 break;
         }
+    }
+
+    @Override
+    public void onException(Object origin, Exception exception, String info) {
+        //TODO: wörkwörk markus
     }
 }
