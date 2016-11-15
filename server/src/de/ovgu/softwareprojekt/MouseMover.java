@@ -11,7 +11,9 @@ import java.awt.event.InputEvent;
 public class MouseMover extends Mover {
 
     private Point mousePos;
-
+    //TODO: find the best sensitivity
+    private final float SENSITIVITY = 5f;
+    private float customSensitivity = 0f;
    public MouseMover()
    {
        super();
@@ -44,9 +46,9 @@ public class MouseMover extends Mover {
     public float[] filter(float[] rawData) {
         //Multiplying or adding numbers?
         //TODO: filter value should be customizable
-        rawData[XAXIS] *= 1;
-        rawData[YAXIS] *= 1;
-        rawData[ZAXIS] *= 1;
+        rawData[XAXIS] *= (SENSITIVITY +customSensitivity);
+        rawData[YAXIS] *= (SENSITIVITY +customSensitivity);
+        rawData[ZAXIS] *= (SENSITIVITY +customSensitivity);
         return rawData;
     }
 
