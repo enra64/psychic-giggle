@@ -9,7 +9,9 @@ import java.net.InetAddress;
 
 import de.ovgu.softwareprojekt.control.OnCommandListener;
 import de.ovgu.softwareprojekt.control.commands.Command;
+import de.ovgu.softwareprojekt.control.commands.CommandType;
 import de.ovgu.softwareprojekt.control.commands.ConnectionRequestResponse;
+import de.ovgu.softwareprojekt.control.commands.EndConnection;
 import de.ovgu.softwareprojekt.control.commands.SetSensorCommand;
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
 import de.ovgu.softwareprojektapp.networking.NetworkClient;
@@ -128,9 +130,21 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
                 }
 
                 break;
+
+
             // ignore unhandled commands
             default:
                 break;
         }
+    }
+
+    /**
+     * This function is called by a button. It sends a command to the server which then
+     * closes the connection
+     */
+    public void endConnection(){
+
+        mNetworkClient.sendCommand(new EndConnection());
+        super.onBackPressed();
     }
 }

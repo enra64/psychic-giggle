@@ -18,7 +18,7 @@ public class MouseMover extends Mover {
    }
 
     /**
-     * moves Mouse according to rawData
+     * moves Mouse atccording to rawData
      * @param rawData x-,y-,z-Axis of gyroscope
      */
     @Override
