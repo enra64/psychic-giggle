@@ -22,7 +22,7 @@ public abstract class DiscoveryThread extends Thread {
     /**
      * True if the thread should keep running
      */
-    private boolean mKeepRunning = true;
+    private boolean mIsRunning = false;
 
     /**
      * True if the thread was started once
@@ -98,6 +98,7 @@ public abstract class DiscoveryThread extends Thread {
     @Override
     public synchronized void start() {
         mHasRun = true;
+        mIsRunning = true;
         super.start();
     }
 
@@ -146,7 +147,7 @@ public abstract class DiscoveryThread extends Thread {
      * @return true if the server will continue running
      */
     public boolean isRunning() {
-        return mKeepRunning;
+        return mIsRunning;
     }
 
     /**
@@ -179,6 +180,6 @@ public abstract class DiscoveryThread extends Thread {
      * Signal the running while loop to stop
      */
     public void close() {
-        mKeepRunning = false;
+        mIsRunning = false;
     }
 }
