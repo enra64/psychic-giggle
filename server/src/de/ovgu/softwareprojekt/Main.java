@@ -94,7 +94,6 @@ public class Main {
                     }
                     break;
                 case EndConnection:
-
                     mDataConnection.close();
                     mCommandConnection.close();
                     //TODO: implement behavior when closed
