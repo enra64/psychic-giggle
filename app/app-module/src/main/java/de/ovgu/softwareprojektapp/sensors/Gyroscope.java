@@ -13,56 +13,16 @@ import de.ovgu.softwareprojekt.SensorData;
 import de.ovgu.softwareprojekt.SensorType;
 
 /**
- * This class implements the DataSource interface for the accelerometer sensor
+ * {@link DataSource} for gyroscope data
  */
-public class Gyroscope implements DataSource, SensorEventListener {
+public class Gyroscope extends AbstractSensor {
     /**
-     * The android sensor manager used to connect to the accelerometer
+     * Create a gyroscope; does not start anything yet, use {@link #start()} or {@link #setRunning(boolean)}
+     * to start receiving events
+     *
+     * @param context    android system context needed for sensors
      */
-    private final SensorManager mSensorManager;
-
-    /**
-     * The sink data should be pushed into
-     */
-    private DataSink mSink;
-
-    public Gyroscope(Context context){
-        mSensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
-    }
-
-    @Override
-    public void setDataSink(DataSink dataSink) {
-        mSink = dataSink;
-    }
-
-    @Override
-    public void start() {
-        Sensor sensor = mSensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
-        mSensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_GAME);
-    }
-
-    @Override
-    public void close() {
-        mSensorManager.unregisterListener(this);
-    }
-
-    @Override
-    public void onSensorChanged(SensorEvent sensorEvent) {
-        // if no sink is set yet, discard the SensorEvent
-        if(mSink == null)
-            return;
-
-        // push data into sink
-        mSink.onData(
-                new SensorData(
-                        SensorType.Gyroscope,
-                        sensorEvent.values,
-                        sensorEvent.timestamp,
-                        sensorEvent.accuracy));
-    }
-
-    @Override
-    public void onAccuracyChanged(Sensor sensor, int i) {
-
+    public Gyroscope(Context context) {
+        super(context, Sensor.TYPE_GYROSCOPE);
     }
 }

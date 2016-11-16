@@ -52,6 +52,12 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
                 this,
                 this
         );
+
+        // prepare the gyroscope
+        mGyroscope = new Gyroscope(this);
+
+        // make the gyroscope directly output to the network
+        mGyroscope.setDataSink(mNetworkClient);
     }
 
     /**
@@ -77,26 +83,21 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
     }
 
     /**
+     * This function is called by a button. It sends a command to the server which then closes the
+     * connection. It also stops the activity.
+     */
+    public void endConnection(View v){
+        mNetworkClient.sendCommand(new EndConnection());
+        super.onBackPressed();
+    }
+
+    /**
      * Enable or disable the gyroscope
      * @param enable true if the gyroscope must be enabled
      */
     private void setGyroscope(boolean enable) {
-        if (enable) {
-            // create a new gyroscope if that has not yet happened
-            if (mGyroscope == null)
-                mGyroscope = new Gyroscope(this);
-
-            // make the gyroscope directly output to the network
-            mGyroscope.setDataSink(mNetworkClient);
-
-            // start listening to gyroscope events
-            mGyroscope.start();
-
-        } else {
-            // disable the gyroscope
-            mGyroscope.close();
-            mGyroscope = null;
-        }
+        // configure the gyroscope run state
+        mGyroscope.setRunning(enable);
     }
 
     /**
@@ -111,7 +112,7 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
         switch (command.getCommandType()) {
             case ConnectionRequestResponse:
                 ConnectionRequestResponse res = (ConnectionRequestResponse) command;
-                // res.grant is true if the connection was
+                // res.grant is true if the connection was allowed
                 // TODO: display connection success
             case SetSensor:
                 // enable or disable a sensor
