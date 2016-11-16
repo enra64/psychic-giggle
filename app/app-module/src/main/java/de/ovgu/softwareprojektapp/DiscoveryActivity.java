@@ -9,13 +9,15 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 
+import java.io.IOException;
 import java.util.List;
 
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
 import de.ovgu.softwareprojekt.discovery.OnDiscoveryListener;
+import de.ovgu.softwareprojekt.misc.ExceptionListener;
 import de.ovgu.softwareprojektapp.networking.DiscoveryClient;
 
-public class DiscoveryActivity extends AppCompatActivity implements OnDiscoveryListener {
+public class DiscoveryActivity extends AppCompatActivity implements OnDiscoveryListener, ExceptionListener {
 
     Button mStartDiscovery;
     ListView mPossibleConnections;
@@ -35,9 +37,6 @@ public class DiscoveryActivity extends AppCompatActivity implements OnDiscoveryL
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_discovery);
-
-        // initialise discovery thread with listener, remote discovery listening port, and our name
-        mDiscovery = new DiscoveryClient(this, 8888, NAME);
 
         mStartDiscovery = (Button) findViewById(R.id.startDiscovery);
         mStartDiscovery.setOnClickListener(new View.OnClickListener() {
@@ -78,10 +77,19 @@ public class DiscoveryActivity extends AppCompatActivity implements OnDiscoveryL
      */
     public void startDiscovery() {
         // only start new discovery if not running yet
-        if (!mDiscovery.isRunning()) {
+        if (mDiscovery == null || !mDiscovery.isRunning()) {
             // create a new discovery thread, if this one already completed
-            if (mDiscovery.hasRun())
-                mDiscovery = new DiscoveryClient(DiscoveryActivity.this, 8888, NAME);
+            if (mDiscovery == null || mDiscovery.hasRun())
+                try {
+                    mDiscovery = new DiscoveryClient(
+                            DiscoveryActivity.this,
+                            DiscoveryActivity.this,
+                            DiscoveryActivity.this,
+                            8888,
+                            NAME);
+                } catch (IOException e) {
+                    onException(this, e, "DiscoveryActivity: could not create DiscoveryClient");
+                }
 
             // start discovery
             mDiscovery.start();
@@ -103,9 +111,14 @@ public class DiscoveryActivity extends AppCompatActivity implements OnDiscoveryL
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                ArrayAdapter<String> serverNameAdapter = new ArrayAdapter<String>(DiscoveryActivity.this, android.R.layout.simple_list_item_1, stringNames);
+                ArrayAdapter<String> serverNameAdapter = new ArrayAdapter<>(DiscoveryActivity.this, android.R.layout.simple_list_item_1, stringNames);
                 mPossibleConnections.setAdapter(serverNameAdapter);
             }
         });
+    }
+
+    @Override
+    public void onException(Object origin, Exception exception, String info) {
+        //TODO: wörkwörk markus
     }
 }
