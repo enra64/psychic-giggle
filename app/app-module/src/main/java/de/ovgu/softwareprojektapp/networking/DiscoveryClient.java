@@ -1,5 +1,7 @@
 package de.ovgu.softwareprojektapp.networking;
 
+import android.content.Context;
+
 import java.io.IOException;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
@@ -10,6 +12,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import de.ovgu.softwareprojekt.discovery.*;
+import de.ovgu.softwareprojekt.misc.ExceptionListener;
 
 /**
  * This thread manages sending discovery request packages and receiving answers from servers
@@ -21,14 +24,20 @@ public class DiscoveryClient extends DiscoveryThread {
     private OnDiscoveryListener mDiscoveryListener;
 
     /**
+     * Interface for listening to exceptions. Exceptions occurring in a multi-threaded environment can
+     * be easily handled through this.
+     */
+    private ExceptionListener mExceptionListener;
+
+    /**
      * Current list of known servers
      */
     private List<NetworkDevice> mCurrentServerList = new LinkedList<>();
 
     /**
-     * The port the server listens on for receiving broadcasts
+     * Our broadcaster handles the recurring self identification broadcasts.
      */
-    private int mRemotePort;
+    private Broadcaster mBroadcaster;
 
     /**
      * Timer used to schedule recurring broadcasts
@@ -44,11 +53,17 @@ public class DiscoveryClient extends DiscoveryThread {
      * @param remotePort the port the discovery server listens on
      * @param selfName   the name this device should announce itself as
      */
-    public DiscoveryClient(OnDiscoveryListener listener, int remotePort, String selfName) {
+    public DiscoveryClient(OnDiscoveryListener listener, ExceptionListener exceptionListener, Context context, int remotePort, String selfName) throws IOException {
         super(selfName);
 
-        mRemotePort = remotePort;
+        // save who wants to be notified of new servers
         mDiscoveryListener = listener;
+
+        // save who wants to be notified of exceptions
+        mExceptionListener = exceptionListener;
+
+        // the broadcaster handles everything related to sending broadcasts
+        mBroadcaster = new Broadcaster(context, this, mExceptionListener, remotePort);
     }
 
     /**
@@ -60,7 +75,7 @@ public class DiscoveryClient extends DiscoveryThread {
             setSocket(new DatagramSocket());
 
             // send a new broadcast every four seconds, beginning now
-            mRecurringBroadcastTimer.scheduleAtFixedRate(new Broadcaster(), 0, 4000);
+            mRecurringBroadcastTimer.scheduleAtFixedRate(mBroadcaster, 0, 4000);
 
             // continously check if we should continue listening
             while (isRunning()) {
@@ -103,21 +118,5 @@ public class DiscoveryClient extends DiscoveryThread {
         mRecurringBroadcastTimer.cancel();
     }
 
-    /**
-     * This class can be used together with {@link java.util.Timer} to periodically send broadcasts
-     * into the network.
-     */
-    private class Broadcaster extends TimerTask {
 
-        @Override
-        public void run() {
-            // send our identification data via broadcast
-            try {
-                if (getSocket() != null)
-                    sendSelfIdentification(InetAddress.getByName("255.255.255.255"), mRemotePort);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
 }

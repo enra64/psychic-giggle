@@ -76,7 +76,7 @@ public abstract class DiscoveryThread extends Thread {
      * @param targetPort at which discoveryPort the message should arrive on targetHost
      * @throws IOException if the identification message could not be sent
      */
-    protected void sendSelfIdentification(InetAddress targetHost, int targetPort) throws IOException {
+    public void sendSelfIdentification(InetAddress targetHost, int targetPort) throws IOException {
         // create a new object output stream
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         ObjectOutputStream os = new ObjectOutputStream(outputStream);
