@@ -13,7 +13,7 @@ import java.util.List;
 
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
 import de.ovgu.softwareprojekt.discovery.OnDiscoveryListener;
-import de.ovgu.softwareprojektapp.networking.server_discovery.DiscoveryClient;
+import de.ovgu.softwareprojektapp.networking.DiscoveryClient;
 
 public class DiscoveryActivity extends AppCompatActivity implements OnDiscoveryListener {
 
