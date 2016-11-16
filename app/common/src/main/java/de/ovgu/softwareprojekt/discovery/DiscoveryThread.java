@@ -25,6 +25,11 @@ public abstract class DiscoveryThread extends Thread {
     private boolean mKeepRunning = true;
 
     /**
+     * True if the thread was started once
+     */
+    private boolean mHasRun = false;
+
+    /**
      * A NetworkDevice that identifies the device this Object is running on
      */
     private NetworkDevice mSelfDeviceId;
@@ -32,9 +37,10 @@ public abstract class DiscoveryThread extends Thread {
     /**
      * Create a new DiscoveryThread when you already know your command- and data port, for example for use in a server
      * announcing where to connect.
-     * @param selfName the discovery thread will announce this name to other devices seeking partners in the network
+     *
+     * @param selfName         the discovery thread will announce this name to other devices seeking partners in the network
      * @param localCommandPort a command server must be listening on this port to receive further communication
-     * @param localDataPort a data server should be listening here to receive further communication
+     * @param localDataPort    a data server should be listening here to receive further communication
      */
     public DiscoveryThread(String selfName, int localCommandPort, int localDataPort) {
         mSelfDeviceId = new NetworkDevice(selfName, localCommandPort, localDataPort);
@@ -85,6 +91,25 @@ public abstract class DiscoveryThread extends Thread {
     }
 
     /**
+     * Start the thread. To quote the java api specification "It is never legal to start a thread
+     * more than once. In particular, a thread may not be restarted once it has completed execution."
+     * Use {@link #hasRun()} to check whether you may start the thread
+     */
+    @Override
+    public synchronized void start() {
+        mHasRun = true;
+        super.start();
+    }
+
+    /**
+     * Check whether this threads {@link #start()} has already been called. If it returns true,
+     * start() may not be called on this instance!
+     */
+    public boolean hasRun(){
+        return mHasRun;
+    }
+
+    /**
      * Wait for a NetworkDevice object to arrive on the set {@link DatagramSocket}. Other messages will be discarded.
      *
      * @throws IOException either a {@link SocketTimeoutException} if the wait times out, or any other IO exception that occurse
@@ -108,7 +133,7 @@ public abstract class DiscoveryThread extends Thread {
             // notify sub-class
             onDiscovery(identification);
 
-        // if the cast to NetworkDevice fails, this message was not sent by the discovery system, and may be ignored
+            // if the cast to NetworkDevice fails, this message was not sent by the discovery system, and may be ignored
         } catch (ClassNotFoundException ignored) {
         }
     }
@@ -117,6 +142,7 @@ public abstract class DiscoveryThread extends Thread {
 
     /**
      * Check whether the server is set to stay running
+     *
      * @return true if the server will continue running
      */
     public boolean isRunning() {
@@ -125,6 +151,7 @@ public abstract class DiscoveryThread extends Thread {
 
     /**
      * Socket currently configured to be used by the discovery system
+     *
      * @return the socket
      */
     protected DatagramSocket getSocket() {
@@ -133,6 +160,7 @@ public abstract class DiscoveryThread extends Thread {
 
     /**
      * Set the socket to be used by this {@link DiscoveryThread}
+     *
      * @param socket new socket configuration
      * @throws SocketException if some of the internal configuration failed
      */
@@ -149,7 +177,6 @@ public abstract class DiscoveryThread extends Thread {
 
     /**
      * Signal the running while loop to stop
-     * TODO: what happens if we close, but want to restart?
      */
     public void close() {
         mKeepRunning = false;

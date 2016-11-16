@@ -13,7 +13,7 @@ import java.util.List;
 
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
 import de.ovgu.softwareprojekt.discovery.OnDiscoveryListener;
-import de.ovgu.softwareprojektapp.networking.server_discovery.DiscoveryClient;
+import de.ovgu.softwareprojektapp.networking.DiscoveryClient;
 
 public class DiscoveryActivity extends AppCompatActivity implements OnDiscoveryListener {
 
@@ -43,8 +43,8 @@ public class DiscoveryActivity extends AppCompatActivity implements OnDiscoveryL
         mStartDiscovery.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // start discovering
-                mDiscovery.start();
+                // let this function handle
+                startDiscovery();
             }
         });
 
@@ -71,7 +71,21 @@ public class DiscoveryActivity extends AppCompatActivity implements OnDiscoveryL
                 mDiscovery.close();
             }
         });
+    }
 
+    /**
+     * Start (or restart) the discovery server gracefully
+     */
+    public void startDiscovery() {
+        // only start new discovery if not running yet
+        if (!mDiscovery.isRunning()) {
+            // create a new discovery thread, if this one already completed
+            if (mDiscovery.hasRun())
+                mDiscovery = new DiscoveryClient(DiscoveryActivity.this, 8888, NAME);
+
+            // start discovery
+            mDiscovery.start();
+        }
     }
 
     @Override

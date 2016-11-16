@@ -1,4 +1,4 @@
-package de.ovgu.softwareprojektapp.networking.server_discovery;
+package de.ovgu.softwareprojektapp.networking;
 
 import java.io.IOException;
 import java.net.DatagramSocket;
@@ -34,7 +34,6 @@ public class DiscoveryClient extends DiscoveryThread {
      * Timer used to schedule recurring broadcasts
      */
     private Timer mRecurringBroadcastTimer = new Timer();
-    ;
 
     /**
      * Create a new DiscoveryClient. In contrast to the DiscoveryServer, the DiscoveryClient does not
