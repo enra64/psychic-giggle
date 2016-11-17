@@ -2,10 +2,13 @@ package de.ovgu.softwareprojektapp;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.support.annotation.Nullable;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.IOException;
@@ -71,8 +74,9 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
         // prepare the gyroscope
         mGyroscope = new Gyroscope(this);
 
-        // make the gyroscope directly output to the network
-        mGyroscope.setDataSink(mNetworkClient);
+            // make the gyroscope directly output to the network
+            mGyroscope.setDataSink(mNetworkClient);
+
     }
 
     /**
@@ -132,7 +136,18 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
      */
     private void setGyroscope(boolean enable) {
         // configure the gyroscope run state
-        mGyroscope.setRunning(enable);
+        try {
+            mGyroscope.setRunning(enable);
+        } catch (IOException e) {
+            AlertDialog alertDialog = new AlertDialog.Builder(this).create();
+            alertDialog.setTitle("No Sensor detected");
+            alertDialog.setMessage("This device does not contain a Gyroscope Sensor");
+
+            alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, "OK", (DialogInterface.OnClickListener) null);
+
+            alertDialog.show();
+
+        }
     }
 
     /**
