@@ -67,6 +67,16 @@ public class Server implements OnCommandListener, DataSink {
 
         mClientListener = clientListener;
 
+        // stop connections on shutdown
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+            @Override
+            public synchronized void start() {
+                System.out.println("closing connections");
+                mCommandConnection.close();
+                mDataConnection.close();
+            }
+        });
+
         System.out.println("discovery server started");
     }
 
@@ -138,6 +148,7 @@ public class Server implements OnCommandListener, DataSink {
                         mCommandConnection.sendCommand(new ConnectionRequestResponse(false));
 
                         // connection no longer needed
+                        // commented out because we cannot accept new connections then
                         //mCommandConnection.close();
                     }
 
@@ -154,7 +165,7 @@ public class Server implements OnCommandListener, DataSink {
                 EndConnection endConnection = (EndConnection) command;
                 endConnection.self.address = origin.getHostAddress();
                 mClientListener.onClientDisconnected(endConnection.self);
-
+                System.exit(0);
                 break;
 
             // ignore unhandled commands (like SetSensorCommand)

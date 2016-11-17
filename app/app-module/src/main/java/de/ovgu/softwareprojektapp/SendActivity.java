@@ -126,7 +126,7 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
         mNetworkClient.endConnection();
 
         // close activity
-        System.exit(0);
+        finish();
     }
 
     /**
