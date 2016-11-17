@@ -208,6 +208,7 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
 
     @Override
     public void onException(Object origin, Exception exception, String info) {
+        exception.printStackTrace();
         //TODO: wörkwörk markus
     }
 }
