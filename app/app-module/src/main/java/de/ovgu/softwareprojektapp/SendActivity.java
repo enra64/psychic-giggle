@@ -59,7 +59,8 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
     /**
      * linear layout as a space to add buttons
      */
-    private LinearLayout ll = (LinearLayout) findViewById(R.id.linlay);
+    private LinearLayout ll;
+    private Button btn_init;
 
     /**
      * Dialog for showing connection progress
@@ -70,6 +71,17 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_send);
+
+        ll = (LinearLayout) findViewById(R.id.linlay);
+        btn_init = (Button) findViewById(R.id.button);
+        btn_init.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                initiateConnection();
+            }
+        });
+
+
 
         // we create a NetworkDevice from our extras to have all the data we need in a neat package
         mNetworkClient = new NetworkClient(
@@ -106,7 +118,7 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
      * This function is called by a button. Currently, it starts listening to server commands and
      * requests a connection with the server given as an intent extra
      */
-    public void initiateConnection(View v) {
+    public void initiateConnection() {
         // display indeterminate, not cancelable wait period to user
         mConnectionProgressDialog = ProgressDialog.show(this, "Connecting", "Waiting for server response", true, false);
 
@@ -233,18 +245,24 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
         //TODO: wörkwörk markus
     }
 
-    public void createNewButton(AddButton addCom){
-        Button btn = new Button(this);
-        btn.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, LinearLayoutCompat.LayoutParams.WRAP_CONTENT));
-        ll.addView(btn);
-        btn.setText(addCom.mName);
-        btn.setTag((Integer) addCom.mID);
-        btn.setOnClickListener(new View.OnClickListener() {
+    public void createNewButton(final AddButton addCom){
+        runOnUiThread(new Runnable() {
             @Override
-            public void onClick(View view) {
-                //send ButtonClick command with button id per networkclient
-                mNetworkClient.sendCommand(new ButtonClick((Integer) view.getTag()));
+            public void run() {
+                Button btn = new Button(SendActivity.this);
+                btn.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, LinearLayoutCompat.LayoutParams.WRAP_CONTENT));
+                ll.addView(btn);
+                btn.setText(addCom.mName);
+                btn.setTag((Integer) addCom.mID);
+                btn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        //send ButtonClick command with button id per networkclient
+                        mNetworkClient.sendCommand(new ButtonClick((Integer) view.getTag()));
+                    }
+                });
             }
         });
+
     }
 }

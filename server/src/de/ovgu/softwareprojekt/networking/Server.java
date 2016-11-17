@@ -69,6 +69,7 @@ public class Server implements OnCommandListener, DataSink {
         discoveryServer.start();
 
         mClientListener = clientListener;
+        mButtonListener = buttonListener;
 
         // stop connections on shutdown
         Runtime.getRuntime().addShutdownHook(new Thread() {
