@@ -1,37 +1,31 @@
 package de.ovgu.softwareprojektapp;
 
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
+import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutCompat;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import java.io.IOException;
 import java.net.InetAddress;
 
+import de.ovgu.softwareprojekt.SensorType;
 import de.ovgu.softwareprojekt.control.OnCommandListener;
 import de.ovgu.softwareprojekt.control.commands.AddButton;
 import de.ovgu.softwareprojekt.control.commands.ButtonClick;
 import de.ovgu.softwareprojekt.control.commands.Command;
-import de.ovgu.softwareprojekt.control.commands.CommandType;
 import de.ovgu.softwareprojekt.control.commands.ConnectionRequestResponse;
-import de.ovgu.softwareprojekt.control.commands.EndConnection;
 import de.ovgu.softwareprojekt.control.commands.SetSensorCommand;
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
 import de.ovgu.softwareprojekt.misc.ExceptionListener;
 import de.ovgu.softwareprojektapp.networking.NetworkClient;
-import de.ovgu.softwareprojektapp.sensors.Gyroscope;
-
-import static de.ovgu.softwareprojekt.control.commands.CommandType.SetSensor;
+import de.ovgu.softwareprojektapp.sensors.SensorHandler;
 
 public class SendActivity extends AppCompatActivity implements OnCommandListener, ExceptionListener {
     // de-magic-stringify the intent extra keys
@@ -47,11 +41,6 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
     static final int RESULT_USER_STOPPED = 0;
 
     /**
-     * Gyroscope sensor object; implements datasource, listens to gyroscope changes
-     */
-    private Gyroscope mGyroscope = null;
-
-    /**
      * The network client organises all our communication with the server
      */
     NetworkClient mNetworkClient;
@@ -59,8 +48,12 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
     /**
      * linear layout as a space to add buttons
      */
-    private LinearLayout ll;
-    private Button btn_init;
+    private LinearLayout mRuntimeButtonLayout;
+
+    /**
+     * The SensorHandler used to handle our sensor needs
+     */
+    SensorHandler mSensorHandler;
 
     /**
      * Dialog for showing connection progress
@@ -72,15 +65,16 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_send);
 
-        ll = (LinearLayout) findViewById(R.id.linlay);
-        btn_init = (Button) findViewById(R.id.button);
-        btn_init.setOnClickListener(new View.OnClickListener() {
+        mRuntimeButtonLayout = (LinearLayout) findViewById(R.id.linlay);
+
+
+        Button initialisationButton = (Button) findViewById(R.id.button);
+        initialisationButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 initiateConnection();
             }
         });
-
 
 
         // we create a NetworkDevice from our extras to have all the data we need in a neat package
@@ -94,11 +88,8 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
         // default to successful execution
         setResult(RESULT_OK);
 
-        // prepare the gyroscope
-        mGyroscope = new Gyroscope(this);
-
-        // make the gyroscope directly output to the network
-        mGyroscope.setDataSink(mNetworkClient);
+        // create a new sensor handler to help with the sensors
+        mSensorHandler = new SensorHandler(this);
     }
 
     /**
@@ -156,19 +147,15 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
      *
      * @param enable true if the gyroscope must be enabled
      */
-    private void setGyroscope(boolean enable) {
-        // configure the gyroscope run state
-        try {
-            mGyroscope.setRunning(enable);
-        } catch (IOException e) {
+    private void setSensor(SensorType sensorType, boolean enable) {
+        // configure the sensor run state
+        if (!mSensorHandler.setRunning(mNetworkClient, sensorType, enable)) {
+            // show a warning if the requested sensor type does not exist
             AlertDialog alertDialog = new AlertDialog.Builder(this).create();
-            alertDialog.setTitle("No Sensor detected");
-            alertDialog.setMessage("This device does not contain a Gyroscope Sensor");
-
+            alertDialog.setTitle("Sensor activation error");
+            alertDialog.setMessage("This device does not contain a " + sensorType.name());
             alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, "OK", (DialogInterface.OnClickListener) null);
-
             alertDialog.show();
-
         }
     }
 
@@ -205,22 +192,12 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
         switch (command.getCommandType()) {
             case ConnectionRequestResponse:
                 ConnectionRequestResponse res = (ConnectionRequestResponse) command;
-                // res.grant is true if the connection was allowed
                 handleConnectionResponse(res.grant);
                 break;
             case SetSensor:
                 // enable or disable a sensor
                 SetSensorCommand com = (SetSensorCommand) command;
-
-                // decide which sensor should be switched
-                switch (com.sensorType) {
-                    case Gyroscope:
-                        setGyroscope(com.enable);
-                        break;
-                    default:
-                        break;
-                }
-
+                setSensor(com.sensorType, com.enable);
                 break;
 
             //adds a button to the activity with id and name
@@ -230,7 +207,6 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
                 createNewButton(addCom);
 
                 break;
-
 
 
             // ignore unhandled commands
@@ -245,13 +221,13 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
         //TODO: wörkwörk markus
     }
 
-    public void createNewButton(final AddButton addCom){
+    public void createNewButton(final AddButton addCom) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 Button btn = new Button(SendActivity.this);
                 btn.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, LinearLayoutCompat.LayoutParams.WRAP_CONTENT));
-                ll.addView(btn);
+                mRuntimeButtonLayout.addView(btn);
                 btn.setText(addCom.mName);
                 btn.setTag((Integer) addCom.mID);
                 btn.setOnClickListener(new View.OnClickListener() {

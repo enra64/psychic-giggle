@@ -23,6 +23,11 @@ class Accelerometer extends AbstractSensor {
      * @param context    android system context needed for sensors
      */
     Accelerometer(Context context) {
-        super(context, Sensor.TYPE_ACCELEROMETER);
+        super(context, Sensor.TYPE_ACCELEROMETER, SensorType.Accelerometer);
+    }
+
+    @Override
+    public SensorType getSensorType() {
+        return SensorType.Accelerometer;
     }
 }

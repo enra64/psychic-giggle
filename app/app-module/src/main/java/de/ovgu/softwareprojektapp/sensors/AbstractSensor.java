@@ -39,14 +39,21 @@ abstract class AbstractSensor implements DataSource, SensorEventListener {
     private final int mSensorType;
 
     /**
+     * Since we have our own definition of sensor type (android definitions not available in common),
+     * we want to save that, too
+     */
+    private final SensorType mPsychicSensorType;
+
+    /**
      * Create a new sensor object; does not start anything yet, use {@link #start()} or {@link #setRunning(boolean)}
      * to start receiving events
      * @param context android system context needed for sensors
      * @param sensorType sensor type we should register for
      */
-    AbstractSensor(Context context, int sensorType){
+    AbstractSensor(Context context, int sensorType, SensorType psychicSensorType){
         mSensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
         mSensorType = sensorType;
+        mPsychicSensorType = psychicSensorType;
     }
 
     /**
@@ -106,6 +113,13 @@ abstract class AbstractSensor implements DataSource, SensorEventListener {
 
         // keep track of registration state
         mListenerRegistered = false;
+    }
+
+    /**
+     * Returns the sensor type the implementation deals with
+     */
+    public SensorType getSensorType(){
+        return mPsychicSensorType;
     }
 
     /**
