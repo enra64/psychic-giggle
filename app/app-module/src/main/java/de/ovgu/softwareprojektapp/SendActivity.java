@@ -122,7 +122,7 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
         mNetworkClient.endConnection();
 
         // close activity
-        super.onBackPressed();
+        System.exit(0);
     }
 
     /**

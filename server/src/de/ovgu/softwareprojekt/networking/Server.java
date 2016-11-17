@@ -113,9 +113,6 @@ public class Server implements OnCommandListener, DataSink {
      */
     @Override
     public void onCommand(InetAddress origin, Command command) {
-        // command-line logging
-        System.out.println("command received, type " + command.getCommandType().toString());
-
         // decide what to do with the packet
         switch (command.getCommandType()) {
             case ConnectionRequest:
@@ -126,11 +123,11 @@ public class Server implements OnCommandListener, DataSink {
                     // update the request address
                     request.self.address = origin.getHostAddress();
 
+                    // initialise the connection to send the request answer
+                    mCommandConnection.setRemote(origin, request.self.commandPort);
+
                     // only accept clients which are accepted by our client listener
                     if (mClientListener.acceptClient(request.self)) {
-                        // now that we have a connection, we know who to talk to for the commands
-                        mCommandConnection.setRemote(origin, request.self.commandPort);
-
                         // accept the client
                         mCommandConnection.sendCommand(new ConnectionRequestResponse(true));
 
@@ -139,6 +136,9 @@ public class Server implements OnCommandListener, DataSink {
                     } else {
                         // deny the client
                         mCommandConnection.sendCommand(new ConnectionRequestResponse(false));
+
+                        // connection no longer needed
+                        //mCommandConnection.close();
                     }
 
                 } catch (IOException e) {
