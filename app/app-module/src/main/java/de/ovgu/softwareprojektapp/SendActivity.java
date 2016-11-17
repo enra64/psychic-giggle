@@ -1,8 +1,12 @@
 package de.ovgu.softwareprojektapp;
 
+import android.app.Activity;
+import android.app.ProgressDialog;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Toast;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -30,6 +34,9 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
 
     static final String EXTRA_SELF_NAME = "SelfName";
 
+    static final int RESULT_SERVER_REFUSED = -1;
+    static final int RESULT_USER_STOPPED = 0;
+
     /**
      * Gyroscope sensor object; implements datasource, listens to gyroscope changes
      */
@@ -39,6 +46,11 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
      * The network client organises all our communication with the server
      */
     NetworkClient mNetworkClient;
+
+    /**
+     * Dialog for showing connection progress
+     */
+    ProgressDialog mConnectionProgressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +64,9 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
                 this,
                 this
         );
+
+        // default to successful execution
+        setResult(RESULT_OK);
 
         // prepare the gyroscope
         mGyroscope = new Gyroscope(this);
@@ -78,6 +93,9 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
      * requests a connection with the server given as an intent extra
      */
     public void initiateConnection(View v) {
+        // display indeterminate, not cancelable wait period to user
+        mConnectionProgressDialog = ProgressDialog.show(this, "Connecting", "Waiting for server response", true, false);
+
         // begin listening for commands
         mNetworkClient.requestConnection();
     }
@@ -86,13 +104,30 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
      * This function is called by a button. It sends a command to the server which then closes the
      * connection. It also stops the activity.
      */
-    public void endConnection(View v){
+    public void endConnection(@Nullable View v) {
+        // close activity
+        closeActivity(RESULT_USER_STOPPED);
+    }
+
+    /**
+     * Sets activity result, closes connections and closes the activity
+     *
+     * @param result one of {@link #RESULT_USER_STOPPED} or {@link #RESULT_SERVER_REFUSED}
+     */
+    private void closeActivity(int result) {
+        // set result of activity
+        setResult(result);
+
+        // end connections
         mNetworkClient.endConnection();
+
+        // close activity
         super.onBackPressed();
     }
 
     /**
      * Enable or disable the gyroscope
+     *
      * @param enable true if the gyroscope must be enabled
      */
     private void setGyroscope(boolean enable) {
@@ -101,11 +136,32 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
     }
 
     /**
+     * Handle connection request responses
+     *
+     * @param granted true if the request was granted
+     */
+    private void handleConnectionResponse(boolean granted) {
+        // the progress dialog can be dismissed in any case
+        mConnectionProgressDialog.dismiss();
+
+        if (granted) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(SendActivity.this, R.string.send_activity_connection_success, Toast.LENGTH_LONG).show();
+                }
+            });
+        } else
+            closeActivity(RESULT_SERVER_REFUSED);
+    }
+
+    /**
      * Called whenever a new command comes in
      *
      * @param origin  where the command comes from
      * @param command the command itself
      */
+    @SuppressWarnings("ConstantConditions")
     @Override
     public void onCommand(InetAddress origin, Command command) {
         // decide what to do with the command
@@ -113,7 +169,8 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
             case ConnectionRequestResponse:
                 ConnectionRequestResponse res = (ConnectionRequestResponse) command;
                 // res.grant is true if the connection was allowed
-                // TODO: display connection success
+                handleConnectionResponse(res.grant);
+                break;
             case SetSensor:
                 // enable or disable a sensor
                 SetSensorCommand com = (SetSensorCommand) command;
