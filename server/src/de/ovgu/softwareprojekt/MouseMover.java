@@ -12,7 +12,7 @@ public class MouseMover extends Mover {
 
     private Point mousePos;
     //TODO: find the best sensitivity
-    private final float SENSITIVITY = 5f;
+    private final float SENSITIVITY = 40f;
     //TODO: user sensitivity feature in app
     //allow user to set own sensitivity
     private float customSensitivity = 0f;
@@ -35,7 +35,7 @@ public class MouseMover extends Mover {
         int yAxis = (int) rawData[XAXIS];
 
         //TODO: Find out if addition or subtraction works better
-        moveBot.mouseMove(mousePos.x + xAxis, mousePos.y + yAxis);
+        moveBot.mouseMove(mousePos.x - xAxis, mousePos.y - yAxis);
     }
 
     /**
