@@ -84,7 +84,6 @@ public class DiscoveryActivity extends AppCompatActivity implements OnDiscoveryL
                     mDiscovery = new DiscoveryClient(
                             DiscoveryActivity.this,
                             DiscoveryActivity.this,
-                            DiscoveryActivity.this,
                             8888,
                             NAME);
                 } catch (IOException e) {

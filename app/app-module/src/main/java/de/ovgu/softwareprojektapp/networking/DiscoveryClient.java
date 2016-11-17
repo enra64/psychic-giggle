@@ -1,17 +1,15 @@
 package de.ovgu.softwareprojektapp.networking;
 
-import android.content.Context;
-
 import java.io.IOException;
 import java.net.DatagramSocket;
-import java.net.InetAddress;
 import java.net.SocketTimeoutException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Timer;
-import java.util.TimerTask;
 
-import de.ovgu.softwareprojekt.discovery.*;
+import de.ovgu.softwareprojekt.discovery.DiscoveryThread;
+import de.ovgu.softwareprojekt.discovery.NetworkDevice;
+import de.ovgu.softwareprojekt.discovery.OnDiscoveryListener;
 import de.ovgu.softwareprojekt.misc.ExceptionListener;
 
 /**
@@ -22,12 +20,6 @@ public class DiscoveryClient extends DiscoveryThread {
      * Listener to be called when our list of servers changes
      */
     private OnDiscoveryListener mDiscoveryListener;
-
-    /**
-     * Interface for listening to exceptions. Exceptions occurring in a multi-threaded environment can
-     * be easily handled through this.
-     */
-    private ExceptionListener mExceptionListener;
 
     /**
      * Current list of known servers
@@ -53,17 +45,14 @@ public class DiscoveryClient extends DiscoveryThread {
      * @param remotePort the port the discovery server listens on
      * @param selfName   the name this device should announce itself as
      */
-    public DiscoveryClient(OnDiscoveryListener listener, ExceptionListener exceptionListener, Context context, int remotePort, String selfName) throws IOException {
+    public DiscoveryClient(OnDiscoveryListener listener, ExceptionListener exceptionListener, int remotePort, String selfName) throws IOException {
         super(selfName);
 
         // save who wants to be notified of new servers
         mDiscoveryListener = listener;
 
-        // save who wants to be notified of exceptions
-        mExceptionListener = exceptionListener;
-
         // the broadcaster handles everything related to sending broadcasts
-        mBroadcaster = new Broadcaster(context, this, mExceptionListener, remotePort);
+        mBroadcaster = new Broadcaster(this, exceptionListener, remotePort);
     }
 
     /**

@@ -1,28 +1,17 @@
 package de.ovgu.softwareprojektapp.networking;
 
-import android.content.Context;
-import android.net.ConnectivityManager;
-import android.net.DhcpInfo;
-import android.net.NetworkInfo;
-import android.net.wifi.WifiInfo;
-import android.net.wifi.WifiManager;
-import android.util.Log;
-
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.net.InetAddress;
 import java.net.InterfaceAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.util.Enumeration;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.TimerTask;
 
 import de.ovgu.softwareprojekt.discovery.DiscoveryThread;
 import de.ovgu.softwareprojekt.misc.ExceptionListener;
-
-import static android.content.ContentValues.TAG;
 
 /**
  * This class can be used together with {@link java.util.Timer} to periodically send broadcasts
@@ -34,7 +23,7 @@ class Broadcaster extends TimerTask {
      * The default is simply 255.255.255.255, but because broadcasting from a hotspot is a very
      * interesting use case, we have a whole lotta code dedicated to detecting being a hotspot
      */
-    private final InetAddress mBroadcastAddress;
+    private final List<InetAddress> mBroadcastAddresses;
 
     /**
      * BREAK GLASS IN CASE OF EXCEPTION
@@ -63,63 +52,40 @@ class Broadcaster extends TimerTask {
         mDiscoveryThread = discoveryThread;
         mExceptionListener = exceptionListener;
 
-        InetAddress i = getIpAddress();
 
-
-        mBroadcastAddress = getBroadcast(i);
+        mBroadcastAddresses = getBroadcastAddresses();
     }
 
     /**
-     * Find an ip address of this device
+     * Return a list of all useful broadcast addresses of this device
      */
-    private InetAddress getIpAddress() {
-        InetAddress myAddr = null;
+    private List<InetAddress> getBroadcastAddresses() {
+        List<InetAddress> resultList = new LinkedList<>();
 
         try {
-            // iterate over all network interface
+            // iterate over all network interfaces
             Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces();
             while (networkInterfaces.hasMoreElements()) {
                 NetworkInterface networkInterface = networkInterfaces.nextElement();
 
-                // iterate over all ip addresses this network interface has
-                Enumeration<InetAddress> IpAddresses = networkInterface.getInetAddresses();
-                while (IpAddresses.hasMoreElements()) {
-                    InetAddress ipAddress = IpAddresses.nextElement();
-
-                    // check if this is an eligible ip address: no loopback and either wlan ethernet or access point
-                    if (!ipAddress.isLoopbackAddress() &&
-                            (networkInterface.getDisplayName().contains("wlan0") ||
-                                    networkInterface.getDisplayName().contains("eth0") ||
-                                    networkInterface.getDisplayName().contains("ap0"))) {
-                        myAddr = ipAddress;
+                // iterate over the interfaces addresses
+                for (InterfaceAddress ifAddress : networkInterface.getInterfaceAddresses()) {
+                    // avoid loopback interfaces
+                    if (!ifAddress.getAddress().isLoopbackAddress()) {
+                        // avoid weird connections
+                        if (networkInterface.getDisplayName().contains("wlan0") ||
+                                networkInterface.getDisplayName().contains("eth0") ||
+                                networkInterface.getDisplayName().contains("ap0"))
+                            // add to list of possible broadcast addresses
+                            resultList.add(ifAddress.getBroadcast());
                     }
                 }
             }
 
         } catch (SocketException ex) {
-            mExceptionListener.onException(this, ex, "Broadcaster: Could not find broadcast address");
+            mExceptionListener.onException(this, ex, "Broadcaster: Could not find device ip addresses");
         }
-        return myAddr;
-    }
-
-    /**
-     * Get the broadcast address for an ip address
-     */
-    private InetAddress getBroadcast(InetAddress inetAddress) {
-
-        try {
-            NetworkInterface temp = NetworkInterface.getByInetAddress(inetAddress);
-            List<InterfaceAddress> addresses = temp.getInterfaceAddresses();
-
-            InetAddress broadcastAddress = null;
-            for (InterfaceAddress tmpAddr : addresses)
-                broadcastAddress = tmpAddr.getBroadcast();
-            return broadcastAddress;
-
-        } catch (SocketException e) {
-            mExceptionListener.onException(this, e, "Broadcaster: Could not find broadcast address");
-        }
-        return null;
+        return resultList;
     }
 
     /**
@@ -129,7 +95,8 @@ class Broadcaster extends TimerTask {
     public void run() {
         // send our identification data via broadcast
         try {
-            mDiscoveryThread.sendSelfIdentification(mBroadcastAddress, mRemotePort);
+            for (InetAddress address : mBroadcastAddresses)
+                mDiscoveryThread.sendSelfIdentification(address, mRemotePort);
         } catch (IOException e) {
             mExceptionListener.onException(this, e, "Discovery: Broadcaster: Exception when trying to broadcast");
         }
