@@ -7,7 +7,7 @@ import java.awt.*;
  *
  * This abstact class defines the Robotclass that controls various applications by smartphone movement
  */
-public abstract class Mover{
+public abstract class Mover implements DataSink {
 
     //methods work with float arrays which contain various sensor data of directional axes
     protected final int XAXIS = 0;
@@ -26,6 +26,15 @@ public abstract class Mover{
         }
     }
 
+    @Override
+    public void onData(SensorData sensorData) {
+        move(sensorData.data);
+    }
+
+    @Override
+    public void close() {
+
+    }
 
     public abstract void move(float[] rawData);
 
