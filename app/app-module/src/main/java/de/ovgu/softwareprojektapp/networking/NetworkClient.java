@@ -12,6 +12,7 @@ import de.ovgu.softwareprojekt.control.CommandConnection;
 import de.ovgu.softwareprojekt.control.OnCommandListener;
 import de.ovgu.softwareprojekt.control.commands.Command;
 import de.ovgu.softwareprojekt.control.commands.ConnectionRequest;
+import de.ovgu.softwareprojekt.control.commands.EndConnection;
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
 import de.ovgu.softwareprojekt.misc.ExceptionListener;
 import de.ovgu.softwareprojektapp.BuildConfig;
@@ -160,12 +161,21 @@ public class NetworkClient implements DataSink, ExceptionListener {
     @Override
     public void close() {
         mOutboundDataConnection.close();
+        mCommandConnection.close();
     }
 
     @Override
     public void onException(Object origin, Exception exception, String info) {
         // relay the exception, but set us as origin, because the UdpConnection instance is not known to users
         mExceptionListener.onException(this, exception, origin.getClass().toString() + info);
+    }
+
+    /**
+     * Unilaterally closes the connection
+     */
+    public void endConnection() {
+        sendCommand(new EndConnection(mSelf));
+        close();
     }
 
     /**

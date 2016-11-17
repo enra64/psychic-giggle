@@ -87,7 +87,7 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
      * connection. It also stops the activity.
      */
     public void endConnection(View v){
-        mNetworkClient.sendCommand(new EndConnection());
+        mNetworkClient.endConnection();
         super.onBackPressed();
     }
 

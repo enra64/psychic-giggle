@@ -119,7 +119,6 @@ public class Server implements OnCommandListener, DataSink {
         // decide what to do with the packet
         switch (command.getCommandType()) {
             case ConnectionRequest:
-                // TODO: check whether we actually want to connect with this client
                 // since this commands CommandType is ConnectionRequest, we know to what to cast it
                 ConnectionRequest request = (ConnectionRequest) command;
 
@@ -127,7 +126,7 @@ public class Server implements OnCommandListener, DataSink {
                     // update the request address
                     request.self.address = origin.getHostAddress();
 
-                    // only accept clients which are accepted
+                    // only accept clients which are accepted by our client listener
                     if(mClientListener.acceptClient(request.self)) {
                         // now that we have a connection, we know who to talk to for the commands
                         mCommandConnection.setRemote(origin, request.self.commandPort);
@@ -141,13 +140,12 @@ public class Server implements OnCommandListener, DataSink {
                 }
                 break;
             case EndConnection:
-                EndConnection endConnection = (EndConnection) command;
-
                 // close connections
                 mDataConnection.close();
                 mCommandConnection.close();
 
                 // notify listener of disconnect
+                EndConnection endConnection = (EndConnection) command;
                 endConnection.self.address = origin.getHostAddress();
                 mClientListener.onClientDisconnected(endConnection.self);
 
