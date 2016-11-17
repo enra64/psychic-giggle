@@ -192,7 +192,6 @@ public class NetworkClient implements DataSink, ExceptionListener {
             try {
                 mCommandConnection.sendCommand(commands[0]);
             } catch (IOException e) {
-                e.printStackTrace();
                 mExceptionListener.onException(
                         NetworkClient.this,
                         e,
