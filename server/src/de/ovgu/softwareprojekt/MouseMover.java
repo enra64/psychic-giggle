@@ -19,7 +19,14 @@ public class MouseMover extends Mover {
    public MouseMover()
    {
        super();
-       //Set Mouse position on start to center position
+       resetPosToCenter();
+   }
+
+    /**
+     * Set Mouse Cursor Position to monitor position
+     * This method may break on devices which use more than one monitor?
+     */
+   public void resetPosToCenter(){
        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
        moveBot.mouseMove(screenSize.width/2, screenSize.height/2);
    }
