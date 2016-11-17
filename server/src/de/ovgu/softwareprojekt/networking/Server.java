@@ -75,7 +75,8 @@ public class Server implements OnCommandListener, DataSink {
 
     /**
      * Register a new data sink to be included in the data stream
-     * @param dataSink where new data from the sensor should go
+     *
+     * @param dataSink        where new data from the sensor should go
      * @param requestedSensor which sensors events are relevant
      */
     public void registerDataSink(DataSink dataSink, SensorType requestedSensor) {
@@ -89,19 +90,21 @@ public class Server implements OnCommandListener, DataSink {
 
     /**
      * Unregister a data sink from a sensors data stream
-     * @param dataSink the data sink to be unregistered
+     *
+     * @param dataSink        the data sink to be unregistered
      * @param requestedSensor the sensor the sink should be unregistered from
      */
-    public void unregisterDataSink(DataSink dataSink, SensorType requestedSensor){
+    public void unregisterDataSink(DataSink dataSink, SensorType requestedSensor) {
         mDataSinks.get(requestedSensor).remove(dataSink);
     }
 
     /**
      * Unregister a data sink from all sensors
+     *
      * @param dataSink which data sink to remove
      */
-    public void unregisterDataSink(DataSink dataSink){
-        for(SensorType type : mDataSinks.keySet())
+    public void unregisterDataSink(DataSink dataSink) {
+        for (SensorType type : mDataSinks.keySet())
             unregisterDataSink(dataSink, type);
     }
 
@@ -113,9 +116,6 @@ public class Server implements OnCommandListener, DataSink {
      */
     @Override
     public void onCommand(InetAddress origin, Command command) {
-        // command-line logging
-        System.out.println("command received, type " + command.getCommandType().toString());
-
         // decide what to do with the packet
         switch (command.getCommandType()) {
             case ConnectionRequest:
@@ -126,16 +126,25 @@ public class Server implements OnCommandListener, DataSink {
                     // update the request address
                     request.self.address = origin.getHostAddress();
 
+                    // initialise the connection to send the request answer
+                    mCommandConnection.setRemote(origin, request.self.commandPort);
+
                     // only accept clients which are accepted by our client listener
-                    if(mClientListener.acceptClient(request.self)) {
-                        // now that we have a connection, we know who to talk to for the commands
-                        mCommandConnection.setRemote(origin, request.self.commandPort);
+                    if (mClientListener.acceptClient(request.self)) {
+                        // accept the client
+                        mCommandConnection.sendCommand(new ConnectionRequestResponse(true));
 
                         //test TODO: wieder entfernen und umschreiben
                         addButton("LeftClick", 0);
 
                         // for now, immediately let the client begin sending gyroscope data
                         mCommandConnection.sendCommand(new SetSensorCommand(SensorType.Gyroscope, true));
+                    } else {
+                        // deny the client
+                        mCommandConnection.sendCommand(new ConnectionRequestResponse(false));
+
+                        // connection no longer needed
+                        //mCommandConnection.close();
                     }
 
                 } catch (IOException e) {
@@ -192,7 +201,7 @@ public class Server implements OnCommandListener, DataSink {
     @Override
     public void onData(SensorData sensorData) {
         // iterate over all data sinks marked as interested in this sensor type
-        for(DataSink sink : mDataSinks.get(sensorData.sensorType))
+        for (DataSink sink : mDataSinks.get(sensorData.sensorType))
             sink.onData(sensorData);
     }
 

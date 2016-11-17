@@ -77,6 +77,7 @@ class Broadcaster extends TimerTask {
                                 networkInterface.getDisplayName().contains("eth0") ||
                                 networkInterface.getDisplayName().contains("ap0"))
                             // add to list of possible broadcast addresses
+                        if(ifAddress.getBroadcast() != null)
                             resultList.add(ifAddress.getBroadcast());
                     }
                 }

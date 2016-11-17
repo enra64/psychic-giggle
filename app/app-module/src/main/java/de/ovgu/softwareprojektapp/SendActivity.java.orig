@@ -1,20 +1,26 @@
 package de.ovgu.softwareprojektapp;
 
+<<<<<<< HEAD
 import android.support.v7.app.ActionBar;
+=======
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
+>>>>>>> 991b0a8dcda073c67e7958ef79f9cc6e3bd462d8
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutCompat;
 import android.view.View;
+<<<<<<< HEAD
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
+=======
 import android.widget.TextView;
 import android.widget.Toast;
+>>>>>>> 991b0a8dcda073c67e7958ef79f9cc6e3bd462d8
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -59,11 +65,15 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
     NetworkClient mNetworkClient;
 
     /**
+<<<<<<< HEAD
      * linear layout as a space to add buttons
-     * Dialog for showing connection progress
      */
     private LinearLayout ll = (LinearLayout) findViewById(R.id.linlay);
+=======
+     * Dialog for showing connection progress
+     */
     ProgressDialog mConnectionProgressDialog;
+>>>>>>> 991b0a8dcda073c67e7958ef79f9cc6e3bd462d8
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,8 +94,9 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
         // prepare the gyroscope
         mGyroscope = new Gyroscope(this);
 
-        // make the gyroscope directly output to the network
-        mGyroscope.setDataSink(mNetworkClient);
+            // make the gyroscope directly output to the network
+            mGyroscope.setDataSink(mNetworkClient);
+
     }
 
     /**
@@ -133,6 +144,9 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
 
         // end connections
         mNetworkClient.endConnection();
+
+        // close activity
+        System.exit(0);
     }
 
     /**
@@ -190,7 +204,8 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
             case ConnectionRequestResponse:
                 ConnectionRequestResponse res = (ConnectionRequestResponse) command;
                 // res.grant is true if the connection was allowed
-                // TODO: display connection success
+                handleConnectionResponse(res.grant);
+                break;
             case SetSensor:
                 // enable or disable a sensor
                 SetSensorCommand com = (SetSensorCommand) command;

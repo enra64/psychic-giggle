@@ -12,13 +12,23 @@ public class MouseMover extends Mover {
 
     private Point mousePos;
     //TODO: find the best sensitivity
-    private final float SENSITIVITY = 5f;
+    private final float SENSITIVITY = 40f;
     //TODO: user sensitivity feature in app
     //allow user to set own sensitivity
     private float customSensitivity = 0f;
    public MouseMover()
    {
        super();
+       resetPosToCenter();
+   }
+
+    /**
+     * Set Mouse Cursor Position to monitor position
+     * This method may break on devices which use more than one monitor?
+     */
+   public void resetPosToCenter(){
+       Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+       moveBot.mouseMove(screenSize.width/2, screenSize.height/2);
    }
 
     /**
@@ -35,7 +45,7 @@ public class MouseMover extends Mover {
         int yAxis = (int) rawData[XAXIS];
 
         //TODO: Find out if addition or subtraction works better
-        moveBot.mouseMove(mousePos.x + xAxis, mousePos.y + yAxis);
+        moveBot.mouseMove(mousePos.x - xAxis, mousePos.y - yAxis);
     }
 
     /**
@@ -46,11 +56,12 @@ public class MouseMover extends Mover {
     @Override
     //TODO: implement method
     public float[] filter(float[] rawData) {
-        //Multiplying or adding numbers?
+
         //TODO: filter value should be customizable
         rawData[XAXIS] *= (SENSITIVITY +customSensitivity);
         rawData[YAXIS] *= (SENSITIVITY +customSensitivity);
         rawData[ZAXIS] *= (SENSITIVITY +customSensitivity);
+
         return rawData;
     }
 
