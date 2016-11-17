@@ -7,7 +7,11 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutCompat;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -15,6 +19,8 @@ import java.io.IOException;
 import java.net.InetAddress;
 
 import de.ovgu.softwareprojekt.control.OnCommandListener;
+import de.ovgu.softwareprojekt.control.commands.AddButton;
+import de.ovgu.softwareprojekt.control.commands.ButtonClick;
 import de.ovgu.softwareprojekt.control.commands.Command;
 import de.ovgu.softwareprojekt.control.commands.CommandType;
 import de.ovgu.softwareprojekt.control.commands.ConnectionRequestResponse;
@@ -49,6 +55,11 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
      * The network client organises all our communication with the server
      */
     NetworkClient mNetworkClient;
+
+    /**
+     * linear layout as a space to add buttons
+     */
+    private LinearLayout ll = (LinearLayout) findViewById(R.id.linlay);
 
     /**
      * Dialog for showing connection progress
@@ -220,5 +231,20 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
     public void onException(Object origin, Exception exception, String info) {
         exception.printStackTrace();
         //TODO: wörkwörk markus
+    }
+
+    public void createNewButton(AddButton addCom){
+        Button btn = new Button(this);
+        btn.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, LinearLayoutCompat.LayoutParams.WRAP_CONTENT));
+        ll.addView(btn);
+        btn.setText(addCom.mName);
+        btn.setTag((Integer) addCom.mID);
+        btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //send ButtonClick command with button id per networkclient
+                mNetworkClient.sendCommand(new ButtonClick((Integer) view.getTag()));
+            }
+        });
     }
 }
