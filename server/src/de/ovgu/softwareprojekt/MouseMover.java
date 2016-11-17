@@ -46,11 +46,12 @@ public class MouseMover extends Mover {
     @Override
     //TODO: implement method
     public float[] filter(float[] rawData) {
-        //Multiplying or adding numbers?
+
         //TODO: filter value should be customizable
         rawData[XAXIS] *= (SENSITIVITY +customSensitivity);
         rawData[YAXIS] *= (SENSITIVITY +customSensitivity);
         rawData[ZAXIS] *= (SENSITIVITY +customSensitivity);
+
         return rawData;
     }
 
