@@ -19,6 +19,9 @@ public class MouseMover extends Mover {
    public MouseMover()
    {
        super();
+       //Set Mouse position on start to center position
+       Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+       moveBot.mouseMove(screenSize.width/2, screenSize.height/2);
    }
 
     /**
