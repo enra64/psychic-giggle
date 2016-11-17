@@ -1,13 +1,20 @@
 package de.ovgu.softwareprojektapp;
 
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutCompat;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.LinearLayout;
 
 import java.io.IOException;
 import java.net.InetAddress;
 
 import de.ovgu.softwareprojekt.control.OnCommandListener;
+import de.ovgu.softwareprojekt.control.commands.AddButton;
+import de.ovgu.softwareprojekt.control.commands.ButtonClick;
 import de.ovgu.softwareprojekt.control.commands.Command;
 import de.ovgu.softwareprojekt.control.commands.CommandType;
 import de.ovgu.softwareprojekt.control.commands.ConnectionRequestResponse;
@@ -18,6 +25,7 @@ import de.ovgu.softwareprojekt.misc.ExceptionListener;
 import de.ovgu.softwareprojektapp.networking.NetworkClient;
 import de.ovgu.softwareprojektapp.sensors.Gyroscope;
 
+import static de.ovgu.softwareprojekt.control.commands.CommandType.AddButton;
 import static de.ovgu.softwareprojekt.control.commands.CommandType.SetSensor;
 
 public class SendActivity extends AppCompatActivity implements OnCommandListener, ExceptionListener {
@@ -39,6 +47,11 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
      * The network client organises all our communication with the server
      */
     NetworkClient mNetworkClient;
+
+    /**
+     * linear layout as a space to add buttons
+     */
+    private LinearLayout ll = (LinearLayout) findViewById(R.id.linlay);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -128,6 +141,17 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
                 }
 
                 break;
+
+            //adds a button to the activity with id and name
+            case AddButton:
+                AddButton addCom = (AddButton) command;
+                //create button with name and id
+                createNewButton(addCom);
+
+                break;
+
+
+
             // ignore unhandled commands
             default:
                 break;
@@ -137,5 +161,20 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
     @Override
     public void onException(Object origin, Exception exception, String info) {
         //TODO: wörkwörk markus
+    }
+
+    public void createNewButton(AddButton addCom){
+        Button btn = new Button(this);
+        btn.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, LinearLayoutCompat.LayoutParams.WRAP_CONTENT));
+        ll.addView(btn);
+        btn.setText(addCom.mName);
+        btn.setTag((Integer) addCom.mID);
+        btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //send ButtonClick command with button id per networkclient
+                mNetworkClient.sendCommand(new ButtonClick((Integer) view.getTag()));
+            }
+        });
     }
 }

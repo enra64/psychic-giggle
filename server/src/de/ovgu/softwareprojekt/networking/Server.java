@@ -6,10 +6,7 @@ import de.ovgu.softwareprojekt.SensorData;
 import de.ovgu.softwareprojekt.SensorType;
 import de.ovgu.softwareprojekt.control.CommandConnection;
 import de.ovgu.softwareprojekt.control.OnCommandListener;
-import de.ovgu.softwareprojekt.control.commands.Command;
-import de.ovgu.softwareprojekt.control.commands.ConnectionRequest;
-import de.ovgu.softwareprojekt.control.commands.EndConnection;
-import de.ovgu.softwareprojekt.control.commands.SetSensorCommand;
+import de.ovgu.softwareprojekt.control.commands.*;
 import de.ovgu.softwareprojekt.misc.ExceptionListener;
 
 import java.io.IOException;
@@ -39,7 +36,10 @@ public class Server implements OnCommandListener, DataSink {
      * Interface to communicate about lost and won clients
      */
     private ClientListener mClientListener;
-
+    /**
+     * interface to process infos about clicked Buttons
+     */
+    private ButtonListener mButtonListener;
     /**
      * Stores all known data sinks
      * <p>
@@ -53,7 +53,7 @@ public class Server implements OnCommandListener, DataSink {
      *
      * @throws IOException when something goes wrong...
      */
-    public Server(ExceptionListener exceptionListener, ClientListener clientListener) throws IOException {
+    public Server(ExceptionListener exceptionListener, ClientListener clientListener, ButtonListener buttonListener) throws IOException {
         // initialise the command and data connections
         initialiseCommandConnection();
         initialiseDataConnection();
@@ -131,6 +131,9 @@ public class Server implements OnCommandListener, DataSink {
                         // now that we have a connection, we know who to talk to for the commands
                         mCommandConnection.setRemote(origin, request.self.commandPort);
 
+                        //test TODO: wieder entfernen und umschreiben
+                        addButton("LeftClick", 0);
+
                         // for now, immediately let the client begin sending gyroscope data
                         mCommandConnection.sendCommand(new SetSensorCommand(SensorType.Gyroscope, true));
                     }
@@ -150,6 +153,10 @@ public class Server implements OnCommandListener, DataSink {
                 mClientListener.onClientDisconnected(endConnection.self);
 
                 break;
+
+            case ButtonClick:
+                ButtonClick btnClk = (ButtonClick) command;
+                mButtonListener.onButtonClick(btnClk);
 
             // ignore unhandled commands (like SetSensorCommand)
             default:
@@ -193,5 +200,13 @@ public class Server implements OnCommandListener, DataSink {
     public void close() {
         mCommandConnection.close();
         mDataConnection.close();
+    }
+
+    public void addButton(String name, int id){
+        try {
+            mCommandConnection.sendCommand(new AddButton(name , id));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
