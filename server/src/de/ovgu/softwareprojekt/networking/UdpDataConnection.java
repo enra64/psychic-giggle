@@ -1,4 +1,8 @@
-package de.ovgu.softwareprojekt;
+package de.ovgu.softwareprojekt.networking;
+
+import de.ovgu.softwareprojekt.DataSink;
+import de.ovgu.softwareprojekt.DataSource;
+import de.ovgu.softwareprojekt.SensorData;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -11,7 +15,7 @@ import java.net.SocketException;
  * This class listens for udp packets containing {@link SensorData} objects, and notifies a listener of new data.
  * The listener must be
  */
-public class UdpDataConnection extends Thread implements DataSource {
+class UdpDataConnection extends Thread implements DataSource {
     /**
      * Incoming sensor data will be forwareded here
      */

@@ -16,5 +16,6 @@ server/out/*
 .fuse*
 **/encodings.xml
 **/.idea/description.html
-
+**/uiDesigner.xml
 **/*.iml
+

@@ -1,7 +1,9 @@
-package de.ovgu.softwareprojekt.discovery;
+package de.ovgu.softwareprojekt.networking;
 
-import de.ovgu.softwareprojekt.UdpDataConnection;
 import de.ovgu.softwareprojekt.control.CommandConnection;
+import de.ovgu.softwareprojekt.discovery.DiscoveryThread;
+import de.ovgu.softwareprojekt.discovery.NetworkDevice;
+import de.ovgu.softwareprojekt.misc.ExceptionListener;
 
 import java.io.IOException;
 import java.net.DatagramSocket;
@@ -10,11 +12,13 @@ import java.net.InetAddress;
 /**
  * Use this class to wait for incoming discovery requests
  */
-public class DiscoveryServer extends DiscoveryThread {
+class DiscoveryServer extends DiscoveryThread {
     /**
      * The port we should listen on for broadcasts by discovery clients
      */
     private int mListenPort;
+
+    private ExceptionListener mExceptionListener;
 
     /**
      * Create a new discovery server. The {@link #start()} function must be called in order to begin listening. Please
@@ -29,9 +33,10 @@ public class DiscoveryServer extends DiscoveryThread {
      *                           parameter can be most easily retrieved via {@link UdpDataConnection#getLocalPort()}.
      * @param selfName           how to announce this server to any remotes
      */
-    public DiscoveryServer(int localDiscoveryPort, int localCommandPort, int localDataPort, String selfName) {
+    DiscoveryServer(ExceptionListener exceptionListener, int localDiscoveryPort, int localCommandPort, int localDataPort, String selfName) {
         super(selfName, localCommandPort, localDataPort);
         mListenPort = localDiscoveryPort;
+        mExceptionListener = exceptionListener;
     }
 
     /**
@@ -44,13 +49,11 @@ public class DiscoveryServer extends DiscoveryThread {
             setSocket(new DatagramSocket(mListenPort, InetAddress.getByName("0.0.0.0")));
 
             // continue running until close() is called
-            while (isRunning()) {
+            while (isRunning())
                 listen();
-            }
 
-            // TODO: do something intelligent with exceptions
         } catch (IOException e) {
-            e.printStackTrace();
+            mExceptionListener.onException(this, e, "DiscoveryServer: could not listen on 0.0.0.0:" + mListenPort);
         }
 
         // after we finished running, our socket must be closed
