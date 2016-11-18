@@ -147,15 +147,20 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
      *
      * @param enable true if the gyroscope must be enabled
      */
-    private void setSensor(SensorType sensorType, boolean enable) {
+    private void setSensor(final SensorType sensorType, boolean enable) {
         // configure the sensor run state
         if (!mSensorHandler.setRunning(mNetworkClient, sensorType, enable)) {
-            // show a warning if the requested sensor type does not exist
-            AlertDialog alertDialog = new AlertDialog.Builder(this).create();
-            alertDialog.setTitle("Sensor activation error");
-            alertDialog.setMessage("This device does not contain a " + sensorType.name());
-            alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, "OK", (DialogInterface.OnClickListener) null);
-            alertDialog.show();
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    // show a warning if the requested sensor type does not exist
+                    AlertDialog alertDialog = new AlertDialog.Builder(SendActivity.this).create();
+                    alertDialog.setTitle("Sensor activation error");
+                    alertDialog.setMessage("This device does not contain a " + sensorType.name());
+                    alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, "OK", (DialogInterface.OnClickListener) null);
+                    alertDialog.show();
+                }
+            });
         }
     }
 
