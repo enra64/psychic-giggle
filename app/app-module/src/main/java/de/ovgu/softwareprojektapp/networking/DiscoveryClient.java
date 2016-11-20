@@ -3,9 +3,16 @@ package de.ovgu.softwareprojektapp.networking;
 import java.io.IOException;
 import java.net.DatagramSocket;
 import java.net.SocketTimeoutException;
+import java.util.AbstractMap;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Timer;
+import java.util.TimerTask;
 
 import de.ovgu.softwareprojekt.discovery.DiscoveryThread;
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
@@ -13,18 +20,10 @@ import de.ovgu.softwareprojekt.discovery.OnDiscoveryListener;
 import de.ovgu.softwareprojekt.misc.ExceptionListener;
 
 /**
- * This thread manages sending discovery request packages and receiving answers from servers
+ * This thread manages sending discovery request packages and receiving answers from servers.
  */
 public class DiscoveryClient extends DiscoveryThread {
-    /**
-     * Listener to be called when our list of servers changes
-     */
-    private OnDiscoveryListener mDiscoveryListener;
 
-    /**
-     * Current list of known servers
-     */
-    private List<NetworkDevice> mCurrentServerList = new LinkedList<>();
 
     /**
      * Our broadcaster handles the recurring self identification broadcasts.
@@ -35,6 +34,16 @@ public class DiscoveryClient extends DiscoveryThread {
      * Timer used to schedule recurring broadcasts
      */
     private Timer mRecurringBroadcastTimer = new Timer();
+
+    /**
+     * Timer used to keep the list of servers up to date by regularly removing old servers
+     */
+    private Timer mServerListTimer = new Timer();
+
+    /**
+     * list of servers
+     */
+    private ServerList mCurrentServerList;
 
     /**
      * Create a new DiscoveryClient. In contrast to the DiscoveryServer, the DiscoveryClient does not
@@ -49,7 +58,7 @@ public class DiscoveryClient extends DiscoveryThread {
         super(selfName);
 
         // save who wants to be notified of new servers
-        mDiscoveryListener = listener;
+        mCurrentServerList = new ServerList(listener);
 
         // the broadcaster handles everything related to sending broadcasts
         mBroadcaster = new Broadcaster(this, exceptionListener, remotePort);
@@ -64,7 +73,8 @@ public class DiscoveryClient extends DiscoveryThread {
             setSocket(new DatagramSocket());
 
             // send a new broadcast every four seconds, beginning now
-            mRecurringBroadcastTimer.scheduleAtFixedRate(mBroadcaster, 0, 4000);
+            mRecurringBroadcastTimer.scheduleAtFixedRate(mBroadcaster, 0, 1000);
+            mServerListTimer.scheduleAtFixedRate(mCurrentServerList, 100, 1000);
 
             // continously check if we should continue listening
             while (isRunning()) {
@@ -91,11 +101,7 @@ public class DiscoveryClient extends DiscoveryThread {
      */
     @Override
     protected void onDiscovery(NetworkDevice device) {
-        // only if we have not yet found this server we may add it to our list of servers
-        if (!mCurrentServerList.contains(device)) {
-            mCurrentServerList.add(device);
-            mDiscoveryListener.onServerListUpdated(mCurrentServerList);
-        }
+        mCurrentServerList.addServer(device);
     }
 
     @Override
@@ -107,5 +113,66 @@ public class DiscoveryClient extends DiscoveryThread {
         mRecurringBroadcastTimer.cancel();
     }
 
+    /**
+     * A TimerTask extension that removes old servers
+     */
+    private class ServerList extends TimerTask {
+        /**
+         * Constant specifying how old a server discovery may be before it is regarded offline
+         */
+        private static final long MAXIMUM_SERVER_AGE_MS = 2000;
 
+        /**
+         * Current list of known servers as well as a timestamp marking their time of discovery
+         */
+        private HashMap<NetworkDevice, Long> mCurrentServerList = new HashMap<>();
+
+        /**
+         * Listener to be called when our list of servers is updated
+         */
+        private OnDiscoveryListener mDiscoveryListener;
+
+        /**
+         * Create a new ServerList that will push the most current list to the discovery listener
+         * at regular intervals
+         */
+        ServerList(OnDiscoveryListener onDiscoveryListener) {
+            mDiscoveryListener = onDiscoveryListener;
+        }
+
+        @Override
+        public void run() {
+            long now = System.currentTimeMillis();
+
+            // remove all servers older than MAXIMUM_SERVER_AGE_MS
+            Iterator<Map.Entry<NetworkDevice, Long>> it = mCurrentServerList.entrySet().iterator();
+            while (it.hasNext()) {
+                // get the next devices discovery timestamp
+                long discoveryTimestamp = it.next().getValue();
+
+                // if the device is too old, remove it
+                if ((now - discoveryTimestamp) > MAXIMUM_SERVER_AGE_MS)
+                    it.remove();
+            }
+
+            // notify listener of update
+            mDiscoveryListener.onServerListUpdated(getCurrentServers());
+        }
+
+        /**
+         * Retrieve an up-to-date list of known servers
+         */
+        private List<NetworkDevice> getCurrentServers() {
+            return new ArrayList<>(mCurrentServerList.keySet());
+        }
+
+        /**
+         * Adds a server to the list or, if it already exists, updates it.
+         */
+        void addServer(NetworkDevice device) {
+            System.out.println(mCurrentServerList.containsKey(device));
+            mCurrentServerList.put(device, System.currentTimeMillis());
+            System.out.println(device);
+        }
+    }
 }

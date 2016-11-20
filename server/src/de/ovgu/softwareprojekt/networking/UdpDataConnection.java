@@ -61,9 +61,6 @@ class UdpDataConnection extends Thread implements DataSource {
     public void run() {
         // this is a "try with resources": it automatically closes the socket, whatever happens
         try(DatagramSocket serverSocket = new DatagramSocket(mLocalPort)) {
-            // if we dont fuck up, we should not need this
-            //serverSocket.setReuseAddress(true);
-
             // storage for udp data
             byte[] appData = new byte[1024];
 

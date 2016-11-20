@@ -36,10 +36,12 @@ public class Server implements OnCommandListener, DataSink {
      * Interface to communicate about lost and won clients
      */
     private ClientListener mClientListener;
+
     /**
      * interface to process infos about clicked Buttons
      */
     private ButtonListener mButtonListener;
+
     /**
      * Stores all known data sinks
      * <p>

@@ -82,9 +82,34 @@ public class NetworkDevice implements Serializable {
         return InetAddress.getByName(address);
     }
 
+
+
     /**
-     * Checks this device for total equivalence (eg name, discoveryPort and address)
-     * @return true if this device identifies itself as the obj and uses the same address and discoveryPort
+     * Returns this network device formatted as "name" at "address"
+     */
+    @Override
+    public String toString() {
+        return name + " at " + address;
+    }
+
+    /**
+     * This hashcode implementation maps to our implementation of {@link #equals(Object)}, and computes
+     * the hash by adding the hash codes of the address and the name.
+     *
+     * If the {@link #equals(Object)} method is changed, this must be adjusted as well!
+     */
+    @Override
+    public int hashCode() {
+        // this hash code implementation relies on the fact that the java string hash code is always
+        // the same for the same string
+        return address.hashCode() + name.hashCode();
+    }
+
+    /**
+     * Check whether two network devices identify as the same device. This only checks their address
+     * and name; the port may change!
+     *
+     * If the {@link #hashCode()} method is changed, this must be adjusted as well!
      */
     @Override
     public boolean equals(Object obj) {

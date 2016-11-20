@@ -57,7 +57,7 @@ class Broadcaster extends TimerTask {
     }
 
     /**
-     * Return a list of all useful broadcast addresses of this device
+     * Return a list of all useful broadcast addresses of this device. Called once in the constructor.
      */
     private List<InetAddress> getBroadcastAddresses() {
         List<InetAddress> resultList = new LinkedList<>();

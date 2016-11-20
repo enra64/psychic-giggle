@@ -15,14 +15,14 @@ import de.ovgu.softwareprojekt.SensorType;
 /**
  * {@link DataSource} for gyroscope data
  */
-class Gyroscope extends AbstractSensor {
+public class Gyroscope extends AbstractSensor {
     /**
      * Create a gyroscope; does not start anything yet, use {@link #start()} or {@link #setRunning(boolean)}
      * to start receiving events
      *
      * @param context    android system context needed for sensors
      */
-    Gyroscope(Context context) {
+    public Gyroscope(Context context) {
         super(context, Sensor.TYPE_GYROSCOPE, SensorType.Gyroscope);
     }
 }
