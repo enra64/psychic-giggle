@@ -24,24 +24,16 @@ public class SensorData implements Serializable, Cloneable, Externalizable {
 
     /**
      * Timestamp
-     * TODO: unit and reference should still be decided
      */
     public long timestamp = 0;
 
     /**
-     * Accuracy of the sensor values
-     * TODO: do we even care about this
-     */
-    public int accuracy = -1;
-
-    /**
      * Create a new SensorType instance
      */
-    public SensorData(SensorType sensorType, float[] data, long timestamp, int accuracy) {
+    public SensorData(SensorType sensorType, float[] data, long timestamp) {
         this.sensorType = sensorType;
         this.data = data;
         this.timestamp = timestamp;
-        this.accuracy = accuracy;
     }
 
     /**
@@ -56,7 +48,7 @@ public class SensorData implements Serializable, Cloneable, Externalizable {
     @Override
     public String toString() {
         // print the data as csv
-        return Arrays.toString(data).replaceAll("[ \\[\\]]", "") + "," + timestamp + "," + accuracy;
+        return Arrays.toString(data).replaceAll("[ \\[\\]]", "") + "," + timestamp;
     }
 
     /**
@@ -74,13 +66,11 @@ public class SensorData implements Serializable, Cloneable, Externalizable {
             cloned.sensorType = sensorType;
             cloned.data = data.clone();
             cloned.timestamp = timestamp;
-            cloned.accuracy = accuracy;
         } catch (CloneNotSupportedException e) {
             e.printStackTrace();
         }
 
         // this must not be reached, as we inherit directly from Object
-        assert(false);
         return cloned;
     }
 
@@ -95,8 +85,6 @@ public class SensorData implements Serializable, Cloneable, Externalizable {
             objectOutput.writeFloat(f);
 
         objectOutput.writeLong(timestamp);
-
-        objectOutput.writeInt(accuracy);
     }
 
     @Override
@@ -112,6 +100,5 @@ public class SensorData implements Serializable, Cloneable, Externalizable {
             data[i] = objectInput.readFloat();
 
         timestamp = objectInput.readLong();
-        accuracy = objectInput.readInt();
     }
 }
