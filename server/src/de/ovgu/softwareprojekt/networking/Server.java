@@ -155,10 +155,6 @@ public class Server implements OnCommandListener, DataSink {
                     } else {
                         // deny the client
                         mCommandConnection.sendCommand(new ConnectionRequestResponse(false));
-
-                        // connection no longer needed
-                        // commented out because we cannot accept new connections then
-                        //mCommandConnection.close();
                     }
 
                 } catch (IOException e) {
@@ -166,15 +162,18 @@ public class Server implements OnCommandListener, DataSink {
                 }
                 break;
             case EndConnection:
-                // close connections
-                mDataConnection.close();
-                mCommandConnection.close();
+                // restart connections
+                try {
+                    initialiseDataConnection();
+                    initialiseCommandConnection();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
 
                 // notify listener of disconnect
                 EndConnection endConnection = (EndConnection) command;
                 endConnection.self.address = origin.getHostAddress();
                 mClientListener.onClientDisconnected(endConnection.self);
-                System.exit(0);
                 break;
 
             case ButtonClick:

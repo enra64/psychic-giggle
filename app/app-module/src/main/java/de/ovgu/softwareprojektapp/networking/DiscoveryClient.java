@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.ConcurrentHashMap;
 
 import de.ovgu.softwareprojekt.discovery.DiscoveryThread;
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
@@ -111,6 +112,9 @@ public class DiscoveryClient extends DiscoveryThread {
 
         // stop sending broadcasts
         mRecurringBroadcastTimer.cancel();
+
+        // stop updating the server list
+        mServerListTimer.cancel();
     }
 
     /**
@@ -125,7 +129,7 @@ public class DiscoveryClient extends DiscoveryThread {
         /**
          * Current list of known servers as well as a timestamp marking their time of discovery
          */
-        private HashMap<NetworkDevice, Long> mCurrentServerList = new HashMap<>();
+        private ConcurrentHashMap<NetworkDevice, Long> mCurrentServerList = new ConcurrentHashMap<>();
 
         /**
          * Listener to be called when our list of servers is updated
@@ -170,9 +174,7 @@ public class DiscoveryClient extends DiscoveryThread {
          * Adds a server to the list or, if it already exists, updates it.
          */
         void addServer(NetworkDevice device) {
-            System.out.println(mCurrentServerList.containsKey(device));
             mCurrentServerList.put(device, System.currentTimeMillis());
-            System.out.println(device);
         }
     }
 }

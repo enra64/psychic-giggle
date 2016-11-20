@@ -132,8 +132,6 @@ public class NetworkClient implements DataSink, ExceptionListener {
         } catch (IOException e) {
             mExceptionListener.onException(this, e, "NetworkClient: could not start listening for commands");
         }
-
-
     }
 
     /**

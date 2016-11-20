@@ -11,17 +11,6 @@
     tools:context="de.ovgu.softwareprojektapp.SendActivity">
 
     <Button
-        android:text="initiate command connection"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/button"
-        android:onClick="initiateConnection (SendActivity)"
-        android:layout_above="@+id/cancelButton"
-        android:layout_alignParentEnd="true"
-        android:layout_marginEnd="29dp"
-        android:layout_marginBottom="65dp" />
-
-    <Button
         android:text="Cancel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

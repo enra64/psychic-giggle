@@ -14,6 +14,7 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import java.net.ConnectException;
 import java.net.InetAddress;
 
 import de.ovgu.softwareprojekt.SensorType;
@@ -41,6 +42,7 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
 
     static final int RESULT_SERVER_REFUSED = -1;
     static final int RESULT_USER_STOPPED = 0;
+    static final int RESULT_SERVER_NOT_LISTENING_ON_COMMAND_PORT = -2;
 
     /**
      * The network client organises all our communication with the server
@@ -69,16 +71,6 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
 
         mRuntimeButtonLayout = (LinearLayout) findViewById(R.id.linlay);
 
-
-        Button initialisationButton = (Button) findViewById(R.id.button);
-        initialisationButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                initiateConnection();
-            }
-        });
-
-
         // we create a NetworkDevice from our extras to have all the data we need in a neat package
         mNetworkClient = new NetworkClient(
                 parseServer(),
@@ -92,6 +84,12 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
 
         // create a new sensor handler to help with the sensors
         mSensorHandler = new SensorHandler(this);
+
+        // immediately try to connect to the server
+        initiateConnection();
+
+        // default activity result is closing by user
+        setResult(RESULT_USER_STOPPED);
     }
 
     /**
@@ -124,6 +122,9 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
      * connection. It also stops the activity.
      */
     public void endConnection(@Nullable View v) {
+        // end connections
+        mNetworkClient.endConnection();
+
         // close activity
         closeActivity(RESULT_USER_STOPPED);
     }
@@ -139,9 +140,6 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
 
         // stop generating sensor data
         mSensorHandler.closeAll();
-
-        // end connections
-        mNetworkClient.endConnection();
 
         // close activity
         finish();
@@ -209,16 +207,12 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
                 SetSensorCommand com = (SetSensorCommand) command;
                 setSensor(com.sensorType, com.enable);
                 break;
-
             //adds a button to the activity with id and name
             case AddButton:
                 AddButton addCom = (AddButton) command;
                 //create button with name and id
                 createNewButton(addCom);
-
                 break;
-
-
             // ignore unhandled commands
             default:
                 break;
@@ -228,6 +222,16 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
     @Override
     public void onException(Object origin, Exception exception, String info) {
         exception.printStackTrace();
+
+        // this exception is thrown when we send commands, but the server has closed its command port
+        if(exception instanceof ConnectException && exception.getMessage().contains("ECONNREFUSED")){
+            // close the non-user-closeable connecting... dialog
+            if(mConnectionProgressDialog != null)
+                mConnectionProgressDialog.dismiss();
+
+            closeActivity(RESULT_SERVER_NOT_LISTENING_ON_COMMAND_PORT);
+        }
+
         //TODO: wörkwörk markus
     }
 
@@ -239,7 +243,7 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
                 btn.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, LinearLayoutCompat.LayoutParams.WRAP_CONTENT));
                 mRuntimeButtonLayout.addView(btn);
                 btn.setText(addCom.mName);
-                btn.setTag((Integer) addCom.mID);
+                btn.setTag(addCom.mID);
                 btn.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {

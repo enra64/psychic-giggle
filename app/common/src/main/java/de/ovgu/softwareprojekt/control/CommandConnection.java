@@ -122,7 +122,7 @@ public class CommandConnection {
     /**
      * Called whenever our CommandServer receives a command packet.
      *
-     * @param origin the host which sent the command
+     * @param origin  the host which sent the command
      * @param command the command we received
      */
     // this could have been implemented by CommandConnection implementing the OnCommandListener, but because it is an

@@ -12,6 +12,7 @@ import android.widget.Button;
 import android.widget.ListView;
 
 import java.io.IOException;
+import java.util.LinkedList;
 import java.util.List;
 
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
@@ -76,12 +77,28 @@ public class DiscoveryActivity extends AppCompatActivity implements OnDiscoveryL
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+
+        // clear the server list in case there is an old entry
+        onServerListUpdated(new LinkedList<NetworkDevice>());
+    }
+
+    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         // request code is ignored
         if(resultCode == SendActivity.RESULT_SERVER_REFUSED){
             AlertDialog alertDialog = new AlertDialog.Builder(this).create();
             alertDialog.setTitle("Connection failed");
             alertDialog.setMessage("Server refused connection");
+
+            alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, "OK", (DialogInterface.OnClickListener) null);
+
+            alertDialog.show();
+        } else if (resultCode == SendActivity.RESULT_SERVER_NOT_LISTENING_ON_COMMAND_PORT) {
+            AlertDialog alertDialog = new AlertDialog.Builder(this).create();
+            alertDialog.setTitle("Connection failed");
+            alertDialog.setMessage("Server seems to be offline");
 
             alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, "OK", (DialogInterface.OnClickListener) null);
 
