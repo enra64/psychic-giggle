@@ -26,6 +26,7 @@ import de.ovgu.softwareprojekt.control.commands.SetSensorCommand;
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
 import de.ovgu.softwareprojekt.misc.ExceptionListener;
 import de.ovgu.softwareprojektapp.networking.NetworkClient;
+import de.ovgu.softwareprojektapp.sensors.AbstractSensor;
 import de.ovgu.softwareprojektapp.sensors.SensorHandler;
 
 public class SendActivity extends AppCompatActivity implements OnCommandListener, ExceptionListener {
@@ -135,6 +136,9 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
     private void closeActivity(int result) {
         // set result of activity
         setResult(result);
+
+        // stop generating sensor data
+        mSensorHandler.closeAll();
 
         // end connections
         mNetworkClient.endConnection();

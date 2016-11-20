@@ -17,7 +17,7 @@ import de.ovgu.softwareprojekt.SensorType;
 /**
  * Super class for our sensors as much of the work is the same for any sensor type
  */
-abstract class AbstractSensor implements DataSource, SensorEventListener {
+public abstract class AbstractSensor implements DataSource, SensorEventListener {
     /**
      * The android sensor manager used to connect to the accelerometer
      */

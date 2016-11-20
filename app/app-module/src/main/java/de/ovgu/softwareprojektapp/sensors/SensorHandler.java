@@ -71,6 +71,14 @@ public class SensorHandler {
     }
 
     /**
+     * Close all sensors (unregister them)
+     */
+    public void closeAll(){
+        for(AbstractSensor abstractSensor : mSensors.values())
+            abstractSensor.close();
+    }
+
+    /**
      * Retrieves the class necessary to create sensor data for a certain sensor type
      *
      * @param sensorType the required sensor type
