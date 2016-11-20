@@ -25,9 +25,4 @@ public class Accelerometer extends AbstractSensor {
     public Accelerometer(Context context) {
         super(context, Sensor.TYPE_ACCELEROMETER, SensorType.Accelerometer);
     }
-
-    @Override
-    public SensorType getSensorType() {
-        return SensorType.Accelerometer;
-    }
 }
