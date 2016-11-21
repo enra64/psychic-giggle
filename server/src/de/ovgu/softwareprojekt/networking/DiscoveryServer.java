@@ -8,6 +8,7 @@ import de.ovgu.softwareprojekt.misc.ExceptionListener;
 import java.io.IOException;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.SocketTimeoutException;
 
 /**
  * Use this class to wait for incoming discovery requests
@@ -48,9 +49,19 @@ class DiscoveryServer extends DiscoveryThread {
             // set our socket listen to broadcasts on the configured listen port
             setSocket(new DatagramSocket(mListenPort, InetAddress.getByName("0.0.0.0")));
 
+            // timeout to allow for stopping the server
+            getSocket().setSoTimeout(20);
+
             // continue running until close() is called
-            while (isRunning())
-                listen();
+            while (isRunning()) {
+                try {
+                    listen();
+
+                // if the socket times out, we just want to check if we should listen again, so we ignore the exception
+                } catch (SocketTimeoutException ignored){
+
+                }
+            }
 
         } catch (IOException e) {
             mExceptionListener.onException(this, e, "DiscoveryServer: could not listen on 0.0.0.0:" + mListenPort);
@@ -58,6 +69,16 @@ class DiscoveryServer extends DiscoveryThread {
 
         // after we finished running, our socket must be closed
         getSocket().close();
+    }
+
+    /**
+     * Stop the listening loop, and wait until the socket is closed.
+     */
+    @Override
+    public void close() {
+        super.close();
+        // wait until the socket is closed
+        while(!getSocket().isClosed());
     }
 
     /**

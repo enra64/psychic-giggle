@@ -162,6 +162,7 @@ public class Server implements OnCommandListener, DataSink {
                 try {
                     mDataConnection.close();
                     mCommandConnection.close();
+                    mDiscoveryServer.close();
                     initialiseDataConnection();
                     initialiseCommandConnection();
                     initialiseDiscoveryServer();
