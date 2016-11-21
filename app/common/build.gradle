@@ -31,4 +31,4 @@ task copyJarToRoot(type: Copy) {
 }
 
 // this task creates the jar and copies it to the project root
-task provideJar (dependsOn: [createJar, copyJarToRoot])
+task provideJar (dependsOn: [clean, createJar, copyJarToRoot])
