@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.EnumMap;
+import java.util.HashSet;
+import java.util.Set;
 
 import de.ovgu.softwareprojekt.DataSink;
 import de.ovgu.softwareprojekt.SensorType;
@@ -32,16 +34,34 @@ public class SensorHandler {
         mContext = context;
     }
 
+
+    @SuppressWarnings("unchecked")
+    public boolean setRunning(DataSink dataSink, Set<SensorType> requiredSensors) {
+        boolean success = true;
+
+        // enable all required sensors
+        for(SensorType requiredSensor : requiredSensors)
+            success = setSensor(dataSink, requiredSensor, true) && success;
+
+        // disable all sensors no longer required
+        Set<SensorType> notRequiredSensors = new HashSet<>(mSensors.keySet());
+        notRequiredSensors.removeAll(requiredSensors);
+
+        // disable all unnecessary sensors
+        for(SensorType notRequiredSensor : notRequiredSensors)
+            success = setSensor(dataSink, notRequiredSensor, false) && success;
+
+        return success;
+    }
+
     /**
      * This method tries to dis- or enable a certain sensor.
      *
      * @param dataSink the datasink the sensor should report to
-     * @param sensorType the sensor type we wish to use
-     * @param enable true if the sensor should send data
+     * @param sensorType the list of required sensors
      * @return true if the sensor state has been successfully set
      */
-    @SuppressWarnings("unchecked")
-    public boolean setRunning(DataSink dataSink, SensorType sensorType, boolean enable) {
+    private boolean setSensor(DataSink dataSink, SensorType sensorType, boolean enable){
         try {
             Class sensorImplementation = getClassForSensorType(sensorType);
 

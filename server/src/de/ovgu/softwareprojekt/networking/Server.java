@@ -1,7 +1,6 @@
 package de.ovgu.softwareprojekt.networking;
 
 import de.ovgu.softwareprojekt.DataSink;
-import de.ovgu.softwareprojekt.Mover;
 import de.ovgu.softwareprojekt.SensorData;
 import de.ovgu.softwareprojekt.SensorType;
 import de.ovgu.softwareprojekt.control.CommandConnection;
@@ -71,10 +70,9 @@ public class Server implements OnCommandListener, DataSink {
     private EnumMap<SensorType, HashSet<DataSink>> mDataSinks = new EnumMap<>(SensorType.class);
 
     /**
-     * Creates a new server object
-     *
-     * @throws IOException when something goes wrong...
+     * true if the sensor list changed since the last device sync, and should thus be resynced
      */
+    private boolean mSensorListChanged = false;
 
     /**Constants to identify which MouseClick it is; */
     public static final int LEFTMOUSECLICK = 0;
@@ -107,6 +105,9 @@ public class Server implements OnCommandListener, DataSink {
 
         // add the new sink to the list of sink for the sensor
         mDataSinks.get(requestedSensor).add(dataSink);
+
+        // force resetting the sensors on the client
+        mSensorListChanged = true;
     }
 
     /**
@@ -117,6 +118,9 @@ public class Server implements OnCommandListener, DataSink {
      */
     public void unregisterDataSink(DataSink dataSink, SensorType requestedSensor) {
         mDataSinks.get(requestedSensor).remove(dataSink);
+
+        // force resetting the sensors on the client
+        mSensorListChanged = true;
     }
 
     /**
@@ -125,8 +129,12 @@ public class Server implements OnCommandListener, DataSink {
      * @param dataSink which data sink to remove
      */
     public void unregisterDataSink(DataSink dataSink) {
+        // unregister dataSink from all sensors it is registered to
         for (SensorType type : mDataSinks.keySet())
             unregisterDataSink(dataSink, type);
+
+        // force resetting the sensors on the client
+        mSensorListChanged = true;
     }
 
     /**
@@ -161,11 +169,14 @@ public class Server implements OnCommandListener, DataSink {
                             mCommandConnection.sendCommand(new UpdateButtons(mButtonList));
                         }
 
+                        // if the sensor list (the sensors we need to be active) changed, update them
+                        if(mSensorListChanged){
+                            mSensorListChanged = false;
+                            mCommandConnection.sendCommand(new SetSensorCommand(mDataSinks.keySet()));
+                        }
+
                         // close the discovery server
                         mDiscoveryServer.close();
-
-                        // for now, immediately let the client begin sending gyroscope data
-                        mCommandConnection.sendCommand(new SetSensorCommand(SensorType.Gyroscope, true));
                     } else {
                         // deny the client
                         mCommandConnection.sendCommand(new ConnectionRequestResponse(false));

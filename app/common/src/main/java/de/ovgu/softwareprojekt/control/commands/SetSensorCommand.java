@@ -1,5 +1,7 @@
 package de.ovgu.softwareprojekt.control.commands;
 
+import java.util.Set;
+
 import de.ovgu.softwareprojekt.SensorType;
 
 /**
@@ -7,23 +9,16 @@ import de.ovgu.softwareprojekt.SensorType;
  */
 public class SetSensorCommand extends Command {
     /**
-     * The sensor that should be switched on or off
+     * The set of sensors required to be enabled
      */
-    public SensorType sensorType;
+    public Set<SensorType> requiredSensors;
 
     /**
-     * Whether to grant or disable the sensor
+     * Create a new command to set the set of required sensors
+     * @param requiredSensors The list of sensors the application currently requires
      */
-    public boolean enable;
-
-    /**
-     * Create a new command to switch a sensor on or off
-     * @param type The sensor that should be switched on or off
-     * @param enable Whether to grant or disable the sensor
-     */
-    public SetSensorCommand(SensorType type, boolean enable) {
+    public SetSensorCommand(Set<SensorType> requiredSensors) {
         super(CommandType.SetSensor);
-        sensorType = type;
-        this.enable = enable;
+        this.requiredSensors = requiredSensors;
     }
 }

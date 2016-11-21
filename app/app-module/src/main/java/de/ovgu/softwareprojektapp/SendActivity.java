@@ -17,6 +17,7 @@ import android.widget.Toast;
 import java.net.ConnectException;
 import java.net.InetAddress;
 import java.util.Map;
+import java.util.Set;
 
 import de.ovgu.softwareprojekt.SensorType;
 import de.ovgu.softwareprojekt.control.OnCommandListener;
@@ -149,20 +150,20 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
     }
 
     /**
-     * Enable or disable the gyroscope
+     * Enable only the required sensors
      *
-     * @param enable true if the gyroscope must be enabled
+     * @param requiredSensors list of required sensors
      */
-    private void setSensor(final SensorType sensorType, boolean enable) {
+    private void setSensor(final Set<SensorType> requiredSensors) {
         // configure the sensor run state
-        if (!mSensorHandler.setRunning(mNetworkClient, sensorType, enable)) {
+        if (!mSensorHandler.setRunning(mNetworkClient, requiredSensors)) {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     // show a warning if the requested sensor type does not exist
                     AlertDialog alertDialog = new AlertDialog.Builder(SendActivity.this).create();
                     alertDialog.setTitle("Sensor activation error");
-                    alertDialog.setMessage("This device does not contain a " + sensorType.name());
+                    alertDialog.setMessage("This device does not contain a required sensor");
                     alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, "OK", (DialogInterface.OnClickListener) null);
                     alertDialog.show();
                 }
@@ -208,7 +209,7 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
             case SetSensor:
                 // enable or disable a sensor
                 SetSensorCommand com = (SetSensorCommand) command;
-                setSensor(com.sensorType, com.enable);
+                setSensor(com.requiredSensors);
                 break;
             //adds a button to the activity with id and name
             case AddButton:
