@@ -13,6 +13,8 @@ buildscript {
 
 // This task creates a common.jar with sources
 task createJar(type: Jar) {
+    dependsOn clean
+
     archiveName = "common.jar"
     baseName = project.name
 
@@ -26,9 +28,10 @@ task createJar(type: Jar) {
 
 // this task copies the generated common.jar into the root of the softwareprojekt
 task copyJarToRoot(type: Copy) {
+    dependsOn createJar
     from 'build/libs/common.jar'
     into "../../"
 }
 
 // this task creates the jar and copies it to the project root
-task provideJar (dependsOn: [clean, createJar, copyJarToRoot])
+task provideJar (dependsOn: [copyJarToRoot])
