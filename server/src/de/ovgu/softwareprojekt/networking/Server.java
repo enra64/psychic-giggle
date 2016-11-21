@@ -172,7 +172,9 @@ public class Server implements OnCommandListener, DataSink {
                         // if the sensor list (the sensors we need to be active) changed, update them
                         if(mSensorListChanged){
                             mSensorListChanged = false;
-                            mCommandConnection.sendCommand(new SetSensorCommand(mDataSinks.keySet()));
+                            mCommandConnection.sendCommand(
+                                    // the key set is not serializable, so we must create an arraylist from it
+                                    new SetSensorCommand(new ArrayList<>(mDataSinks.keySet())));
                         }
 
                         // close the discovery server

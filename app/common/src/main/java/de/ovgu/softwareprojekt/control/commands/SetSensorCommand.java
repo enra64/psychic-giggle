@@ -1,6 +1,6 @@
 package de.ovgu.softwareprojekt.control.commands;
 
-import java.util.Set;
+import java.util.List;
 
 import de.ovgu.softwareprojekt.SensorType;
 
@@ -11,13 +11,13 @@ public class SetSensorCommand extends Command {
     /**
      * The set of sensors required to be enabled
      */
-    public Set<SensorType> requiredSensors;
+    public List<SensorType> requiredSensors;
 
     /**
      * Create a new command to set the set of required sensors
      * @param requiredSensors The list of sensors the application currently requires
      */
-    public SetSensorCommand(Set<SensorType> requiredSensors) {
+    public SetSensorCommand(List<SensorType> requiredSensors) {
         super(CommandType.SetSensor);
         this.requiredSensors = requiredSensors;
     }

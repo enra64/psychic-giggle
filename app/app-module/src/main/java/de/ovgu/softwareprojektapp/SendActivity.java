@@ -16,6 +16,7 @@ import android.widget.Toast;
 
 import java.net.ConnectException;
 import java.net.InetAddress;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -154,7 +155,7 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
      *
      * @param requiredSensors list of required sensors
      */
-    private void setSensor(final Set<SensorType> requiredSensors) {
+    private void setSensor(final List<SensorType> requiredSensors) {
         // configure the sensor run state
         if (!mSensorHandler.setRunning(mNetworkClient, requiredSensors)) {
             runOnUiThread(new Runnable() {

@@ -7,6 +7,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.EnumMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import de.ovgu.softwareprojekt.DataSink;
@@ -36,7 +37,7 @@ public class SensorHandler {
 
 
     @SuppressWarnings("unchecked")
-    public boolean setRunning(DataSink dataSink, Set<SensorType> requiredSensors) {
+    public boolean setRunning(DataSink dataSink, List<SensorType> requiredSensors) {
         boolean success = true;
 
         // enable all required sensors
