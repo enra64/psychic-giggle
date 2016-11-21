@@ -12,6 +12,11 @@ import java.io.IOException;
 
 public class Main {
 
+    /**Constants to identify which AppButton was activated; */
+    public static final int LEFTMOUSECLICK = 0;
+    public static final int RIGHTMOUSECLICK = 1;
+    public static final int STOPMOVEMENT = 2;
+
     public static void main(String[] args) throws IOException {
         final MouseMover mover = new MouseMover();
         // create a new server, and handle its exceptions by dying
@@ -48,8 +53,8 @@ public class Main {
 
         // register a new mouse move to be used as data sink for the gyroscope
         server.registerDataSink(mover, SensorType.Gyroscope);
-        server.addButton("left click", 0);
-        server.addButton("right click", 1);
-        server.addButton("stop movement", 2);
+        server.addButton("left click", LEFTMOUSECLICK);
+        server.addButton("right click", RIGHTMOUSECLICK);
+        server.addButton("stop movement", STOPMOVEMENT);
     }
 }

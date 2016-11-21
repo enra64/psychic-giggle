@@ -247,9 +247,10 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
                 // clear all old buttons
                 mRuntimeButtonLayout.removeAllViews();
 
+
                 for (Map.Entry<Integer, String> button : addCom.buttons.entrySet()) {
                     Button btn = new Button(SendActivity.this);
-                    btn.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, LinearLayoutCompat.LayoutParams.WRAP_CONTENT));
+                    btn.setLayoutParams(new LinearLayout.LayoutParams(LinearLayoutCompat.LayoutParams.MATCH_PARENT, mRuntimeButtonLayout.getHeight()/ addCom.buttons.size()));
                     mRuntimeButtonLayout.addView(btn);
                     btn.setText(button.getValue());
                     btn.setTag(button.getKey());
