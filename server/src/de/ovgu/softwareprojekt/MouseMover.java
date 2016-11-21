@@ -9,17 +9,17 @@ import java.awt.event.InputEvent;
  * This class gets the gyroscope data and moves the mouse accordingly
  */
 public class MouseMover extends Mover {
-<<<<<<< HEAD
+
     float averageX=0,averageY=0,averageZ=0;
     float[][] average = new float[5][3];
     int rawCount=0; //used for average output
-=======
+
 
     /** This is probably stupid, I just want to know what happens*/
     //TODO: Remove or improve this boolean bullshit dependent of this working or not
     private boolean isAlreadyClicked;
 
->>>>>>> a5aab7ac5acf5d75b2d6ef743e40faa75e9163ac
+
     private Point mousePos;
     //TODO: find the best sensitivity
     private final float SENSITIVITY = 40f;
