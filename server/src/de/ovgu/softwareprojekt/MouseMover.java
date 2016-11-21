@@ -9,11 +9,17 @@ import java.awt.event.InputEvent;
  * This class gets the gyroscope data and moves the mouse accordingly
  */
 public class MouseMover extends Mover {
+<<<<<<< HEAD
+    float averageX=0,averageY=0,averageZ=0;
+    float[][] average = new float[5][3];
+    int rawCount=0; //used for average output
+=======
 
     /** This is probably stupid, I just want to know what happens*/
     //TODO: Remove or improve this boolean bullshit dependent of this working or not
     private boolean isAlreadyClicked;
 
+>>>>>>> a5aab7ac5acf5d75b2d6ef743e40faa75e9163ac
     private Point mousePos;
     //TODO: find the best sensitivity
     private final float SENSITIVITY = 40f;
@@ -62,12 +68,45 @@ public class MouseMover extends Mover {
     //TODO: implement method
     public float[] filter(float[] rawData) {
 
+
+
         //TODO: filter value should be customizable
         rawData[XAXIS] *= (SENSITIVITY +customSensitivity);
         rawData[YAXIS] *= (SENSITIVITY +customSensitivity);
         rawData[ZAXIS] *= (SENSITIVITY +customSensitivity);
 
+
+        //TODO: average Data out of 5 inputs
+
+
+
+        average[rawCount][0]=rawData[XAXIS];
+        average[rawCount][1]=rawData[YAXIS];
+        average[rawCount][2]=rawData[ZAXIS];
+
+        for(int i=0;i<5;i++)
+        {
+            averageX = averageX + average[rawCount][0];
+            averageY = averageY + average[rawCount][1];
+            averageZ = averageZ + average[rawCount][2];
+        }
+        rawCount++;
+
+        if(rawCount==5) {
+            rawCount = 0;
+        }
+
+        averageX=averageX/5;
+        averageY=averageY/5;
+        averageZ=averageZ/5;
+
+        rawData[XAXIS]=averageX;
+        rawData[YAXIS]=averageY;
+        rawData[ZAXIS]=averageZ;
+
         return rawData;
+
+
     }
 
     /**
