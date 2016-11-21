@@ -10,7 +10,7 @@ import java.awt.event.InputEvent;
  */
 public class MouseMover extends Mover {
 
-    private float averageX=0,averageY=0,averageZ=0;
+    private float[] filteredData = new float[3];
     private final int averageSampleSize = 5;
     private float[][] average = new float[averageSampleSize][3];
     private int rawCount=0; //used for average output
@@ -51,10 +51,10 @@ public class MouseMover extends Mover {
     public void move(float[] rawData) {
         mousePos = MouseInfo.getPointerInfo().getLocation();
 
-        rawData = filter(rawData);
+        float[] axesValues = filter(rawData);
 
-        int xAxis = (int) rawData[ZAXIS];   //Up down movement on screen is achieved my rotating phone by z-axis
-        int yAxis = (int) rawData[XAXIS];
+        int xAxis = (int) axesValues[ZAXIS];   //Up down movement on screen is achieved my rotating phone by z-axis
+        int yAxis = (int) axesValues[XAXIS];
 
         //TODO: Find out if addition or subtraction works better
         moveBot.mouseMove(mousePos.x - xAxis, mousePos.y - yAxis);
@@ -70,9 +70,9 @@ public class MouseMover extends Mover {
     //TODO: implement method
     public float[] filter(float[] rawData) {
         //TODO: filter value should be customizable
-        rawData[XAXIS] *= (SENSITIVITY +customSensitivity);
-        rawData[YAXIS] *= (SENSITIVITY +customSensitivity);
-        rawData[ZAXIS] *= (SENSITIVITY +customSensitivity);
+        rawData[XAXIS] *= (SENSITIVITY + customSensitivity);
+        rawData[YAXIS] *= (SENSITIVITY + customSensitivity);
+        rawData[ZAXIS] *= (SENSITIVITY + customSensitivity);
 
         //enter new gyroscope values
         average[rawCount][0]=rawData[XAXIS];
@@ -82,9 +82,9 @@ public class MouseMover extends Mover {
         //create average of all values in the sample size
         for(int i=0;i< averageSampleSize;i++)
         {
-            averageX = averageX + average[rawCount][XAXIS];
-            averageY = averageY + average[rawCount][YAXIS];
-            averageZ = averageZ + average[rawCount][ZAXIS];
+            filteredData[XAXIS] += average[rawCount][XAXIS];
+            filteredData[YAXIS] += average[rawCount][YAXIS];
+            filteredData[ZAXIS] += average[rawCount][ZAXIS];
         }
         rawCount++;
 
@@ -94,16 +94,11 @@ public class MouseMover extends Mover {
         }
 
         //calculate average
-        averageX=averageX/ averageSampleSize;
-        averageY=averageY/ averageSampleSize;
-        averageZ=averageZ/ averageSampleSize;
+        for (int i = 0; i < filteredData.length; i++) {
+            filteredData[i] /= averageSampleSize;
+        }
 
-        //enter average into rawData which is used to move the mouse with the new values
-        rawData[XAXIS]=averageX;
-        rawData[YAXIS]=averageY;
-        rawData[ZAXIS]=averageZ;
-
-        return rawData;
+        return filteredData;
     }
 
     /**
