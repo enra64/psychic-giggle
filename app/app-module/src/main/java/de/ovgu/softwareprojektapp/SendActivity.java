@@ -15,10 +15,11 @@ import android.widget.Toast;
 
 import java.net.ConnectException;
 import java.net.InetAddress;
+import java.util.Map;
 
 import de.ovgu.softwareprojekt.SensorType;
 import de.ovgu.softwareprojekt.control.OnCommandListener;
-import de.ovgu.softwareprojekt.control.commands.AddButton;
+import de.ovgu.softwareprojekt.control.commands.UpdateButtons;
 import de.ovgu.softwareprojekt.control.commands.ButtonClick;
 import de.ovgu.softwareprojekt.control.commands.Command;
 import de.ovgu.softwareprojekt.control.commands.ConnectionRequestResponse;
@@ -210,9 +211,9 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
                 break;
             //adds a button to the activity with id and name
             case AddButton:
-                AddButton addCom = (AddButton) command;
+                UpdateButtons addCom = (UpdateButtons) command;
                 //create button with name and id
-                createNewButton(addCom);
+                createButtons(addCom);
                 break;
             // ignore unhandled commands
             default:
@@ -236,22 +237,25 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
         //TODO: wörkwörk markus
     }
 
-    public void createNewButton(final AddButton addCom) {
+    public void createButtons(final UpdateButtons addCom) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                Button btn = new Button(SendActivity.this);
-                btn.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, LinearLayoutCompat.LayoutParams.WRAP_CONTENT));
-                mRuntimeButtonLayout.addView(btn);
-                btn.setText(addCom.mName);
-                btn.setTag(addCom.mID);
-                btn.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        //send ButtonClick command with button id per networkclient
-                        mNetworkClient.sendCommand(new ButtonClick((Integer) view.getTag()));
-                    }
-                });
+                for(Map.Entry<Integer, String> button : addCom.buttons.entrySet()){
+                    Button btn = new Button(SendActivity.this);
+                    btn.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, LinearLayoutCompat.LayoutParams.WRAP_CONTENT));
+                    mRuntimeButtonLayout.addView(btn);
+                    btn.setText(button.getValue());
+                    btn.setTag(button.getKey());
+                    btn.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            //send ButtonClick command with button id per networkclient
+                            mNetworkClient.sendCommand(new ButtonClick((Integer) view.getTag()));
+                        }
+                    });
+                }
+
             }
         });
 

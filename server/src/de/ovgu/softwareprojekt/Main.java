@@ -46,6 +46,8 @@ public class Main {
 
         // register a new mouse move to be used as data sink for the gyroscope
         server.registerDataSink(mover, SensorType.Gyroscope);
-        //server.addButton("LeftClick", 0);
+        server.addButton("left click", 0);
+        server.addButton("right click", 1);
+        server.addButton("stop movement", 2);
     }
 }

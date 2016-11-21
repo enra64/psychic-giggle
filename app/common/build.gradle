@@ -13,8 +13,6 @@ buildscript {
 
 // This task creates a common.jar with sources
 task createJar(type: Jar) {
-    dependsOn clean
-
     archiveName = "common.jar"
     baseName = project.name
 
