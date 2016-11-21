@@ -242,19 +242,15 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
+                // clear all old buttons
+                mRuntimeButtonLayout.removeAllViews();
+
                 for (Map.Entry<Integer, String> button : addCom.buttons.entrySet()) {
                     Button btn = new Button(SendActivity.this);
                     btn.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, LinearLayoutCompat.LayoutParams.WRAP_CONTENT));
                     mRuntimeButtonLayout.addView(btn);
                     btn.setText(button.getValue());
                     btn.setTag(button.getKey());
-                    btn.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            //send ButtonClick command with button id per networkclient
-                            mNetworkClient.sendCommand(new ButtonClick((Integer) view.getTag(), false));
-                        }
-                    });
                     btn.setOnTouchListener(new View.OnTouchListener() {
                         @Override
                         public boolean onTouch(View view, MotionEvent motionEvent) {
