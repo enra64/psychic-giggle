@@ -9,7 +9,7 @@ import java.awt.event.InputEvent;
  * This class gets the gyroscope data and moves the mouse accordingly
  */
 public class MouseMover extends Mover {
-
+    static int rawCount=0; //used for average output
     private Point mousePos;
     //TODO: find the best sensitivity
     private final float SENSITIVITY = 40f;
@@ -57,12 +57,40 @@ public class MouseMover extends Mover {
     //TODO: implement method
     public float[] filter(float[] rawData) {
 
+        float[]nullarray={0,0,0};
+
         //TODO: filter value should be customizable
         rawData[XAXIS] *= (SENSITIVITY +customSensitivity);
         rawData[YAXIS] *= (SENSITIVITY +customSensitivity);
         rawData[ZAXIS] *= (SENSITIVITY +customSensitivity);
 
-        return rawData;
+
+        //TODO: average Data out of 5 inputs
+
+        float averageX=0,averageY=0,averageZ=0;
+        float[][] average = new float[5][3];
+        average[rawCount][1]=rawData[XAXIS];
+        average[rawCount][2]=rawData[YAXIS];
+        average[rawCount][3]=rawData[ZAXIS];
+
+        rawCount++;
+        if(rawCount==5) {
+            rawCount = 0;
+            for (int i = 1; i <= 5; i++) {
+                averageX = averageX + average[1][i];
+                averageY = averageY + average[2][i];
+                averageZ = averageZ + average[3][i];
+            }
+            averageX=averageX/5;
+            averageY=averageY/5;
+            averageZ=averageZ/5;
+            rawData[XAXIS]=averageX;
+            rawData[YAXIS]=averageY;
+            rawData[ZAXIS]=averageZ;
+
+            return rawData;
+        }
+        return nullarray;
     }
 
     /**
