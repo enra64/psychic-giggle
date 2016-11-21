@@ -53,6 +53,16 @@ public class Server implements OnCommandListener, DataSink {
     private ButtonListener mButtonListener;
 
     /**
+     * list of buttons that should be displayed on all clients
+     */
+    private Map<Integer, String> mButtonList = new HashMap<>();
+
+    /**
+     * whether the button list was changed since the update
+     */
+    private boolean mButtonListChanged = false;
+
+    /**
      * Stores all known data sinks
      * <p>
      * This variable is an EnumMap, so iterations over the keys should be quite fast. The sinks are stored in a
@@ -65,6 +75,11 @@ public class Server implements OnCommandListener, DataSink {
      *
      * @throws IOException when something goes wrong...
      */
+
+    /**Constants to identify which MouseClick it is; */
+    public static final int LEFTMOUSECLICK = 0;
+    public static final int RIGHTMOUSECLICK = 1;
+
     public Server(ExceptionListener exceptionListener, ClientListener clientListener, ButtonListener buttonListener) throws IOException {
         // store the various listeners
         mExceptionListener = exceptionListener;
@@ -140,8 +155,11 @@ public class Server implements OnCommandListener, DataSink {
                         // accept the client
                         mCommandConnection.sendCommand(new ConnectionRequestResponse(true));
 
-                        //test TODO: wieder entfernen und umschreiben
-                        addButton("LeftClick", 0);
+                        // if the button list was changed, we need to update the clients buttons
+                        if(mButtonListChanged){
+                            mButtonListChanged = false;
+                            mCommandConnection.sendCommand(new UpdateButtons(mButtonList));
+                        }
 
                         // close the discovery server
                         mDiscoveryServer.close();
@@ -240,11 +258,17 @@ public class Server implements OnCommandListener, DataSink {
         mDataConnection.close();
     }
 
+    /**
+     * Add a button to be displayed on the clients
+     *
+     * @param name text to be displayed on the button
+     * @param id id of the button
+     */
     public void addButton(String name, int id) {
-        try {
-            mCommandConnection.sendCommand(new AddButton(name, id));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        // add the new button
+        mButtonList.put(id, name);
+
+        // flag to update the button list on our clients
+        mButtonListChanged = true;
     }
 }

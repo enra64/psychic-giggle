@@ -39,13 +39,17 @@ public class Main {
                 new ButtonListener() {
                     @Override
                     public void onButtonClick(ButtonClick click) {
+
                         mover.click(true);
-                        mover.click(false);
+                        if(!click.isHold)
+                            mover.click(false);
                     }
                 });
 
         // register a new mouse move to be used as data sink for the gyroscope
         server.registerDataSink(mover, SensorType.Gyroscope);
-        //server.addButton("LeftClick", 0);
+        server.addButton("left click", 0);
+        server.addButton("right click", 1);
+        server.addButton("stop movement", 2);
     }
 }

@@ -210,9 +210,9 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
                 break;
             //adds a button to the activity with id and name
             case AddButton:
-                AddButton addCom = (AddButton) command;
+                UpdateButtons addCom = (UpdateButtons) command;
                 //create button with name and id
-                createNewButton(addCom);
+                createButtons(addCom);
                 break;
             // ignore unhandled commands
             default:
@@ -236,10 +236,11 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
         //TODO: wörkwörk markus
     }
 
-    public void createNewButton(final AddButton addCom) {
+    public void createButtons(final UpdateButtons addCom) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
+for(Map.Entry<Integer, String> button : addCom.buttons.entrySet()){
                 Button btn = new Button(SendActivity.this);
                 btn.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, LinearLayoutCompat.LayoutParams.WRAP_CONTENT));
                 mRuntimeButtonLayout.addView(btn);
@@ -249,11 +250,19 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
                     @Override
                     public void onClick(View view) {
                         //send ButtonClick command with button id per networkclient
-                        mNetworkClient.sendCommand(new ButtonClick((Integer) view.getTag()));
+                        mNetworkClient.sendCommand(new ButtonClick((Integer) view.getTag(), false));
                     }
                 });
+                btn.setOnTouchListener(new View.OnTouchListener() {
+                       @Override
+                       public boolean onTouch(View view, MotionEvent motionEvent) {
+                           if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
+                               mNetworkClient.sendCommand(new ButtonClick((Integer) view.getTag(), true));
+                           } else if (motionEvent.getAction() == MotionEvent.ACTION_UP)
+                               mNetworkClient.sendCommand(new ButtonClick((Integer) view.getTag(), false));
+
             }
         });
-
+	}
     }
 }
