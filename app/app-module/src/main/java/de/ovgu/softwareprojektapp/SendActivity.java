@@ -7,6 +7,7 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutCompat;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -225,9 +226,9 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
         exception.printStackTrace();
 
         // this exception is thrown when we send commands, but the server has closed its command port
-        if(exception instanceof ConnectException && exception.getMessage().contains("ECONNREFUSED")){
+        if (exception instanceof ConnectException && exception.getMessage().contains("ECONNREFUSED")) {
             // close the non-user-closeable connecting... dialog
-            if(mConnectionProgressDialog != null)
+            if (mConnectionProgressDialog != null)
                 mConnectionProgressDialog.dismiss();
 
             closeActivity(RESULT_SERVER_NOT_LISTENING_ON_COMMAND_PORT);
@@ -249,9 +250,23 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
                     @Override
                     public void onClick(View view) {
                         //send ButtonClick command with button id per networkclient
-                        mNetworkClient.sendCommand(new ButtonClick((Integer) view.getTag()));
+                        mNetworkClient.sendCommand(new ButtonClick((Integer) view.getTag(), false));
                     }
                 });
+                btn.setOnTouchListener(new View.OnTouchListener() {
+                       @Override
+                       public boolean onTouch(View view, MotionEvent motionEvent) {
+                           if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
+                               mNetworkClient.sendCommand(new ButtonClick((Integer) view.getTag(), true));
+                           } else if (motionEvent.getAction() == MotionEvent.ACTION_UP)
+                               mNetworkClient.sendCommand(new ButtonClick((Integer) view.getTag(), false));
+
+                           return true;
+                       }
+
+                   }
+
+                );
             }
         });
 

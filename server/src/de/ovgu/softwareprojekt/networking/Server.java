@@ -65,6 +65,11 @@ public class Server implements OnCommandListener, DataSink {
      *
      * @throws IOException when something goes wrong...
      */
+
+    /**Constants to identify which MouseClick it is; */
+    public static final int LEFTMOUSECLICK = 0;
+    public static final int RIGHTMOUSECLICK = 1;
+
     public Server(ExceptionListener exceptionListener, ClientListener clientListener, ButtonListener buttonListener) throws IOException {
         // store the various listeners
         mExceptionListener = exceptionListener;
@@ -141,7 +146,7 @@ public class Server implements OnCommandListener, DataSink {
                         mCommandConnection.sendCommand(new ConnectionRequestResponse(true));
 
                         //test TODO: wieder entfernen und umschreiben
-                        addButton("LeftClick", 0);
+                        addButton("LeftClick", LEFTMOUSECLICK);
 
                         // close the discovery server
                         mDiscoveryServer.close();

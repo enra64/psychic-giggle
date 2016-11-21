@@ -10,6 +10,10 @@ import java.awt.event.InputEvent;
  */
 public class MouseMover extends Mover {
 
+    /** This is probably stupid, I just want to know what happens*/
+    //TODO: Remove or improve this boolean bullshit dependent of this working or not
+    private boolean isAlreadyClicked;
+
     private Point mousePos;
     //TODO: find the best sensitivity
     private final float SENSITIVITY = 40f;
@@ -20,6 +24,7 @@ public class MouseMover extends Mover {
    {
        super();
        resetPosToCenter();
+       isAlreadyClicked = false;
    }
 
     /**
@@ -73,9 +78,14 @@ public class MouseMover extends Mover {
     {
         //TODO: Check later if this actually works as intended
         if(isClicked)
-            moveBot.mousePress(InputEvent.BUTTON1_DOWN_MASK);
+            if(!isAlreadyClicked) {
+                moveBot.mousePress(InputEvent.BUTTON1_DOWN_MASK);
+                isAlreadyClicked = true;
+            }
 
-        else
-            moveBot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
+        else {
+                moveBot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
+                isAlreadyClicked = false;
+        }
     }
 }
