@@ -1,7 +1,9 @@
 package de.ovgu.softwareprojektapp;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
@@ -10,6 +12,7 @@ import android.widget.Button;
 import android.widget.ListView;
 
 import java.io.IOException;
+import java.util.LinkedList;
 import java.util.List;
 
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
@@ -64,12 +67,43 @@ public class DiscoveryActivity extends AppCompatActivity implements OnDiscoveryL
                 // store our name, too
                 intent.putExtra(SendActivity.EXTRA_SELF_NAME, NAME);
 
-                DiscoveryActivity.this.startActivity(intent);
+                // start activity; 2nd parameter unused by us
+                DiscoveryActivity.this.startActivityForResult(intent, 0);
 
                 // stop the discovery server
                 mDiscovery.close();
             }
         });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        // clear the server list in case there is an old entry
+        onServerListUpdated(new LinkedList<NetworkDevice>());
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        // request code is ignored
+        if(resultCode == SendActivity.RESULT_SERVER_REFUSED){
+            AlertDialog alertDialog = new AlertDialog.Builder(this).create();
+            alertDialog.setTitle("Connection failed");
+            alertDialog.setMessage("Server refused connection");
+
+            alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, "OK", (DialogInterface.OnClickListener) null);
+
+            alertDialog.show();
+        } else if (resultCode == SendActivity.RESULT_SERVER_NOT_LISTENING_ON_COMMAND_PORT) {
+            AlertDialog alertDialog = new AlertDialog.Builder(this).create();
+            alertDialog.setTitle("Connection failed");
+            alertDialog.setMessage("Server seems to be offline");
+
+            alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, "OK", (DialogInterface.OnClickListener) null);
+
+            alertDialog.show();
+        }
     }
 
     /**

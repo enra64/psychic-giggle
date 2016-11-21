@@ -7,5 +7,7 @@ public enum CommandType {
     ConnectionRequest,
     ConnectionRequestResponse,
     SetSensor,
-    EndConnection
+    EndConnection,
+    AddButton,
+    ButtonClick;
 }

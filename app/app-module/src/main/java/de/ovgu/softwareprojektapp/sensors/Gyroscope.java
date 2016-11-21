@@ -23,6 +23,6 @@ public class Gyroscope extends AbstractSensor {
      * @param context    android system context needed for sensors
      */
     public Gyroscope(Context context) {
-        super(context, Sensor.TYPE_GYROSCOPE);
+        super(context, Sensor.TYPE_GYROSCOPE, SensorType.Gyroscope);
     }
 }

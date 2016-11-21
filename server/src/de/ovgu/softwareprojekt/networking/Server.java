@@ -6,10 +6,7 @@ import de.ovgu.softwareprojekt.SensorData;
 import de.ovgu.softwareprojekt.SensorType;
 import de.ovgu.softwareprojekt.control.CommandConnection;
 import de.ovgu.softwareprojekt.control.OnCommandListener;
-import de.ovgu.softwareprojekt.control.commands.Command;
-import de.ovgu.softwareprojekt.control.commands.ConnectionRequest;
-import de.ovgu.softwareprojekt.control.commands.EndConnection;
-import de.ovgu.softwareprojekt.control.commands.SetSensorCommand;
+import de.ovgu.softwareprojekt.control.commands.*;
 import de.ovgu.softwareprojekt.misc.ExceptionListener;
 
 import java.io.IOException;
@@ -41,6 +38,11 @@ public class Server implements OnCommandListener, DataSink {
     private ClientListener mClientListener;
 
     /**
+     * interface to process infos about clicked Buttons
+     */
+    private ButtonListener mButtonListener;
+
+    /**
      * Stores all known data sinks
      * <p>
      * This variable is an EnumMap, so iterations over the keys should be quite fast. The sinks are stored in a
@@ -53,7 +55,7 @@ public class Server implements OnCommandListener, DataSink {
      *
      * @throws IOException when something goes wrong...
      */
-    public Server(ExceptionListener exceptionListener, ClientListener clientListener) throws IOException {
+    public Server(ExceptionListener exceptionListener, ClientListener clientListener, ButtonListener buttonListener) throws IOException {
         // initialise the command and data connections
         initialiseCommandConnection();
         initialiseDataConnection();
@@ -69,13 +71,25 @@ public class Server implements OnCommandListener, DataSink {
         discoveryServer.start();
 
         mClientListener = clientListener;
+        mButtonListener = buttonListener;
+
+        // stop connections on shutdown
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+            @Override
+            public synchronized void start() {
+                System.out.println("closing connections");
+                mCommandConnection.close();
+                mDataConnection.close();
+            }
+        });
 
         System.out.println("discovery server started");
     }
 
     /**
      * Register a new data sink to be included in the data stream
-     * @param dataSink where new data from the sensor should go
+     *
+     * @param dataSink        where new data from the sensor should go
      * @param requestedSensor which sensors events are relevant
      */
     public void registerDataSink(DataSink dataSink, SensorType requestedSensor) {
@@ -89,19 +103,21 @@ public class Server implements OnCommandListener, DataSink {
 
     /**
      * Unregister a data sink from a sensors data stream
-     * @param dataSink the data sink to be unregistered
+     *
+     * @param dataSink        the data sink to be unregistered
      * @param requestedSensor the sensor the sink should be unregistered from
      */
-    public void unregisterDataSink(DataSink dataSink, SensorType requestedSensor){
+    public void unregisterDataSink(DataSink dataSink, SensorType requestedSensor) {
         mDataSinks.get(requestedSensor).remove(dataSink);
     }
 
     /**
      * Unregister a data sink from all sensors
+     *
      * @param dataSink which data sink to remove
      */
-    public void unregisterDataSink(DataSink dataSink){
-        for(SensorType type : mDataSinks.keySet())
+    public void unregisterDataSink(DataSink dataSink) {
+        for (SensorType type : mDataSinks.keySet())
             unregisterDataSink(dataSink, type);
     }
 
@@ -113,9 +129,6 @@ public class Server implements OnCommandListener, DataSink {
      */
     @Override
     public void onCommand(InetAddress origin, Command command) {
-        // command-line logging
-        System.out.println("command received, type " + command.getCommandType().toString());
-
         // decide what to do with the packet
         switch (command.getCommandType()) {
             case ConnectionRequest:
@@ -126,13 +139,22 @@ public class Server implements OnCommandListener, DataSink {
                     // update the request address
                     request.self.address = origin.getHostAddress();
 
+                    // initialise the connection to send the request answer
+                    mCommandConnection.setRemote(origin, request.self.commandPort);
+
                     // only accept clients which are accepted by our client listener
-                    if(mClientListener.acceptClient(request.self)) {
-                        // now that we have a connection, we know who to talk to for the commands
-                        mCommandConnection.setRemote(origin, request.self.commandPort);
+                    if (mClientListener.acceptClient(request.self)) {
+                        // accept the client
+                        mCommandConnection.sendCommand(new ConnectionRequestResponse(true));
+
+                        //test TODO: wieder entfernen und umschreiben
+                        addButton("LeftClick", 0);
 
                         // for now, immediately let the client begin sending gyroscope data
                         mCommandConnection.sendCommand(new SetSensorCommand(SensorType.Gyroscope, true));
+                    } else {
+                        // deny the client
+                        mCommandConnection.sendCommand(new ConnectionRequestResponse(false));
                     }
 
                 } catch (IOException e) {
@@ -140,16 +162,23 @@ public class Server implements OnCommandListener, DataSink {
                 }
                 break;
             case EndConnection:
-                // close connections
-                mDataConnection.close();
-                mCommandConnection.close();
+                // restart connections
+                try {
+                    initialiseDataConnection();
+                    initialiseCommandConnection();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
 
                 // notify listener of disconnect
                 EndConnection endConnection = (EndConnection) command;
                 endConnection.self.address = origin.getHostAddress();
                 mClientListener.onClientDisconnected(endConnection.self);
-
                 break;
+
+            case ButtonClick:
+                ButtonClick btnClk = (ButtonClick) command;
+                mButtonListener.onButtonClick(btnClk);
 
             // ignore unhandled commands (like SetSensorCommand)
             default:
@@ -185,7 +214,7 @@ public class Server implements OnCommandListener, DataSink {
     @Override
     public void onData(SensorData sensorData) {
         // iterate over all data sinks marked as interested in this sensor type
-        for(DataSink sink : mDataSinks.get(sensorData.sensorType))
+        for (DataSink sink : mDataSinks.get(sensorData.sensorType))
             sink.onData(sensorData);
     }
 
@@ -193,5 +222,13 @@ public class Server implements OnCommandListener, DataSink {
     public void close() {
         mCommandConnection.close();
         mDataConnection.close();
+    }
+
+    public void addButton(String name, int id){
+        try {
+            mCommandConnection.sendCommand(new AddButton(name , id));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

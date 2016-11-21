@@ -72,7 +72,6 @@ public class UdpConnection implements DataSink {
         new SensorOut().execute(sensorData);
     }
 
-
     /**
      * Class to encapsulate sending SensorData objects asynchronously
      */
@@ -83,11 +82,17 @@ public class UdpConnection implements DataSink {
             try {
                 ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
                 ObjectOutputStream os = new ObjectOutputStream(outputStream);
+
                 os.writeObject(sensorData[0]);
                 byte[] data = outputStream.toByteArray();
+
+                //long start = System.nanoTime(); // benchmarking
+                //System.out.println(System.nanoTime() - start); // benchmarking
+
                 DatagramPacket sendPacket = new DatagramPacket(data, data.length, mHost, mPort);
                 mSocket.send(sendPacket);
             } catch (IOException e) {
+                //TODO: somehow avoid sending millions of exceptions when the socket has been closed
                 mExceptionListener.onException(UdpConnection.this, e, "UdpConnection: could not send SensorData object");
                 return false;
             }

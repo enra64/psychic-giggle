@@ -6,6 +6,9 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 
+import java.io.IOException;
+import java.security.InvalidParameterException;
+
 import de.ovgu.softwareprojekt.DataSink;
 import de.ovgu.softwareprojekt.DataSource;
 import de.ovgu.softwareprojekt.SensorData;
@@ -14,7 +17,7 @@ import de.ovgu.softwareprojekt.SensorType;
 /**
  * Super class for our sensors as much of the work is the same for any sensor type
  */
-abstract class AbstractSensor implements DataSource, SensorEventListener {
+public abstract class AbstractSensor implements DataSource, SensorEventListener {
     /**
      * The android sensor manager used to connect to the accelerometer
      */
@@ -36,14 +39,21 @@ abstract class AbstractSensor implements DataSource, SensorEventListener {
     private final int mSensorType;
 
     /**
+     * Since we have our own definition of sensor type (android definitions not available in common),
+     * we want to save that, too
+     */
+    private final SensorType mPsychicSensorType;
+
+    /**
      * Create a new sensor object; does not start anything yet, use {@link #start()} or {@link #setRunning(boolean)}
      * to start receiving events
      * @param context android system context needed for sensors
      * @param sensorType sensor type we should register for
      */
-    AbstractSensor(Context context, int sensorType){
+    AbstractSensor(Context context, int sensorType, SensorType psychicSensorType){
         mSensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
         mSensorType = sensorType;
+        mPsychicSensorType = psychicSensorType;
     }
 
     /**
@@ -66,7 +76,7 @@ abstract class AbstractSensor implements DataSource, SensorEventListener {
      * Shorthand for {@link #start} and {@link #close()}.
      * @param enable true if the sensor output should be started
      */
-    public void setRunning(boolean enable){
+    public void setRunning(boolean enable) throws IOException{
         if(enable)
             start();
         else
@@ -77,7 +87,7 @@ abstract class AbstractSensor implements DataSource, SensorEventListener {
      * Registers a listener for sensor events; will start sending data to the registered sink
      */
     @Override
-    public void start() {
+    public void start() throws IOException{
         // abort if already registered
         if(mListenerRegistered)
             return;
@@ -87,6 +97,9 @@ abstract class AbstractSensor implements DataSource, SensorEventListener {
 
         // register for sensor events
         Sensor sensor = mSensorManager.getDefaultSensor(mSensorType);
+        //check if sensor exist on this device
+        if(sensor == null)
+            throw new IOException("Sensor not detected");
         mSensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_GAME);
     }
 
@@ -100,6 +113,13 @@ abstract class AbstractSensor implements DataSource, SensorEventListener {
 
         // keep track of registration state
         mListenerRegistered = false;
+    }
+
+    /**
+     * Returns the sensor type the implementation deals with
+     */
+    public SensorType getSensorType(){
+        return mPsychicSensorType;
     }
 
     /**
