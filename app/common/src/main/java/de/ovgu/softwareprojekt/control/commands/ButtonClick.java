@@ -6,9 +6,11 @@ package de.ovgu.softwareprojekt.control.commands;
 
 public class ButtonClick extends Command{
     public int mID;
+    public boolean isHold;
 
-    public ButtonClick(int id){
+    public ButtonClick(int id, boolean isHold){
         super(CommandType.ButtonClick);
         mID = id;
+        this.isHold = isHold;
     }
 }

@@ -1,7 +1,6 @@
 package de.ovgu.softwareprojekt.networking;
 
 import de.ovgu.softwareprojekt.DataSink;
-import de.ovgu.softwareprojekt.Mover;
 import de.ovgu.softwareprojekt.SensorData;
 import de.ovgu.softwareprojekt.SensorType;
 import de.ovgu.softwareprojekt.control.CommandConnection;
@@ -155,11 +154,16 @@ public class Server implements OnCommandListener, DataSink {
                         // accept the client
                         mCommandConnection.sendCommand(new ConnectionRequestResponse(true));
 
+<<<<<<< HEAD
                         // if the button list was changed, we need to update the clients buttons
                         if(mButtonListChanged){
                             mButtonListChanged = false;
                             mCommandConnection.sendCommand(new UpdateButtons(mButtonList));
                         }
+=======
+                        //test TODO: wieder entfernen und umschreiben
+                        addButton("LeftClick", LEFTMOUSECLICK);
+>>>>>>> 61b19b0ec29181c64c77e78d4655be0a6be9a6f2
 
                         // close the discovery server
                         mDiscoveryServer.close();
@@ -216,7 +220,7 @@ public class Server implements OnCommandListener, DataSink {
                 8888,
                 mCommandConnection.getLocalPort(),
                 mDataConnection.getLocalPort(),
-                "lessig. _christian_ lessig");
+                "lessig. _christian_ lessig arne");
         mDiscoveryServer.start();
     }
 

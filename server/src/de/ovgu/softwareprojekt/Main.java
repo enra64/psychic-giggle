@@ -39,8 +39,10 @@ public class Main {
                 new ButtonListener() {
                     @Override
                     public void onButtonClick(ButtonClick click) {
+
                         mover.click(true);
-                        mover.click(false);
+                        if(!click.isHold)
+                            mover.click(false);
                     }
                 });
 
