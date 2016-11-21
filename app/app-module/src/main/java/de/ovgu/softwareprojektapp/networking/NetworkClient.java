@@ -169,11 +169,10 @@ public class NetworkClient implements DataSink, ExceptionListener {
     }
 
     /**
-     * Unilaterally closes the connection
+     * Notifies the server that we will stop working
      */
-    public void endConnection() {
+    public void signalConnectionEnd() {
         sendCommand(new EndConnection(mSelf));
-        close();
     }
 
     /**

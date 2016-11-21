@@ -3,7 +3,6 @@ package de.ovgu.softwareprojektapp;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.os.HandlerThread;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -27,7 +26,6 @@ import de.ovgu.softwareprojekt.control.commands.SetSensorCommand;
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
 import de.ovgu.softwareprojekt.misc.ExceptionListener;
 import de.ovgu.softwareprojektapp.networking.NetworkClient;
-import de.ovgu.softwareprojektapp.sensors.AbstractSensor;
 import de.ovgu.softwareprojektapp.sensors.SensorHandler;
 
 public class SendActivity extends AppCompatActivity implements OnCommandListener, ExceptionListener {
@@ -123,7 +121,7 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
      */
     public void endConnection(@Nullable View v) {
         // end connections
-        mNetworkClient.endConnection();
+        mNetworkClient.signalConnectionEnd();
 
         // close activity
         closeActivity(RESULT_USER_STOPPED);
@@ -140,6 +138,9 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
 
         // stop generating sensor data
         mSensorHandler.closeAll();
+
+        // close all network resources used
+        mNetworkClient.close();
 
         // close activity
         finish();

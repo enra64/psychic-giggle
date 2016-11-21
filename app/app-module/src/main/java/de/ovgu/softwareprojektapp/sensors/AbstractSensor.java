@@ -137,8 +137,7 @@ public abstract class AbstractSensor implements DataSource, SensorEventListener 
                 new SensorData(
                         SensorType.Gyroscope,
                         sensorEvent.values,
-                        sensorEvent.timestamp,
-                        sensorEvent.accuracy));
+                        sensorEvent.timestamp));
     }
 
     @Override

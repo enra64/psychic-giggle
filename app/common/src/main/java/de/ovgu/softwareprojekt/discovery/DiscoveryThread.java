@@ -176,6 +176,11 @@ public abstract class DiscoveryThread extends Thread {
         mSelfDeviceId.discoveryPort = socket.getLocalPort();
     }
 
+    public void setPorts(int commandPort, int dataPort){
+        mSelfDeviceId.commandPort = commandPort;
+        mSelfDeviceId.dataPort = dataPort;
+    }
+
     /**
      * Signal the running while loop to stop
      */
