@@ -76,10 +76,6 @@ public class Server implements OnCommandListener, DataSink {
      * @throws IOException when something goes wrong...
      */
 
-    /**Constants to identify which MouseClick it is; */
-    public static final int LEFTMOUSECLICK = 0;
-    public static final int RIGHTMOUSECLICK = 1;
-
     public Server(ExceptionListener exceptionListener, ClientListener clientListener, ButtonListener buttonListener) throws IOException {
         // store the various listeners
         mExceptionListener = exceptionListener;
