@@ -12,7 +12,9 @@ import java.io.IOException;
 
 public class Main {
 
-    /**Constants to identify which AppButton was activated; */
+    /**
+     * Constants to identify which AppButton was activated;
+     */
     public static final int LEFTMOUSECLICK = 0;
     public static final int RIGHTMOUSECLICK = 1;
     public static final int STOPMOVEMENT = 2;
@@ -46,7 +48,7 @@ public class Main {
                     public void onButtonClick(ButtonClick click) {
 
                         mover.click(true);
-                        if(!click.isHold)
+                        if (!click.isHold)
                             mover.click(false);
                     }
                 });

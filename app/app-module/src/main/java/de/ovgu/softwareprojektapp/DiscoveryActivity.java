@@ -23,7 +23,7 @@ import de.ovgu.softwareprojektapp.networking.DiscoveryClient;
 
 public class DiscoveryActivity extends AppCompatActivity implements OnDiscoveryListener, ExceptionListener {
 
-    Button mStartDiscovery;
+    Button mStartDiscoveryButton;
     ListView mPossibleConnections;
     List<NetworkDevice> mServerList;
 
@@ -42,12 +42,13 @@ public class DiscoveryActivity extends AppCompatActivity implements OnDiscoveryL
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_discovery);
 
-        mStartDiscovery = (Button) findViewById(R.id.startDiscovery);
-        mStartDiscovery.setOnClickListener(new View.OnClickListener() {
+        mStartDiscoveryButton = (Button) findViewById(R.id.startDiscovery);
+        mStartDiscoveryButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 // let this function handle
                 startDiscovery();
+                mStartDiscoveryButton.setEnabled(false);
             }
         });
 
@@ -86,6 +87,9 @@ public class DiscoveryActivity extends AppCompatActivity implements OnDiscoveryL
         // hide the progress bar for now
         ProgressBar progressBar = (ProgressBar) findViewById(R.id.discovery_progress_spinner);
         progressBar.setVisibility(View.GONE);
+
+        // enable the discovery button in case we disabled it
+        mStartDiscoveryButton.setEnabled(true);
     }
 
     @Override

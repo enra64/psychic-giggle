@@ -100,6 +100,10 @@ public class CommandConnection {
         }
     }
 
+    public boolean isRunningAndConfigured() {
+        return mIncomingServer.isRunning() && mRemoteHost != null && mRemotePort >= 0;
+    }
+
     /**
      * Use this to gracefully stop operations
      */
@@ -145,7 +149,12 @@ public class CommandConnection {
         /**
          * true if the server should continue running
          */
-        private boolean mRunning = true;
+        private boolean mKeepRunning = true;
+
+        /**
+         * true while the server has not reached end of thread execution
+         */
+        private boolean mIsRunning = false;
 
         /**
          * Socket we use to listen
@@ -179,7 +188,7 @@ public class CommandConnection {
          */
         void shutdown() {
             // kill the running server
-            mRunning = false;
+            mKeepRunning = false;
         }
 
         /**
@@ -188,7 +197,9 @@ public class CommandConnection {
          */
         public void run() {
             // continue running till shutdown() is called
-            while (mRunning) {
+            while (mKeepRunning) {
+                mIsRunning = true;
+
                 // try-with-resource: close the socket after accepting the connection
                 try (Socket connection = mSocket.accept()) {
                     // create an object input stream from the new connection
@@ -196,7 +207,6 @@ public class CommandConnection {
 
                     // call listener with new command
                     mListener.onCommand(connection.getInetAddress(), (Command) oinput.readObject());
-
                 } catch (IOException | ClassNotFoundException e) {
                     e.printStackTrace();
                 }
@@ -209,6 +219,12 @@ public class CommandConnection {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+
+            mIsRunning = false;
+        }
+
+        public boolean isRunning() {
+            return mIsRunning;
         }
     }
 }
