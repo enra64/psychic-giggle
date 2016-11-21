@@ -10,6 +10,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 
 import java.io.IOException;
 import java.util.LinkedList;
@@ -51,7 +52,6 @@ public class DiscoveryActivity extends AppCompatActivity implements OnDiscoveryL
         });
 
         mPossibleConnections = (ListView) findViewById(R.id.possibleConnections);
-
         mPossibleConnections.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
@@ -82,12 +82,16 @@ public class DiscoveryActivity extends AppCompatActivity implements OnDiscoveryL
 
         // clear the server list in case there is an old entry
         onServerListUpdated(new LinkedList<NetworkDevice>());
+
+        // hide the progress bar for now
+        ProgressBar progressBar = (ProgressBar) findViewById(R.id.discovery_progress_spinner);
+        progressBar.setVisibility(View.GONE);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         // request code is ignored
-        if(resultCode == SendActivity.RESULT_SERVER_REFUSED){
+        if (resultCode == SendActivity.RESULT_SERVER_REFUSED) {
             AlertDialog alertDialog = new AlertDialog.Builder(this).create();
             alertDialog.setTitle("Connection failed");
             alertDialog.setMessage("Server refused connection");
@@ -113,7 +117,7 @@ public class DiscoveryActivity extends AppCompatActivity implements OnDiscoveryL
         // only start new discovery if not running yet
         if (mDiscovery == null || !mDiscovery.isRunning()) {
             // create a new discovery thread, if this one already completed
-            if (mDiscovery == null || mDiscovery.hasRun())
+            if (mDiscovery == null || mDiscovery.hasRun()) {
                 try {
                     mDiscovery = new DiscoveryClient(
                             DiscoveryActivity.this,
@@ -123,6 +127,10 @@ public class DiscoveryActivity extends AppCompatActivity implements OnDiscoveryL
                 } catch (IOException e) {
                     onException(this, e, "DiscoveryActivity: could not create DiscoveryClient");
                 }
+            }
+
+            ProgressBar progressBar = (ProgressBar) findViewById(R.id.discovery_progress_spinner);
+            progressBar.setVisibility(View.VISIBLE);
 
             // start discovery
             mDiscovery.start();
