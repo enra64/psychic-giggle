@@ -10,9 +10,10 @@ import java.awt.event.InputEvent;
  */
 public class MouseMover extends Mover {
 
-    float averageX=0,averageY=0,averageZ=0;
-    float[][] average = new float[5][3];
-    int rawCount=0; //used for average output
+    private float[] filteredData = new float[3];
+    private final int averageSampleSize = 5;
+    private float[][] average = new float[averageSampleSize][3];
+    private int rawCount=0; //used for average output
 
 
     /** This is probably stupid, I just want to know what happens*/
@@ -50,63 +51,54 @@ public class MouseMover extends Mover {
     public void move(float[] rawData) {
         mousePos = MouseInfo.getPointerInfo().getLocation();
 
-        rawData = filter(rawData);
+        float[] axesValues = filter(rawData);
 
-        int xAxis = (int) rawData[ZAXIS];   //Up down movement on screen is achieved my rotating phone by z-axis
-        int yAxis = (int) rawData[XAXIS];
+        int xAxis = (int) axesValues[ZAXIS];   //Up down movement on screen is achieved my rotating phone by z-axis
+        int yAxis = (int) axesValues[XAXIS];
 
         //TODO: Find out if addition or subtraction works better
         moveBot.mouseMove(mousePos.x - xAxis, mousePos.y - yAxis);
     }
 
     /**
-     *  takes rawData[] and turns it into useful data
+     *  takes rawData[] and turns it into useful data by applying the average of the last
+     *  last n gyroscope values. n = averageSampleSize
      * @param rawData unfiltered gyroscope data
      * @return  a float array which has useful axes values
      */
     @Override
     //TODO: implement method
     public float[] filter(float[] rawData) {
-
-
-
         //TODO: filter value should be customizable
-        rawData[XAXIS] *= (SENSITIVITY +customSensitivity);
-        rawData[YAXIS] *= (SENSITIVITY +customSensitivity);
-        rawData[ZAXIS] *= (SENSITIVITY +customSensitivity);
+        rawData[XAXIS] *= (SENSITIVITY + customSensitivity);
+        rawData[YAXIS] *= (SENSITIVITY + customSensitivity);
+        rawData[ZAXIS] *= (SENSITIVITY + customSensitivity);
 
-
-        //TODO: average Data out of 5 inputs
-
-
-
+        //enter new gyroscope values
         average[rawCount][0]=rawData[XAXIS];
         average[rawCount][1]=rawData[YAXIS];
         average[rawCount][2]=rawData[ZAXIS];
 
-        for(int i=0;i<5;i++)
+        //create average of all values in the sample size
+        for(int i=0;i< averageSampleSize;i++)
         {
-            averageX = averageX + average[rawCount][0];
-            averageY = averageY + average[rawCount][1];
-            averageZ = averageZ + average[rawCount][2];
+            filteredData[XAXIS] += average[rawCount][XAXIS];
+            filteredData[YAXIS] += average[rawCount][YAXIS];
+            filteredData[ZAXIS] += average[rawCount][ZAXIS];
         }
         rawCount++;
 
-        if(rawCount==5) {
+        //rawCount rotates through the array
+        if(rawCount == averageSampleSize) {
             rawCount = 0;
         }
 
-        averageX=averageX/5;
-        averageY=averageY/5;
-        averageZ=averageZ/5;
+        //calculate average
+        for (int i = 0; i < filteredData.length; i++) {
+            filteredData[i] /= averageSampleSize;
+        }
 
-        rawData[XAXIS]=averageX;
-        rawData[YAXIS]=averageY;
-        rawData[ZAXIS]=averageZ;
-
-        return rawData;
-
-
+        return filteredData;
     }
 
     /**
