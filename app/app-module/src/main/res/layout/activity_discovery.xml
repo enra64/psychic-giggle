@@ -18,6 +18,15 @@
         android:headerDividersEnabled="false"
         android:clickable="true" />
 
+    <ProgressBar
+        android:id="@+id/discovery_progress_spinner"
+        android:layout_centerInParent="true"
+        style="?android:attr/progressBarStyle"
+        android:visibility="gone"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" >
+    </ProgressBar>
+
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
