@@ -14,6 +14,7 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import java.io.IOException;
 import java.net.ConnectException;
 import java.net.InetAddress;
 import java.util.List;
@@ -45,6 +46,7 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
     static final int RESULT_SERVER_REFUSED = -1;
     static final int RESULT_USER_STOPPED = 0;
     static final int RESULT_SERVER_NOT_LISTENING_ON_COMMAND_PORT = -2;
+    static final int RESULT_SENSOR_ERROR = -3;
 
     /**
      * The network client organises all our communication with the server
@@ -169,6 +171,34 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
                     alertDialog.show();
                 }
             });
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        try {
+            mSensorHandler.temporarilyDisableSensors();
+        } catch (IOException e) {
+            // end connections
+            mNetworkClient.signalConnectionEnd();
+
+            // close the activity
+            closeActivity(RESULT_SENSOR_ERROR);
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        try {
+            mSensorHandler.enableTemporarilyDisabledSensors();
+        } catch (IOException e) {
+            // end connections
+            mNetworkClient.signalConnectionEnd();
+
+            // close the activity
+            closeActivity(RESULT_SENSOR_ERROR);
         }
     }
 

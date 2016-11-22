@@ -108,11 +108,23 @@ public abstract class AbstractSensor implements DataSource, SensorEventListener 
      */
     @Override
     public void close() {
+        // abort if not registered yet
+        if(!mListenerRegistered)
+            return;
+
         // unregister the listener
         mSensorManager.unregisterListener(this);
 
         // keep track of registration state
         mListenerRegistered = false;
+    }
+
+    /**
+     * Get the state of listener registration
+     * @return true if the listener is currently registered
+     */
+    public boolean isRegistered(){
+        return mListenerRegistered;
     }
 
     /**
