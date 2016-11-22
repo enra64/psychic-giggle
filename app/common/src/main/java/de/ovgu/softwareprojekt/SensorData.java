@@ -15,7 +15,7 @@ public class SensorData implements Serializable, Cloneable, Externalizable {
     /**
      * Type of the sensor this data belongs to
      */
-    public SensorType sensorType = SensorType.Invalid;
+    public SensorType sensorType = null;
 
     /**
      * Data contained in this instance

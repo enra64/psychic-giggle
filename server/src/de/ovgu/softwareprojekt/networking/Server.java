@@ -11,6 +11,7 @@ import de.ovgu.softwareprojekt.misc.ExceptionListener;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.util.*;
 
 /**
@@ -58,6 +59,11 @@ public class Server implements OnCommandListener, DataSink {
     private Map<Integer, String> mButtonList = new HashMap<>();
 
     /**
+     *
+     */
+    private String mServerName;
+
+    /**
      * Stores all known data sinks
      * <p>
      * This variable is an EnumMap, so iterations over the keys should be quite fast. The sinks are stored in a
@@ -67,6 +73,16 @@ public class Server implements OnCommandListener, DataSink {
 
 
     public Server(ExceptionListener exceptionListener, ClientListener clientListener, ButtonListener buttonListener) throws IOException {
+        this(exceptionListener, clientListener, buttonListener, null);
+    }
+
+    public Server(ExceptionListener exceptionListener, ClientListener clientListener, ButtonListener buttonListener, String serverName) throws IOException {
+        // if the server name was not set, use the host name
+        if(serverName == null)
+            mServerName = getHostName();
+        else
+            mServerName = serverName;
+
         // store the various listeners
         mExceptionListener = exceptionListener;
         mClientListener = clientListener;
@@ -78,6 +94,27 @@ public class Server implements OnCommandListener, DataSink {
         initialiseDiscoveryServer();
 
         System.out.println("discovery server started");
+    }
+
+    private void setServerName(String serverName){
+        mServerName = serverName;
+    }
+
+    private String getServerName(){
+        return mServerName;
+    }
+
+    /**
+     * Tries to get a server name via the host name; not very reliable, but also not very important.
+     */
+    private String getHostName() {
+        try {
+            InetAddress addr;
+            addr = InetAddress.getLocalHost();
+            return addr.getHostName();
+        } catch (UnknownHostException ex) {
+            return "unknown hostname";
+        }
     }
 
     /**
@@ -197,21 +234,23 @@ public class Server implements OnCommandListener, DataSink {
 
     /**
      * Notify the client of all required buttons
+     *
      * @throws IOException if the command could not be sent
      */
     private void updateButtons() throws IOException {
         // if the button list was changed, we need to update the clients buttons
-        if(mCommandConnection.isRunningAndConfigured())
+        if (mCommandConnection.isRunningAndConfigured())
             mCommandConnection.sendCommand(new UpdateButtons(mButtonList));
     }
 
     /**
      * Notify the client of all required sensors
+     *
      * @throws IOException if the command could not be sent
      */
     private void updateSensors() throws IOException {
         // the key set is not serializable, so we must create an ArrayList from it
-        if(mCommandConnection.isRunningAndConfigured())
+        if (mCommandConnection.isRunningAndConfigured())
             mCommandConnection.sendCommand(new SetSensorCommand(new ArrayList<>(mDataSinks.keySet())));
     }
 
@@ -227,7 +266,7 @@ public class Server implements OnCommandListener, DataSink {
                 8888,
                 mCommandConnection.getLocalPort(),
                 mDataConnection.getLocalPort(),
-                "lessig. _christian_ lessig");
+                mServerName);
         mDiscoveryServer.start();
     }
 
@@ -273,7 +312,7 @@ public class Server implements OnCommandListener, DataSink {
      * Add a button to be displayed on the clients
      *
      * @param name text to be displayed on the button
-     * @param id id of the button
+     * @param id   id of the button
      */
     public void addButton(String name, int id) throws IOException {
         // add the new button

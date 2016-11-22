@@ -7,6 +7,8 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutCompat;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -46,7 +48,6 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
     static final int RESULT_SERVER_REFUSED = -1;
     static final int RESULT_USER_STOPPED = 0;
     static final int RESULT_SERVER_NOT_LISTENING_ON_COMMAND_PORT = -2;
-    static final int RESULT_SENSOR_ERROR = -3;
 
     /**
      * The network client organises all our communication with the server
@@ -83,14 +84,31 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
                 this
         );
 
+        // disable the sensors while this button is held down
+        Button disableSensorsButton = (Button) findViewById(R.id.disableSensorsButton);
+        disableSensorsButton.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
+                    mSensorHandler.temporarilyDisableSensors();
+                    return true;
+                } else if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
+                    mSensorHandler.enableTemporarilyDisabledSensors();
+                    return true;
+                }
+
+                return false;
+            }
+        });
+
         // default to successful execution
         setResult(RESULT_OK);
 
-        // create a new sensor handler to help with the sensors
-        mSensorHandler = new SensorHandler(this);
-
         // immediately try to connect to the server
         initiateConnection();
+
+        // create a new sensor handler to help with the sensors
+        mSensorHandler = new SensorHandler(this, mNetworkClient);
 
         // default activity result is closing by user
         setResult(RESULT_USER_STOPPED);
@@ -122,15 +140,32 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
     }
 
     /**
-     * This function is called by a button. It sends a command to the server which then closes the
-     * connection. It also stops the activity.
+     * This function is called by a button in the action bar. It sends a command to the server which
+     * then closes the connection. It also stops the activity.
      */
-    public void endConnection(@Nullable View v) {
-        // end connections
-        mNetworkClient.signalConnectionEnd();
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.menu_disconnect) {
+            // end connections
+            mNetworkClient.signalConnectionEnd();
 
-        // close activity
-        closeActivity(RESULT_USER_STOPPED);
+            // close activity
+            closeActivity(RESULT_USER_STOPPED);
+
+            // handled click -> return true
+            return true;
+        }
+        // invoke the superclass if we didn't want to handle the click
+        return super.onOptionsItemSelected(item);
+    }
+
+    /**
+     * Add all requested buttons to the action bar
+     */
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_activity_send, menu);
+        return true;
     }
 
     /**
@@ -159,7 +194,7 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
      */
     private void setSensor(final List<SensorType> requiredSensors) {
         // configure the sensor run state
-        if (!mSensorHandler.setRunning(mNetworkClient, requiredSensors)) {
+        if (!mSensorHandler.setRunning(requiredSensors)) {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -177,29 +212,13 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
     @Override
     protected void onPause() {
         super.onPause();
-        try {
-            mSensorHandler.temporarilyDisableSensors();
-        } catch (IOException e) {
-            // end connections
-            mNetworkClient.signalConnectionEnd();
-
-            // close the activity
-            closeActivity(RESULT_SENSOR_ERROR);
-        }
+        mSensorHandler.temporarilyDisableSensors();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        try {
-            mSensorHandler.enableTemporarilyDisabledSensors();
-        } catch (IOException e) {
-            // end connections
-            mNetworkClient.signalConnectionEnd();
-
-            // close the activity
-            closeActivity(RESULT_SENSOR_ERROR);
-        }
+        mSensorHandler.enableTemporarilyDisabledSensors();
     }
 
     /**
@@ -280,7 +299,7 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
 
                 for (Map.Entry<Integer, String> button : addCom.buttons.entrySet()) {
                     Button btn = new Button(SendActivity.this);
-                    btn.setLayoutParams(new LinearLayout.LayoutParams(LinearLayoutCompat.LayoutParams.MATCH_PARENT, mRuntimeButtonLayout.getHeight()/ addCom.buttons.size()));
+                    btn.setLayoutParams(new LinearLayout.LayoutParams(LinearLayoutCompat.LayoutParams.MATCH_PARENT, mRuntimeButtonLayout.getHeight() / addCom.buttons.size()));
                     mRuntimeButtonLayout.addView(btn);
                     btn.setText(button.getValue());
                     btn.setTag(button.getKey());

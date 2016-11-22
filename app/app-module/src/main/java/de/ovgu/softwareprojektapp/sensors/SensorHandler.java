@@ -5,16 +5,18 @@ import android.content.Context;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import de.ovgu.softwareprojekt.DataSink;
 import de.ovgu.softwareprojekt.SensorType;
 
 /**
- * Handle instantiation and storage of sensor classes
+ * Handle instantiation and storage of sensor classes, as well as temporarily disabling them.
  */
 public class SensorHandler {
     /**
@@ -27,92 +29,127 @@ public class SensorHandler {
      */
     private Context mContext;
 
+    private DataSink mDataSink;
+
     /**
      * Create a new SensorHandler
      *
-     * @param context required for interaction with android sensor system
+     * @param context  required for interaction with android sensor system
+     * @param dataSink required for pushing the data somewhere
      */
-    public SensorHandler(Context context) {
+    public SensorHandler(Context context, DataSink dataSink) {
         mContext = context;
+        mDataSink = dataSink;
     }
 
-    private HashSet<SensorType> mTemporarilyDisabledSensors = null;
+    private EnumMap<SensorType, Boolean> mTemporarySensorActivationList = new EnumMap<>(SensorType.class);
 
+    private boolean mSensorsTempDisabled = false;
 
     @SuppressWarnings("unchecked")
-    public boolean setRunning(DataSink dataSink, List<SensorType> requiredSensors) {
+    public boolean setRunning(List<SensorType> requiredSensors) {
+        // if the sensors are currently disabled, only update the list of sensors that will be
+        // enabled after starting them again
+        if (mSensorsTempDisabled) {
+            mTemporarySensorActivationList = getSensorActivationList(requiredSensors);
+            return true;
+        }
+
+        // try to apply the list of required sensors
+        return applySensorActivationList(getSensorActivationList(requiredSensors));
+    }
+
+    /**
+     * Create a mapping from sensor type to required activation status
+     *
+     * @param requiredSensors list of required sensors
+     * @return the mapping
+     */
+    private EnumMap<SensorType, Boolean> getSensorActivationList(List<SensorType> requiredSensors) {
+        // empty sensor activation list
+        EnumMap<SensorType, Boolean> sensorActivationList = new EnumMap<>(SensorType.class);
+
+        // default all sensors to off
+        for (SensorType sensorType : SensorType.values())
+            sensorActivationList.put(sensorType, false);
+
+        // set those to true which are required
+        for (SensorType sensorType : requiredSensors)
+            sensorActivationList.put(sensorType, true);
+
+        return sensorActivationList;
+    }
+
+    /**
+     * Apply each sensor state from a sensor activation list
+     *
+     * @param activationList a mapping from sensor type to its required activation state
+     * @return true if all sensor states could be correctly applied
+     */
+    private boolean applySensorActivationList(EnumMap<SensorType, Boolean> activationList) {
         boolean success = true;
-
-        // enable all required sensors
-        for (SensorType requiredSensor : requiredSensors)
-            success = setSensor(dataSink, requiredSensor, true) && success;
-
-        // get list of unnecessary sensors
-        Set<SensorType> notRequiredSensors = new HashSet<>(mSensors.keySet());
-        notRequiredSensors.removeAll(requiredSensors);
-
-        // disable all unnecessary sensors
-        for (SensorType notRequiredSensor : notRequiredSensors)
-            success = setSensor(dataSink, notRequiredSensor, false) && success;
-
+        for (Map.Entry<SensorType, Boolean> sensor : activationList.entrySet())
+            success = setSensor(sensor.getKey(), sensor.getValue()) && success;
         return success;
     }
 
     /**
      * This method tries to dis- or enable a certain sensor.
      *
-     * @param dataSink   the datasink the sensor should report to
      * @param sensorType the list of required sensors
      * @return true if the sensor state has been successfully set
      */
-    private boolean setSensor(DataSink dataSink, SensorType sensorType, boolean enable) {
+    private boolean setSensor(SensorType sensorType, boolean enable) {
         try {
-            // if we must enable the sensor, check whether it exists beforehand
+            // are we supposed to enable the sensor?
             if (enable) {
-                // already exists, just set running and update data sink
-                if (mSensors.containsKey(sensorType)) {
+                // already instantiated, just set it running
+                if (mSensors.containsKey(sensorType))
                     mSensors.get(sensorType).setRunning(true);
-                    mSensors.get(sensorType).setDataSink(dataSink);
-                }
-                // create new sensor
+                    // not yet instantiated, instantiate and start
                 else
-                    instantiateSensor(sensorType, dataSink);
+                    instantiateSensor(sensorType);
             }
-            // disable the sensor
-            else {
-                if (mSensors.containsKey(sensorType)) {
-                    mSensors.get(sensorType).setRunning(false);
-                    mSensors.remove(sensorType);
-                }
-            }
+            // disable the sensor if it was already instantiated
+            else if (mSensors.containsKey(sensorType))
+                mSensors.get(sensorType).setRunning(false);
         } catch (NoSuchMethodException | InstantiationException | InvocationTargetException | IllegalAccessException | IOException e) {
             return false;
         }
         return true;
     }
 
-    public void enableTemporarilyDisabledSensors() throws IOException {
-        // enable all sensors that were in our list of required sensors
-        if (mTemporarilyDisabledSensors != null) {
-            for (SensorType sensor : mTemporarilyDisabledSensors)
-                mSensors.get(sensor).setRunning(true);
-            mTemporarilyDisabledSensors = null;
-        }
+    /**
+     * Re-enable the sensors that were previously temporarily disabled using {@link #temporarilyDisableSensors()}
+     */
+    public void enableTemporarilyDisabledSensors() {
+        applySensorActivationList(mTemporarySensorActivationList);
+        mSensorsTempDisabled = false;
     }
 
-    public void temporarilyDisableSensors() throws IOException {
-        mTemporarilyDisabledSensors = new HashSet<>(mSensors.keySet());
+    /**
+     * Save the sensor activation state, and temporarily disable all of them, until they are activated
+     * again with {@link #enableTemporarilyDisabledSensors()}
+     */
+    public void temporarilyDisableSensors() {
+        // assemble a list of required sensors by listing the ones currently enabled
+        List<SensorType> requiredSensors = new ArrayList<>();
+        for (AbstractSensor sensor : mSensors.values())
+            if (sensor.isRegistered())
+                requiredSensors.add(sensor.getSensorType());
 
-        // disable all sensors that were in our list of required sensors
-        for (SensorType sensor : mTemporarilyDisabledSensors)
-            mSensors.get(sensor).setRunning(false);
+        // store the old required sensors
+        mTemporarySensorActivationList = getSensorActivationList(requiredSensors);
+        mSensorsTempDisabled = true;
+
+        // disable all for now by requiring an empty list of sensors
+        applySensorActivationList(getSensorActivationList(new ArrayList<SensorType>()));
     }
 
     /**
      * Instantiate a sensor
      *
      * @param sensorType the sensor type to be initiated
-     * @param dataSink   where the sensor should send its data
      * @throws NoSuchMethodException     if the sensor could not be instantiated
      * @throws IllegalAccessException    if the sensor could not be instantiated
      * @throws InvocationTargetException if the sensor could not be instantiated
@@ -120,7 +157,7 @@ public class SensorHandler {
      * @throws IOException               if the sensor could not be started
      */
     @SuppressWarnings("unchecked")
-    private void instantiateSensor(SensorType sensorType, DataSink dataSink) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException, IOException {
+    private void instantiateSensor(SensorType sensorType) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException, IOException {
         Class sensorImplementation = getClassForSensorType(sensorType);
 
         // find the constructor for this class
@@ -131,7 +168,7 @@ public class SensorHandler {
 
         // configure
         instance.setRunning(true);
-        instance.setDataSink(dataSink);
+        instance.setDataSink(mDataSink);
 
         // put into sensor list to avoid next instantiation
         mSensors.put(sensorType, instance);

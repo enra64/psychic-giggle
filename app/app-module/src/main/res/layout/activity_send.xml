@@ -16,17 +16,17 @@
         android:layout_height="match_parent"
         android:layout_alignParentStart="true"
         android:id="@+id/linlay"
-        android:layout_above="@+id/cancelButton">
+        android:layout_above="@+id/disableSensorsButton">
 
     </LinearLayout>
 
     <Button
-        android:text="Cancel"
+        android:text="hold sonsors"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/cancelButton"
-        android:onClick="endConnection"
+        android:id="@+id/disableSensorsButton"
         android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true" />
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true" />
 
 </RelativeLayout>
