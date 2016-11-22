@@ -20,6 +20,7 @@ import java.util.*;
  * 2) A CommandConnection to be able to reliable communicate about important stuff, like enabling sensors
  * 3) A DataConnection to rapidly transmit sensor data
  */
+@SuppressWarnings("unused")
 public class Server implements OnCommandListener, DataSink {
     /**
      * Useful when you want to transmit SensorData
@@ -57,11 +58,6 @@ public class Server implements OnCommandListener, DataSink {
     private Map<Integer, String> mButtonList = new HashMap<>();
 
     /**
-     * whether the button list was changed since the update
-     */
-    private boolean mButtonListChanged = false;
-
-    /**
      * Stores all known data sinks
      * <p>
      * This variable is an EnumMap, so iterations over the keys should be quite fast. The sinks are stored in a
@@ -69,10 +65,6 @@ public class Server implements OnCommandListener, DataSink {
      */
     private EnumMap<SensorType, HashSet<DataSink>> mDataSinks = new EnumMap<>(SensorType.class);
 
-    /**
-     * true if the sensor list changed since the last device sync, and should thus be resynced
-     */
-    private boolean mSensorListChanged = false;
 
     public Server(ExceptionListener exceptionListener, ClientListener clientListener, ButtonListener buttonListener) throws IOException {
         // store the various listeners
@@ -94,7 +86,7 @@ public class Server implements OnCommandListener, DataSink {
      * @param dataSink        where new data from the sensor should go
      * @param requestedSensor which sensors events are relevant
      */
-    public void registerDataSink(DataSink dataSink, SensorType requestedSensor) {
+    public void registerDataSink(DataSink dataSink, SensorType requestedSensor) throws IOException {
         // add new data sink list if the requested sensor type has no sinks yet
         if (!mDataSinks.containsKey(requestedSensor))
             mDataSinks.put(requestedSensor, new HashSet<DataSink>());
@@ -103,7 +95,7 @@ public class Server implements OnCommandListener, DataSink {
         mDataSinks.get(requestedSensor).add(dataSink);
 
         // force resetting the sensors on the client
-        mSensorListChanged = true;
+        updateSensors();
     }
 
     /**
@@ -112,11 +104,11 @@ public class Server implements OnCommandListener, DataSink {
      * @param dataSink        the data sink to be unregistered
      * @param requestedSensor the sensor the sink should be unregistered from
      */
-    public void unregisterDataSink(DataSink dataSink, SensorType requestedSensor) {
+    public void unregisterDataSink(DataSink dataSink, SensorType requestedSensor) throws IOException {
         mDataSinks.get(requestedSensor).remove(dataSink);
 
         // force resetting the sensors on the client
-        mSensorListChanged = true;
+        updateSensors();
     }
 
     /**
@@ -124,13 +116,13 @@ public class Server implements OnCommandListener, DataSink {
      *
      * @param dataSink which data sink to remove
      */
-    public void unregisterDataSink(DataSink dataSink) {
+    public void unregisterDataSink(DataSink dataSink) throws IOException {
         // unregister dataSink from all sensors it is registered to
         for (SensorType type : mDataSinks.keySet())
             unregisterDataSink(dataSink, type);
 
         // force resetting the sensors on the client
-        mSensorListChanged = true;
+        updateSensors();
     }
 
     /**
@@ -159,19 +151,9 @@ public class Server implements OnCommandListener, DataSink {
                         // accept the client
                         mCommandConnection.sendCommand(new ConnectionRequestResponse(true));
 
-                        // if the button list was changed, we need to update the clients buttons
-                        if(mButtonListChanged){
-                            mButtonListChanged = false;
-                            mCommandConnection.sendCommand(new UpdateButtons(mButtonList));
-                        }
-
-                        // if the sensor list (the sensors we need to be active) changed, update them
-                        if(mSensorListChanged){
-                            mSensorListChanged = false;
-                            mCommandConnection.sendCommand(
-                                    // the key set is not serializable, so we must create an arraylist from it
-                                    new SetSensorCommand(new ArrayList<>(mDataSinks.keySet())));
-                        }
+                        // notify the client of our button and sensor requirements
+                        updateButtons();
+                        updateSensors();
 
                         // close the discovery server
                         mDiscoveryServer.close();
@@ -211,6 +193,26 @@ public class Server implements OnCommandListener, DataSink {
             default:
                 break;
         }
+    }
+
+    /**
+     * Notify the client of all required buttons
+     * @throws IOException if the command could not be sent
+     */
+    private void updateButtons() throws IOException {
+        // if the button list was changed, we need to update the clients buttons
+        if(mCommandConnection.isRunningAndConfigured())
+            mCommandConnection.sendCommand(new UpdateButtons(mButtonList));
+    }
+
+    /**
+     * Notify the client of all required sensors
+     * @throws IOException if the command could not be sent
+     */
+    private void updateSensors() throws IOException {
+        // the key set is not serializable, so we must create an ArrayList from it
+        if(mCommandConnection.isRunningAndConfigured())
+            mCommandConnection.sendCommand(new SetSensorCommand(new ArrayList<>(mDataSinks.keySet())));
     }
 
     /**
@@ -273,11 +275,24 @@ public class Server implements OnCommandListener, DataSink {
      * @param name text to be displayed on the button
      * @param id id of the button
      */
-    public void addButton(String name, int id) {
+    public void addButton(String name, int id) throws IOException {
         // add the new button
         mButtonList.put(id, name);
 
-        // flag to update the button list on our clients
-        mButtonListChanged = true;
+        // update the button list on our clients
+        updateButtons();
+    }
+
+    /**
+     * Remove a button from the clients
+     *
+     * @param id id of the button
+     */
+    public void removeButton(int id) throws IOException {
+        // remove the button
+        mButtonList.remove(id);
+
+        // update the button list on our clients
+        updateButtons();
     }
 }

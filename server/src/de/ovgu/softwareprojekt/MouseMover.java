@@ -15,12 +15,6 @@ public class MouseMover extends Mover {
     private float[][] average = new float[averageSampleSize][3];
     private int rawCount=0; //used for average output
 
-
-    /** This is probably stupid, I just want to know what happens*/
-    //TODO: Remove or improve this boolean bullshit dependent of this working or not
-    private boolean isAlreadyClicked;
-
-
     private Point mousePos;
     //TODO: find the best sensitivity
     private final float SENSITIVITY = 40f;
@@ -31,7 +25,6 @@ public class MouseMover extends Mover {
    {
        super();
        resetPosToCenter();
-       isAlreadyClicked = false;
    }
 
     /**
@@ -56,7 +49,6 @@ public class MouseMover extends Mover {
         int xAxis = (int) axesValues[ZAXIS];   //Up down movement on screen is achieved my rotating phone by z-axis
         int yAxis = (int) axesValues[XAXIS];
 
-        //TODO: Find out if addition or subtraction works better
         moveBot.mouseMove(mousePos.x - xAxis, mousePos.y - yAxis);
     }
 
@@ -105,18 +97,23 @@ public class MouseMover extends Mover {
      * This Method recieves a boolean and if true presses the left mouseButton and releases the button again if false
      * @param isClicked
      */
-    public void click(boolean isClicked)
+    public void click(int buttonID,boolean isClicked)
     {
-        //TODO: Check later if this actually works as intended
-        if(isClicked)
-            if(!isAlreadyClicked) {
-                moveBot.mousePress(InputEvent.BUTTON1_DOWN_MASK);
-                isAlreadyClicked = true;
-            }
-
-        else {
+        if(buttonID == Main.LEFTMOUSECLICK){
+            if(isClicked)
+                    moveBot.mousePress(InputEvent.BUTTON1_DOWN_MASK);
+            else {
                 moveBot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
-                isAlreadyClicked = false;
+            }
         }
+        else if(buttonID == Main.RIGHTMOUSECLICK)
+        {
+            if(isClicked){
+                moveBot.mousePress(InputEvent.BUTTON3_DOWN_MASK);
+            }
+            else
+                moveBot.mouseRelease(InputEvent.BUTTON3_DOWN_MASK);
+        }
+
     }
 }
