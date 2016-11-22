@@ -17,7 +17,7 @@ public class Main {
      */
     public static final int LEFTMOUSECLICK = 0;
     public static final int RIGHTMOUSECLICK = 1;
-    public static final int STOPMOVEMENT = 2;
+    // public static final int STOPMOVEMENT = 2; not needed?
 
     public static void main(String[] args) throws IOException {
         final MouseMover mover = new MouseMover();
@@ -46,10 +46,9 @@ public class Main {
                 new ButtonListener() {
                     @Override
                     public void onButtonClick(ButtonClick click) {
-
-                        mover.click(true);
+                        mover.click(click.mID, true);
                         if (!click.isHold)
-                            mover.click(false);
+                            mover.click(click.mID, false);
                     }
                 });
 
@@ -57,6 +56,6 @@ public class Main {
         server.registerDataSink(mover, SensorType.Gyroscope);
         server.addButton("left click", LEFTMOUSECLICK);
         server.addButton("right click", RIGHTMOUSECLICK);
-        server.addButton("stop movement", STOPMOVEMENT);
+        // server.addButton("stop movement", STOPMOVEMENT); not needed for now?
     }
 }
