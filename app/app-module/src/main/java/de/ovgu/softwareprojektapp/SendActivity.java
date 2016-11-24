@@ -1,27 +1,20 @@
 package de.ovgu.softwareprojektapp;
 
 import android.app.ProgressDialog;
-import android.content.DialogInterface;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutCompat;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
-import android.widget.Toast;
 
-import java.io.IOException;
 import java.net.ConnectException;
 import java.net.InetAddress;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import de.ovgu.softwareprojekt.SensorType;
 import de.ovgu.softwareprojekt.control.OnCommandListener;
@@ -42,9 +35,9 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
     static final String EXTRA_SERVER_PORT_DISCOVERY = "DiscoveryPort";
     static final String EXTRA_SERVER_PORT_COMMAND = "CommandPort";
     static final String EXTRA_SERVER_PORT_DATA = "DataPort";
-
     static final String EXTRA_SELF_NAME = "SelfName";
 
+    // result codes for the activity
     static final int RESULT_SERVER_REFUSED = -1;
     static final int RESULT_USER_STOPPED = 0;
     static final int RESULT_SERVER_NOT_LISTENING_ON_COMMAND_PORT = -2;
@@ -74,30 +67,26 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_send);
 
-        mRuntimeButtonLayout = (LinearLayout) findViewById(R.id.linlay);
+        // find the layout we use to display buttons requested by the server
+        mRuntimeButtonLayout = (LinearLayout) findViewById(R.id.runtime_button_parent);
 
         // we create a NetworkDevice from our extras to have all the data we need in a neat package
-        mNetworkClient = new NetworkClient(
-                parseServer(),
-                getIntent().getExtras().getString(EXTRA_SELF_NAME),
-                this,
-                this
-        );
+        parseIncomingNetworkDevice();
 
         // disable the sensors while this button is held down
         Button disableSensorsButton = (Button) findViewById(R.id.disableSensorsButton);
         disableSensorsButton.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
-                if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
+                // we only handle button press and release
+                if (motionEvent.getAction() == MotionEvent.ACTION_DOWN)
                     mSensorHandler.temporarilyDisableSensors();
-                    return true;
-                } else if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
+                else if (motionEvent.getAction() == MotionEvent.ACTION_UP)
                     mSensorHandler.enableTemporarilyDisabledSensors();
-                    return true;
-                }
+                else
+                    return false;
 
-                return false;
+                return true;
             }
         });
 
@@ -115,16 +104,27 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
     }
 
     /**
-     * Create a NetworkDevice object from the intent extras
+     * Initialise {@link #mNetworkClient} from incoming extras
      */
-    private NetworkDevice parseServer() {
+    private void parseIncomingNetworkDevice() {
+        // get the extras
         Bundle in = getIntent().getExtras();
-        return new NetworkDevice(
+
+        // parse a server from incoming extras
+        NetworkDevice server = new NetworkDevice(
                 in.getString(EXTRA_SERVER_NAME),
                 in.getInt(EXTRA_SERVER_PORT_DISCOVERY),
                 in.getInt(EXTRA_SERVER_PORT_COMMAND),
                 in.getInt(EXTRA_SERVER_PORT_DATA),
                 in.getString(EXTRA_SERVER_ADDRESS));
+
+        // initiate the network client with the necessary parameters
+        mNetworkClient = new NetworkClient(
+                server,
+                getIntent().getExtras().getString(EXTRA_SELF_NAME),
+                this,
+                this
+        );
     }
 
     /**
@@ -195,17 +195,7 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
     private void setSensor(final List<SensorType> requiredSensors) {
         // configure the sensor run state
         if (!mSensorHandler.setRunning(requiredSensors)) {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    // show a warning if the requested sensor type does not exist
-                    AlertDialog alertDialog = new AlertDialog.Builder(SendActivity.this).create();
-                    alertDialog.setTitle("Sensor activation error");
-                    alertDialog.setMessage("This device does not contain a required sensor");
-                    alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, "OK", (DialogInterface.OnClickListener) null);
-                    alertDialog.show();
-                }
-            });
+            UiUtil.showAlert(this, "Sensor activation error", "This device does not contain a required sensor");
         }
     }
 
@@ -230,14 +220,9 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
         // the progress dialog can be dismissed in any case
         mConnectionProgressDialog.dismiss();
 
-        if (granted) {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    Toast.makeText(SendActivity.this, R.string.send_activity_connection_success, Toast.LENGTH_LONG).show();
-                }
-            });
-        } else
+        if (granted)
+            UiUtil.showToast(this, getString(R.string.send_activity_connection_success));
+        else
             closeActivity(RESULT_SERVER_REFUSED);
     }
 

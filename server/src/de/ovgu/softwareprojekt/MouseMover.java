@@ -42,7 +42,8 @@ public class MouseMover extends Mover {
      */
     @Override
     public void move(float[] rawData) {
-        mousePos = MouseInfo.getPointerInfo().getLocation();
+        PointerInfo pi = MouseInfo.getPointerInfo();
+        mousePos = pi.getLocation();
 
         float[] axesValues = filter(rawData);
 

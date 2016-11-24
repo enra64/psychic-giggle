@@ -95,23 +95,10 @@ public class DiscoveryActivity extends AppCompatActivity implements OnDiscoveryL
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         // request code is ignored
-        if (resultCode == SendActivity.RESULT_SERVER_REFUSED) {
-            AlertDialog alertDialog = new AlertDialog.Builder(this).create();
-            alertDialog.setTitle("Connection failed");
-            alertDialog.setMessage("Server refused connection");
-
-            alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, "OK", (DialogInterface.OnClickListener) null);
-
-            alertDialog.show();
-        } else if (resultCode == SendActivity.RESULT_SERVER_NOT_LISTENING_ON_COMMAND_PORT) {
-            AlertDialog alertDialog = new AlertDialog.Builder(this).create();
-            alertDialog.setTitle("Connection failed");
-            alertDialog.setMessage("Server seems to be offline");
-
-            alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, "OK", (DialogInterface.OnClickListener) null);
-
-            alertDialog.show();
-        }
+        if (resultCode == SendActivity.RESULT_SERVER_REFUSED)
+            UiUtil.showAlert(this, "Connection failed", "Server refused connection");
+        else if (resultCode == SendActivity.RESULT_SERVER_NOT_LISTENING_ON_COMMAND_PORT)
+            UiUtil.showAlert(this, "Connection failed", "Server seems to be offline");
     }
 
     /**
