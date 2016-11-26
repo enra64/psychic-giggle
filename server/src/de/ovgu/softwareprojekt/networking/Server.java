@@ -233,7 +233,7 @@ public abstract class Server implements OnCommandListener, DataSink, ClientListe
      */
     private void updateButtons() throws IOException {
         // if the button list was changed, we need to update the clients buttons
-        if (mCommandConnection.isRunningAndConfigured())
+        if (mCommandConnection != null && mCommandConnection.isRunningAndConfigured())
             mCommandConnection.sendCommand(new UpdateButtons(mButtonList));
     }
 
@@ -244,7 +244,7 @@ public abstract class Server implements OnCommandListener, DataSink, ClientListe
      */
     private void updateSensors() throws IOException {
         // the key set is not serializable, so we must create an ArrayList from it
-        if (mCommandConnection.isRunningAndConfigured())
+        if (mCommandConnection != null && mCommandConnection.isRunningAndConfigured())
             mCommandConnection.sendCommand(new SetSensorCommand(new ArrayList<>(mDataSinks.keySet())));
     }
 

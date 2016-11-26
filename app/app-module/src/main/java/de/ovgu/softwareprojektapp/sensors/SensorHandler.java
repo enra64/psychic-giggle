@@ -1,22 +1,24 @@
 package de.ovgu.softwareprojektapp.sensors;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.EnumMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import de.ovgu.softwareprojekt.DataSink;
 import de.ovgu.softwareprojekt.SensorType;
+import de.ovgu.softwareprojektapp.BuildConfig;
 
 /**
- * Handle instantiation and storage of sensor classes, as well as temporarily disabling them.
+ * Handle instantiation and storage of sensor classes, as well as temporarily disabling them. Uses
+ * reflection to find classes for the different SensorType values.
  */
 public class SensorHandler {
     /**
@@ -37,7 +39,7 @@ public class SensorHandler {
      * @param context  required for interaction with android sensor system
      * @param dataSink required for pushing the data somewhere
      */
-    public SensorHandler(Context context, DataSink dataSink) {
+    public SensorHandler(@NonNull Context context, @NonNull DataSink dataSink) {
         mContext = context;
         mDataSink = dataSink;
     }
@@ -106,14 +108,14 @@ public class SensorHandler {
                 // already instantiated, just set it running
                 if (mSensors.containsKey(sensorType))
                     mSensors.get(sensorType).setRunning(true);
-                    // not yet instantiated, instantiate and start
+                // not yet instantiated, instantiate and start
                 else
                     instantiateSensor(sensorType);
             }
             // disable the sensor if it was already instantiated
             else if (mSensors.containsKey(sensorType))
                 mSensors.get(sensorType).setRunning(false);
-        } catch (NoSuchMethodException | InstantiationException | InvocationTargetException | IllegalAccessException | IOException e) {
+        } catch (NoSuchMethodException | ClassNotFoundException | InstantiationException | InvocationTargetException | IllegalAccessException | IOException e) {
             return false;
         }
         return true;
@@ -155,10 +157,19 @@ public class SensorHandler {
      * @throws InvocationTargetException if the sensor could not be instantiated
      * @throws InstantiationException    if the sensor could not be instantiated
      * @throws IOException               if the sensor could not be started
+     * @throws ClassNotFoundException    if no sensor class with a name matching the enum value could be found
      */
     @SuppressWarnings("unchecked")
-    private void instantiateSensor(SensorType sensorType) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException, IOException {
-        Class sensorImplementation = getClassForSensorType(sensorType);
+    private void instantiateSensor(SensorType sensorType)
+            throws
+            NoSuchMethodException,
+            IllegalAccessException,
+            InvocationTargetException,
+            InstantiationException,
+            IOException,
+            ClassNotFoundException {
+        String implementationsPackage = getClass().getPackage().getName() + ".implementations.";
+        Class sensorImplementation = Class.forName(implementationsPackage + sensorType.name());
 
         // find the constructor for this class
         Constructor<?> constructor = sensorImplementation.getConstructor(Context.class);
@@ -180,23 +191,5 @@ public class SensorHandler {
     public void closeAll() {
         for (AbstractSensor abstractSensor : mSensors.values())
             abstractSensor.close();
-    }
-
-    /**
-     * Retrieves the class necessary to create sensor data for a certain sensor type
-     *
-     * @param sensorType the required sensor type
-     * @return the class usable for creating such sensor data
-     * @throws NoSuchMethodException if no fitting AbstractSensor implementation is known
-     */
-    private Class getClassForSensorType(SensorType sensorType) throws NoSuchMethodException {
-        switch (sensorType) {
-            case Accelerometer:
-                return Accelerometer.class;
-            case Gyroscope:
-                return Gyroscope.class;
-            default:
-                throw new NoSuchMethodException();
-        }
     }
 }

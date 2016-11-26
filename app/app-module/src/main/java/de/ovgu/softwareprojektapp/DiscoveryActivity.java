@@ -84,12 +84,22 @@ public class DiscoveryActivity extends AppCompatActivity implements OnDiscoveryL
         // clear the server list in case there is an old entry
         onServerListUpdated(new LinkedList<NetworkDevice>());
 
-        // hide the progress bar for now
+        // find the progress indicator
         ProgressBar progressBar = (ProgressBar) findViewById(R.id.discovery_progress_spinner);
-        progressBar.setVisibility(View.GONE);
 
-        // enable the discovery button in case we disabled it
-        mStartDiscoveryButton.setEnabled(true);
+        if(mDiscovery != null && mDiscovery.isRunning()){
+            // show the progress indicator
+            progressBar.setVisibility(View.VISIBLE);
+
+            // disable the discovery button, since we are still running
+            mStartDiscoveryButton.setEnabled(false);
+        } else {
+            // hide the progress indicator
+            progressBar.setVisibility(View.GONE);
+
+            // enable the discovery button in case we disabled it
+            mStartDiscoveryButton.setEnabled(true);
+        }
     }
 
     @Override

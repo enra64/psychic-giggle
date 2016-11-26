@@ -7,7 +7,6 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 
 import java.io.IOException;
-import java.security.InvalidParameterException;
 
 import de.ovgu.softwareprojekt.DataSink;
 import de.ovgu.softwareprojekt.DataSource;
@@ -50,17 +49,10 @@ public abstract class AbstractSensor implements DataSource, SensorEventListener 
      * @param context android system context needed for sensors
      * @param sensorType sensor type we should register for
      */
-    AbstractSensor(Context context, int sensorType, SensorType psychicSensorType){
+    public AbstractSensor(Context context, int sensorType, SensorType psychicSensorType){
         mSensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
         mSensorType = sensorType;
         mPsychicSensorType = psychicSensorType;
-    }
-
-    /**
-     * Retrieve the android sensor manager
-     */
-    protected SensorManager getSensorManager(){
-        return mSensorManager;
     }
 
     /**
@@ -76,7 +68,7 @@ public abstract class AbstractSensor implements DataSource, SensorEventListener 
      * Shorthand for {@link #start} and {@link #close()}.
      * @param enable true if the sensor output should be started
      */
-    public void setRunning(boolean enable) throws IOException{
+    void setRunning(boolean enable) throws IOException{
         if(enable)
             start();
         else
@@ -123,14 +115,14 @@ public abstract class AbstractSensor implements DataSource, SensorEventListener 
      * Get the state of listener registration
      * @return true if the listener is currently registered
      */
-    public boolean isRegistered(){
+    boolean isRegistered(){
         return mListenerRegistered;
     }
 
     /**
      * Returns the sensor type the implementation deals with
      */
-    public SensorType getSensorType(){
+    SensorType getSensorType(){
         return mPsychicSensorType;
     }
 

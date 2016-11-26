@@ -7,5 +7,7 @@ package de.ovgu.softwareprojekt;
 // when adding a sensor type, remember to add its class to the sensor handler (at the bottom...)
 public enum SensorType {
     Accelerometer,
-    Gyroscope
+    Gyroscope,
+    Magnetometer,
+    RotationVector
 }

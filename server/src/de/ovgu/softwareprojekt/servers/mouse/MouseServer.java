@@ -72,6 +72,7 @@ public class MouseServer extends Server {
      */
     @Override
     public boolean acceptClient(NetworkDevice newClient) {
+        System.out.println(newClient + " connected");
         return true;
     }
 

@@ -1,7 +1,6 @@
 package de.ovgu.softwareprojektapp.networking;
 
 import android.os.AsyncTask;
-import android.os.Build;
 
 import java.io.IOException;
 
@@ -15,7 +14,6 @@ import de.ovgu.softwareprojekt.control.commands.ConnectionRequest;
 import de.ovgu.softwareprojekt.control.commands.EndConnection;
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
 import de.ovgu.softwareprojekt.misc.ExceptionListener;
-import de.ovgu.softwareprojektapp.BuildConfig;
 
 /**
  * The network client contains both the command and the data connection. Use {@link #sendCommand(Command)}

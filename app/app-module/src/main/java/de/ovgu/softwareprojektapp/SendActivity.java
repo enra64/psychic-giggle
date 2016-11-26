@@ -73,6 +73,9 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
         // we create a NetworkDevice from our extras to have all the data we need in a neat package
         parseIncomingNetworkDevice();
 
+        // create a new sensor handler to help with the sensors
+        mSensorHandler = new SensorHandler(this, mNetworkClient);
+
         // disable the sensors while this button is held down
         Button disableSensorsButton = (Button) findViewById(R.id.disableSensorsButton);
         disableSensorsButton.setOnTouchListener(new View.OnTouchListener() {
@@ -91,16 +94,10 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
         });
 
         // default to successful execution
-        setResult(RESULT_OK);
+        setResult(RESULT_USER_STOPPED);
 
         // immediately try to connect to the server
         initiateConnection();
-
-        // create a new sensor handler to help with the sensors
-        mSensorHandler = new SensorHandler(this, mNetworkClient);
-
-        // default activity result is closing by user
-        setResult(RESULT_USER_STOPPED);
     }
 
     /**
@@ -194,9 +191,8 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
      */
     private void setSensor(final List<SensorType> requiredSensors) {
         // configure the sensor run state
-        if (!mSensorHandler.setRunning(requiredSensors)) {
+        if (!mSensorHandler.setRunning(requiredSensors))
             UiUtil.showAlert(this, "Sensor activation error", "This device does not contain a required sensor");
-        }
     }
 
     @Override
@@ -209,6 +205,13 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
     protected void onResume() {
         super.onResume();
         mSensorHandler.enableTemporarilyDisabledSensors();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mNetworkClient.signalConnectionEnd();
+        mNetworkClient.close();
     }
 
     /**

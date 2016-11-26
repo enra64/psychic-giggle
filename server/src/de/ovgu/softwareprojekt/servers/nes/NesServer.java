@@ -8,11 +8,32 @@ import de.ovgu.softwareprojekt.discovery.NetworkDevice;
 import de.ovgu.softwareprojekt.networking.Server;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 /**
  * This server is designed to create NES controller input from gyroscope data
  */
 public class NesServer extends Server {
+    /**
+     * Data we need to store for calculating the devices rotation
+     */
+    private float[] mValuesMagnet = new float[3];
+
+    /**
+     * Data we need to store for calculating the devices rotation
+     */
+    private float[] mValuesAccelerometer = new float[3];
+
+    /**
+     * Data we need to store for calculating the devices rotation
+     */
+    private float[] mValuesOrientation = new float[3];
+
+    /**
+     * Current device rotation matrix
+     */
+    private float[] mRotationMatrix = new float[9];
+
     /**
      * Create a new server. It will be offline (not using any sockets) until {@link #start()} is called.
      *
@@ -21,7 +42,7 @@ public class NesServer extends Server {
     public NesServer(@Nullable String serverName) throws IOException {
         super(serverName);
 
-        registerDataSink(this, SensorType.Gyroscope);
+        registerDataSink(this, SensorType.RotationVector);
     }
 
     /**
@@ -51,6 +72,13 @@ public class NesServer extends Server {
 
     @Override
     public void onData(SensorData sensorData) {
+        switch (sensorData.sensorType) {
+            case RotationVector:
+                System.out.println(Arrays.toString(sensorData.data));
+                break;
+            default:
+                System.out.println("unhandled sensor data incoming");
+        }
     }
 
     /**
