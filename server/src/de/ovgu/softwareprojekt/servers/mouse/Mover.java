@@ -1,4 +1,7 @@
-package de.ovgu.softwareprojekt;
+package de.ovgu.softwareprojekt.servers.mouse;
+
+import de.ovgu.softwareprojekt.DataSink;
+import de.ovgu.softwareprojekt.SensorData;
 
 import java.awt.*;
 

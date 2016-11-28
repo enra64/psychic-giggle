@@ -1,4 +1,4 @@
-package de.ovgu.softwareprojektapp.sensors;
+package de.ovgu.softwareprojektapp.sensors.implementations;
 
 
 import android.content.Context;
@@ -11,6 +11,7 @@ import de.ovgu.softwareprojekt.DataSink;
 import de.ovgu.softwareprojekt.DataSource;
 import de.ovgu.softwareprojekt.SensorData;
 import de.ovgu.softwareprojekt.SensorType;
+import de.ovgu.softwareprojektapp.sensors.AbstractSensor;
 
 /**
  * {@link DataSource} for gyroscope data

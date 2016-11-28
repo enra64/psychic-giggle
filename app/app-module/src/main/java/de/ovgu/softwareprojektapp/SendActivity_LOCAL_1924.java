@@ -8,8 +8,6 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutCompat;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -45,7 +43,6 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
 
     static final String EXTRA_SELF_NAME = "SelfName";
 
-    // result codes for the activity
     static final int RESULT_SERVER_REFUSED = -1;
     static final int RESULT_USER_STOPPED = 0;
     static final int RESULT_SERVER_NOT_LISTENING_ON_COMMAND_PORT = -2;
@@ -75,34 +72,21 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_send);
 
-        // find the layout we use to display buttons requested by the server
-        mRuntimeButtonLayout = (LinearLayout) findViewById(R.id.runtime_button_parent);
+        mRuntimeButtonLayout = (LinearLayout) findViewById(R.id.linlay);
 
         // we create a NetworkDevice from our extras to have all the data we need in a neat package
-        parseIncomingNetworkDevice();
-
-        // create a new sensor handler to help with the sensors
-        mSensorHandler = new SensorHandler(this, mNetworkClient);
-
-        // disable the sensors while this button is held down
-        Button disableSensorsButton = (Button) findViewById(R.id.disableSensorsButton);
-        disableSensorsButton.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                // we only handle button press and release
-                if (motionEvent.getAction() == MotionEvent.ACTION_DOWN)
-                    mSensorHandler.temporarilyDisableSensors();
-                else if (motionEvent.getAction() == MotionEvent.ACTION_UP)
-                    mSensorHandler.enableTemporarilyDisabledSensors();
-                else
-                    return false;
-
-                return true;
-            }
-        });
+        mNetworkClient = new NetworkClient(
+                parseServer(),
+                getIntent().getExtras().getString(EXTRA_SELF_NAME),
+                this,
+                this
+        );
 
         // default to successful execution
-        setResult(RESULT_USER_STOPPED);
+        setResult(RESULT_OK);
+
+        // create a new sensor handler to help with the sensors
+        mSensorHandler = new SensorHandler(this);
 
         // immediately try to connect to the server
         initiateConnection();
@@ -112,27 +96,16 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
     }
 
     /**
-     * Initialise {@link #mNetworkClient} from incoming extras
+     * Create a NetworkDevice object from the intent extras
      */
-    private void parseIncomingNetworkDevice() {
-        // get the extras
+    private NetworkDevice parseServer() {
         Bundle in = getIntent().getExtras();
-
-        // parse a server from incoming extras
-        NetworkDevice server = new NetworkDevice(
+        return new NetworkDevice(
                 in.getString(EXTRA_SERVER_NAME),
                 in.getInt(EXTRA_SERVER_PORT_DISCOVERY),
                 in.getInt(EXTRA_SERVER_PORT_COMMAND),
                 in.getInt(EXTRA_SERVER_PORT_DATA),
                 in.getString(EXTRA_SERVER_ADDRESS));
-
-        // initiate the network client with the necessary parameters
-        mNetworkClient = new NetworkClient(
-                server,
-                getIntent().getExtras().getString(EXTRA_SELF_NAME),
-                this,
-                this
-        );
     }
 
     /**
@@ -148,32 +121,15 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
     }
 
     /**
-     * This function is called by a button in the action bar. It sends a command to the server which
-     * then closes the connection. It also stops the activity.
+     * This function is called by a button. It sends a command to the server which then closes the
+     * connection. It also stops the activity.
      */
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.menu_disconnect) {
-            // end connections
-            mNetworkClient.signalConnectionEnd();
+    public void endConnection(@Nullable View v) {
+        // end connections
+        mNetworkClient.signalConnectionEnd();
 
-            // close activity
-            closeActivity(RESULT_USER_STOPPED);
-
-            // handled click -> return true
-            return true;
-        }
-        // invoke the superclass if we didn't want to handle the click
-        return super.onOptionsItemSelected(item);
-    }
-
-    /**
-     * Add all requested buttons to the action bar
-     */
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_activity_send, menu);
-        return true;
+        // close activity
+        closeActivity(RESULT_USER_STOPPED);
     }
 
     /**
@@ -202,27 +158,19 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
      */
     private void setSensor(final List<SensorType> requiredSensors) {
         // configure the sensor run state
-        if (!mSensorHandler.setRunning(requiredSensors))
-            UiUtil.showAlert(this, "Sensor activation error", "This device does not contain a required sensor");
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        mSensorHandler.temporarilyDisableSensors();
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        mSensorHandler.enableTemporarilyDisabledSensors();
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        mNetworkClient.signalConnectionEnd();
-        mNetworkClient.close();
+        if (!mSensorHandler.setRunning(mNetworkClient, requiredSensors)) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    // show a warning if the requested sensor type does not exist
+                    AlertDialog alertDialog = new AlertDialog.Builder(SendActivity.this).create();
+                    alertDialog.setTitle("Sensor activation error");
+                    alertDialog.setMessage("This device does not contain a required sensor");
+                    alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, "OK", (DialogInterface.OnClickListener) null);
+                    alertDialog.show();
+                }
+            });
+        }
     }
 
     /**
@@ -234,9 +182,14 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
         // the progress dialog can be dismissed in any case
         mConnectionProgressDialog.dismiss();
 
-        if (granted)
-            UiUtil.showToast(this, getString(R.string.send_activity_connection_success));
-        else
+        if (granted) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(SendActivity.this, R.string.send_activity_connection_success, Toast.LENGTH_LONG).show();
+                }
+            });
+        } else
             closeActivity(RESULT_SERVER_REFUSED);
     }
 
@@ -298,7 +251,7 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
 
                 for (Map.Entry<Integer, String> button : addCom.buttons.entrySet()) {
                     Button btn = new Button(SendActivity.this);
-                    btn.setLayoutParams(new LinearLayout.LayoutParams(LinearLayoutCompat.LayoutParams.MATCH_PARENT, mRuntimeButtonLayout.getHeight() / addCom.buttons.size()));
+                    btn.setLayoutParams(new LinearLayout.LayoutParams(LinearLayoutCompat.LayoutParams.MATCH_PARENT, mRuntimeButtonLayout.getHeight()/ addCom.buttons.size()));
                     mRuntimeButtonLayout.addView(btn);
                     btn.setText(button.getValue());
                     btn.setTag(button.getKey());

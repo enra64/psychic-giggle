@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">SoftwareprojektApp</string>
+    <string name="disconnect">Trennen</string>
+    <string name="send_activity_connection_success">Verbindung erflogreich!</string>
+</resources>

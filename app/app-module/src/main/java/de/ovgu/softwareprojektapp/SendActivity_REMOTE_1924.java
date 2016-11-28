@@ -1,27 +1,20 @@
 package de.ovgu.softwareprojektapp;
 
 import android.app.ProgressDialog;
-import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutCompat;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
-import android.widget.Toast;
 
 import java.net.ConnectException;
 import java.net.InetAddress;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import de.ovgu.softwareprojekt.SensorType;
 import de.ovgu.softwareprojekt.control.OnCommandListener;
@@ -42,7 +35,6 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
     static final String EXTRA_SERVER_PORT_DISCOVERY = "DiscoveryPort";
     static final String EXTRA_SERVER_PORT_COMMAND = "CommandPort";
     static final String EXTRA_SERVER_PORT_DATA = "DataPort";
-
     static final String EXTRA_SELF_NAME = "SelfName";
 
     // result codes for the activity
@@ -106,9 +98,6 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
 
         // immediately try to connect to the server
         initiateConnection();
-
-        // default activity result is closing by user
-        setResult(RESULT_USER_STOPPED);
     }
 
     /**
@@ -315,10 +304,5 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
                 }
             }
         });
-    }
-
-    public void goToOptions(View view){
-        Intent intent = new Intent(SendActivity.this, OptionsActivity.class);
-        SendActivity.this.startActivity(intent);
     }
 }

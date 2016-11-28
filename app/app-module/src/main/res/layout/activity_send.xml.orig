@@ -24,7 +24,9 @@
         android:text="hold sonsors"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/disableSensorsButton"
+<<<<<<< HEAD
+        android:id="@+id/cancelButton"
+        android:onClick="endConnection (SendActivity)"
         android:layout_alignParentBottom="true"
         android:layout_alignParentStart="true"
         android:layout_marginStart="46dp" />
@@ -38,5 +40,11 @@
         android:layout_marginEnd="45dp"
         android:id="@+id/optionsBtn"
         android:onClick="goToOptions" />
+=======
+        android:id="@+id/disableSensorsButton"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true" />
+>>>>>>> f1aab7ae5293da14a6cf914ed56fff2f2f0feb02
 
 </RelativeLayout>
