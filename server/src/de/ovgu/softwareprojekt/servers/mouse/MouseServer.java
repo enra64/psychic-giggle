@@ -32,8 +32,8 @@ public class MouseServer extends Server {
      *
      * @param serverName if not null, this name will be used. otherwise, the devices hostname is used
      */
-    public MouseServer(@Nullable String serverName) throws IOException {
-        super(serverName);
+    public MouseServer(@Nullable String serverName, int port) throws IOException {
+        super(serverName, port);
 
         // create a new mouse mover
         mMouseMover = new MouseMover();
