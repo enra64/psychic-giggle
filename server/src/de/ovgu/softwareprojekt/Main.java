@@ -7,6 +7,6 @@ import java.io.IOException;
 
 public class Main {
     public static void main(String[] args) throws IOException {
-        new MouseServer(null, 12345).start();
+        new MouseServer(null).start();
     }
 }

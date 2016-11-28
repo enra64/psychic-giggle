@@ -51,7 +51,7 @@ public abstract class Server implements OnCommandListener, DataSink, ClientListe
     private String mServerName;
 
     /**
-     * port where discovery packets are expected. default 8888
+     * port where discovery packets are expected
      */
     private int mDiscoveryPort;
 
