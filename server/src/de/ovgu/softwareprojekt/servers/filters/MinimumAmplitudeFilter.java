@@ -54,17 +54,13 @@ public class MinimumAmplitudeFilter implements DataSink, DataSource {
 
         // if the change does not meet the set minimum, overwrite the new data with our old, unchanged data
         if (calculateChange(sensorData.data, mLastValue) < mMinimumChange)
-            // TODO: check argument reihenfolge, i had no documentation when i wrote this
-            System.arraycopy(mLastValue, mLastValue.length, sensorData.data, mLastValue.length, 0);
-            // if the change does meet the minimum, copy over the new values
+            System.arraycopy(mLastValue, 0, sensorData.data, 0, mLastValue.length);
+        // if the change does meet the minimum, copy over the new values
         else
-            System.arraycopy(sensorData.data, sensorData.data.length, mLastValue, mLastValue.length, 0);
+            System.arraycopy(sensorData.data, 0, mLastValue, 0, mLastValue.length);
 
         // notify attached sink of new data
         mDataSink.onData(sensorData);
-
-        // see above todo
-        throw new NotImplementedException();
     }
 
     /**
