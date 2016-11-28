@@ -9,10 +9,12 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 
 import java.io.IOException;
+import java.security.InvalidParameterException;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -48,7 +50,7 @@ public class DiscoveryActivity extends AppCompatActivity implements OnDiscoveryL
             public void onClick(View view) {
                 // let this function handle
                 startDiscovery();
-                mStartDiscoveryButton.setEnabled(false);
+
             }
         });
 
@@ -87,7 +89,7 @@ public class DiscoveryActivity extends AppCompatActivity implements OnDiscoveryL
         // find the progress indicator
         ProgressBar progressBar = (ProgressBar) findViewById(R.id.discovery_progress_spinner);
 
-        if(mDiscovery != null && mDiscovery.isRunning()){
+        if (mDiscovery != null && mDiscovery.isRunning()) {
             // show the progress indicator
             progressBar.setVisibility(View.VISIBLE);
 
@@ -120,21 +122,69 @@ public class DiscoveryActivity extends AppCompatActivity implements OnDiscoveryL
             // create a new discovery thread, if this one already completed
             if (mDiscovery == null || mDiscovery.hasRun()) {
                 try {
+                    // parse port from input
+                    int discoveryPort = getDiscoveryPort();
+
+                    // create discovery client
                     mDiscovery = new DiscoveryClient(
                             DiscoveryActivity.this,
                             DiscoveryActivity.this,
-                            8888,
+                            discoveryPort,
                             NAME);
+                // this is a network problem
                 } catch (IOException e) {
                     onException(this, e, "DiscoveryActivity: could not create DiscoveryClient");
+                }
+                // these exceptions are thrown if the port is invalid, so we do not want to continue
+                catch (NumberFormatException | InvalidParameterException e) {
+                    return;
                 }
             }
 
             ProgressBar progressBar = (ProgressBar) findViewById(R.id.discovery_progress_spinner);
             progressBar.setVisibility(View.VISIBLE);
 
+            mStartDiscoveryButton.setEnabled(false);
+
             // start discovery
             mDiscovery.start();
+        }
+    }
+
+    /**
+     * Parse the discovery port from the edittext for the discovery port
+     *
+     * @return 8888 if no port was entered, or the result port
+     * @throws NumberFormatException if a non-number was entered
+     * @throws InvalidParameterException if a port below 1024 (reserved for root) was entered
+     */
+    private int getDiscoveryPort() throws NumberFormatException, InvalidParameterException {
+        EditText portEditText = (EditText) findViewById(R.id.port_edit_text);
+        String portFieldContent = portEditText.getText().toString();
+
+        if (portFieldContent.length() == 0)
+            return 8888;
+
+        try {
+            // try and convert the field content to a number
+            int port = Integer.valueOf(portFieldContent);
+
+            // avoid root-only ports
+            if (port < 1024)
+                throw new InvalidParameterException("Ports below 1024 are reserved");
+
+            // remove error if we set one, since we have successfully survived the trials
+            portEditText.setError(null);
+
+            return port;
+        } catch (NumberFormatException e) {
+            // display an error about invalid numbers
+            portEditText.setError("Numbers only");
+            throw e;
+        } catch (InvalidParameterException e) {
+            // ports below 1024 are root ports...
+            portEditText.setError(e.getMessage());
+            throw e;
         }
     }
 
