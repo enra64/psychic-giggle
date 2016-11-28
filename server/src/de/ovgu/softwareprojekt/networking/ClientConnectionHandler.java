@@ -1,5 +1,6 @@
 package de.ovgu.softwareprojekt.networking;
 
+import com.sun.istack.internal.NotNull;
 import de.ovgu.softwareprojekt.DataSink;
 import de.ovgu.softwareprojekt.SensorType;
 import de.ovgu.softwareprojekt.control.CommandConnection;
@@ -16,7 +17,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * This class manages the command- and data connection to a single client
+ * This class manages the command- and data connection for a single client
  */
 public class ClientConnectionHandler {
     /**
@@ -29,50 +30,109 @@ public class ClientConnectionHandler {
      */
     private CommandConnection mCommandConnection;
 
+    /**
+     * The client this instance handles
+     */
     private NetworkDevice mClient;
 
+    /**
+     * Who to notify about unhandleable exceptions
+     */
     private ExceptionListener mExceptionListener;
 
+    /**
+     * Who to notify about commands
+     */
     private OnCommandListener mCommandListener;
 
+    /**
+     * Where to put data
+     */
     private DataSink mDataSink;
 
+    /**
+     * Create a new client connection handler, which will immediately begin listening on random ports. They may be retrieved
+     * using {@link #getCommandPort()} and {@link #getDataPort()}.
+     *
+     * @param exceptionListener Who to notify about unhandleable exceptions
+     * @param commandListener   Who to notify about commands
+     * @param dataSink          Where to put data
+     * @throws IOException when the listening process could not be started
+     */
     public ClientConnectionHandler(ExceptionListener exceptionListener, OnCommandListener commandListener, DataSink dataSink) throws IOException {
-        initialiseCommandConnection();
-        initialiseDataConnection();
-
         mExceptionListener = exceptionListener;
         mCommandListener = commandListener;
+        mDataSink = dataSink;
+
+        initialiseCommandConnection();
+        initialiseDataConnection();
     }
 
-    public void start() {
-
-    }
-
+    /**
+     * Send a command to this client
+     *
+     * @param command the command to be sent
+     * @throws IOException if the command could not be sent
+     */
     public void sendCommand(Command command) throws IOException {
         mCommandConnection.sendCommand(command);
     }
 
-    public NetworkDevice getClient(){
+    /**
+     * Retrieve the client this connection handler is bound to
+     */
+    public
+    @NotNull
+    NetworkDevice getClient() {
         return mClient;
     }
 
-    public void handleConnectionRequest(ConnectionRequest connectionRequest, boolean acceptClient) throws UnknownHostException {
+    /**
+     * Handle a connection request to this client connection. If acceptClient is true, this instance may not be used to
+     * handle another client.
+     *
+     * @param client       the client that wants to connect
+     * @param acceptClient true if the client should be accepted, and this instance be bound to it
+     * @throws UnknownHostException if the clients address could not be parsed to an {@link java.net.InetAddress}. Unlikely...
+     */
+    public void handleConnectionRequest(NetworkDevice client, boolean acceptClient) throws UnknownHostException {
+        // if mClient is not null, we already handled a client, but we cannot handle another one.
+        assert mClient == null;
+
         // initialise the connection to be able to send the request answer
-        mCommandConnection.setRemote(connectionRequest.self.getInetAddress(), connectionRequest.self.commandPort);
+        mCommandConnection.setRemote(client.getInetAddress(), client.commandPort);
 
         // accept or reject the client
         if (acceptClient)
-            onClientAccepted(connectionRequest.self);
+            onClientAccepted(client);
         else
             onClientRejected();
     }
 
+    /**
+     * Close all network interfaces this connection handler has used
+     */
     public void close() {
         mCommandConnection.close();
         mDataConnection.close();
     }
 
+    /**
+     * Close the ports, but beforehand send an {@link EndConnection} command to the client.
+     */
+    public void closeAndSignalClient() {
+        try {
+            sendCommand(new EndConnection(null));
+        } catch (IOException ignored) {
+        }
+        close();
+    }
+
+    /**
+     * Notify a client of its acceptance and set this instance to handle that client
+     *
+     * @param client the client we will be handling
+     */
     private void onClientAccepted(NetworkDevice client) {
         try {
             // accept the client
@@ -85,6 +145,9 @@ public class ClientConnectionHandler {
         }
     }
 
+    /**
+     * Notify a client of its rejection. This instance may continue to be used for another client.
+     */
     private void onClientRejected() {
         try {
             // deny the client
@@ -138,10 +201,16 @@ public class ClientConnectionHandler {
         sendCommand(new SetSensorCommand(new ArrayList<>(requiredSensors)));
     }
 
+    /**
+     * @return the port the {@link CommandConnection} is listening on
+     */
     public int getCommandPort() {
         return mCommandConnection.getLocalPort();
     }
 
+    /**
+     * @return the port the {@link UdpDataConnection} is listening on
+     */
     public int getDataPort() {
         return mDataConnection.getLocalPort();
     }

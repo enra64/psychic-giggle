@@ -38,8 +38,15 @@ public abstract class Server implements OnCommandListener, DataSink, ClientListe
      */
     private String mServerName;
 
+    /**
+     * This is the list of all currently bound clients.
+     */
     private List<ClientConnectionHandler> mClientConnections = new ArrayList<>();
 
+    /**
+     * This is the latest unbound client connection, which makes it also the currently advertised connection. When bound,
+     * this instance will be moved to {@link #mClientConnections}, and a new instance will be set instead
+     */
     private ClientConnectionHandler mCurrentUnboundClientConnection;
 
     /**
@@ -164,7 +171,7 @@ public abstract class Server implements OnCommandListener, DataSink, ClientListe
 
                 // reply to the client, either accepting or denying his request
                 try {
-                    mCurrentUnboundClientConnection.handleConnectionRequest(request, acceptClient);
+                    mCurrentUnboundClientConnection.handleConnectionRequest(request.self, acceptClient);
                 } catch (UnknownHostException e) {
                     e.printStackTrace();
                 }
