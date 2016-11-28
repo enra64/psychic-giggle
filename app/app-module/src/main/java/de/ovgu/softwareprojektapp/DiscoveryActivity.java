@@ -2,6 +2,7 @@ package de.ovgu.softwareprojektapp;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -34,11 +35,6 @@ public class DiscoveryActivity extends AppCompatActivity implements OnDiscoveryL
      */
     DiscoveryClient mDiscovery;
 
-    /**
-     * how we announce ourselves to servers
-     */
-    private static final String NAME = "bond. _james_ bond";
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,7 +46,6 @@ public class DiscoveryActivity extends AppCompatActivity implements OnDiscoveryL
             public void onClick(View view) {
                 // let this function handle
                 startDiscovery();
-
             }
         });
 
@@ -68,7 +63,7 @@ public class DiscoveryActivity extends AppCompatActivity implements OnDiscoveryL
                 intent.putExtra(SendActivity.EXTRA_SERVER_PORT_DATA, mServerList.get(i).dataPort);
 
                 // store our name, too
-                intent.putExtra(SendActivity.EXTRA_SELF_NAME, NAME);
+                intent.putExtra(SendActivity.EXTRA_SELF_NAME, getDeviceName());
 
                 // start activity; 2nd parameter unused by us
                 DiscoveryActivity.this.startActivityForResult(intent, 0);
@@ -77,6 +72,9 @@ public class DiscoveryActivity extends AppCompatActivity implements OnDiscoveryL
                 mDiscovery.close();
             }
         });
+
+        // default to the device model for identification
+        ((EditText) findViewById(R.id.device_name_edit_text)).setText(Build.MODEL);
     }
 
     @Override
@@ -89,19 +87,8 @@ public class DiscoveryActivity extends AppCompatActivity implements OnDiscoveryL
         // find the progress indicator
         ProgressBar progressBar = (ProgressBar) findViewById(R.id.discovery_progress_spinner);
 
-        if (mDiscovery != null && mDiscovery.isRunning()) {
-            // show the progress indicator
-            progressBar.setVisibility(View.VISIBLE);
-
-            // disable the discovery button, since we are still running
-            mStartDiscoveryButton.setEnabled(false);
-        } else {
-            // hide the progress indicator
-            progressBar.setVisibility(View.GONE);
-
-            // enable the discovery button in case we disabled it
-            mStartDiscoveryButton.setEnabled(true);
-        }
+        // only enable the discovery user interface if the discovery system is not running
+        setDiscoveryUserInterfaceEnabled(!(mDiscovery != null && mDiscovery.isRunning()));
     }
 
     @Override
@@ -130,8 +117,8 @@ public class DiscoveryActivity extends AppCompatActivity implements OnDiscoveryL
                             DiscoveryActivity.this,
                             DiscoveryActivity.this,
                             discoveryPort,
-                            NAME);
-                // this is a network problem
+                            getDeviceName());
+                    // this is a network problem
                 } catch (IOException e) {
                     onException(this, e, "DiscoveryActivity: could not create DiscoveryClient");
                 }
@@ -141,21 +128,47 @@ public class DiscoveryActivity extends AppCompatActivity implements OnDiscoveryL
                 }
             }
 
-            ProgressBar progressBar = (ProgressBar) findViewById(R.id.discovery_progress_spinner);
-            progressBar.setVisibility(View.VISIBLE);
-
-            mStartDiscoveryButton.setEnabled(false);
+            setDiscoveryUserInterfaceEnabled(false);
 
             // start discovery
             mDiscovery.start();
         }
     }
 
+    private void setDiscoveryUserInterfaceEnabled(boolean enable){
+        // find the progress indicator
+        View progressBar = findViewById(R.id.discovery_progress_spinner);
+
+        // find the EditTexts for port and device name
+        View portEditText = findViewById(R.id.port_edit_text);
+        View deviceNameEditText = findViewById(R.id.device_name_edit_text);
+
+        // refresh activation state
+        portEditText.setEnabled(enable);
+        deviceNameEditText.setEnabled(enable);
+
+        if (!enable) {
+            // show the progress indicator
+            progressBar.setVisibility(View.VISIBLE);
+
+
+        } else {
+            // hide the progress indicator
+            progressBar.setVisibility(View.GONE);
+
+            // enable the discovery button in case we disabled it
+            mStartDiscoveryButton.setEnabled(true);
+        }
+
+        // disable the discovery button, since we are still running
+        mStartDiscoveryButton.setEnabled(enable);
+    }
+
     /**
      * Parse the discovery port from the edittext for the discovery port
      *
      * @return 8888 if no port was entered, or the result port
-     * @throws NumberFormatException if a non-number was entered
+     * @throws NumberFormatException     if a non-number was entered
      * @throws InvalidParameterException if a port below 1024 (reserved for root) was entered
      */
     private int getDiscoveryPort() throws NumberFormatException, InvalidParameterException {
@@ -186,6 +199,14 @@ public class DiscoveryActivity extends AppCompatActivity implements OnDiscoveryL
             portEditText.setError(e.getMessage());
             throw e;
         }
+    }
+
+    /**
+     * Retrieve the device name from source edittext
+     */
+    private String getDeviceName() {
+        EditText deviceNameEditText = (EditText) findViewById(R.id.device_name_edit_text);
+        return deviceNameEditText.getText().toString();
     }
 
     @Override
