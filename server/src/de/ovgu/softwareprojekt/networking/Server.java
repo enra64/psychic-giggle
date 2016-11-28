@@ -51,6 +51,11 @@ public abstract class Server implements OnCommandListener, DataSink, ClientListe
     private String mServerName;
 
     /**
+     * port where discovery packets are expected. default 8888
+     */
+    private int mDiscoveryPort;
+
+    /**
      * Stores all known data sinks
      * <p>
      * This variable is an EnumMap, so iterations over the keys should be quite fast. The sinks are stored in a
@@ -61,13 +66,24 @@ public abstract class Server implements OnCommandListener, DataSink, ClientListe
     /**
      * Create a new server. It will be offline (not using any sockets) until {@link #start()} is called.
      *
+     * @param serverName    if not null, this name will be used. otherwise, the devices hostname is used
+     * @param discoveryPort the port where the discovery packets are expected to arrive
+     */
+    public Server(@Nullable String serverName, int discoveryPort) {
+        // if the server name was not set, use the host name
+        mServerName = serverName != null ? serverName : getHostName();
+        mDiscoveryPort = discoveryPort;
+    }
+
+    /**
+     * Create a new server. It will be offline (not using any sockets) until {@link #start()} is called. The
+     * discovery port is defaulted to port 8888
+     *
      * @param serverName if not null, this name will be used. otherwise, the devices hostname is used
      */
     public Server(@Nullable String serverName) {
-        // if the server name was not set, use the host name
-        mServerName = serverName != null ? serverName : getHostName();
+        this(serverName, 8888);
     }
-
 
     /**
      * Starts the server. This will start making the server available for discovery, and also block the command and
@@ -257,7 +273,7 @@ public abstract class Server implements OnCommandListener, DataSink, ClientListe
         // data ports, which is why we had to initialise those connections first
         mDiscoveryServer = new DiscoveryServer(
                 this,
-                8888,
+                mDiscoveryPort,
                 mCommandConnection.getLocalPort(),
                 mDataConnection.getLocalPort(),
                 mServerName);
@@ -329,7 +345,7 @@ public abstract class Server implements OnCommandListener, DataSink, ClientListe
      *
      * @param origin    the instance (or, if it is a hidden instance, the known parent) that produced the exception
      * @param exception the exception that was thrown
-     * @param info additional information to help identify the problem
+     * @param info      additional information to help identify the problem
      */
     @Override
     public abstract void onException(Object origin, Exception exception, String info);
@@ -353,6 +369,7 @@ public abstract class Server implements OnCommandListener, DataSink, ClientListe
 
     /**
      * Called when a client sent a disconnect signal
+     *
      * @param disconnectedClient the lost client
      */
     @Override

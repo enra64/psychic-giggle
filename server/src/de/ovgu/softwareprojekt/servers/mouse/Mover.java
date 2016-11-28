@@ -41,5 +41,5 @@ public abstract class Mover implements DataSink {
 
     public abstract void move(float[] rawData);
 
-    public abstract float[] filter(float[] rawData);
+    //public abstract float[] filter(float[] rawData);
 }
