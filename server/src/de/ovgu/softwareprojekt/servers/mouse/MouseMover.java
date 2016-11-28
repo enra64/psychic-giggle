@@ -63,7 +63,7 @@ public class MouseMover extends Mover {
      * @param rawData unfiltered gyroscope data
      * @return a float array which has useful axes values
      */
-    @Override
+
     //TODO: implement method
     public float[] filter(float[] rawData) {
         //TODO: filter value should be customizable
