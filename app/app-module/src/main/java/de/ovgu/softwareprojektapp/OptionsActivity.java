@@ -8,16 +8,27 @@ import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 
 import de.ovgu.softwareprojekt.SensorType;
+import de.ovgu.softwareprojekt.control.CommandConnection;
+import de.ovgu.softwareprojekt.control.commands.SensorChange;
 
-public class OptionsActivity extends AppCompatActivity {
+public class OptionsActivity extends AppCompatActivity implements SeekBar.OnSeekBarChangeListener {
+
+    static final String
+            EXTRA_SERVER_ADDRESS = "Address",
+            EXTRA_SERVER_PORT_COMMAND = "CommandPort";
+
 
     LinearLayout mSensorOptions;
     Button mBackBtn;
     int mNumberOfSensors;
     ArrayList<SeekBar> mSeekBars = new ArrayList<SeekBar>();
+    CommandConnection mComCon;
 
     public static final String PREFS_NAME = "SensitivitySettings";
 
@@ -28,6 +39,13 @@ public class OptionsActivity extends AppCompatActivity {
 
         mSensorOptions = (LinearLayout) findViewById(R.id.SensorOptions);
         mBackBtn = (Button) findViewById(R.id.backFromOptionsBtn);
+        Bundle givenExtras = getIntent().getExtras();
+
+        try {//TODO:Exception wörk wörk
+            mComCon.setRemote(InetAddress.getByName(givenExtras.getString(EXTRA_SERVER_ADDRESS)),givenExtras.getInt(EXTRA_SERVER_PORT_COMMAND));
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
 
         mNumberOfSensors =  SensorType.values().length;
 
@@ -50,6 +68,7 @@ public class OptionsActivity extends AppCompatActivity {
             SeekBar seek = new SeekBar(OptionsActivity.this);
             seek.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
             seek.setTag(SensorType.values()[i]);
+            seek.setOnSeekBarChangeListener(this);
 
             mSeekBars.add(seek);
 
@@ -72,5 +91,24 @@ public class OptionsActivity extends AppCompatActivity {
         }
         editor.commit();
 
+    }
+
+    @Override
+    public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+
+    }
+
+    @Override
+    public void onStartTrackingTouch(SeekBar seekBar) {
+
+    }
+
+    @Override
+    public void onStopTrackingTouch(SeekBar seekBar) {
+        try {  //TODO:Exception wörk wörk
+            mComCon.sendCommand(new SensorChange((SensorType)seekBar.getTag() ,seekBar.getProgress()));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

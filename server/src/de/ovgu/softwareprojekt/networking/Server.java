@@ -4,15 +4,16 @@ import com.sun.istack.internal.Nullable;
 import de.ovgu.softwareprojekt.DataSink;
 import de.ovgu.softwareprojekt.SensorData;
 import de.ovgu.softwareprojekt.SensorType;
-import de.ovgu.softwareprojekt.control.CommandConnection;
 import de.ovgu.softwareprojekt.control.OnCommandListener;
-import de.ovgu.softwareprojekt.control.commands.*;
+import de.ovgu.softwareprojekt.control.commands.ButtonClick;
+import de.ovgu.softwareprojekt.control.commands.Command;
+import de.ovgu.softwareprojekt.control.commands.ConnectionRequest;
+import de.ovgu.softwareprojekt.control.commands.EndConnection;
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
 import de.ovgu.softwareprojekt.misc.ExceptionListener;
 
 import java.io.IOException;
 import java.net.InetAddress;
-import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.*;
 
@@ -25,16 +26,6 @@ import java.util.*;
  */
 @SuppressWarnings("unused")
 public abstract class Server implements OnCommandListener, DataSink, ClientListener, ExceptionListener, ButtonListener {
-    /**
-     * Useful when you want to transmit SensorData
-     */
-    private UdpDataConnection mDataConnection;
-
-    /**
-     * Two-way communication for basically everything non-data, like enabling sensors or requesting connections
-     */
-    private CommandConnection mCommandConnection;
-
     /**
      * Server handling responding to discovery broadcasts
      */
@@ -49,6 +40,17 @@ public abstract class Server implements OnCommandListener, DataSink, ClientListe
      * Name of the server as displayed to discovery clients
      */
     private String mServerName;
+
+    /**
+     * This is the list of all currently bound clients.
+     */
+    private List<ClientConnectionHandler> mClientConnections = new ArrayList<>();
+
+    /**
+     * This is the latest unbound client connection, which makes it also the currently advertised connection. When bound,
+     * this instance will be moved to {@link #mClientConnections}, and a new instance will be set instead
+     */
+    private ClientConnectionHandler mCurrentUnboundClientConnection;
 
     /**
      * port where discovery packets are expected
@@ -66,8 +68,7 @@ public abstract class Server implements OnCommandListener, DataSink, ClientListe
     /**
      * Create a new server. It will be offline (not using any sockets) until {@link #start()} is called.
      *
-     * @param serverName    if not null, this name will be used. otherwise, the devices hostname is used
-     * @param discoveryPort the port where the discovery packets are expected to arrive
+     * @param serverName if not null, this name will be used. otherwise, the devices hostname is used
      */
     public Server(@Nullable String serverName, int discoveryPort) {
         // if the server name was not set, use the host name
@@ -94,9 +95,8 @@ public abstract class Server implements OnCommandListener, DataSink, ClientListe
     @SuppressWarnings("WeakerAccess")
     public void start() throws IOException {
         // initialise the command and data connections
-        initialiseCommandConnection();
-        initialiseDataConnection();
-        initialiseDiscoveryServer();
+        mCurrentUnboundClientConnection = new ClientConnectionHandler(this, this, this);
+        advertiseServer(mCurrentUnboundClientConnection);
     }
 
     /**
@@ -104,8 +104,8 @@ public abstract class Server implements OnCommandListener, DataSink, ClientListe
      */
     @Override
     public void close() {
-        mCommandConnection.close();
-        mDataConnection.close();
+        for(ClientConnectionHandler client : mClientConnections)
+            client.close();
         mDiscoveryServer.close();
     }
 
@@ -114,9 +114,7 @@ public abstract class Server implements OnCommandListener, DataSink, ClientListe
      */
     private String getHostName() {
         try {
-            InetAddress addr;
-            addr = InetAddress.getLocalHost();
-            return addr.getHostName();
+            return InetAddress.getLocalHost().getHostName();
         } catch (UnknownHostException ex) {
             return "unknown hostname";
         }
@@ -185,14 +183,35 @@ public abstract class Server implements OnCommandListener, DataSink, ClientListe
                 // update the request source address
                 request.self.address = origin.getHostAddress();
 
-                // initialise the connection to be able to send the request answer
-                mCommandConnection.setRemote(origin, request.self.commandPort);
+                boolean acceptClient = acceptClient(request.self);
 
-                // accept or reject the client
-                if (acceptClient(request.self))
-                    onClientAccepted(request.self);
-                else
-                    onClientRejected(request.self);
+                // reply to the client, either accepting or denying his request
+                try {
+                    mCurrentUnboundClientConnection.handleConnectionRequest(request.self, acceptClient);
+                } catch (UnknownHostException e) {
+                    e.printStackTrace();
+                }
+
+                if(acceptClient){
+                    // add unbound connection to list of bound connections
+                    mClientConnections.add(mCurrentUnboundClientConnection);
+
+                    try {
+                        // send the sensor- and button requirements to the new client
+                        mCurrentUnboundClientConnection.updateSensors(mDataSinks.keySet());
+                        mCurrentUnboundClientConnection.updateButtons(mButtonList);
+
+                        // create new possible client connection
+                        mCurrentUnboundClientConnection = new ClientConnectionHandler(this, this, this);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+                    // begin advertising the next client connection
+                    advertiseServer(mCurrentUnboundClientConnection);
+                }
+
+
                 break;
             case EndConnection:
                 // notify listener of disconnect
@@ -217,93 +236,27 @@ public abstract class Server implements OnCommandListener, DataSink, ClientListe
         }
     }
 
-    private void onClientAccepted(NetworkDevice self) {
-        try {
-            // accept the client
-            mCommandConnection.sendCommand(new ConnectionRequestResponse(true));
-
-            // notify the client of our button and sensor requirements
-            updateButtons();
-            updateSensors();
-
-            // close the discovery server
-            mDiscoveryServer.close();
-        } catch (IOException e) {
-            onException(this, e, "could not accept client");
-        }
-    }
-
-    private void onClientRejected(NetworkDevice self) {
-        try {
-            // deny the client
-            mCommandConnection.sendCommand(new ConnectionRequestResponse(false));
-        } catch (IOException e) {
-            onException(this, e, "could not reject client");
-        }
-    }
-
-    /**
-     * Notify the client of all required buttons
-     *
-     * @throws IOException if the command could not be sent
-     */
-    private void updateButtons() throws IOException {
-        // if the button list was changed, we need to update the clients buttons
-        if (mCommandConnection != null && mCommandConnection.isRunningAndConfigured())
-            mCommandConnection.sendCommand(new UpdateButtons(mButtonList));
-    }
-
-    /**
-     * Notify the client of all required sensors
-     *
-     * @throws IOException if the command could not be sent
-     */
-    private void updateSensors() throws IOException {
-        // the key set is not serializable, so we must create an ArrayList from it
-        if (mCommandConnection != null && mCommandConnection.isRunningAndConfigured())
-            mCommandConnection.sendCommand(new SetSensorCommand(new ArrayList<>(mDataSinks.keySet())));
-    }
-
     /**
      * Initialising the discovery server makes it possible for the client ot find use. The command- and data connection
      * need to be initialised, because they provide important information
      */
-    private void initialiseDiscoveryServer() {
+    private void advertiseServer(ClientConnectionHandler clientConnectionHandler) {
+        // stop old instances
+        if(mDiscoveryServer != null)
+            mDiscoveryServer.close();
+
         // the DiscoveryServer makes it possible for the client to find us, but it needs to know the command and
         // data ports, which is why we had to initialise those connections first
         mDiscoveryServer = new DiscoveryServer(
                 this,
                 mDiscoveryPort,
-                mCommandConnection.getLocalPort(),
-                mDataConnection.getLocalPort(),
+                clientConnectionHandler.getCommandPort(),
+                clientConnectionHandler.getDataPort(),
                 mServerName);
         mDiscoveryServer.start();
     }
 
-    /**
-     * Instantiate the command connection (with this as listener) and start listening for command packets
-     */
-    private void initialiseCommandConnection() throws IOException {
-        // begin a new command connection, set this as callback
-        mCommandConnection = new CommandConnection(this);
 
-        // begin listening for commands
-        mCommandConnection.start();
-    }
-
-    /**
-     * Instantiate the data connection (with this as listener) and start listening for data packets
-     */
-    private void initialiseDataConnection() throws SocketException {
-        // begin a new data connection
-        mDataConnection = new UdpDataConnection();
-
-        // register a callback for data objects
-        mDataConnection.setDataSink(this);
-
-        // begin listening for SensorData objects
-        mDataConnection.start();
-    }
 
     @Override
     public void onData(SensorData sensorData) {
@@ -340,12 +293,22 @@ public abstract class Server implements OnCommandListener, DataSink, ClientListe
         updateButtons();
     }
 
+    private void updateButtons() throws IOException {
+        for(ClientConnectionHandler client : mClientConnections)
+            client.updateButtons(mButtonList);
+    }
+
+    private void updateSensors() throws IOException {
+        for(ClientConnectionHandler client : mClientConnections)
+            client.updateSensors(mDataSinks.keySet());
+    }
+
     /**
      * Called when an exception cannot be gracefully handled.
      *
      * @param origin    the instance (or, if it is a hidden instance, the known parent) that produced the exception
      * @param exception the exception that was thrown
-     * @param info      additional information to help identify the problem
+     * @param info additional information to help identify the problem
      */
     @Override
     public abstract void onException(Object origin, Exception exception, String info);

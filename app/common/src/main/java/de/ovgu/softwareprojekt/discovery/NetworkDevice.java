@@ -50,7 +50,7 @@ public class NetworkDevice implements Serializable {
         this.address = address;
     }
 
-    /**
+    /**j
      * Create a new NetworkDevice which will announce itself as "name" who may be contacted using commandPort and dataPort
      * @param name human readable name
      * @param commandPort the device is listening on this port for incoming commands

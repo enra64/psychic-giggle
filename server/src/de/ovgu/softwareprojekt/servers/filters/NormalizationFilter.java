@@ -31,6 +31,13 @@ public class NormalizationFilter extends AbstractFilter {
     }
 
     /**
+     * standard constructor where you can choose the sensitivity
+     */
+    public NormalizationFilter(DataSink sink, float sensitivity, float customSensitivity){
+        this(sensitivity, customSensitivity, sink, 0, 1, 2);
+    }
+
+    /**
      * A filter that normalizes the sensorData into usable input
      * @param sensitivity base value that normalizes the sensor data, cannot be negative
      * @param customSensitivity custom value that is added to the base value
@@ -59,7 +66,7 @@ public class NormalizationFilter extends AbstractFilter {
     }
 
     //TODO: user sensitivity feature in app
-    public void setmCustomSensitivity(float customValue){
+    public void setCustomSensitivity(float customValue){
         mCustomSensitivity = customValue;
     }
 
