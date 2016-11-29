@@ -6,6 +6,7 @@ import de.ovgu.softwareprojekt.control.commands.ButtonClick;
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
 import de.ovgu.softwareprojekt.networking.Server;
 
+import java.awt.*;
 import java.io.IOException;
 
 /**
@@ -32,7 +33,7 @@ public class MouseServer extends Server {
      *
      * @param serverName if not null, this name will be used. otherwise, the devices hostname is used
      */
-    public MouseServer(@Nullable String serverName) throws IOException {
+    public MouseServer(@Nullable String serverName) throws IOException, AWTException {
         super(serverName);
 
         // create a new mouse mover
