@@ -1,6 +1,6 @@
 package de.ovgu.softwareprojekt.control;
 
-import de.ovgu.softwareprojekt.control.commands.Command;
+import de.ovgu.softwareprojekt.control.commands.AbstractCommand;
 
 import java.net.InetAddress;
 
@@ -14,5 +14,5 @@ public interface OnCommandListener {
      * @param origin hostname of whoever sent the packet
      * @param command the command that was sent
      */
-    void onCommand(InetAddress origin, Command command);
+    void onCommand(InetAddress origin, AbstractCommand command);
 }

@@ -1,11 +1,9 @@
 package de.ovgu.softwareprojekt.control.commands;
 
-import de.ovgu.softwareprojekt.SensorType;
-
 /**
  * This command may be used to switch sensors on or off
  */
-public class ConnectionRequestResponse extends Command {
+public class ConnectionRequestResponse extends AbstractCommand {
     /**
      * Whether the request was granted or not
      */
