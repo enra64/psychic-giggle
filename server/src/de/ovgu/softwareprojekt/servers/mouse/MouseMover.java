@@ -21,8 +21,8 @@ public class MouseMover extends Mover {
      * This method may break on devices which use more than one monitor?
      */
     public void resetPosToCenter() {
-        //get mouse location
-        Point point = MouseInfo.getPointerInfo().getLocation();
+        //get mouse location (which screen)
+        Point point = MouseInfo.getPointerInfo().getLocation(); //might be wrong, has to be tested!!!
 
         GraphicsEnvironment e = GraphicsEnvironment.getLocalGraphicsEnvironment();
 
