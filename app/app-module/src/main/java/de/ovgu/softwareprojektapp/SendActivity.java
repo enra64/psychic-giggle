@@ -3,6 +3,7 @@ package de.ovgu.softwareprojektapp;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
@@ -19,6 +20,7 @@ import android.widget.Toast;
 
 import java.net.ConnectException;
 import java.net.InetAddress;
+import java.net.ServerSocket;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -28,6 +30,7 @@ import de.ovgu.softwareprojekt.control.OnCommandListener;
 import de.ovgu.softwareprojekt.control.commands.ButtonClick;
 import de.ovgu.softwareprojekt.control.commands.Command;
 import de.ovgu.softwareprojekt.control.commands.ConnectionRequestResponse;
+import de.ovgu.softwareprojekt.control.commands.SensorChange;
 import de.ovgu.softwareprojekt.control.commands.SetSensorCommand;
 import de.ovgu.softwareprojekt.control.commands.UpdateButtons;
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
@@ -39,6 +42,9 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
     /**
      * The intent extras (the data given to us by the {@link DiscoveryActivity})
      */
+
+
+
     static final String
             EXTRA_SERVER_NAME = "Name",
             EXTRA_SERVER_ADDRESS = "Address",
@@ -221,6 +227,11 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
     protected void onResume() {
         super.onResume();
         mSensorHandler.enableTemporarilyDisabledSensors();
+        SharedPreferences sensitivitySettings = getSharedPreferences(OptionsActivity.PREFS_NAME, 0);
+        for(SensorType s : SensorType.values()){
+            mNetworkClient.sendCommand(new SensorChange(s,sensitivitySettings.getInt(s.toString(),50)));
+        }
+
     }
 
     @Override
@@ -323,7 +334,12 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
     }
 
     public void goToOptions(View view) {
+
+        Bundle in = getIntent().getExtras();
+
         Intent intent = new Intent(SendActivity.this, OptionsActivity.class);
+        intent.putExtra(EXTRA_SERVER_PORT_COMMAND, in.getInt(EXTRA_SERVER_PORT_COMMAND));
+        intent.putExtra(EXTRA_SERVER_ADDRESS, in.getString(EXTRA_SERVER_ADDRESS));
         SendActivity.this.startActivity(intent);
     }
 }
