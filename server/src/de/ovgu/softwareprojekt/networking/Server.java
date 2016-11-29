@@ -237,46 +237,6 @@ public abstract class Server implements OnCommandListener, DataSink, ClientListe
         }
     }
 
-
-
-            // close the discovery server
-            mDiscoveryServer.close();
-        } catch (IOException e) {
-            onException(this, e, "could not accept client");
-        }
-    }
-
-    private void onClientRejected(NetworkDevice self) {
-        try {
-            // deny the client
-            mCommandConnection.sendCommand(new ConnectionRequestResponse(false));
-        } catch (IOException e) {
-            onException(this, e, "could not reject client");
-        }
-    }
-
-    /**
-     * Notify the client of all required buttons
-     *
-     * @throws IOException if the command could not be sent
-     */
-    private void updateButtons() throws IOException {
-        // if the button list was changed, we need to update the clients buttons
-        if (mCommandConnection != null && mCommandConnection.isRunningAndConfigured())
-            mCommandConnection.sendCommand(new UpdateButtons(mButtonList));
-    }
-
-    /**
-     * Notify the client of all required sensors
-     *
-     * @throws IOException if the command could not be sent
-     */
-    private void updateSensors() throws IOException {
-        // the key set is not serializable, so we must create an ArrayList from it
-        if (mCommandConnection != null && mCommandConnection.isRunningAndConfigured())
-            mCommandConnection.sendCommand(new SetSensorCommand(new ArrayList<>(mDataSinks.keySet())));
-    }
-
     /**
      * Initialising the discovery server makes it possible for the client ot find use. The command- and data connection
      * need to be initialised, because they provide important information
