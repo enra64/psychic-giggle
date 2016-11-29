@@ -2,24 +2,28 @@ package de.ovgu.softwareprojekt.networking;
 
 import com.sun.istack.internal.NotNull;
 import de.ovgu.softwareprojekt.DataSink;
+import de.ovgu.softwareprojekt.SensorData;
 import de.ovgu.softwareprojekt.SensorType;
 import de.ovgu.softwareprojekt.control.CommandConnection;
 import de.ovgu.softwareprojekt.control.OnCommandListener;
 import de.ovgu.softwareprojekt.control.commands.*;
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
 import de.ovgu.softwareprojekt.misc.ExceptionListener;
+import de.ovgu.softwareprojekt.servers.filters.NormalizationFilter;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.Map;
 import java.util.Set;
 
 /**
  * This class manages the command- and data connection for a single client
  */
-public class ClientConnectionHandler {
+public class ClientConnectionHandler implements OnCommandListener, DataSink {
     /**
      * Useful when you want to transmit SensorData
      */
@@ -51,6 +55,11 @@ public class ClientConnectionHandler {
     private DataSink mDataSink;
 
     /**
+     * This class handles scaling the data of each sensor
+     */
+    private DataScalingHandler mDataScaler;
+
+    /**
      * Create a new client connection handler, which will immediately begin listening on random ports. They may be retrieved
      * using {@link #getCommandPort()} and {@link #getDataPort()}.
      *
@@ -59,10 +68,13 @@ public class ClientConnectionHandler {
      * @param dataSink          Where to put data
      * @throws IOException when the listening process could not be started
      */
-    public ClientConnectionHandler(ExceptionListener exceptionListener, OnCommandListener commandListener, DataSink dataSink) throws IOException {
+    ClientConnectionHandler(ExceptionListener exceptionListener, OnCommandListener commandListener, DataSink dataSink) throws IOException {
         mExceptionListener = exceptionListener;
         mCommandListener = commandListener;
-        mDataSink = dataSink;
+
+        // the DataScaler is our data sink for everything, because
+        mDataScaler = new DataScalingHandler(dataSink);
+        mDataSink = mDataScaler;
 
         initialiseCommandConnection();
         initialiseDataConnection();
@@ -74,14 +86,13 @@ public class ClientConnectionHandler {
      * @param command the command to be sent
      * @throws IOException if the command could not be sent
      */
-    public void sendCommand(Command command) throws IOException {
+    void sendCommand(Command command) throws IOException {
         mCommandConnection.sendCommand(command);
     }
 
     /**
      * Retrieve the client this connection handler is bound to
      */
-    public
     @NotNull
     NetworkDevice getClient() {
         return mClient;
@@ -95,7 +106,7 @@ public class ClientConnectionHandler {
      * @param acceptClient true if the client should be accepted, and this instance be bound to it
      * @throws UnknownHostException if the clients address could not be parsed to an {@link java.net.InetAddress}. Unlikely...
      */
-    public void handleConnectionRequest(NetworkDevice client, boolean acceptClient) throws UnknownHostException {
+    void handleConnectionRequest(NetworkDevice client, boolean acceptClient) throws UnknownHostException {
         // if mClient is not null, we already handled a client, but we cannot handle another one.
         assert mClient == null;
 
@@ -107,6 +118,12 @@ public class ClientConnectionHandler {
             onClientAccepted(client);
         else
             onClientRejected();
+    }
+
+    @Override
+    public void onData(SensorData sensorData) {
+
+        mDataSink.onData(sensorData);
     }
 
     /**
@@ -187,7 +204,7 @@ public class ClientConnectionHandler {
      *
      * @throws IOException if the command could not be sent
      */
-    public void updateButtons(Map<Integer, String> buttonList) throws IOException {
+    void updateButtons(Map<Integer, String> buttonList) throws IOException {
         // if the button list was changed, we need to update the clients buttons
         sendCommand(new UpdateButtons(buttonList));
     }
@@ -197,21 +214,84 @@ public class ClientConnectionHandler {
      *
      * @throws IOException if the command could not be sent
      */
-    public void updateSensors(Set<SensorType> requiredSensors) throws IOException {
+    void updateSensors(Set<SensorType> requiredSensors) throws IOException {
         sendCommand(new SetSensorCommand(new ArrayList<>(requiredSensors)));
     }
 
     /**
      * @return the port the {@link CommandConnection} is listening on
      */
-    public int getCommandPort() {
+    int getCommandPort() {
         return mCommandConnection.getLocalPort();
     }
 
     /**
      * @return the port the {@link UdpDataConnection} is listening on
      */
-    public int getDataPort() {
+    int getDataPort() {
         return mDataConnection.getLocalPort();
+    }
+
+    @Override
+    public void onCommand(InetAddress inetAddress, Command command) {
+        // we only want to catch the sensor change commands here
+        if (command.getCommandType() == CommandType.SensorChange) {
+            // update the sensitivity for the given sensor
+            SensorChange sensorChangeCommand = (SensorChange) command;
+            mDataScaler.setSensorSensitivity(sensorChangeCommand.mTag, sensorChangeCommand.mProgress);
+            return;
+        }
+        mCommandListener.onCommand(inetAddress, command);
+    }
+
+    /**
+     * This class handles scaling all the data, because we may have to apply a different scaling factor to
+     * all the incoming data
+     */
+    private class DataScalingHandler implements DataSink {
+        /**
+         * Contains the scaling filters that have to be applied for each sensors
+         */
+        private EnumMap<SensorType, NormalizationFilter> mScalingFilters = new EnumMap<>(SensorType.class);
+
+        /**
+         * Create a new data scaling handler, which will multiply all incoming data with 40.
+         *
+         * @param outgoingDataSink where all outgoing data will go
+         */
+        DataScalingHandler(DataSink outgoingDataSink) {
+            for (SensorType sensorType : SensorType.values())
+                mScalingFilters.put(sensorType, new NormalizationFilter(outgoingDataSink));
+        }
+
+        /**
+         * Changes the scaling factor that is applied to a sensor
+         *
+         * @param sensorType  the sensor that shall be affected
+         * @param sensitivity the resulting factor will be (40 + sensitivity)
+         */
+        void setSensorSensitivity(SensorType sensorType, float sensitivity) {
+            // get the normalization filter configured for this sensor
+            NormalizationFilter sensorTypeFilter = mScalingFilters.get(sensorType);
+
+            // update the sensitivity for this sensor type
+            sensorTypeFilter.setCustomSensitivity(sensitivity);
+        }
+
+        /**
+         * handle incoming data
+         */
+        @Override
+        public void onData(SensorData sensorData) {
+            // get the normalization filter configured for this sensor
+            NormalizationFilter sensorTypeFilter = mScalingFilters.get(sensorData.sensorType);
+
+            // let it handle the sensordata; the scaled result will be pushed into the outgoing data sink
+            sensorTypeFilter.onData(sensorData);
+        }
+
+        @Override
+        public void close() {
+        }
     }
 }

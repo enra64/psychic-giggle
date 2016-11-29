@@ -4,15 +4,16 @@ import com.sun.istack.internal.Nullable;
 import de.ovgu.softwareprojekt.DataSink;
 import de.ovgu.softwareprojekt.SensorData;
 import de.ovgu.softwareprojekt.SensorType;
-import de.ovgu.softwareprojekt.control.CommandConnection;
 import de.ovgu.softwareprojekt.control.OnCommandListener;
-import de.ovgu.softwareprojekt.control.commands.*;
+import de.ovgu.softwareprojekt.control.commands.ButtonClick;
+import de.ovgu.softwareprojekt.control.commands.Command;
+import de.ovgu.softwareprojekt.control.commands.ConnectionRequest;
+import de.ovgu.softwareprojekt.control.commands.EndConnection;
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
 import de.ovgu.softwareprojekt.misc.ExceptionListener;
 
 import java.io.IOException;
 import java.net.InetAddress;
-import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.*;
 
@@ -113,9 +114,7 @@ public abstract class Server implements OnCommandListener, DataSink, ClientListe
      */
     private String getHostName() {
         try {
-            InetAddress addr;
-            addr = InetAddress.getLocalHost();
-            return addr.getHostName();
+            return InetAddress.getLocalHost().getHostName();
         } catch (UnknownHostException ex) {
             return "unknown hostname";
         }
