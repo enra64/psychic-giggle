@@ -1,7 +1,9 @@
 package de.ovgu.softwareprojektapp;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
@@ -73,19 +75,16 @@ public class DiscoveryActivity extends AppCompatActivity implements OnDiscoveryL
             }
         });
 
-        // default to the device model for identification
-        ((EditText) findViewById(R.id.device_name_edit_text)).setText(Build.MODEL);
+        // try to load old discovery configuration
+        loadDiscoveryConfig();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
 
-        // clear the server list in case there is an old entry
+        // clear the server list of old entries
         onServerListUpdated(new LinkedList<NetworkDevice>());
-
-        // find the progress indicator
-        ProgressBar progressBar = (ProgressBar) findViewById(R.id.discovery_progress_spinner);
 
         // only enable the discovery user interface if the discovery system is not running
         setDiscoveryUserInterfaceEnabled(!(mDiscovery != null && mDiscovery.isRunning()));
@@ -109,15 +108,16 @@ public class DiscoveryActivity extends AppCompatActivity implements OnDiscoveryL
             // create a new discovery thread, if this one already completed
             if (mDiscovery == null || mDiscovery.hasRun()) {
                 try {
-                    // parse port from input
+                    // parse info from user input
                     int discoveryPort = getDiscoveryPort();
+                    String deviceName = getDeviceName();
 
                     // create discovery client
                     mDiscovery = new DiscoveryClient(
                             DiscoveryActivity.this,
                             DiscoveryActivity.this,
                             discoveryPort,
-                            getDeviceName());
+                            deviceName);
                     // this is a network problem
                 } catch (IOException e) {
                     onException(this, e, "DiscoveryActivity: could not create DiscoveryClient");
@@ -135,33 +135,49 @@ public class DiscoveryActivity extends AppCompatActivity implements OnDiscoveryL
         }
     }
 
-    private void setDiscoveryUserInterfaceEnabled(boolean enable){
-        // find the progress indicator
-        View progressBar = findViewById(R.id.discovery_progress_spinner);
+    /**
+     * Switch all the widgets dis- or enabled regarding to the current state of discovery
+     *
+     * @param enable true if the discovery start ui should be enabled
+     */
+    private void setDiscoveryUserInterfaceEnabled(boolean enable) {
+        // find the EditTexts for port and device name and set their state
+        findViewById(R.id.port_edit_text).setEnabled(enable);
+        findViewById(R.id.device_name_edit_text).setEnabled(enable);
 
-        // find the EditTexts for port and device name
-        View portEditText = findViewById(R.id.port_edit_text);
-        View deviceNameEditText = findViewById(R.id.device_name_edit_text);
+        // if the discovery start ui is enabled, we are not currently scanning, so hide the progress
+        // bar
+        findViewById(R.id.discovery_progress_spinner).setVisibility(enable ? View.GONE : View.VISIBLE);
 
-        // refresh activation state
-        portEditText.setEnabled(enable);
-        deviceNameEditText.setEnabled(enable);
-
-        if (!enable) {
-            // show the progress indicator
-            progressBar.setVisibility(View.VISIBLE);
-
-
-        } else {
-            // hide the progress indicator
-            progressBar.setVisibility(View.GONE);
-
-            // enable the discovery button in case we disabled it
-            mStartDiscoveryButton.setEnabled(true);
-        }
-
-        // disable the discovery button, since we are still running
+        // enable the discovery button if the ui should be enabled
         mStartDiscoveryButton.setEnabled(enable);
+    }
+
+    /**
+     * Store the current discovery configuration persistently
+     *
+     * @param deviceName the device name to be stored
+     * @param port the port to be stored
+     */
+    private void storeDiscoveryConfig(String deviceName, int port) {
+        SharedPreferences sharedPref = getSharedPreferences("discovery_config", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putInt("port", port);
+        editor.putString("deviceName", deviceName);
+        editor.apply();
+    }
+
+    /**
+     * Load the old discovery configuration, and apply to the edittexts
+     */
+    private void loadDiscoveryConfig() {
+        SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
+        int port = sharedPref.getInt("port", 8888);
+        String deviceName = sharedPref.getString("deviceName", Build.MODEL);
+
+        // find the EditTexts for port and device name and set their text
+        ((EditText) findViewById(R.id.port_edit_text)).setText(String.valueOf(port));
+        ((EditText) findViewById(R.id.device_name_edit_text)).setText(deviceName);
     }
 
     /**
@@ -186,6 +202,10 @@ public class DiscoveryActivity extends AppCompatActivity implements OnDiscoveryL
             if (port < 1024)
                 throw new InvalidParameterException("Ports below 1024 are reserved");
 
+            // avoid non-existent ports
+            if (port > 65535)
+                throw new InvalidParameterException("Ports above 65535 do not exist");
+
             // remove error if we set one, since we have successfully survived the trials
             portEditText.setError(null);
 
@@ -207,6 +227,16 @@ public class DiscoveryActivity extends AppCompatActivity implements OnDiscoveryL
     private String getDeviceName() {
         EditText deviceNameEditText = (EditText) findViewById(R.id.device_name_edit_text);
         return deviceNameEditText.getText().toString();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        // store the discovery config
+        EditText portEditText = (EditText) findViewById(R.id.port_edit_text);
+        EditText deviceNameEditText = (EditText) findViewById(R.id.device_name_edit_text);
+        storeDiscoveryConfig(deviceNameEditText.getText().toString(), Integer.valueOf(portEditText.getText().toString()));
     }
 
     @Override

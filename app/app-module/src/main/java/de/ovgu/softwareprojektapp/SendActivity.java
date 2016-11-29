@@ -36,19 +36,24 @@ import de.ovgu.softwareprojektapp.networking.NetworkClient;
 import de.ovgu.softwareprojektapp.sensors.SensorHandler;
 
 public class SendActivity extends AppCompatActivity implements OnCommandListener, ExceptionListener {
-    // de-magic-stringify the intent extra keys
-    static final String EXTRA_SERVER_NAME = "Name";
-    static final String EXTRA_SERVER_ADDRESS = "Address";
-    static final String EXTRA_SERVER_PORT_DISCOVERY = "DiscoveryPort";
-    static final String EXTRA_SERVER_PORT_COMMAND = "CommandPort";
-    static final String EXTRA_SERVER_PORT_DATA = "DataPort";
+    /**
+     * The intent extras (the data given to us by the {@link DiscoveryActivity})
+     */
+    static final String
+            EXTRA_SERVER_NAME = "Name",
+            EXTRA_SERVER_ADDRESS = "Address",
+            EXTRA_SERVER_PORT_DISCOVERY = "DiscoveryPort",
+            EXTRA_SERVER_PORT_COMMAND = "CommandPort",
+            EXTRA_SERVER_PORT_DATA = "DataPort",
+            EXTRA_SELF_NAME = "SelfName";
 
-    static final String EXTRA_SELF_NAME = "SelfName";
-
-    // result codes for the activity
-    static final int RESULT_SERVER_REFUSED = -1;
-    static final int RESULT_USER_STOPPED = 0;
-    static final int RESULT_SERVER_NOT_LISTENING_ON_COMMAND_PORT = -2;
+    /**
+     * result codes for the activity
+     */
+    static final int
+            RESULT_SERVER_REFUSED = -1,
+            RESULT_USER_STOPPED = 0,
+            RESULT_SERVER_NOT_LISTENING_ON_COMMAND_PORT = -2;
 
     /**
      * The network client organises all our communication with the server
@@ -262,8 +267,8 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
                 break;
             //adds a button to the activity with id and name
             case AddButton:
-                UpdateButtons addCom = (UpdateButtons) command;
                 //create button with name and id
+                UpdateButtons addCom = (UpdateButtons) command;
                 createButtons(addCom);
                 break;
             // ignore unhandled commands
@@ -317,7 +322,7 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
         });
     }
 
-    public void goToOptions(View view){
+    public void goToOptions(View view) {
         Intent intent = new Intent(SendActivity.this, OptionsActivity.class);
         SendActivity.this.startActivity(intent);
     }
