@@ -21,10 +21,35 @@ public class MouseMover extends Mover {
      * This method may break on devices which use more than one monitor?
      */
     public void resetPosToCenter() {
-        GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
-        GraphicsDevice[] gs = ge.getScreenDevices();
-        DisplayMode dm = gs[0].getDisplayMode();
-        moveBot.mouseMove(dm.getWidth() / 2, dm.getHeight() / 2);
+        //get mouse location
+        Point point = MouseInfo.getPointerInfo().getLocation();
+
+        GraphicsEnvironment e = GraphicsEnvironment.getLocalGraphicsEnvironment();
+
+        GraphicsDevice[] devices = e.getScreenDevices();
+
+        Rectangle displayBounds = null;
+
+        //now get the configurations for each device
+        for (int i=0;i<devices.length;i++) {
+
+            GraphicsConfiguration[] configurations =
+                    devices[i].getConfigurations();
+            for (GraphicsConfiguration config: configurations) {
+                Rectangle gcBounds = config.getBounds();
+
+                if(gcBounds.contains(point)) {
+                    displayBounds=gcBounds;
+                    moveBot.mouseMove(devices[i].getDisplayMode().getWidth() / 2, devices[i].getDisplayMode().getHeight() / 2);
+                }
+            }
+        }
+        //not found, get the bounds for the default display
+        if(displayBounds == null) {
+            GraphicsDevice device = e.getDefaultScreenDevice();
+            moveBot.mouseMove(device.getDisplayMode().getWidth() / 2, device.getDisplayMode().getHeight() / 2);
+
+        }
     }
 
     /**
