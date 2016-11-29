@@ -62,8 +62,8 @@ public class OptionsActivity extends AppCompatActivity {
 
         }
     }
-    protected void onStop(){
-        super.onStop();
+    protected void onPause(){
+        super.onPause();
 
         SharedPreferences settings = getSharedPreferences(PREFS_NAME,0);
         SharedPreferences.Editor editor = settings.edit();
