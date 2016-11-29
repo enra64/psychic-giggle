@@ -40,8 +40,8 @@ public class MouseMover implements DataSink {
 
     //TODO:Test with more than one monitor, may glitch on multimonitors
     public void resetPosToCenter() {
-        //get mouse location
-        Point point = MouseInfo.getPointerInfo().getLocation();
+        //get mouse location (which screen)
+        Point point = MouseInfo.getPointerInfo().getLocation(); //might be wrong, has to be tested!!!
 
         GraphicsEnvironment e = GraphicsEnvironment.getLocalGraphicsEnvironment();
 
