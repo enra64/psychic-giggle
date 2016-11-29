@@ -41,9 +41,14 @@ public class OptionsActivity extends AppCompatActivity implements SeekBar.OnSeek
         mBackBtn = (Button) findViewById(R.id.backFromOptionsBtn);
         Bundle givenExtras = getIntent().getExtras();
 
+
+
         try {//TODO:Exception wörk wörk
+            mComCon = new CommandConnection(null);
             mComCon.setRemote(InetAddress.getByName(givenExtras.getString(EXTRA_SERVER_ADDRESS)),givenExtras.getInt(EXTRA_SERVER_PORT_COMMAND));
         } catch (UnknownHostException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
             e.printStackTrace();
         }
 
