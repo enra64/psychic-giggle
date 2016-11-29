@@ -11,8 +11,6 @@ import de.ovgu.softwareprojekt.SensorData;
  * the sensitivity
  */
 public class NormalizationFilter extends AbstractFilter {
-
-    //TODO: find the best sensitivity
     /**
      * A base value which multiplies the gyroscope value to turn it into useful values
      */
