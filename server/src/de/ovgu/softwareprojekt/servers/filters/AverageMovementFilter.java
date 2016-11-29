@@ -39,17 +39,6 @@ public class AverageMovementFilter implements DataSink, DataSource{
      */
     private int mIndexPointer; //used for mAverage output
 
-    //TODO: find the best sensitivity
-    /**
-     * A base value which multiplies the gyroscope value to turn it into useful values
-     */
-    private final float SENSITIVITY = 40f;
-
-    /**
-     * Allows the user to change the base value SENSITIVITY by adding or subtracting this value
-     */
-    private float mCustomSensitivity = 0f;
-
     /**
      * Standard AverageMovementFilter that uses standard axes distribution X=0, Y=1, Z=2
      * @param avgSampSize how many samples should be used to calculate mAverage
@@ -76,7 +65,6 @@ public class AverageMovementFilter implements DataSink, DataSource{
         mAverageSampleSize = avgSampSize;
         mAverage = new float[mAverageSampleSize][3];
         mIndexPointer = 0;
-        mCustomSensitivity = 0f;
         mDataSink = dataSink;
     }
 
@@ -86,10 +74,6 @@ public class AverageMovementFilter implements DataSink, DataSource{
      */
     //TODO: Maybe return a float[] anyway?
     private void filter(float[] rawData) {
-        //TODO: filter value should be customizable
-        rawData[XAXIS] *= (SENSITIVITY + mCustomSensitivity);
-        rawData[YAXIS] *= (SENSITIVITY + mCustomSensitivity);
-        rawData[ZAXIS] *= (SENSITIVITY + mCustomSensitivity);
 
         //enter new gyroscope values
         mAverage[mIndexPointer][0] = rawData[XAXIS];
@@ -143,8 +127,4 @@ public class AverageMovementFilter implements DataSink, DataSource{
 
     }
 
-    //TODO: user sensitivity feature in app
-    public void setmCustomSensitivity(float customValue){
-        mCustomSensitivity = customValue;
-    }
 }
