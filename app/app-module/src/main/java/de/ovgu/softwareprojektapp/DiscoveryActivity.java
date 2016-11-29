@@ -74,9 +74,6 @@ public class DiscoveryActivity extends AppCompatActivity implements OnDiscoveryL
                 mDiscovery.close();
             }
         });
-
-        // try to load old discovery configuration
-        loadDiscoveryConfig();
     }
 
     @Override
@@ -88,6 +85,9 @@ public class DiscoveryActivity extends AppCompatActivity implements OnDiscoveryL
 
         // only enable the discovery user interface if the discovery system is not running
         setDiscoveryUserInterfaceEnabled(!(mDiscovery != null && mDiscovery.isRunning()));
+
+        // try to load old discovery configuration
+        loadDiscoveryConfig();
     }
 
     @Override
@@ -164,14 +164,14 @@ public class DiscoveryActivity extends AppCompatActivity implements OnDiscoveryL
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putInt("port", port);
         editor.putString("deviceName", deviceName);
-        editor.apply();
+        editor.commit();
     }
 
     /**
      * Load the old discovery configuration, and apply to the edittexts
      */
     private void loadDiscoveryConfig() {
-        SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences sharedPref = getSharedPreferences("discovery_config", Context.MODE_PRIVATE);
         int port = sharedPref.getInt("port", 8888);
         String deviceName = sharedPref.getString("deviceName", Build.MODEL);
 
