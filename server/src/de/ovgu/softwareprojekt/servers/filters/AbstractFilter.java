@@ -8,6 +8,8 @@ import java.io.IOException;
 
 /**
  * Created by Ulrich on 29.11.2016.
+ * This abstract filter implements a lot of the interface methods used by the inherited classes and
+ * provides the DataSink and axes
  */
 public abstract class AbstractFilter implements DataSink, DataSource {
 

@@ -3,8 +3,6 @@ package de.ovgu.softwareprojekt.servers.filters;
 import de.ovgu.softwareprojekt.DataSink;
 import de.ovgu.softwareprojekt.SensorData;
 
-import java.io.IOException;
-
 /**
  * Created by Ulrich on 29.11.2016.
  *

@@ -1,11 +1,8 @@
 package de.ovgu.softwareprojekt.servers.filters;
 
 import de.ovgu.softwareprojekt.DataSink;
-import de.ovgu.softwareprojekt.DataSource;
 import de.ovgu.softwareprojekt.SensorData;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
-import java.io.IOException;
 
 import static java.lang.Math.abs;
 
