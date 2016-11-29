@@ -9,5 +9,6 @@ public enum CommandType {
     SetSensor,
     EndConnection,
     AddButton,
-    ButtonClick;
+    ButtonClick,
+    SensorChange;
 }
