@@ -65,6 +65,11 @@ public class NormalizationFilter extends AbstractFilter {
         mCustomSensitivity = customValue;
     }
 
+    /**
+     * Called when the next element should be filtered
+     *
+     * @param sensorData sensor data to process
+     */
     @Override
     public void onData(SensorData sensorData) {
         normalize(sensorData.data);
