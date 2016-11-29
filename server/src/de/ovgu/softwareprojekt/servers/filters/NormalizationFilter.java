@@ -1,7 +1,6 @@
 package de.ovgu.softwareprojekt.servers.filters;
 
 import de.ovgu.softwareprojekt.DataSink;
-import de.ovgu.softwareprojekt.DataSource;
 import de.ovgu.softwareprojekt.SensorData;
 
 import java.io.IOException;
@@ -13,7 +12,7 @@ import java.io.IOException;
  * with a base sensitivity value which can be changed by subtracting or adding a custom value to
  * the sensitivity
  */
-public class NormalizationFilter implements DataSink, DataSource {
+public class NormalizationFilter extends AbstractFilter {
 
     //TODO: find the best sensitivity
     /**
@@ -27,20 +26,12 @@ public class NormalizationFilter implements DataSink, DataSource {
     private float mCustomSensitivity = 0f;
 
     /**
-     * Target data sink
+     * A filter that normalizes the sensorData into usable input
+     * and uses standard axes and a base sensitivity of 40f
+     * @param dataSink      where to put filtered data
      */
-    private DataSink mDataSink;
-
-    /**
-     * These values call the wanted axis index of the sent rawData
-     */
-    private final int XAXIS, YAXIS, ZAXIS;
-
-    /**
-     * standard constructor that chooses 40 as base sensitivity and 0 as custom sensitivity
-     */
-    public NormalizationFilter(DataSink sink){
-        this(40f, 0f, sink, 0, 1, 2);
+    public NormalizationFilter(DataSink dataSink){
+        this(40f, 0f, dataSink, 0, 1, 2);
     }
 
     /**
@@ -50,17 +41,14 @@ public class NormalizationFilter implements DataSink, DataSource {
      */
     public NormalizationFilter(float sensitivity, float customSensitivity, DataSink sink, int xaxis, int yaxis, int zaxis){
 
+        super(sink, xaxis, yaxis, zaxis);
+
         //It is basicly pointless to use 0 or negative values
         //TODO: assert necessary?
         assert sensitivity > 0;
 
-        mDataSink = sink;
         SENSITIVITY = sensitivity;
         mCustomSensitivity = customSensitivity;
-
-        XAXIS = xaxis;
-        YAXIS = yaxis;
-        ZAXIS = zaxis;
     }
 
     /**
@@ -83,20 +71,5 @@ public class NormalizationFilter implements DataSink, DataSource {
     public void onData(SensorData sensorData) {
         normalize(sensorData.data);
         mDataSink.onData(sensorData);
-    }
-
-    @Override
-    public void setDataSink(DataSink dataSink) {
-        mDataSink = dataSink;
-    }
-
-    @Override
-    public void start() throws IOException {
-
-    }
-
-    @Override
-    public void close() {
-
     }
 }

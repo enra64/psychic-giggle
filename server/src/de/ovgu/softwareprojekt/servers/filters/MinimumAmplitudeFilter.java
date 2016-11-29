@@ -13,17 +13,12 @@ import static java.lang.Math.abs;
  * This filter ignores changes in sensor data up to a certain margin to avoid zittering when trying not to move,
  * for example when pointing with a mouse
  */
-public class MinimumAmplitudeFilter implements DataSink, DataSource {
+public class MinimumAmplitudeFilter extends AbstractFilter {
     /**
      * If the sum of changes does not at least equal this value, the last value that changed will
      * be sent as an update instead.
      */
     private final float mMinimumChange;
-
-    /**
-     * Target data sink
-     */
-    private DataSink mDataSink;
 
     /**
      * Last value that was accepted as "changed enough"
@@ -37,8 +32,8 @@ public class MinimumAmplitudeFilter implements DataSink, DataSource {
      * @param minimumChange the minimum of change a new data element must represent to be let through
      */
     public MinimumAmplitudeFilter(DataSink dataSink, float minimumChange) {
+        super(dataSink, 0, 1, 2);
         mMinimumChange = minimumChange;
-        mDataSink = dataSink;
     }
 
     /**
@@ -81,29 +76,4 @@ public class MinimumAmplitudeFilter implements DataSink, DataSource {
         return change;
     }
 
-    /**
-     * Save the data sink to be used for pushing new data
-     *
-     * @param dataSink any implementation of the {@link DataSink} interface
-     */
-    @Override
-    public void setDataSink(DataSink dataSink) {
-        mDataSink = dataSink;
-    }
-
-    /**
-     * Interface requirement; does not do anything for this implementation.
-     *
-     * @throws IOException never
-     */
-    @Override
-    public void start() throws IOException {
-    }
-
-    /**
-     * Interface requirement. Does not do anything in this implementation.
-     */
-    @Override
-    public void close() {
-    }
 }
