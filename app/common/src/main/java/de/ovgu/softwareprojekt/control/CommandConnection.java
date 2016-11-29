@@ -91,7 +91,7 @@ public class CommandConnection {
      */
     public void sendCommand(Command command) throws IOException {
         // ensure that the remote host is properly configured
-        assert (mRemotePort >= 0 && mRemoteHost != null);
+        assert (mRemotePort >= 0 && (mRemoteHost != null));
 
         // this is a try-with-resources; it will automatically close its resources when finished, whatever happens.
         try (Socket outboundSocket = new Socket(mRemoteHost, mRemotePort);
