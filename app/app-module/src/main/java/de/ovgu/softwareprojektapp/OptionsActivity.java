@@ -17,8 +17,9 @@ public class OptionsActivity extends AppCompatActivity {
     LinearLayout mSensorOptions;
     Button mBackBtn;
     int mNumberOfSensors;
+    ArrayList<SeekBar> mSeekBars = new ArrayList<SeekBar>();
 
-    //public static final String PREFS_NAME = "SensitivitySettings";
+    public static final String PREFS_NAME = "SensitivitySettings";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,7 +33,11 @@ public class OptionsActivity extends AppCompatActivity {
 
         createSensorOptions();
 
-        //SharedPreferences settings = getSharedPreferences(PREFS_NAME,0);
+        SharedPreferences settings = getSharedPreferences(PREFS_NAME,0);
+        for(SeekBar s : mSeekBars){
+            s.setProgress(settings.getInt(s.getTag().toString(), 50));
+        }
+
 
     }
     public void createSensorOptions(){
@@ -44,7 +49,11 @@ public class OptionsActivity extends AppCompatActivity {
 
             SeekBar seek = new SeekBar(OptionsActivity.this);
             seek.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
-            seek.setProgress(50);
+            seek.setTag(SensorType.values()[i]);
+
+            mSeekBars.add(seek);
+
+
 
 
             mSensorOptions.addView(text);
@@ -52,5 +61,16 @@ public class OptionsActivity extends AppCompatActivity {
 
 
         }
+    }
+    protected void onStop(){
+        super.onStop();
+
+        SharedPreferences settings = getSharedPreferences(PREFS_NAME,0);
+        SharedPreferences.Editor editor = settings.edit();
+        for(SeekBar s : mSeekBars){
+            editor.putInt(s.getTag().toString(), s.getProgress());
+        }
+        editor.commit();
+
     }
 }
