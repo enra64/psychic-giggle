@@ -5,7 +5,7 @@ import de.ovgu.softwareprojekt.discovery.NetworkDevice;
 /**
  * Signal an unilateral connection close
  */
-public class EndConnection extends Command {
+public class EndConnection extends AbstractCommand {
     /**
      * Identify the device trying to connect. The net address is most probably not set!
      */

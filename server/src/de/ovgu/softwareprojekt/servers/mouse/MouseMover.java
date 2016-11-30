@@ -47,28 +47,22 @@ public class MouseMover implements DataSink {
 
         GraphicsDevice[] devices = e.getScreenDevices();
 
-        Rectangle displayBounds = null;
-
         //now get the configurations for each device
         for (int i=0;i<devices.length;i++) {
 
-            GraphicsConfiguration[] configurations =
-                    devices[i].getConfigurations();
+            GraphicsConfiguration[] configurations = devices[i].getConfigurations();
             for (GraphicsConfiguration config: configurations) {
                 Rectangle gcBounds = config.getBounds();
 
                 if(gcBounds.contains(point)) {
-                    displayBounds=gcBounds;
-                    mMoveBot.mouseMove(devices[i].getDisplayMode().getWidth() / 2, devices[i].getDisplayMode().getHeight() / 2);
+                    mMoveBot.mouseMove((int) config.getBounds().getCenterX(), (int) config.getBounds().getCenterY());
+                    return;
                 }
             }
         }
         //not found, get the bounds for the default display
-        if(displayBounds == null) {
-            GraphicsDevice device = e.getDefaultScreenDevice();
-            mMoveBot.mouseMove(device.getDisplayMode().getWidth() / 2, device.getDisplayMode().getHeight() / 2);
-
-        }
+        GraphicsDevice device = e.getDefaultScreenDevice();
+        mMoveBot.mouseMove(device.getDisplayMode().getWidth() / 2, device.getDisplayMode().getHeight() / 2);
     }
 
     /**

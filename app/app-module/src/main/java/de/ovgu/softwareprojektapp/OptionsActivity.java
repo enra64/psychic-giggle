@@ -1,6 +1,7 @@
 package de.ovgu.softwareprojektapp;
 
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.Button;
@@ -15,7 +16,8 @@ import java.util.ArrayList;
 
 import de.ovgu.softwareprojekt.SensorType;
 import de.ovgu.softwareprojekt.control.CommandConnection;
-import de.ovgu.softwareprojekt.control.commands.SensorChange;
+import de.ovgu.softwareprojekt.control.commands.AbstractCommand;
+import de.ovgu.softwareprojekt.control.commands.ChangeSensorSensitivity;
 
 public class OptionsActivity extends AppCompatActivity implements SeekBar.OnSeekBarChangeListener {
 
@@ -41,9 +43,14 @@ public class OptionsActivity extends AppCompatActivity implements SeekBar.OnSeek
         mBackBtn = (Button) findViewById(R.id.backFromOptionsBtn);
         Bundle givenExtras = getIntent().getExtras();
 
+
+
         try {//TODO:Exception wörk wörk
+            mComCon = new CommandConnection(null);
             mComCon.setRemote(InetAddress.getByName(givenExtras.getString(EXTRA_SERVER_ADDRESS)),givenExtras.getInt(EXTRA_SERVER_PORT_COMMAND));
         } catch (UnknownHostException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
             e.printStackTrace();
         }
 
@@ -105,10 +112,27 @@ public class OptionsActivity extends AppCompatActivity implements SeekBar.OnSeek
 
     @Override
     public void onStopTrackingTouch(SeekBar seekBar) {
-        try {  //TODO:Exception wörk wörk
-            mComCon.sendCommand(new SensorChange((SensorType)seekBar.getTag() ,seekBar.getProgress()));
-        } catch (IOException e) {
-            e.printStackTrace();
+            new SendCommand().execute(new ChangeSensorSensitivity((SensorType)seekBar.getTag() ,seekBar.getProgress()));
+    }
+
+    /**TODO: wörk wörk
+     * This class is a wrapper for {@link CommandConnection#sendCommand(AbstractCommand) sending commands}
+     * to avoid dealing with network on the ui thread. Use as follows:
+     * <br><br>
+     * {@code new SendCommand().execute(new WhatEverCommand()); }
+     * <br><br>
+     * where WhatEverCommand is a subclass of {@link AbstractCommand}
+     */
+    private class SendCommand extends AsyncTask<AbstractCommand, Void, Void> {
+        @Override
+        protected Void doInBackground(AbstractCommand... commands) {
+            try {
+                mComCon.sendCommand(commands[0]);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return null;
+
         }
     }
 }

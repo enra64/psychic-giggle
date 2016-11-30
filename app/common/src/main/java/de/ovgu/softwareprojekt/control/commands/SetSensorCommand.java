@@ -7,7 +7,7 @@ import de.ovgu.softwareprojekt.SensorType;
 /**
  * This command may be used to switch sensors on or off
  */
-public class SetSensorCommand extends Command {
+public class SetSensorCommand extends AbstractCommand {
     /**
      * The set of sensors required to be enabled
      */

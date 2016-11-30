@@ -179,7 +179,7 @@ public class ClientConnectionHandler implements OnCommandListener, DataSink {
      */
     private void initialiseCommandConnection() throws IOException {
         // begin a new command connection, set this as callback
-        mCommandConnection = new CommandConnection(mCommandListener);
+        mCommandConnection = new CommandConnection(this);
 
         // begin listening for commands
         mCommandConnection.start();
@@ -261,7 +261,7 @@ public class ClientConnectionHandler implements OnCommandListener, DataSink {
          */
         DataScalingHandler(DataSink outgoingDataSink) {
             for (SensorType sensorType : SensorType.values())
-                mScalingFilters.put(sensorType, new NormalizationFilter(outgoingDataSink));
+                mScalingFilters.put(sensorType, new NormalizationFilter(outgoingDataSink, 0, 40));
         }
 
         /**

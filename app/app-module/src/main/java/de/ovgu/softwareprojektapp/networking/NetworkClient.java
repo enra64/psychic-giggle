@@ -9,14 +9,14 @@ import de.ovgu.softwareprojekt.DataSource;
 import de.ovgu.softwareprojekt.SensorData;
 import de.ovgu.softwareprojekt.control.CommandConnection;
 import de.ovgu.softwareprojekt.control.OnCommandListener;
-import de.ovgu.softwareprojekt.control.commands.Command;
+import de.ovgu.softwareprojekt.control.commands.AbstractCommand;
 import de.ovgu.softwareprojekt.control.commands.ConnectionRequest;
 import de.ovgu.softwareprojekt.control.commands.EndConnection;
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
 import de.ovgu.softwareprojekt.misc.ExceptionListener;
 
 /**
- * The network client contains both the command and the data connection. Use {@link #sendCommand(Command)}
+ * The network client contains both the command and the data connection. Use {@link #sendCommand(AbstractCommand)}
  * to send commands, request a connection with the server with {@link #requestConnection()}. To send
  * data with it, you may use {@link #onData(SensorData)}, but really, this class implements {@link DataSink}
  * so you can simply give it to {@link DataSource DataSources}. You will be notified of incoming commands
@@ -137,7 +137,7 @@ public class NetworkClient implements DataSink, ExceptionListener {
      *
      * @param command the command to be sent to the server
      */
-    public void sendCommand(Command command) {
+    public void sendCommand(AbstractCommand command) {
         new SendCommand().execute(command);
     }
 
@@ -174,16 +174,16 @@ public class NetworkClient implements DataSink, ExceptionListener {
     }
 
     /**
-     * This class is a wrapper for {@link CommandConnection#sendCommand(Command) sending commands}
+     * This class is a wrapper for {@link CommandConnection#sendCommand(AbstractCommand) sending commands}
      * to avoid dealing with network on the ui thread. Use as follows:
      * <br><br>
      * {@code new SendCommand().execute(new WhatEverCommand()); }
      * <br><br>
-     * where WhatEverCommand is a subclass of {@link Command}
+     * where WhatEverCommand is a subclass of {@link AbstractCommand}
      */
-    private class SendCommand extends AsyncTask<Command, Void, Void> {
+    private class SendCommand extends AsyncTask<AbstractCommand, Void, Void> {
         @Override
-        protected Void doInBackground(Command... commands) {
+        protected Void doInBackground(AbstractCommand... commands) {
             try {
                 mCommandConnection.sendCommand(commands[0]);
             } catch (IOException e) {

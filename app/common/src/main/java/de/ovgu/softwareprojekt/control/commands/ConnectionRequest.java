@@ -6,7 +6,7 @@ import de.ovgu.softwareprojekt.discovery.NetworkDevice;
  * Signifies a connection request by a client device to a server.
  */
 @SuppressWarnings("WeakerAccess")
-public class ConnectionRequest extends Command {
+public class ConnectionRequest extends AbstractCommand {
     /**
      * Identify the device trying to connect. The net address is most probably not set!
      */

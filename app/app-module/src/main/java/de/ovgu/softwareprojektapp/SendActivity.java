@@ -1,36 +1,29 @@
 package de.ovgu.softwareprojektapp;
 
 import android.app.ProgressDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutCompat;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
-import android.widget.Toast;
 
 import java.net.ConnectException;
 import java.net.InetAddress;
-import java.net.ServerSocket;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import de.ovgu.softwareprojekt.SensorType;
 import de.ovgu.softwareprojekt.control.OnCommandListener;
 import de.ovgu.softwareprojekt.control.commands.ButtonClick;
-import de.ovgu.softwareprojekt.control.commands.Command;
+import de.ovgu.softwareprojekt.control.commands.AbstractCommand;
 import de.ovgu.softwareprojekt.control.commands.ConnectionRequestResponse;
-import de.ovgu.softwareprojekt.control.commands.SensorChange;
+import de.ovgu.softwareprojekt.control.commands.ChangeSensorSensitivity;
 import de.ovgu.softwareprojekt.control.commands.SetSensorCommand;
 import de.ovgu.softwareprojekt.control.commands.UpdateButtons;
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
@@ -229,7 +222,7 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
         mSensorHandler.enableTemporarilyDisabledSensors();
         SharedPreferences sensitivitySettings = getSharedPreferences(OptionsActivity.PREFS_NAME, 0);
         for(SensorType s : SensorType.values()){
-            mNetworkClient.sendCommand(new SensorChange(s,sensitivitySettings.getInt(s.toString(),50)));
+            mNetworkClient.sendCommand(new ChangeSensorSensitivity(s,sensitivitySettings.getInt(s.toString(),50)));
         }
 
     }
@@ -264,7 +257,7 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
      */
     @SuppressWarnings("ConstantConditions")
     @Override
-    public void onCommand(InetAddress origin, Command command) {
+    public void onCommand(InetAddress origin, AbstractCommand command) {
         // decide what to do with the command
         switch (command.getCommandType()) {
             case ConnectionRequestResponse:

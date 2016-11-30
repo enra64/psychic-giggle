@@ -1,6 +1,6 @@
 package de.ovgu.softwareprojekt.control;
 
-import de.ovgu.softwareprojekt.control.commands.Command;
+import de.ovgu.softwareprojekt.control.commands.AbstractCommand;
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
 
 import java.io.IOException;
@@ -20,7 +20,7 @@ import java.net.UnknownHostException;
  * </p>
  * <p>
  * When you want to send commands with it, you need to configure the remote host using {@link #setRemote(InetAddress, int)}
- * first. Then you can use {@link #sendCommand(Command)} to send any command.
+ * first. Then you can use {@link #sendCommand(AbstractCommand)} to send any command.
  * </p>
  */
 @SuppressWarnings("WeakerAccess")
@@ -47,7 +47,7 @@ public class CommandConnection {
 
     /**
      * New control connection. The local listening port can be retrieved using {@link #getLocalPort()} after calling {@link #start()}.
-     * The remote host and port may be set using {@link #setRemote(InetAddress, int)}, commands can then be sent there using {@link #sendCommand(Command)}
+     * The remote host and port may be set using {@link #setRemote(InetAddress, int)}, commands can then be sent there using {@link #sendCommand(AbstractCommand)}
      *
      * @param listener the listener that will be notified of new commands arriving at this CommandConnection
      */
@@ -89,7 +89,7 @@ public class CommandConnection {
      * @param command this command will be received by the peer
      * @throws IOException most probably if the socket is blocked TODO: definitive answer here
      */
-    public void sendCommand(Command command) throws IOException {
+    public void sendCommand(AbstractCommand command) throws IOException {
         // ensure that the remote host is properly configured
         assert (mRemotePort >= 0 && (mRemoteHost != null));
 
@@ -132,7 +132,7 @@ public class CommandConnection {
     // this could have been implemented by CommandConnection implementing the OnCommandListener, but because it is an
     // interface, it would have polluted our public surface with a method that is destined to be used by inner class
     // workings only.
-    private void onCommand(InetAddress origin, Command command) {
+    private void onCommand(InetAddress origin, AbstractCommand command) {
         mCommandListener.onCommand(origin, command);
     }
 
@@ -206,7 +206,7 @@ public class CommandConnection {
                     ObjectInputStream oinput = new ObjectInputStream(connection.getInputStream());
 
                     // call listener with new command
-                    mListener.onCommand(connection.getInetAddress(), (Command) oinput.readObject());
+                    mListener.onCommand(connection.getInetAddress(), (AbstractCommand) oinput.readObject());
                 } catch (IOException | ClassNotFoundException e) {
                     e.printStackTrace();
                 }
