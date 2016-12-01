@@ -86,7 +86,7 @@ public class ClientConnectionHandler implements OnCommandListener, DataSink {
      * @param command the command to be sent
      * @throws IOException if the command could not be sent
      */
-    void sendCommand(Command command) throws IOException {
+    void sendCommand(AbstractCommand command) throws IOException {
         mCommandConnection.sendCommand(command);
     }
 
@@ -233,12 +233,12 @@ public class ClientConnectionHandler implements OnCommandListener, DataSink {
     }
 
     @Override
-    public void onCommand(InetAddress inetAddress, Command command) {
+    public void onCommand(InetAddress inetAddress, AbstractCommand command) {
         // we only want to catch the sensor change commands here
         if (command.getCommandType() == CommandType.SensorChange) {
             // update the sensitivity for the given sensor
-            SensorChange sensorChangeCommand = (SensorChange) command;
-            mDataScaler.setSensorSensitivity(sensorChangeCommand.mTag, sensorChangeCommand.mProgress);
+            ChangeSensorSensitivity sensorChangeCommand = (ChangeSensorSensitivity) command;
+            mDataScaler.setSensorSensitivity(sensorChangeCommand.sensorType, sensorChangeCommand.sensitivity);
             return;
         }
         mCommandListener.onCommand(inetAddress, command);
