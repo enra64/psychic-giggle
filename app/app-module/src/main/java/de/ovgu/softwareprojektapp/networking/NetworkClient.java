@@ -167,6 +167,13 @@ public class NetworkClient implements DataSink, ExceptionListener {
     }
 
     /**
+     * Return a {@link NetworkDevice} identifying this network client
+     */
+    public NetworkDevice getSelf(){
+        return mSelf;
+    }
+
+    /**
      * Notifies the server that we will stop working
      */
     public void signalConnectionEnd() {

@@ -6,6 +6,7 @@ import de.ovgu.softwareprojekt.discovery.NetworkDevice;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.ConnectException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -87,9 +88,9 @@ public class CommandConnection {
      * used.
      *
      * @param command this command will be received by the peer
-     * @throws IOException most probably if the socket is blocked TODO: definitive answer here
+     * @throws IOException some I/O error. A ConnectException with ECONNREFUSED and ETIMEDOUT may also be thrown.
      */
-    public void sendCommand(AbstractCommand command) throws IOException {
+    public void sendCommand(AbstractCommand command) throws IOException{
         // ensure that the remote host is properly configured
         // note: this is the common project. it does not recognize androids BuildConfig.DEBUG.
         assert (mRemotePort >= 0 && (mRemoteHost != null));

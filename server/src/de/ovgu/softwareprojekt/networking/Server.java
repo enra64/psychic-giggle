@@ -1,6 +1,7 @@
 package de.ovgu.softwareprojekt.networking;
 
 import com.sun.istack.internal.Nullable;
+import com.sun.security.ntlm.Client;
 import de.ovgu.softwareprojekt.DataSink;
 import de.ovgu.softwareprojekt.SensorData;
 import de.ovgu.softwareprojekt.SensorType;
@@ -95,7 +96,11 @@ public abstract class Server implements OnCommandListener, DataSink, ClientListe
     @SuppressWarnings("WeakerAccess")
     public void start() throws IOException {
         // initialise the command and data connections
-        mCurrentUnboundClientConnection = new ClientConnectionHandler(this, this, this);
+        mCurrentUnboundClientConnection = new ClientConnectionHandler(mServerName,
+                this,
+                this,
+                this,
+                this);
         advertiseServer(mCurrentUnboundClientConnection);
     }
 
@@ -104,7 +109,7 @@ public abstract class Server implements OnCommandListener, DataSink, ClientListe
      */
     @Override
     public void close() {
-        for(ClientConnectionHandler client : mClientConnections)
+        for (ClientConnectionHandler client : mClientConnections)
             client.close();
         mDiscoveryServer.close();
     }
@@ -193,7 +198,7 @@ public abstract class Server implements OnCommandListener, DataSink, ClientListe
                 }
 
 
-                if(acceptClient){
+                if (acceptClient) {
                     // add unbound connection to list of bound connections
                     mClientConnections.add(mCurrentUnboundClientConnection);
 
@@ -203,7 +208,12 @@ public abstract class Server implements OnCommandListener, DataSink, ClientListe
                         mCurrentUnboundClientConnection.updateButtons(mButtonList);
 
                         // create new possible client connection
-                        mCurrentUnboundClientConnection = new ClientConnectionHandler(this, this, this);
+                        mCurrentUnboundClientConnection = new ClientConnectionHandler(
+                                mServerName,
+                                this,
+                                this,
+                                this,
+                                this);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -220,12 +230,11 @@ public abstract class Server implements OnCommandListener, DataSink, ClientListe
                 endConnection.self.address = origin.getHostAddress();
                 onClientDisconnected(endConnection.self);
 
-                // restart connections
+                // remove that client
                 try {
-                    close();
-                    start();
-                } catch (IOException e) {
-                    onException(this, e, "Could not restart connection after client connected");
+                    getClientHandler(endConnection.self).close();
+                } catch (NullPointerException e) {
+                    e.printStackTrace();
                 }
                 break;
 
@@ -243,7 +252,7 @@ public abstract class Server implements OnCommandListener, DataSink, ClientListe
      */
     private void advertiseServer(ClientConnectionHandler clientConnectionHandler) {
         // stop old instances
-        if(mDiscoveryServer != null)
+        if (mDiscoveryServer != null)
             mDiscoveryServer.close();
 
         // the DiscoveryServer makes it possible for the client to find us, but it needs to know the command and
@@ -258,12 +267,43 @@ public abstract class Server implements OnCommandListener, DataSink, ClientListe
     }
 
 
-
     @Override
     public void onData(SensorData sensorData) {
         // iterate over all data sinks marked as interested in this sensor type
         for (DataSink sink : mDataSinks.get(sensorData.sensorType))
             sink.onData(sensorData);
+    }
+
+    /**
+     * Closes the clients handler, and notifies the client of his disconnection
+     *
+     * @param client the client to be removed
+     * @return false if client could not be found, true otherwise
+     */
+    public boolean disconnectClient(NetworkDevice client) {
+        ClientConnectionHandler connectionHandler = getClientHandler(client);
+
+        // return false if no matching client could be found
+        if (connectionHandler == null)
+            return false;
+
+        // close the client connection
+        connectionHandler.closeAndSignalClient();
+        return true;
+    }
+
+    /**
+     * This function find the connection handler that is managing a certain client
+     *
+     * @param client the client that should be found
+     * @return null if no matching handler was found, or the handler.
+     */
+    private ClientConnectionHandler getClientHandler(NetworkDevice client) {
+        for (ClientConnectionHandler clientConnection : mClientConnections)
+            // true if the clients match
+            if (clientConnection.getClient().equals(client))
+                return clientConnection;
+        return null;
     }
 
 
@@ -273,6 +313,7 @@ public abstract class Server implements OnCommandListener, DataSink, ClientListe
      * @param name text to be displayed on the button
      * @param id   id of the button
      */
+
     public void addButton(String name, int id) throws IOException {
         // add the new button to local storage
         mButtonList.put(id, name);
@@ -294,48 +335,23 @@ public abstract class Server implements OnCommandListener, DataSink, ClientListe
         updateButtons();
     }
 
+    /**
+     * Force each client to update his buttons
+     *
+     * @throws IOException if the command could not be sent
+     */
     private void updateButtons() throws IOException {
-        for(ClientConnectionHandler client : mClientConnections)
+        for (ClientConnectionHandler client : mClientConnections)
             client.updateButtons(mButtonList);
     }
 
+    /**
+     * Force each client to update his required sensors
+     *
+     * @throws IOException if the command could not be sent
+     */
     private void updateSensors() throws IOException {
-        for(ClientConnectionHandler client : mClientConnections)
+        for (ClientConnectionHandler client : mClientConnections)
             client.updateSensors(mDataSinks.keySet());
     }
-
-    /**
-     * Called when an exception cannot be gracefully handled.
-     *
-     * @param origin    the instance (or, if it is a hidden instance, the known parent) that produced the exception
-     * @param exception the exception that was thrown
-     * @param info additional information to help identify the problem
-     */
-    @Override
-    public abstract void onException(Object origin, Exception exception, String info);
-
-    /**
-     * Called whenever a button is clicked
-     *
-     * @param click event object specifying details like button id
-     */
-    @Override
-    public abstract void onButtonClick(ButtonClick click);
-
-    /**
-     * Check whether a new client should be accepted
-     *
-     * @param newClient the new clients identification
-     * @return true if the client should be accepted, false otherwise
-     */
-    @Override
-    public abstract boolean acceptClient(NetworkDevice newClient);
-
-    /**
-     * Called when a client sent a disconnect signal
-     *
-     * @param disconnectedClient the lost client
-     */
-    @Override
-    public abstract void onClientDisconnected(NetworkDevice disconnectedClient);
 }

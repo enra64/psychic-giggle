@@ -101,4 +101,9 @@ public class NesServer extends Server {
     public void onClientDisconnected(NetworkDevice disconnectedClient) {
         System.out.println("Player " + disconnectedClient.name + " disconnected!");
     }
+
+    @Override
+    public void onClientTimeout(NetworkDevice timeoutClient) {
+        System.out.println("Player " + timeoutClient.name + " had a timeout!");
+    }
 }

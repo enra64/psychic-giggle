@@ -17,11 +17,14 @@ import java.net.ConnectException;
 import java.net.InetAddress;
 import java.util.List;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import de.ovgu.softwareprojekt.SensorType;
 import de.ovgu.softwareprojekt.control.OnCommandListener;
 import de.ovgu.softwareprojekt.control.commands.ButtonClick;
 import de.ovgu.softwareprojekt.control.commands.AbstractCommand;
+import de.ovgu.softwareprojekt.control.commands.ConnectionAliveCheck;
 import de.ovgu.softwareprojekt.control.commands.ConnectionRequestResponse;
 import de.ovgu.softwareprojekt.control.commands.ChangeSensorSensitivity;
 import de.ovgu.softwareprojekt.control.commands.SetSensorCommand;
@@ -72,6 +75,22 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
      */
     ProgressDialog mConnectionProgressDialog;
 
+    /**
+     * Save a timestamp of when we received the last command from the server
+     */
+    private long mLastCommandTimestamp;
+
+    /**
+     * This timer is used to frequently check whether the connection is still alive
+     */
+    private Timer mConnectionAgeTimer = new Timer();
+
+    /**
+     * This constant defines the threshold after which a connectino is deemed dead, and the
+     * SendActivity is stopped
+     */
+    private static final long MAXIMUM_CONNECTION_AGE = 1000;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -111,6 +130,31 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
 
         // default activity result is closing by user
         setResult(RESULT_USER_STOPPED);
+    }
+
+    /**
+     * Start a timer that periodically checks whether we have recently communicated with the server.
+     * If the last connection is too old, it gives alarm, as the connection has probably timed out
+     */
+    private void startConnectionCheckTimer() {
+        // set the last connection to NOW to avoid immediate disconnect
+        mLastCommandTimestamp = System.currentTimeMillis();
+
+        mConnectionAgeTimer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                if ((System.currentTimeMillis() - mLastCommandTimestamp) > MAXIMUM_CONNECTION_AGE)
+                    onConnectionTimeout();
+            }
+        }, 0, 500);
+    }
+
+    private void onConnectionTimeout(){
+        // if the server _is_ still alive, send a last message :(
+        mNetworkClient.signalConnectionEnd();
+
+        // close the activity with an appropriate result code
+        closeActivity(RESULT_SERVER_CONNECTION_TIMED_OUT);
     }
 
     /**
@@ -164,7 +208,7 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
 
             // handled click -> return true
             return true;
-        } else if (item.getItemId() == R.id.menu_settings){
+        } else if (item.getItemId() == R.id.menu_settings) {
             goToOptions();
         }
         // invoke the superclass if we didn't want to handle the click
@@ -221,8 +265,8 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
         super.onResume();
         mSensorHandler.enableTemporarilyDisabledSensors();
         SharedPreferences sensitivitySettings = getSharedPreferences(OptionsActivity.PREFS_NAME, 0);
-        for(SensorType s : SensorType.values()){
-            mNetworkClient.sendCommand(new ChangeSensorSensitivity(s,sensitivitySettings.getInt(s.toString(),50)));
+        for (SensorType s : SensorType.values()) {
+            mNetworkClient.sendCommand(new ChangeSensorSensitivity(s, sensitivitySettings.getInt(s.toString(), 50)));
         }
 
     }
@@ -243,8 +287,12 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
         // the progress dialog can be dismissed in any case
         mConnectionProgressDialog.dismiss();
 
-        if (granted)
+        if (granted){
             UiUtil.showToast(this, getString(R.string.send_activity_connection_success));
+
+
+            startConnectionCheckTimer();
+        }
         else
             closeActivity(RESULT_SERVER_REFUSED);
     }
@@ -274,6 +322,12 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
                 //create button with name and id
                 UpdateButtons addCom = (UpdateButtons) command;
                 createButtons(addCom);
+                break;
+            case ConnectionAliveCheck:
+                mLastCommandTimestamp = System.currentTimeMillis();
+                ConnectionAliveCheck response = (ConnectionAliveCheck) command;
+                response.answerer = mNetworkClient.getSelf();
+                mNetworkClient.sendCommand(response);
                 break;
             // ignore unhandled commands
             default:
@@ -336,9 +390,10 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
      * Tell PC to reposition the mouse cursor to the center of its main screen?
      * Probably shit code?
      * Arne plz help me
+     *
      * @param view
      */
-    public void repositionMouseCursor(View view){
+    public void repositionMouseCursor(View view) {
         //TODO: buttonID should be set without seeming so random but view.getTag() doesn't work :(
         mNetworkClient.sendCommand(new ButtonClick(2, false));
     }

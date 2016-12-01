@@ -62,8 +62,7 @@ public class MouseServer extends Server {
     @Override
     public void onException(Object o, Exception e, String s) {
         e.printStackTrace();
-        System.out.println("with additional information:\n" + s);
-        System.out.println("in " + o.getClass());
+        System.out.println("Exception in " + o.getClass() + "with additional information:\n" + s);
         System.exit(0);
     }
 
@@ -96,5 +95,12 @@ public class MouseServer extends Server {
     @Override
     public void onClientDisconnected(NetworkDevice disconnectedClient) {
         System.out.println(disconnectedClient.name + " disconnected");
+    }
+
+    @Override
+    public void onClientTimeout(NetworkDevice timeoutClient) {
+        System.out.println(timeoutClient.name + " had a timeout");
+        // the client may still be ok, but we could send a disconnect signal...
+        //disconnectClient(timeoutClient);
     }
 }
