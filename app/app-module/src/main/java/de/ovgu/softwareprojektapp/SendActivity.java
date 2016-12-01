@@ -326,6 +326,17 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
         });
     }
 
+    /**
+     * Tell PC to reposition the mouse cursor to the center of its main screen?
+     * Probably shit code?
+     * Arne plz help me
+     * @param view
+     */
+    public void repositionMouseCursor(View view){
+        //TODO: buttonID should be set without seeming so random but view.getTag() doesn't work :(
+        mNetworkClient.sendCommand(new ButtonClick(2, false));
+    }
+
     public void goToOptions(View view) {
 
         Bundle in = getIntent().getExtras();

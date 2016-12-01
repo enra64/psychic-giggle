@@ -21,22 +21,29 @@
     </LinearLayout>
 
     <Button
+        android:text="Options"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/optionsBtn"
+        android:onClick="goToOptions"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true" />
+
+    <Button
+        android:text="Reposition"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/repositionMouseCursor"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
+        android:onClick="repositionMouseCursor" />
+
+    <Button
         android:text="hold sonsors"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/disableSensorsButton"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentStart="true"
-        android:layout_marginStart="46dp" />
-
-    <Button
-        android:text="Options"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="43dp"
-        android:id="@+id/optionsBtn"
-        android:onClick="goToOptions"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true" />
+        android:layout_centerHorizontal="true" />
 
 </RelativeLayout>
