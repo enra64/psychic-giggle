@@ -2,4 +2,7 @@
     <string name="app_name">SoftwareprojektApp</string>
     <string name="send_activity_connection_success">Connection successful</string>
     <string name="disconnect">Disconnect</string>
+    <string name="hold_sonsors">Hold sensors</string>
+    <string name="reposition">Center</string>
+    <string name="settings">Settings</string>
 </resources>

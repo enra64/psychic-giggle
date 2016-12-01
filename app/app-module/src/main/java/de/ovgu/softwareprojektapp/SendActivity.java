@@ -35,9 +35,6 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
     /**
      * The intent extras (the data given to us by the {@link DiscoveryActivity})
      */
-
-
-
     static final String
             EXTRA_SERVER_NAME = "Name",
             EXTRA_SERVER_ADDRESS = "Address",
@@ -52,7 +49,8 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
     static final int
             RESULT_SERVER_REFUSED = -1,
             RESULT_USER_STOPPED = 0,
-            RESULT_SERVER_NOT_LISTENING_ON_COMMAND_PORT = -2;
+            RESULT_SERVER_NOT_LISTENING_ON_COMMAND_PORT = -2,
+            RESULT_SERVER_CONNECTION_TIMED_OUT = -3;
 
     /**
      * The network client organises all our communication with the server
@@ -166,6 +164,8 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
 
             // handled click -> return true
             return true;
+        } else if (item.getItemId() == R.id.menu_settings){
+            goToOptions();
         }
         // invoke the superclass if we didn't want to handle the click
         return super.onOptionsItemSelected(item);
@@ -292,6 +292,12 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
                 mConnectionProgressDialog.dismiss();
 
             closeActivity(RESULT_SERVER_NOT_LISTENING_ON_COMMAND_PORT);
+        } else if (exception instanceof ConnectException && exception.getMessage().contains("ETIMEDOUT")) {
+            // close the non-user-closeable connecting... dialog
+            if (mConnectionProgressDialog != null)
+                mConnectionProgressDialog.dismiss();
+
+            closeActivity(RESULT_SERVER_CONNECTION_TIMED_OUT);
         }
 
         //TODO: wörkwörk markus
@@ -337,8 +343,7 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
         mNetworkClient.sendCommand(new ButtonClick(2, false));
     }
 
-    public void goToOptions(View view) {
-
+    private void goToOptions() {
         Bundle in = getIntent().getExtras();
 
         Intent intent = new Intent(SendActivity.this, OptionsActivity.class);

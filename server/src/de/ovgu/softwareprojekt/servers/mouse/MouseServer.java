@@ -1,16 +1,20 @@
 package de.ovgu.softwareprojekt.servers.mouse;
 
 import com.sun.istack.internal.Nullable;
+import de.ovgu.softwareprojekt.DataSink;
 import de.ovgu.softwareprojekt.SensorType;
 import de.ovgu.softwareprojekt.control.commands.ButtonClick;
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
 import de.ovgu.softwareprojekt.networking.Server;
+import de.ovgu.softwareprojekt.servers.filters.AverageMovementFilter;
+import de.ovgu.softwareprojekt.servers.filters.MinimumAmplitudeFilter;
 
 import java.awt.*;
 import java.io.IOException;
 
 /**
- * Created by arne on 11/25/16.
+ * The MouseServer class is an exemplary extension of Server that enables
+ * the user to move the mouse using his phone
  */
 public class MouseServer extends Server {
     /**
@@ -44,8 +48,11 @@ public class MouseServer extends Server {
         // create a new mouse mover
         mMouseMover = new MouseMover();
 
+        // this is how we currently define a filter pipeline:
+        DataSink pipeline = new AverageMovementFilter(3, new MinimumAmplitudeFilter(mMouseMover, 1f));
+
         // register our mouse mover to receive gyroscope data
-        registerDataSink(mMouseMover, SensorType.Gyroscope);
+        registerDataSink(pipeline, SensorType.Gyroscope);
 
         // add left- and right click buttons
         addButton("left click", LEFT_MOUSE_BUTTON);

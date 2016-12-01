@@ -97,6 +97,8 @@ public class DiscoveryActivity extends AppCompatActivity implements OnDiscoveryL
             UiUtil.showAlert(this, "Connection failed", "Server refused connection");
         else if (resultCode == SendActivity.RESULT_SERVER_NOT_LISTENING_ON_COMMAND_PORT)
             UiUtil.showAlert(this, "Connection failed", "Server seems to be offline");
+        else if (resultCode == SendActivity.RESULT_SERVER_CONNECTION_TIMED_OUT)
+            UiUtil.showAlert(this, "Connection failed", "The server connection has timed out! Check your network configuration.");
     }
 
     /**

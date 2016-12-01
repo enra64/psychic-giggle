@@ -16,34 +16,32 @@
         android:layout_height="match_parent"
         android:layout_alignParentStart="true"
         android:id="@+id/runtime_button_parent"
-        android:layout_above="@+id/disableSensorsButton">
+        android:layout_above="@+id/compileTimeButtonLayout">
 
     </LinearLayout>
 
-    <Button
-        android:text="Options"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:id="@+id/compileTimeButtonLayout"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/optionsBtn"
-        android:onClick="goToOptions"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true" />
+        android:layout_centerHorizontal="true">
 
-    <Button
-        android:text="Reposition"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/repositionMouseCursor"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentStart="true"
-        android:onClick="repositionMouseCursor" />
+        <Button
+            android:text="@string/reposition"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/repositionMouseCursor"
+            android:onClick="repositionMouseCursor"
+            android:layout_weight="2" />
 
-    <Button
-        android:text="hold sonsors"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/disableSensorsButton"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true" />
+        <Button
+            android:text="@string/hold_sonsors"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/disableSensorsButton"
+            android:layout_weight="1" />
+    </LinearLayout>
 
 </RelativeLayout>

@@ -192,6 +192,7 @@ public abstract class Server implements OnCommandListener, DataSink, ClientListe
                     e.printStackTrace();
                 }
 
+
                 if(acceptClient){
                     // add unbound connection to list of bound connections
                     mClientConnections.add(mCurrentUnboundClientConnection);
