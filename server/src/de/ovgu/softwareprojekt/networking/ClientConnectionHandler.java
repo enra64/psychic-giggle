@@ -330,7 +330,7 @@ public class ClientConnectionHandler implements OnCommandListener, DataSink {
          */
         DataScalingHandler(DataSink outgoingDataSink) {
             for (SensorType sensorType : SensorType.values())
-                mScalingFilters.put(sensorType, new NormalizationFilter(outgoingDataSink, 0, 50));
+                mScalingFilters.put(sensorType, new NormalizationFilter(outgoingDataSink, 50));
         }
 
         /**
