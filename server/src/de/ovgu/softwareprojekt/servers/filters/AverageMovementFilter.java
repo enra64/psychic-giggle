@@ -77,7 +77,6 @@ public class AverageMovementFilter extends AbstractFilter {
         }
         mIndexPointer++;
 
-        //TODO: If there is a bug, probably here lol
         System.arraycopy(filteredData, 0, rawData, 0, rawData.length);
 
         //mIndexPointer rotates through the array

@@ -264,6 +264,6 @@ public class DiscoveryActivity extends AppCompatActivity implements OnDiscoveryL
 
     @Override
     public void onException(Object origin, Exception exception, String info) {
-        //TODO: wörkwörk markus
+        //TODO: wörkwörk markus (to be implemented)
     }
 }
