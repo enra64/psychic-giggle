@@ -137,8 +137,8 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
      * If the last connection is too old, it gives alarm, as the connection has probably timed out
      */
     private void startConnectionCheckTimer() {
-        // set the last connection to NOW to avoid immediate disconnect
-        mLastCommandTimestamp = System.currentTimeMillis();
+        // set the last connection to NOW (+ execution delay of timer) to avoid immediate disconnect
+        mLastCommandTimestamp = System.currentTimeMillis() + 1000;
 
         mConnectionAgeTimer.scheduleAtFixedRate(new TimerTask() {
             @Override
@@ -146,7 +146,7 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
                 if ((System.currentTimeMillis() - mLastCommandTimestamp) > MAXIMUM_CONNECTION_AGE)
                     onConnectionTimeout();
             }
-        }, 0, 500);
+        }, 1000, 500);
     }
 
     private void onConnectionTimeout(){
