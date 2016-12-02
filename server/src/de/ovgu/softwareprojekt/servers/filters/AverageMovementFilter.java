@@ -6,7 +6,7 @@ import de.ovgu.softwareprojekt.SensorData;
 /**
  * Created by Ulrich on 28.11.2016.
  */
-public class AverageMovementFilter extends AbstractFilter{
+public class AverageMovementFilter extends AbstractFilter {
 
     /**
      * This value describes how many of the previous inputs are used to calculate the mAverage movement
@@ -26,22 +26,24 @@ public class AverageMovementFilter extends AbstractFilter{
 
     /**
      * A filter that uses the mAverage movement in order to create a smooth movement
+     *
      * @param avgSampSize how many values should be used to calculate the average
-     * @param dataSink where to put the filtered data
+     * @param dataSink    where to put the filtered data
      */
-    public AverageMovementFilter(int avgSampSize, DataSink dataSink){
-        this(avgSampSize,dataSink ,0, 1, 2);
+    public AverageMovementFilter(int avgSampSize, DataSink dataSink) {
+        this(avgSampSize, dataSink, 0, 1, 2);
     }
 
     /**
      * A filter that uses the mAverage movement in order to create a smooth movement
+     *
      * @param avgSampSize how many values should be used to calculate the average
-     * @param dataSink where to put the filtered data
+     * @param dataSink    where to put the filtered data
      * @param xaxis
      * @param yaxis
      * @param zaxis
      */
-    public AverageMovementFilter(int avgSampSize, DataSink dataSink ,int xaxis, int yaxis, int zaxis) {
+    public AverageMovementFilter(int avgSampSize, DataSink dataSink, int xaxis, int yaxis, int zaxis) {
         super(dataSink, xaxis, yaxis, zaxis);
 
         //The sample Size must be bigger than 0 or we would not create an average at all or even divide by zero
@@ -54,6 +56,7 @@ public class AverageMovementFilter extends AbstractFilter{
 
     /**
      * turns the values of the given array into more useful ones
+     *
      * @param rawData hopefully the SensorData.data array
      */
     private void filter(float[] rawData) {

@@ -91,6 +91,7 @@ public class CommandConnection {
      */
     public void sendCommand(AbstractCommand command) throws IOException {
         // ensure that the remote host is properly configured
+        // note: this is the common project. it does not recognize androids BuildConfig.DEBUG.
         assert (mRemotePort >= 0 && (mRemoteHost != null));
 
         // this is a try-with-resources; it will automatically close its resources when finished, whatever happens.

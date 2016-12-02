@@ -48,9 +48,10 @@ public class MinimumAmplitudeFilter extends AbstractFilter {
         if (calculateChange(sensorData.data, mLastValue) < mMinimumChange)
             System.arraycopy(mLastValue, 0, sensorData.data, 0, mLastValue.length);
         // if the change does meet the minimum, copy over the new values
-        else
+        else {
+            //System.out.println(calculateChange(sensorData.data, mLastValue));
             System.arraycopy(sensorData.data, 0, mLastValue, 0, mLastValue.length);
-
+        }
         // notify attached sink of new data
         mDataSink.onData(sensorData);
     }

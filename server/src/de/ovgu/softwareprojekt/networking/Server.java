@@ -5,8 +5,8 @@ import de.ovgu.softwareprojekt.DataSink;
 import de.ovgu.softwareprojekt.SensorData;
 import de.ovgu.softwareprojekt.SensorType;
 import de.ovgu.softwareprojekt.control.OnCommandListener;
+import de.ovgu.softwareprojekt.control.commands.AbstractCommand;
 import de.ovgu.softwareprojekt.control.commands.ButtonClick;
-import de.ovgu.softwareprojekt.control.commands.Command;
 import de.ovgu.softwareprojekt.control.commands.ConnectionRequest;
 import de.ovgu.softwareprojekt.control.commands.EndConnection;
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
@@ -173,7 +173,7 @@ public abstract class Server implements OnCommandListener, DataSink, ClientListe
      * @param command the command issued
      */
     @Override
-    public void onCommand(InetAddress origin, Command command) {
+    public void onCommand(InetAddress origin, AbstractCommand command) {
         // decide what to do with the packet
         switch (command.getCommandType()) {
             case ConnectionRequest:
@@ -191,6 +191,7 @@ public abstract class Server implements OnCommandListener, DataSink, ClientListe
                 } catch (UnknownHostException e) {
                     e.printStackTrace();
                 }
+
 
                 if(acceptClient){
                     // add unbound connection to list of bound connections
