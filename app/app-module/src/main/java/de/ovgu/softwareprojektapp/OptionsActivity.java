@@ -4,6 +4,7 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
@@ -41,6 +42,14 @@ public class OptionsActivity extends AppCompatActivity implements SeekBar.OnSeek
 
         mSensorOptions = (LinearLayout) findViewById(R.id.SensorOptions);
         mBackBtn = (Button) findViewById(R.id.backFromOptionsBtn);
+
+        mBackBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
+            }
+        });
+
         Bundle givenExtras = getIntent().getExtras();
 
 

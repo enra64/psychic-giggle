@@ -12,11 +12,6 @@ import de.ovgu.softwareprojekt.SensorData;
  */
 public class NormalizationFilter extends AbstractFilter {
     /**
-     * A base value which multiplies the gyroscope value to turn it into useful values
-     */
-    private final float SENSITIVITY;
-
-    /**
      * Allows the user to change the base value SENSITIVITY by adding or subtracting this value
      */
     private float mCustomSensitivity = 0f;
@@ -27,29 +22,24 @@ public class NormalizationFilter extends AbstractFilter {
      * @param dataSink      where to put filtered data
      */
     public NormalizationFilter(DataSink dataSink){
-        this(40f, 0f, dataSink, 0, 1, 2);
+        this(dataSink, 0f, 0, 1, 2);
     }
 
     /**
      * standard constructor where you can choose the sensitivity
      */
-    public NormalizationFilter(DataSink sink, float sensitivity, float customSensitivity){
-        this(sensitivity, customSensitivity, sink, 0, 1, 2);
+    public NormalizationFilter(DataSink sink, float customSensitivity){
+        this( sink, customSensitivity, 0, 1, 2);
     }
 
     /**
      * A filter that normalizes the sensorData into usable input
-     * @param sensitivity base value that normalizes the sensor data, cannot be negative
      * @param customSensitivity custom value that is added to the base value
      */
-    public NormalizationFilter(float sensitivity, float customSensitivity, DataSink sink, int xaxis, int yaxis, int zaxis){
+    public NormalizationFilter(DataSink sink, float customSensitivity,  int xaxis, int yaxis, int zaxis){
 
         super(sink, xaxis, yaxis, zaxis);
 
-        //It is basicly pointless to use 0 or negative values
-        assert sensitivity > 0;
-
-        SENSITIVITY = sensitivity;
         mCustomSensitivity = customSensitivity;
     }
 
@@ -59,9 +49,9 @@ public class NormalizationFilter extends AbstractFilter {
      * @param sensorData the data received by the sensor
      */
     public void normalize(float[] sensorData){
-        sensorData[XAXIS] *= (SENSITIVITY + mCustomSensitivity);
-        sensorData[YAXIS] *= (SENSITIVITY + mCustomSensitivity);
-        sensorData[ZAXIS] *= (SENSITIVITY + mCustomSensitivity);
+        sensorData[XAXIS] *= mCustomSensitivity;
+        sensorData[YAXIS] *= mCustomSensitivity;
+        sensorData[ZAXIS] *= mCustomSensitivity;
     }
 
     public void setCustomSensitivity(float customValue){

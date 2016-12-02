@@ -11,6 +11,8 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 
 import java.net.ConnectException;
@@ -87,21 +89,20 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
         mSensorHandler = new SensorHandler(this, mNetworkClient);
 
         // disable the sensors while this button is held down
-        Button disableSensorsButton = (Button) findViewById(R.id.disableSensorsButton);
-        disableSensorsButton.setOnTouchListener(new View.OnTouchListener() {
+        CheckBox disableSensorsCheck = (CheckBox) findViewById(R.id.holdSensor);
+        disableSensorsCheck.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                // we only handle button press and release
-                if (motionEvent.getAction() == MotionEvent.ACTION_DOWN)
+            public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
+                if(isChecked)
+                {
                     mSensorHandler.temporarilyDisableSensors();
-                else if (motionEvent.getAction() == MotionEvent.ACTION_UP)
+                }
+                else{
                     mSensorHandler.enableTemporarilyDisabledSensors();
-                else
-                    return false;
-
-                return true;
+                }
             }
         });
+
 
         // default to successful execution
         setResult(RESULT_USER_STOPPED);
