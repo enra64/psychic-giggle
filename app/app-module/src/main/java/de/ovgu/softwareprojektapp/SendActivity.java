@@ -333,9 +333,7 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
     }
 
     /**
-     * Tell PC to reposition the mouse cursor to the center of its main screen?
-     * Probably shit code?
-     * Arne plz help me
+     * Tell PC to reposition the mouse cursor to the center of its main screen
      * @param view
      */
     public void repositionMouseCursor(View view){

@@ -47,7 +47,6 @@ public class NormalizationFilter extends AbstractFilter {
         super(sink, xaxis, yaxis, zaxis);
 
         //It is basicly pointless to use 0 or negative values
-        //TODO: assert necessary?
         assert sensitivity > 0;
 
         SENSITIVITY = sensitivity;
@@ -65,7 +64,6 @@ public class NormalizationFilter extends AbstractFilter {
         sensorData[ZAXIS] *= (SENSITIVITY + mCustomSensitivity);
     }
 
-    //TODO: user sensitivity feature in app
     public void setCustomSensitivity(float customValue){
         mCustomSensitivity = customValue;
     }
