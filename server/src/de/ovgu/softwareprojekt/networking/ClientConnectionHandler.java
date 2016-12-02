@@ -1,5 +1,6 @@
 package de.ovgu.softwareprojekt.networking;
 
+import com.sun.istack.internal.NotNull;
 import de.ovgu.softwareprojekt.DataSink;
 import de.ovgu.softwareprojekt.SensorData;
 import de.ovgu.softwareprojekt.SensorType;
@@ -122,6 +123,14 @@ public class ClientConnectionHandler implements OnCommandListener, DataSink {
     }
 
     /**
+     * Retrieve the client this connection handler is bound to
+     */
+    @NotNull
+    NetworkDevice getClient() {
+        return mClient;
+    }
+
+    /**
      * Handle a connection request to this client connection. If acceptClient is true, this instance may not be used to
      * handle another client.
      *
@@ -156,7 +165,6 @@ public class ClientConnectionHandler implements OnCommandListener, DataSink {
         mCommandConnection.close();
         mDataConnection.close();
         mIsConnected = false;
-        System.out.println("false now");
         mConnectionCheckTimer.cancel();
     }
 
@@ -197,7 +205,7 @@ public class ClientConnectionHandler implements OnCommandListener, DataSink {
                     try {
                         if((System.currentTimeMillis() - mLastClientResponse) > MAXIMUM_CLIENT_RESPONSE_DELAY)
                             mClientListener.onClientTimeout(mClient);
-                        System.out.println("async:" + mIsConnected);
+                        //System.out.println("async:" + mIsConnected);
                         if(isConnected())
                             sendCommand(new ConnectionAliveCheck(new NetworkDevice(mServerName, mCommandConnection.getLocalPort(), mDataConnection.getLocalPort())));
                     } catch (IOException e) {
@@ -304,9 +312,6 @@ public class ClientConnectionHandler implements OnCommandListener, DataSink {
         }
     }
 
-    NetworkDevice getClient() {
-        return mClient;
-    }
 
     /**
      * This class handles scaling all the data, because we may have to apply a different scaling factor to
