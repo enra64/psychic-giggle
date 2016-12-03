@@ -12,13 +12,18 @@ import de.ovgu.softwareprojekt.misc.ExceptionListener;
 import de.ovgu.softwareprojekt.servers.filters.NormalizationFilter;
 
 import java.io.IOException;
+import java.net.ConnectException;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.*;
+//EndConnectionConnectionAliveCheckSensorChange
 
 /**
- * This class manages the command- and data connection for a single client
+ * This class manages the command- and data connection for a single client. It intercepts the following commands:
+ * {@link ConnectionAliveCheck} and {@link ChangeSensorSensitivity}, never notifying the command listener of receiving
+ * them. When a {@link EndConnection} command is received, all ports are closed, and the command is forwarded; no other
+ * command can be sent to the client after that.
  */
 public class ClientConnectionHandler implements OnCommandListener, DataSink {
     /**
@@ -64,7 +69,7 @@ public class ClientConnectionHandler implements OnCommandListener, DataSink {
     /**
      * False until {@link #onClientAccepted(NetworkDevice)} has run successfully, and after {@link #close()} was called
      */
-    private boolean mIsConnected = false;
+    private volatile boolean mIsConnected = false;
 
     /**
      * Name of the server this client connection handler belongs to
@@ -116,10 +121,24 @@ public class ClientConnectionHandler implements OnCommandListener, DataSink {
      * Send a command to this client
      *
      * @param command the command to be sent
-     * @throws IOException if the command could not be sent
+     * @throws IOException if an error <b>other than</b> {@link ConnectException} occurred. If a {@link ConnectException}
+     *                     occurred, the client is likely listening no longer.
      */
-    void sendCommand(AbstractCommand command) throws IOException {
-        mCommandConnection.sendCommand(command);
+    private void sendCommand(AbstractCommand command) throws IOException {
+        if (mIsConnected){
+            try{
+                mCommandConnection.sendCommand(command);
+            } catch (ConnectException e){
+                // if the client does not listen anymore, it most probably is down
+                if(e.getMessage().contains("Connection refused")){
+                    // notify client listener
+                    mClientListener.onClientDisconnected(mClient);
+
+                    // close self
+                    close();
+                }
+            }
+        }
     }
 
     /**
@@ -154,7 +173,6 @@ public class ClientConnectionHandler implements OnCommandListener, DataSink {
 
     @Override
     public void onData(SensorData sensorData) {
-
         mDataSink.onData(sensorData);
     }
 
@@ -175,6 +193,7 @@ public class ClientConnectionHandler implements OnCommandListener, DataSink {
         try {
             sendCommand(new EndConnection(null));
         } catch (IOException ignored) {
+            // ignore this exception, since the connection state to this client doesn't matter anymore anyways
         }
         close();
     }
@@ -184,41 +203,51 @@ public class ClientConnectionHandler implements OnCommandListener, DataSink {
      *
      * @param client the client we will be handling
      */
-    private void onClientAccepted(NetworkDevice client) {
+    private void onClientAccepted(final NetworkDevice client) {
         try {
+            // flag that we have been connected
+            mIsConnected = true;
+
             // accept the client
-            mCommandConnection.sendCommand(new ConnectionRequestResponse(true));
+            sendCommand(new ConnectionRequestResponse(true));
 
             // store client identification
             mClient = client;
 
-            // flag that we have been connected
-            mIsConnected = true;
-
             // update the last client response time to avoid immediate timeout (+1000 for connection check timer delay)
-            mLastClientResponse = System.currentTimeMillis() + 1000;
+            mLastClientResponse = System.currentTimeMillis() + 900;
 
             // in one second, begin requesting a "still-alive" beep from the clients once per second
             mConnectionCheckTimer.scheduleAtFixedRate(new TimerTask() {
                 @Override
                 public void run() {
                     try {
-                        if((System.currentTimeMillis() - mLastClientResponse) > MAXIMUM_CLIENT_RESPONSE_DELAY)
+                        // check for timeout
+                        long connectionAge = System.currentTimeMillis() - mLastClientResponse;
+                        if (connectionAge > MAXIMUM_CLIENT_RESPONSE_DELAY) {
                             mClientListener.onClientTimeout(mClient);
-                        //System.out.println("async:" + mIsConnected);
-                        if(isConnected())
+
+                            // notify the client that we do no longer communicate with it in case it is still listening
+                            closeAndSignalClient();
+                        }
+
+                        // send a new alive check
+                        else if (mIsConnected)
                             sendCommand(new ConnectionAliveCheck(new NetworkDevice(mServerName, mCommandConnection.getLocalPort(), mDataConnection.getLocalPort())));
                     } catch (IOException e) {
                         mExceptionListener.onException(ClientConnectionHandler.this, e, "CONNECTION_CHECK_FAILED: Could not check connection; probably offline.");
                     }
                 }
-            }, 1000, 500);
+            }, 900, 500);
         } catch (IOException e) {
             mExceptionListener.onException(this, e, "could not accept client");
         }
     }
 
-    private boolean isConnected(){
+    /**
+     * Return true if we are currently between {@link #onClientAccepted(NetworkDevice)} and {@link #close()}
+     */
+    private boolean isConnected() {
         return mIsConnected;
     }
 
@@ -304,8 +333,12 @@ public class ClientConnectionHandler implements OnCommandListener, DataSink {
             case ConnectionAliveCheck:
                 ConnectionAliveCheck check = (ConnectionAliveCheck) command;
                 check.answerer.address = inetAddress.getHostAddress();
-                if(check.answerer.equals(mClient))
+                if (check.answerer.equals(mClient))
                     mLastClientResponse = System.currentTimeMillis();
+                break;
+            case EndConnection:
+                close();
+                mCommandListener.onCommand(inetAddress, command);
                 break;
             default:
                 mCommandListener.onCommand(inetAddress, command);

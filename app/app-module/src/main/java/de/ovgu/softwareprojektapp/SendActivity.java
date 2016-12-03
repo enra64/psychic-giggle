@@ -36,7 +36,7 @@ import de.ovgu.softwareprojekt.misc.ExceptionListener;
 import de.ovgu.softwareprojektapp.networking.NetworkClient;
 import de.ovgu.softwareprojektapp.sensors.SensorHandler;
 
-public class SendActivity extends AppCompatActivity implements OnCommandListener, ExceptionListener {
+public class SendActivity extends AppCompatActivity implements OnCommandListener, ExceptionListener, NetworkClient.TimeoutListener {
     /**
      * The intent extras (the data given to us by the {@link DiscoveryActivity})
      */
@@ -77,22 +77,6 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
      */
     ProgressDialog mConnectionProgressDialog;
 
-    /**
-     * Save a timestamp of when we received the last command from the server
-     */
-    private long mLastCommandTimestamp;
-
-    /**
-     * This timer is used to frequently check whether the connection is still alive
-     */
-    private Timer mConnectionAgeTimer = new Timer();
-
-    /**
-     * This constant defines the threshold after which a connectino is deemed dead, and the
-     * SendActivity is stopped
-     */
-    private static final long MAXIMUM_CONNECTION_AGE = 1000;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -132,27 +116,10 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
         setResult(RESULT_USER_STOPPED);
     }
 
-    /**
-     * Start a timer that periodically checks whether we have recently communicated with the server.
-     * If the last connection is too old, it gives alarm, as the connection has probably timed out
-     */
-    private void startConnectionCheckTimer() {
-        // set the last connection to NOW (+ execution delay of timer) to avoid immediate disconnect
-        mLastCommandTimestamp = System.currentTimeMillis() + 1000;
 
-        mConnectionAgeTimer.scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run() {
-                if ((System.currentTimeMillis() - mLastCommandTimestamp) > MAXIMUM_CONNECTION_AGE)
-                    onConnectionTimeout();
-            }
-        }, 1000, 500);
-    }
 
-    private void onConnectionTimeout(){
-        // if the server _is_ still alive, send a last message :(
-        mNetworkClient.signalConnectionEnd();
-
+    @Override
+    public void onConnectionTimeout(){
         // close the activity with an appropriate result code
         closeActivity(RESULT_SERVER_CONNECTION_TIMED_OUT);
     }
@@ -176,6 +143,7 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
         mNetworkClient = new NetworkClient(
                 server,
                 getIntent().getExtras().getString(EXTRA_SELF_NAME),
+                this,
                 this,
                 this
         );
@@ -287,12 +255,8 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
         // the progress dialog can be dismissed in any case
         mConnectionProgressDialog.dismiss();
 
-        if (granted){
+        if (granted)
             UiUtil.showToast(this, getString(R.string.send_activity_connection_success));
-
-	    // start the timer that checks whether the connection is still alive
-            startConnectionCheckTimer();
-        }
         else
             closeActivity(RESULT_SERVER_REFUSED);
     }
@@ -322,12 +286,6 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
                 //create button with name and id
                 UpdateButtons addCom = (UpdateButtons) command;
                 createButtons(addCom);
-                break;
-            case ConnectionAliveCheck:
-                mLastCommandTimestamp = System.currentTimeMillis();
-                ConnectionAliveCheck response = (ConnectionAliveCheck) command;
-                response.answerer = mNetworkClient.getSelf();
-                mNetworkClient.sendCommand(response);
                 break;
             // ignore unhandled commands
             default:

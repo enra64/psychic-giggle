@@ -100,7 +100,5 @@ public class MouseServer extends Server {
     @Override
     public void onClientTimeout(NetworkDevice timeoutClient) {
         System.out.println(timeoutClient.name + " had a timeout");
-        // the client may still be ok, but we could send a disconnect signal...
-        //disconnectClient(timeoutClient);
     }
 }

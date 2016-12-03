@@ -3,6 +3,10 @@ package de.ovgu.softwareprojektapp.networking;
 import android.os.AsyncTask;
 
 import java.io.IOException;
+import java.net.ConnectException;
+import java.net.InetAddress;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import de.ovgu.softwareprojekt.DataSink;
 import de.ovgu.softwareprojekt.DataSource;
@@ -10,7 +14,9 @@ import de.ovgu.softwareprojekt.SensorData;
 import de.ovgu.softwareprojekt.control.CommandConnection;
 import de.ovgu.softwareprojekt.control.OnCommandListener;
 import de.ovgu.softwareprojekt.control.commands.AbstractCommand;
+import de.ovgu.softwareprojekt.control.commands.ConnectionAliveCheck;
 import de.ovgu.softwareprojekt.control.commands.ConnectionRequest;
+import de.ovgu.softwareprojekt.control.commands.ConnectionRequestResponse;
 import de.ovgu.softwareprojekt.control.commands.EndConnection;
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
 import de.ovgu.softwareprojekt.misc.ExceptionListener;
@@ -22,7 +28,7 @@ import de.ovgu.softwareprojekt.misc.ExceptionListener;
  * so you can simply give it to {@link DataSource DataSources}. You will be notified of incoming commands
  * via the listener you had to supply in the constructor.
  */
-public class NetworkClient implements DataSink, ExceptionListener {
+public class NetworkClient implements DataSink, ExceptionListener, OnCommandListener {
     /**
      * Stores necessary information about our server, like data port, command port, and its address
      */
@@ -50,9 +56,30 @@ public class NetworkClient implements DataSink, ExceptionListener {
     private OnCommandListener mCommandListener;
 
     /**
+     * Callbacks for server timeout events
+     */
+    private TimeoutListener mTimeoutListener;
+
+    /**
      * listener for exceptions interesting to the user
      */
     private ExceptionListener mExceptionListener = null;
+
+    /**
+     * Save a timestamp of when we received the last command from the server
+     */
+    private volatile long mLastCommandTimestamp;
+
+    /**
+     * This timer is used to frequently check whether the connection is still alive
+     */
+    private Timer mConnectionAgeTimer = new Timer();
+
+    /**
+     * This constant defines the threshold after which a connectino is deemed dead, and the
+     * SendActivity is stopped
+     */
+    private static final long MAXIMUM_CONNECTION_AGE = 1000;
 
     /**
      * Create a new network client. To connect to a server, call {@link #requestConnection()}, and wait
@@ -62,11 +89,13 @@ public class NetworkClient implements DataSink, ExceptionListener {
      * @param selfName        how to identify the client
      * @param commandListener who should be called back for incoming commands
      */
-    public NetworkClient(NetworkDevice server, String selfName, OnCommandListener commandListener, ExceptionListener exceptionListener) {
+    public NetworkClient(NetworkDevice server, String selfName, OnCommandListener commandListener, ExceptionListener exceptionListener, TimeoutListener timeoutListener) {
         // store the server device information
         mServer = server;
 
-        // who should be notified of incoming commands
+        // store listeners
+        mTimeoutListener = timeoutListener;
+        mExceptionListener = exceptionListener;
         mCommandListener = commandListener;
 
         // initialise command and data connection
@@ -79,9 +108,6 @@ public class NetworkClient implements DataSink, ExceptionListener {
                 mCommandConnection.getLocalPort(),
                 mOutboundDataConnection.getLocalPort()
         );
-
-        // store who wants to be notified of exceptions
-        mExceptionListener = exceptionListener;
     }
 
     /**
@@ -91,7 +117,7 @@ public class NetworkClient implements DataSink, ExceptionListener {
         // create a command connection
         try {
             // create the command connection, set this to receive incoming commands
-            mCommandConnection = new CommandConnection(mCommandListener);
+            mCommandConnection = new CommandConnection(this);
 
             // we want to send commands to the server
             mCommandConnection.setRemote(mServer);
@@ -114,6 +140,24 @@ public class NetworkClient implements DataSink, ExceptionListener {
         } catch (IOException e) {
             mExceptionListener.onException(this, e, "NetworkClient: IOException when trying to initialise DataConnection");
         }
+    }
+
+    /**
+     * Start a timer that periodically checks whether we have recently communicated with the server.
+     * If the last connection is too old, it gives alarm, as the connection has probably timed out
+     */
+    private void startConnectionCheckTimer() {
+        // set the last connection to NOW (+ execution delay of timer) to avoid immediate disconnect
+        mLastCommandTimestamp = System.currentTimeMillis() + 1000;
+
+        mConnectionAgeTimer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                long connectionAge = System.currentTimeMillis() - mLastCommandTimestamp;
+                if (connectionAge > MAXIMUM_CONNECTION_AGE)
+                    mTimeoutListener.onConnectionTimeout();
+            }
+        }, 1000, 500);
     }
 
     /**
@@ -158,6 +202,7 @@ public class NetworkClient implements DataSink, ExceptionListener {
     public void close() {
         mOutboundDataConnection.close();
         mCommandConnection.close();
+        mConnectionAgeTimer.cancel();
     }
 
     @Override
@@ -181,6 +226,35 @@ public class NetworkClient implements DataSink, ExceptionListener {
     }
 
     /**
+     * Intercept certain commands
+     * @param origin hostname of whoever sent the packet
+     * @param command the command that was sent
+     */
+    @Override
+    public void onCommand(InetAddress origin, AbstractCommand command) {
+        switch (command.getCommandType()){
+            // completely handle connection checks
+            case ConnectionAliveCheck:
+                mLastCommandTimestamp = System.currentTimeMillis();
+                ConnectionAliveCheck response = (ConnectionAliveCheck) command;
+                response.answerer = getSelf();
+                sendCommand(response);
+                break;
+            case ConnectionRequestResponse:
+                ConnectionRequestResponse res = (ConnectionRequestResponse) command;
+                // if the connection was granted, start the connection check timer
+                if(res.grant)
+                    startConnectionCheckTimer();
+
+                // relay the connection request
+                mCommandListener.onCommand(origin, command);
+                break;
+            default:
+                mCommandListener.onCommand(origin, command);
+        }
+    }
+
+    /**
      * This class is a wrapper for {@link CommandConnection#sendCommand(AbstractCommand) sending commands}
      * to avoid dealing with network on the ui thread. Use as follows:
      * <br><br>
@@ -201,5 +275,9 @@ public class NetworkClient implements DataSink, ExceptionListener {
             }
             return null;
         }
+    }
+
+    public interface TimeoutListener {
+        void onConnectionTimeout();
     }
 }
