@@ -11,11 +11,11 @@ import android.widget.Toast;
  */
 
 public class UiUtil {
-    public static void showToast(final Activity host, String toast) {
+    public static void showToast(final Activity host, final String toast) {
         host.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                Toast.makeText(host, R.string.send_activity_connection_success, Toast.LENGTH_LONG).show();
+                Toast.makeText(host, toast, Toast.LENGTH_LONG).show();
             }
         });
     }

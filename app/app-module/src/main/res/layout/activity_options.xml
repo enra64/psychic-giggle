@@ -27,5 +27,19 @@
         android:layout_above="@+id/backFromOptionsBtn"
         android:id="@+id/SensorOptions">
 
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textPersonName"
+            android:ems="10"
+            android:id="@+id/device_name_edit_text"
+            android:hint="@string/client_name" />
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="number"
+            android:ems="10"
+            android:id="@+id/port_edit_text" />
     </LinearLayout>
 </RelativeLayout>

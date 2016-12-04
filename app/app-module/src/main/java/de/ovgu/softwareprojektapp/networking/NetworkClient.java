@@ -248,11 +248,11 @@ public class NetworkClient implements DataSink, ExceptionListener, OnCommandList
      * This class is a wrapper for {@link CommandConnection#sendCommand(AbstractCommand) sending commands}
      * to avoid dealing with network on the ui thread. Use as follows:
      * <br><br>
-     * {@code new SendCommand().execute(new WhatEverCommand()); }
+     * {@code new AsyncSendCommand().execute(new WhatEverCommand()); }
      * <br><br>
      * where WhatEverCommand is a subclass of {@link AbstractCommand}
      */
-    private class SendCommand extends AsyncTask<AbstractCommand, Void, Void> {
+    public class SendCommand extends AsyncTask<AbstractCommand, Void, Void> {
         @Override
         protected Void doInBackground(AbstractCommand... commands) {
             try {

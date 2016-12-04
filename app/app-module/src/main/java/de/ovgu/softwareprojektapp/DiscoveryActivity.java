@@ -1,20 +1,18 @@
 package de.ovgu.softwareprojektapp;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.ProgressBar;
 
 import java.io.IOException;
 import java.security.InvalidParameterException;
@@ -26,10 +24,24 @@ import de.ovgu.softwareprojekt.discovery.OnDiscoveryListener;
 import de.ovgu.softwareprojekt.misc.ExceptionListener;
 import de.ovgu.softwareprojektapp.networking.DiscoveryClient;
 
-public class DiscoveryActivity extends AppCompatActivity implements OnDiscoveryListener, ExceptionListener {
+import static de.ovgu.softwareprojektapp.OptionsActivity.DISCOVERY_PREFS_DEVICE_NAME;
+import static de.ovgu.softwareprojektapp.OptionsActivity.DISCOVERY_PREFS_NAME;
+import static de.ovgu.softwareprojektapp.OptionsActivity.DISCOVERY_PREFS_PORT;
 
+public class DiscoveryActivity extends AppCompatActivity implements OnDiscoveryListener, ExceptionListener {
+    /**
+     * The button we use for discovery
+     */
     Button mStartDiscoveryButton;
+
+    /**
+     * The ListView we use to display available servers
+     */
     ListView mPossibleConnections;
+
+    /**
+     * List of current servers
+     */
     List<NetworkDevice> mServerList;
 
     /**
@@ -46,8 +58,11 @@ public class DiscoveryActivity extends AppCompatActivity implements OnDiscoveryL
         mStartDiscoveryButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // let this function handle
-                startDiscovery();
+                // either start or stop the discovery
+                if(mDiscovery != null && mDiscovery.isRunning())
+                    stopDiscovery();
+                else
+                    startDiscovery();
             }
         });
 
@@ -55,7 +70,6 @@ public class DiscoveryActivity extends AppCompatActivity implements OnDiscoveryL
         mPossibleConnections.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-
                 // store the information of the selected server in the intent extras
                 Intent intent = new Intent(DiscoveryActivity.this, SendActivity.class);
                 intent.putExtra(SendActivity.EXTRA_SERVER_NAME, mServerList.get(i).name);
@@ -85,9 +99,33 @@ public class DiscoveryActivity extends AppCompatActivity implements OnDiscoveryL
 
         // only enable the discovery user interface if the discovery system is not running
         setDiscoveryUserInterfaceEnabled(!(mDiscovery != null && mDiscovery.isRunning()));
+    }
 
-        // try to load old discovery configuration
-        loadDiscoveryConfig();
+    @Override
+    protected void onPause() {
+        super.onPause();
+        stopDiscovery();
+    }
+
+    /**
+     * This function is called by a button in the action bar. It sends a command to the server which
+     * then closes the connection. It also stops the activity.
+     */
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.menu_settings)
+            startActivity(new Intent(this, OptionsActivity.class));
+        // invoke the superclass if we didn't want to handle the click
+        return super.onOptionsItemSelected(item);
+    }
+
+    /**
+     * Add all requested buttons to the action bar
+     */
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_activity_discovery, menu);
+        return true;
     }
 
     @Override
@@ -138,107 +176,36 @@ public class DiscoveryActivity extends AppCompatActivity implements OnDiscoveryL
     }
 
     /**
+     * Stop discovering
+     */
+    private void stopDiscovery(){
+        if(mDiscovery != null)
+            mDiscovery.close();
+        setDiscoveryUserInterfaceEnabled(true);
+    }
+
+    private int getDiscoveryPort() {
+        SharedPreferences sharedPref = getSharedPreferences(DISCOVERY_PREFS_NAME, Context.MODE_PRIVATE);
+        return sharedPref.getInt(DISCOVERY_PREFS_PORT, 8888);
+    }
+
+    private String getDeviceName() {
+        SharedPreferences sharedPref = getSharedPreferences(DISCOVERY_PREFS_NAME, Context.MODE_PRIVATE);
+        return sharedPref.getString(DISCOVERY_PREFS_DEVICE_NAME, Build.MODEL);
+    }
+
+    /**
      * Switch all the widgets dis- or enabled regarding to the current state of discovery
      *
      * @param enable true if the discovery start ui should be enabled
      */
     private void setDiscoveryUserInterfaceEnabled(boolean enable) {
-        // find the EditTexts for port and device name and set their state
-        findViewById(R.id.port_edit_text).setEnabled(enable);
-        findViewById(R.id.device_name_edit_text).setEnabled(enable);
-
         // if the discovery start ui is enabled, we are not currently scanning, so hide the progress
         // bar
         findViewById(R.id.discovery_progress_spinner).setVisibility(enable ? View.GONE : View.VISIBLE);
 
-        // enable the discovery button if the ui should be enabled
-        mStartDiscoveryButton.setEnabled(enable);
-    }
-
-    /**
-     * Store the current discovery configuration persistently
-     *
-     * @param deviceName the device name to be stored
-     * @param port the port to be stored
-     */
-    private void storeDiscoveryConfig(String deviceName, int port) {
-        SharedPreferences sharedPref = getSharedPreferences("discovery_config", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putInt("port", port);
-        editor.putString("deviceName", deviceName);
-        editor.commit();
-    }
-
-    /**
-     * Load the old discovery configuration, and apply to the edittexts
-     */
-    private void loadDiscoveryConfig() {
-        SharedPreferences sharedPref = getSharedPreferences("discovery_config", Context.MODE_PRIVATE);
-        int port = sharedPref.getInt("port", 8888);
-        String deviceName = sharedPref.getString("deviceName", Build.MODEL);
-
-        // find the EditTexts for port and device name and set their text
-        ((EditText) findViewById(R.id.port_edit_text)).setText(String.valueOf(port));
-        ((EditText) findViewById(R.id.device_name_edit_text)).setText(deviceName);
-    }
-
-    /**
-     * Parse the discovery port from the edittext for the discovery port
-     *
-     * @return 8888 if no port was entered, or the result port
-     * @throws NumberFormatException     if a non-number was entered
-     * @throws InvalidParameterException if a port below 1024 (reserved for root) was entered
-     */
-    private int getDiscoveryPort() throws NumberFormatException, InvalidParameterException {
-        EditText portEditText = (EditText) findViewById(R.id.port_edit_text);
-        String portFieldContent = portEditText.getText().toString();
-
-        if (portFieldContent.length() == 0)
-            return 8888;
-
-        try {
-            // try and convert the field content to a number
-            int port = Integer.valueOf(portFieldContent);
-
-            // avoid root-only ports
-            if (port < 1024)
-                throw new InvalidParameterException("Ports below 1024 are reserved");
-
-            // avoid non-existent ports
-            if (port > 65535)
-                throw new InvalidParameterException("Ports above 65535 do not exist");
-
-            // remove error if we set one, since we have successfully survived the trials
-            portEditText.setError(null);
-
-            return port;
-        } catch (NumberFormatException e) {
-            // display an error about invalid numbers
-            portEditText.setError("Numbers only");
-            throw e;
-        } catch (InvalidParameterException e) {
-            // ports below 1024 are root ports...
-            portEditText.setError(e.getMessage());
-            throw e;
-        }
-    }
-
-    /**
-     * Retrieve the device name from source edittext
-     */
-    private String getDeviceName() {
-        EditText deviceNameEditText = (EditText) findViewById(R.id.device_name_edit_text);
-        return deviceNameEditText.getText().toString();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-
-        // store the discovery config
-        EditText portEditText = (EditText) findViewById(R.id.port_edit_text);
-        EditText deviceNameEditText = (EditText) findViewById(R.id.device_name_edit_text);
-        storeDiscoveryConfig(deviceNameEditText.getText().toString(), Integer.valueOf(portEditText.getText().toString()));
+        // set start/stop discovery text
+        mStartDiscoveryButton.setText(getString(enable ? R.string.start_discovery : R.string.stop_discovery));
     }
 
     @Override

@@ -20,14 +20,11 @@ import java.net.ConnectException;
 import java.net.InetAddress;
 import java.util.List;
 import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import de.ovgu.softwareprojekt.SensorType;
 import de.ovgu.softwareprojekt.control.OnCommandListener;
 import de.ovgu.softwareprojekt.control.commands.ButtonClick;
 import de.ovgu.softwareprojekt.control.commands.AbstractCommand;
-import de.ovgu.softwareprojekt.control.commands.ConnectionAliveCheck;
 import de.ovgu.softwareprojekt.control.commands.ConnectionRequestResponse;
 import de.ovgu.softwareprojekt.control.commands.ChangeSensorSensitivity;
 import de.ovgu.softwareprojekt.control.commands.ResetToCenter;
@@ -227,7 +224,7 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
     protected void onResume() {
         super.onResume();
         mSensorHandler.enableTemporarilyDisabledSensors();
-        SharedPreferences sensitivitySettings = getSharedPreferences(OptionsActivity.PREFS_NAME, 0);
+        SharedPreferences sensitivitySettings = getSharedPreferences(OptionsActivity.SENSITIVITY_PREFS_NAME, 0);
         for (SensorType s : SensorType.values()) {
             mNetworkClient.sendCommand(new ChangeSensorSensitivity(s, sensitivitySettings.getInt(s.toString(), 50)));
         }
@@ -350,7 +347,6 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
 
     private void goToOptions() {
         Bundle in = getIntent().getExtras();
-
         Intent intent = new Intent(SendActivity.this, OptionsActivity.class);
         intent.putExtra(EXTRA_SERVER_PORT_COMMAND, in.getInt(EXTRA_SERVER_PORT_COMMAND));
         intent.putExtra(EXTRA_SERVER_ADDRESS, in.getString(EXTRA_SERVER_ADDRESS));
