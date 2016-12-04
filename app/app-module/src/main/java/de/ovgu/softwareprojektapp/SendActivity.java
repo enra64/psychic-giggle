@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutCompat;
 import android.view.Menu;
@@ -29,6 +30,7 @@ import de.ovgu.softwareprojekt.control.commands.AbstractCommand;
 import de.ovgu.softwareprojekt.control.commands.ConnectionAliveCheck;
 import de.ovgu.softwareprojekt.control.commands.ConnectionRequestResponse;
 import de.ovgu.softwareprojekt.control.commands.ChangeSensorSensitivity;
+import de.ovgu.softwareprojekt.control.commands.ResetToCenter;
 import de.ovgu.softwareprojekt.control.commands.SetSensorCommand;
 import de.ovgu.softwareprojekt.control.commands.UpdateButtons;
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
@@ -96,13 +98,7 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
         disableSensorsCheck.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
-                if(isChecked)
-                {
-                    mSensorHandler.temporarilyDisableSensors();
-                }
-                else{
-                    mSensorHandler.enableTemporarilyDisabledSensors();
-                }
+                mSensorHandler.temporarilySetSensors(!isChecked);
             }
         });
 
@@ -117,9 +113,8 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
     }
 
 
-
     @Override
-    public void onConnectionTimeout(){
+    public void onConnectionTimeout() {
         // close the activity with an appropriate result code
         closeActivity(RESULT_SERVER_CONNECTION_TIMED_OUT);
     }
@@ -346,11 +341,11 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
 
     /**
      * Tell PC to reposition the mouse cursor to the center of its main screen
-     * @param view
+     *
+     * @param view ignored
      */
-    public void repositionMouseCursor(View view) {
-        //TODO: buttonID should be set without seeming so random but view.getTag() doesn't work :(
-        mNetworkClient.sendCommand(new ButtonClick(2, false));
+    public void repositionMouseCursor(@Nullable View view) {
+        mNetworkClient.sendCommand(new ResetToCenter());
     }
 
     private void goToOptions() {

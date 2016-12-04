@@ -1,4 +1,4 @@
-package de.ovgu.softwareprojekt.servers.filters;
+package de.ovgu.softwareprojekt.filters;
 
 import de.ovgu.softwareprojekt.DataSink;
 import de.ovgu.softwareprojekt.SensorData;

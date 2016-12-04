@@ -9,7 +9,7 @@ import de.ovgu.softwareprojekt.control.OnCommandListener;
 import de.ovgu.softwareprojekt.control.commands.*;
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
 import de.ovgu.softwareprojekt.misc.ExceptionListener;
-import de.ovgu.softwareprojekt.servers.filters.NormalizationFilter;
+import de.ovgu.softwareprojekt.filters.NormalizationFilter;
 
 import java.io.IOException;
 import java.net.ConnectException;

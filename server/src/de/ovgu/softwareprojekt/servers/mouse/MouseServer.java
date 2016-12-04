@@ -6,8 +6,8 @@ import de.ovgu.softwareprojekt.SensorType;
 import de.ovgu.softwareprojekt.control.commands.ButtonClick;
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
 import de.ovgu.softwareprojekt.networking.Server;
-import de.ovgu.softwareprojekt.servers.filters.AverageMovementFilter;
-import de.ovgu.softwareprojekt.servers.filters.MinimumAmplitudeFilter;
+import de.ovgu.softwareprojekt.filters.AverageMovementFilter;
+import de.ovgu.softwareprojekt.filters.MinimumAmplitudeFilter;
 
 import java.awt.*;
 import java.io.IOException;
@@ -30,7 +30,7 @@ public class MouseServer extends Server {
     /**
      * Constant identifying the resetPosToCenter option in app
      */
-    static final int RESET_MOUSE_POSITION  = 2;
+    static final int RESET_MOUSE_POSITION = 2;
 
     /**
      * Mouse mover; endpoint for our data, button clicks etc.
@@ -68,10 +68,12 @@ public class MouseServer extends Server {
 
     /**
      * Called whenever a button is clicked
-     * @param click event object specifying details like button id
+     *
+     * @param click  event object specifying details like button id
+     * @param origin the client that sent the button click
      */
     @Override
-    public void onButtonClick(ButtonClick click) {
+    public void onButtonClick(ButtonClick click, NetworkDevice origin) {
         mMouseMover.click(click.mID, true);
         if (!click.isHold)
             mMouseMover.click(click.mID, false);
@@ -79,6 +81,7 @@ public class MouseServer extends Server {
 
     /**
      * Check whether a new client should be accepted
+     *
      * @param newClient the new clients identification
      * @return true if the client should be accepted, false otherwise
      */
@@ -90,6 +93,7 @@ public class MouseServer extends Server {
 
     /**
      * Called when a client sent a disconnect signal
+     *
      * @param disconnectedClient the lost client
      */
     @Override
@@ -100,5 +104,10 @@ public class MouseServer extends Server {
     @Override
     public void onClientTimeout(NetworkDevice timeoutClient) {
         System.out.println(timeoutClient.name + " had a timeout");
+    }
+
+    @Override
+    public void onResetPosition(NetworkDevice origin) {
+        mMouseMover.resetPosToCenter();
     }
 }

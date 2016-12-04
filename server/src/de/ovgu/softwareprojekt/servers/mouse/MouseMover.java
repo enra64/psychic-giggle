@@ -97,10 +97,6 @@ public class MouseMover implements DataSink {
             } else
                 mMoveBot.mouseRelease(InputEvent.BUTTON3_DOWN_MASK);
         }
-        else if(buttonID == MouseServer.RESET_MOUSE_POSITION){
-            resetPosToCenter();
-        }
-
     }
 
     @Override

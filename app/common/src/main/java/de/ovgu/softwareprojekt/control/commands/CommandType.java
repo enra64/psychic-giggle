@@ -11,5 +11,5 @@ public enum CommandType {
     AddButton,
     ButtonClick,
     SensorChange,
-    ConnectionAliveCheck
+    ResetToCenter, ConnectionAliveCheck
 }

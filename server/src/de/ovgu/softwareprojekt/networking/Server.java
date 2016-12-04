@@ -5,6 +5,7 @@ import com.sun.security.ntlm.Client;
 import de.ovgu.softwareprojekt.DataSink;
 import de.ovgu.softwareprojekt.SensorData;
 import de.ovgu.softwareprojekt.SensorType;
+import de.ovgu.softwareprojekt.callback_interfaces.ResetListener;
 import de.ovgu.softwareprojekt.control.OnCommandListener;
 import de.ovgu.softwareprojekt.control.commands.AbstractCommand;
 import de.ovgu.softwareprojekt.control.commands.ButtonClick;
@@ -26,7 +27,7 @@ import java.util.*;
  * 3) A DataConnection to rapidly transmit sensor data
  */
 @SuppressWarnings("unused")
-public abstract class Server implements OnCommandListener, DataSink, ClientListener, ExceptionListener, ButtonListener {
+public abstract class Server implements OnCommandListener, DataSink, ClientListener, ExceptionListener, ButtonListener, ResetListener {
     /**
      * Server handling responding to discovery broadcasts
      */
@@ -56,7 +57,12 @@ public abstract class Server implements OnCommandListener, DataSink, ClientListe
     /**
      * port where discovery packets are expected
      */
-    private int mDiscoveryPort;
+    private final int mDiscoveryPort;
+
+    /**
+     * Button id of the reset button
+     */
+    private static final int RESET_POSITION_BUTTON_ID = -1;
 
     /**
      * Stores all known data sinks
@@ -71,6 +77,7 @@ public abstract class Server implements OnCommandListener, DataSink, ClientListe
      *
      * @param serverName if not null, this name will be used. otherwise, the devices hostname is used
      */
+    @SuppressWarnings("WeakerAccess")
     public Server(@Nullable String serverName, int discoveryPort) {
         // if the server name was not set, use the host name
         mServerName = serverName != null ? serverName : getHostName();
@@ -131,6 +138,7 @@ public abstract class Server implements OnCommandListener, DataSink, ClientListe
      * @param dataSink        where new data from the sensor should go
      * @param requestedSensor which sensors events are relevant
      */
+    @SuppressWarnings("WeakerAccess")
     public void registerDataSink(DataSink dataSink, SensorType requestedSensor) throws IOException {
         // add new data sink list if the requested sensor type has no sinks yet
         if (!mDataSinks.containsKey(requestedSensor))
@@ -194,7 +202,7 @@ public abstract class Server implements OnCommandListener, DataSink, ClientListe
                 try {
                     mCurrentUnboundClientConnection.handleConnectionRequest(request.self, acceptClient);
                 } catch (UnknownHostException e) {
-                    e.printStackTrace();
+                    onException(this, e, "Could not parse address of incoming connection request. This is bad.");
                 }
 
 
@@ -215,14 +223,12 @@ public abstract class Server implements OnCommandListener, DataSink, ClientListe
                                 this,
                                 this);
                     } catch (IOException e) {
-                        e.printStackTrace();
+                        onException(this, e, "Could not start listening for new client. Bad.");
                     }
 
                     // begin advertising the next client connection
                     advertiseServer(mCurrentUnboundClientConnection);
                 }
-
-
                 break;
             case EndConnection:
                 // notify listener of disconnect
@@ -234,13 +240,18 @@ public abstract class Server implements OnCommandListener, DataSink, ClientListe
                 try {
                     getClientHandler(endConnection.self).close();
                 } catch (NullPointerException e) {
-                    e.printStackTrace();
+                    // yeah this shouldn't happen
+                    onException(this, e, "Could not find client that ended connection!");
                 }
                 break;
 
             case ButtonClick:
-                onButtonClick((ButtonClick) command);
-                // ignore unhandled commands
+                onButtonClick((ButtonClick) command, getClientHandler(origin).getClient());
+                break;
+            case ResetToCenter:
+                onResetPosition(getClientHandler(origin).getClient());
+                break;
+            // ignore unhandled commands
             default:
                 break;
         }
@@ -306,15 +317,31 @@ public abstract class Server implements OnCommandListener, DataSink, ClientListe
         return null;
     }
 
+    /**
+     * This function find the connection handler that is managing a certain client, which is identified only by
+     * his address
+     *
+     * @param address the address of the client that should be found
+     * @return null if no matching handler was found, or the handler.
+     */
+    private ClientConnectionHandler getClientHandler(InetAddress address) {
+        for (ClientConnectionHandler clientConnection : mClientConnections)
+            // true if the clients match
+            if (clientConnection.getClient().address.equals(address.getHostAddress()))
+                return clientConnection;
+        return null;
+    }
 
     /**
      * Add a button to be displayed on the clients
      *
      * @param name text to be displayed on the button
-     * @param id   id of the button
+     * @param id   id of the button. ids below zero are reserved.
      */
+    protected final void addButton(String name, int id) throws IOException {
+        // reserve id's below zero
+        assert (id >= 0);
 
-    public void addButton(String name, int id) throws IOException {
         // add the new button to local storage
         mButtonList.put(id, name);
 

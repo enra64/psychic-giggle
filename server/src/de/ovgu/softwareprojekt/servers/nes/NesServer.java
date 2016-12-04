@@ -60,16 +60,6 @@ public class NesServer extends Server {
         System.exit(0);
     }
 
-    /**
-     * Called whenever a button is clicked
-     *
-     * @param click event object specifying details like button id
-     */
-    @Override
-    public void onButtonClick(ButtonClick click) {
-
-    }
-
     @Override
     public void onData(SensorData sensorData) {
         switch (sensorData.sensorType) {
@@ -105,5 +95,13 @@ public class NesServer extends Server {
     @Override
     public void onClientTimeout(NetworkDevice timeoutClient) {
         System.out.println("Player " + timeoutClient.name + " had a timeout!");
+    }
+
+    @Override
+    public void onResetPosition(NetworkDevice origin) {
+    }
+
+    @Override
+    public void onButtonClick(ButtonClick click, NetworkDevice origin) {
     }
 }

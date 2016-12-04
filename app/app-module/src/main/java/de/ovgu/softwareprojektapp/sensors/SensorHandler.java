@@ -108,7 +108,7 @@ public class SensorHandler {
                 // already instantiated, just set it running
                 if (mSensors.containsKey(sensorType))
                     mSensors.get(sensorType).setRunning(true);
-                // not yet instantiated, instantiate and start
+                    // not yet instantiated, instantiate and start
                 else
                     instantiateSensor(sensorType);
             }
@@ -119,6 +119,19 @@ public class SensorHandler {
             return false;
         }
         return true;
+    }
+
+    /**
+     * Wrapper function for {@link #enableTemporarilyDisabledSensors()} and
+     * {@link #temporarilyDisableSensors()}.
+     *
+     * @param enable true if the sensors should be enabled
+     */
+    public void temporarilySetSensors(boolean enable) {
+        if (enable)
+            enableTemporarilyDisabledSensors();
+        else
+            temporarilyDisableSensors();
     }
 
     /**

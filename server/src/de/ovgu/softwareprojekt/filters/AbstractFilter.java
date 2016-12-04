@@ -1,8 +1,7 @@
-package de.ovgu.softwareprojekt.servers.filters;
+package de.ovgu.softwareprojekt.filters;
 
 import de.ovgu.softwareprojekt.DataSink;
 import de.ovgu.softwareprojekt.DataSource;
-import de.ovgu.softwareprojekt.SensorData;
 
 import java.io.IOException;
 
