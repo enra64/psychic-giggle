@@ -5,6 +5,7 @@ import de.ovgu.softwareprojekt.DataSink;
 import de.ovgu.softwareprojekt.SensorData;
 import de.ovgu.softwareprojekt.SensorType;
 import de.ovgu.softwareprojekt.control.CommandConnection;
+import de.ovgu.softwareprojekt.control.ConnectionWatch;
 import de.ovgu.softwareprojekt.control.OnCommandListener;
 import de.ovgu.softwareprojekt.control.commands.*;
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
@@ -301,7 +302,7 @@ public class ClientConnectionHandler implements OnCommandListener, DataSink, Con
                 ConnectionAliveCheck check = (ConnectionAliveCheck) command;
                 check.answerer.address = inetAddress.getHostAddress();
                 if (check.answerer.equals(mClient))
-                    mConnectionWatch.clientResponded();
+                    mConnectionWatch.onCheckEvent();
                 break;
             case EndConnection:
                 close();

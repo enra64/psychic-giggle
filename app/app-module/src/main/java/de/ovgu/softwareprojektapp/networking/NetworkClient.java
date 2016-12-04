@@ -12,6 +12,7 @@ import de.ovgu.softwareprojekt.DataSink;
 import de.ovgu.softwareprojekt.DataSource;
 import de.ovgu.softwareprojekt.SensorData;
 import de.ovgu.softwareprojekt.control.CommandConnection;
+import de.ovgu.softwareprojekt.control.ConnectionWatch;
 import de.ovgu.softwareprojekt.control.OnCommandListener;
 import de.ovgu.softwareprojekt.control.commands.AbstractCommand;
 import de.ovgu.softwareprojekt.control.commands.ConnectionAliveCheck;
@@ -28,7 +29,7 @@ import de.ovgu.softwareprojekt.misc.ExceptionListener;
  * so you can simply give it to {@link DataSource DataSources}. You will be notified of incoming commands
  * via the listener you had to supply in the constructor.
  */
-public class NetworkClient implements DataSink, ExceptionListener, OnCommandListener {
+public class NetworkClient implements DataSink, ExceptionListener, OnCommandListener, ConnectionWatch.TimeoutListener {
     /**
      * Stores necessary information about our server, like data port, command port, and its address
      */
@@ -66,20 +67,9 @@ public class NetworkClient implements DataSink, ExceptionListener, OnCommandList
     private ExceptionListener mExceptionListener = null;
 
     /**
-     * Save a timestamp of when we received the last command from the server
+     * Handles our connection checking
      */
-    private volatile long mLastCommandTimestamp;
-
-    /**
-     * This timer is used to frequently check whether the connection is still alive
-     */
-    private Timer mConnectionAgeTimer = new Timer();
-
-    /**
-     * This constant defines the threshold after which a connectino is deemed dead, and the
-     * SendActivity is stopped
-     */
-    private static final long MAXIMUM_CONNECTION_AGE = 1000;
+    private ConnectionWatch mConnectionWatch;
 
     /**
      * Create a new network client. To connect to a server, call {@link #requestConnection()}, and wait
@@ -108,6 +98,9 @@ public class NetworkClient implements DataSink, ExceptionListener, OnCommandList
                 mCommandConnection.getLocalPort(),
                 mOutboundDataConnection.getLocalPort()
         );
+
+        // create a new passive connection watch
+        mConnectionWatch = new ConnectionWatch(mSelf, this, mExceptionListener);
     }
 
     /**
@@ -148,17 +141,7 @@ public class NetworkClient implements DataSink, ExceptionListener, OnCommandList
      */
     private void startConnectionCheckTimer() {
         // set the last connection to NOW (+ execution delay of timer) to avoid immediate disconnect
-        mLastCommandTimestamp = System.currentTimeMillis() + 1000;
-
-        mConnectionAgeTimer.scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run() {
-                long connectionAge = System.currentTimeMillis() - mLastCommandTimestamp;
-                System.out.println(connectionAge);
-                if (connectionAge > MAXIMUM_CONNECTION_AGE)
-                    mTimeoutListener.onConnectionTimeout();
-            }
-        }, 1000, 500);
+        mConnectionWatch.start();
     }
 
     /**
@@ -203,7 +186,7 @@ public class NetworkClient implements DataSink, ExceptionListener, OnCommandList
     public void close() {
         mOutboundDataConnection.close();
         mCommandConnection.close();
-        mConnectionAgeTimer.cancel();
+        mConnectionWatch.close();
     }
 
     @Override
@@ -236,10 +219,11 @@ public class NetworkClient implements DataSink, ExceptionListener, OnCommandList
         switch (command.getCommandType()){
             // completely handle connection checks
             case ConnectionAliveCheck:
-                mLastCommandTimestamp = System.currentTimeMillis();
                 ConnectionAliveCheck response = (ConnectionAliveCheck) command;
                 response.answerer = getSelf();
                 sendCommand(response);
+                // notify the connection watch of the event
+                mConnectionWatch.onCheckEvent();
                 break;
             case ConnectionRequestResponse:
                 ConnectionRequestResponse res = (ConnectionRequestResponse) command;
@@ -253,6 +237,11 @@ public class NetworkClient implements DataSink, ExceptionListener, OnCommandList
             default:
                 mCommandListener.onCommand(origin, command);
         }
+    }
+
+    @Override
+    public void onTimeout(long responseDelay) {
+
     }
 
     /**
