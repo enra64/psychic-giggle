@@ -55,7 +55,7 @@ public class OptionsActivity extends AppCompatActivity implements SeekBar.OnSeek
 
 
         try {//TODO:Exception wörk wörk
-            mComCon = new CommandConnection(null);
+            mComCon = new CommandConnection(null); //new CommandConnection from Server address and command port
             mComCon.setRemote(InetAddress.getByName(givenExtras.getString(EXTRA_SERVER_ADDRESS)),givenExtras.getInt(EXTRA_SERVER_PORT_COMMAND));
         } catch (UnknownHostException e) {
             e.printStackTrace();
@@ -67,6 +67,7 @@ public class OptionsActivity extends AppCompatActivity implements SeekBar.OnSeek
 
         createSensorOptions();
 
+        //get recently set sharedpreference values of sensorsensitivities
         SharedPreferences settings = getSharedPreferences(PREFS_NAME,0);
         for(SeekBar s : mSeekBars){
             s.setProgress(settings.getInt(s.getTag().toString(), 50));
@@ -74,6 +75,9 @@ public class OptionsActivity extends AppCompatActivity implements SeekBar.OnSeek
 
 
     }
+    /*
+    * create Options dynamically based on the number of sensortypes
+    * */
     public void createSensorOptions(){
         for (int i = 0; i < mNumberOfSensors; i++){
 
@@ -97,6 +101,9 @@ public class OptionsActivity extends AppCompatActivity implements SeekBar.OnSeek
 
         }
     }
+    /*
+    set sharedpreferences when activity is exited
+     */
     protected void onPause(){
         super.onPause();
 
@@ -120,6 +127,7 @@ public class OptionsActivity extends AppCompatActivity implements SeekBar.OnSeek
     }
 
     @Override
+    //send new sensitivity as command
     public void onStopTrackingTouch(SeekBar seekBar) {
             new SendCommand().execute(new ChangeSensorSensitivity((SensorType)seekBar.getTag() ,seekBar.getProgress()));
     }
