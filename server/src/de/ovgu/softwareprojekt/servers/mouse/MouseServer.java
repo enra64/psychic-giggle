@@ -28,11 +28,6 @@ public class MouseServer extends Server {
     static final int RIGHT_MOUSE_BUTTON = 1;
 
     /**
-     * Constant identifying the resetPosToCenter option in app
-     */
-    static final int RESET_MOUSE_POSITION = 2;
-
-    /**
      * Mouse mover; endpoint for our data, button clicks etc.
      */
     private MouseMover mMouseMover;

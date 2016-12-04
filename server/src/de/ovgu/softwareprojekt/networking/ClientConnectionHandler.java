@@ -25,7 +25,7 @@ import java.util.*;
  * them. When a {@link EndConnection} command is received, all ports are closed, and the command is forwarded; no other
  * command can be sent to the client after that.
  */
-public class ClientConnectionHandler implements OnCommandListener, DataSink {
+public class ClientConnectionHandler implements OnCommandListener, DataSink, ConnectionWatch.TimeoutListener {
     /**
      * Who to notify about unhandleable exceptions
      */
@@ -72,26 +72,14 @@ public class ClientConnectionHandler implements OnCommandListener, DataSink {
     private volatile boolean mIsConnected = false;
 
     /**
-     * Name of the server this client connection handler belongs to
+     * NetworkDevice identifying this client handler (eg name, data, command port)
      */
-    private final String mServerName;
+    private final NetworkDevice mSelf;
 
     /**
-     * This timer is used for scheduling the "still-alive" requests to our client
+     * Used to keep track of the connection health
      */
-    private Timer mConnectionCheckTimer = new Timer();
-
-    /**
-     * If the time between connection check requests exceeds this time, the connection is deemed dead.
-     */
-    private static final long MAXIMUM_CLIENT_RESPONSE_DELAY = 1000;
-
-    /**
-     * This is the basis of our client timeout timer; it is set first in {@link #onClientAccepted(NetworkDevice)}, and
-     * updated whenever a "still-alive" response is received from a client. If the last response is too old, the client
-     * probably went offline silently!
-     */
-    private long mLastClientResponse;
+    private final ConnectionWatch mConnectionWatch;
 
     /**
      * Create a new client connection handler, which will immediately begin listening on random ports. They may be retrieved
@@ -107,7 +95,6 @@ public class ClientConnectionHandler implements OnCommandListener, DataSink {
         mExceptionListener = exceptionListener;
         mCommandListener = commandListener;
         mClientListener = clientListener;
-        mServerName = serverName;
 
         // this is our sink for everything to be able to do customized scaling for any sensor type
         mDataScalingHandler = new DataScalingHandler(dataSink);
@@ -115,6 +102,9 @@ public class ClientConnectionHandler implements OnCommandListener, DataSink {
 
         initialiseCommandConnection();
         initialiseDataConnection();
+
+        mSelf = new NetworkDevice(serverName, mCommandConnection.getLocalPort(), mDataConnection.getLocalPort());
+        mConnectionWatch = new ConnectionWatch(mSelf, this, mCommandConnection, exceptionListener);
     }
 
     /**
@@ -125,12 +115,12 @@ public class ClientConnectionHandler implements OnCommandListener, DataSink {
      *                     occurred, the client is likely listening no longer.
      */
     private void sendCommand(AbstractCommand command) throws IOException {
-        if (mIsConnected){
-            try{
+        if (mIsConnected) {
+            try {
                 mCommandConnection.sendCommand(command);
-            } catch (ConnectException e){
+            } catch (ConnectException e) {
                 // if the client does not listen anymore, it most probably is down
-                if(e.getMessage().contains("Connection refused")){
+                if (e.getMessage().contains("Connection refused")) {
                     // notify client listener
                     mClientListener.onClientDisconnected(mClient);
 
@@ -183,7 +173,7 @@ public class ClientConnectionHandler implements OnCommandListener, DataSink {
         mCommandConnection.close();
         mDataConnection.close();
         mIsConnected = false;
-        mConnectionCheckTimer.cancel();
+        mConnectionWatch.close();
     }
 
     /**
@@ -214,31 +204,8 @@ public class ClientConnectionHandler implements OnCommandListener, DataSink {
             // store client identification
             mClient = client;
 
-            // update the last client response time to avoid immediate timeout (+1000 for connection check timer delay)
-            mLastClientResponse = System.currentTimeMillis() + 900;
-
-            // in one second, begin requesting a "still-alive" beep from the clients once per second
-            mConnectionCheckTimer.scheduleAtFixedRate(new TimerTask() {
-                @Override
-                public void run() {
-                    try {
-                        // check for timeout
-                        long connectionAge = System.currentTimeMillis() - mLastClientResponse;
-                        if (connectionAge > MAXIMUM_CLIENT_RESPONSE_DELAY) {
-                            mClientListener.onClientTimeout(mClient);
-
-                            // notify the client that we do no longer communicate with it in case it is still listening
-                            closeAndSignalClient();
-                        }
-
-                        // send a new alive check
-                        else if (mIsConnected)
-                            sendCommand(new ConnectionAliveCheck(new NetworkDevice(mServerName, mCommandConnection.getLocalPort(), mDataConnection.getLocalPort())));
-                    } catch (IOException e) {
-                        mExceptionListener.onException(ClientConnectionHandler.this, e, "CONNECTION_CHECK_FAILED: Could not check connection; probably offline.");
-                    }
-                }
-            }, 900, 500);
+            // start the connection watch
+            mConnectionWatch.start();
         } catch (IOException e) {
             mExceptionListener.onException(this, e, "could not accept client");
         }
@@ -334,7 +301,7 @@ public class ClientConnectionHandler implements OnCommandListener, DataSink {
                 ConnectionAliveCheck check = (ConnectionAliveCheck) command;
                 check.answerer.address = inetAddress.getHostAddress();
                 if (check.answerer.equals(mClient))
-                    mLastClientResponse = System.currentTimeMillis();
+                    mConnectionWatch.clientResponded();
                 break;
             case EndConnection:
                 close();
@@ -345,6 +312,19 @@ public class ClientConnectionHandler implements OnCommandListener, DataSink {
         }
     }
 
+    /**
+     * This function may be called by the {@link ConnectionWatch} if it detects a timeout
+     *
+     * @param age the response delay, e.g. how long did the client need to respond
+     */
+    @Override
+    public void onTimeout(long age) {
+        // notify our client listener of the timeout
+        mClientListener.onClientTimeout(mClient);
+
+        // notify the client that we do no longer communicate with it in case it is still listening
+        closeAndSignalClient();
+    }
 
     /**
      * This class handles scaling all the data, because we may have to apply a different scaling factor to

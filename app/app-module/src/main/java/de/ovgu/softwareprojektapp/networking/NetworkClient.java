@@ -154,6 +154,7 @@ public class NetworkClient implements DataSink, ExceptionListener, OnCommandList
             @Override
             public void run() {
                 long connectionAge = System.currentTimeMillis() - mLastCommandTimestamp;
+                System.out.println(connectionAge);
                 if (connectionAge > MAXIMUM_CONNECTION_AGE)
                     mTimeoutListener.onConnectionTimeout();
             }
