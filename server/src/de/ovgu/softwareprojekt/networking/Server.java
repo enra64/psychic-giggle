@@ -278,8 +278,13 @@ public abstract class Server implements OnCommandListener, DataSink, ClientListe
     }
 
 
+    /**
+     * This onData must not be overridden to allow the data sink registration system to work
+     *
+     * @param sensorData new sensor data
+     */
     @Override
-    public void onData(SensorData sensorData) {
+    public final void onData(SensorData sensorData) {
         // iterate over all data sinks marked as interested in this sensor type
         for (DataSink sink : mDataSinks.get(sensorData.sensorType))
             sink.onData(sensorData);
