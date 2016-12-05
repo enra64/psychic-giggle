@@ -29,6 +29,7 @@ import de.ovgu.softwareprojekt.control.commands.ConnectionRequestResponse;
 import de.ovgu.softwareprojekt.control.commands.ChangeSensorSensitivity;
 import de.ovgu.softwareprojekt.control.commands.ResetToCenter;
 import de.ovgu.softwareprojekt.control.commands.SetSensorCommand;
+import de.ovgu.softwareprojekt.control.commands.SetSensorSpeed;
 import de.ovgu.softwareprojekt.control.commands.UpdateButtons;
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
 import de.ovgu.softwareprojekt.misc.ExceptionListener;
@@ -278,6 +279,11 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
                 //create button with name and id
                 UpdateButtons addCom = (UpdateButtons) command;
                 createButtons(addCom);
+                break;
+            case SetSensorSpeed:
+                // update the speed for the given sensor
+                SetSensorSpeed setSpeedCommand = (SetSensorSpeed) command;
+                mSensorHandler.setSensorSpeed(setSpeedCommand.affectedSensor, setSpeedCommand.sensorSpeed);
                 break;
             // ignore unhandled commands
             default:

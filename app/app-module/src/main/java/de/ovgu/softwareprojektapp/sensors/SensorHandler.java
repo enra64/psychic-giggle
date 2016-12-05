@@ -14,6 +14,7 @@ import java.util.Map;
 
 import de.ovgu.softwareprojekt.DataSink;
 import de.ovgu.softwareprojekt.SensorType;
+import de.ovgu.softwareprojekt.control.commands.SetSensorSpeed;
 import de.ovgu.softwareprojektapp.BuildConfig;
 
 /**
@@ -27,10 +28,23 @@ public class SensorHandler {
     private EnumMap<SensorType, AbstractSensor> mSensors = new EnumMap<>(SensorType.class);
 
     /**
+     * The list of sensor activations. May be updated during the de-activated phase.
+     */
+    private EnumMap<SensorType, Boolean> mTemporarySensorActivationList = new EnumMap<>(SensorType.class);
+
+    /**
+     * True if the sensors are all (possibly temporarily) unregistered
+     */
+    private boolean mSensorsTempDisabled = false;
+
+    /**
      * Context stored for android interaction purposes
      */
     private Context mContext;
 
+    /**
+     * The data sink given to every sensor.
+     */
     private DataSink mDataSink;
 
     /**
@@ -44,10 +58,6 @@ public class SensorHandler {
         mDataSink = dataSink;
     }
 
-    private EnumMap<SensorType, Boolean> mTemporarySensorActivationList = new EnumMap<>(SensorType.class);
-
-    private boolean mSensorsTempDisabled = false;
-
     @SuppressWarnings("unchecked")
     public boolean setRunning(List<SensorType> requiredSensors) {
         // if the sensors are currently disabled, only update the list of sensors that will be
@@ -59,6 +69,25 @@ public class SensorHandler {
 
         // try to apply the list of required sensors
         return applySensorActivationList(getSensorActivationList(requiredSensors));
+    }
+
+    /**
+     * Update the sensor speed for a given sensor
+     * @param sensorType the sensor type that should change its speed
+     * @param sensorSpeed the speed the sensor should switch to
+     * @return true if the setting succeeded
+     */
+    public boolean setSensorSpeed(SensorType sensorType, SetSensorSpeed.SensorSpeed sensorSpeed) {
+        try {
+            // get the class
+            Class<?> sensorClass = getClass(sensorType);
+
+            // call setSensorSpeed with sensor speed argument
+            sensorClass.getDeclaredMethod("setSensorSpeed", SetSensorSpeed.SensorSpeed.class).invoke(null, sensorSpeed);
+            return true;
+        } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+            return false;
+        }
     }
 
     /**
@@ -181,11 +210,8 @@ public class SensorHandler {
             InstantiationException,
             IOException,
             ClassNotFoundException {
-        String implementationsPackage = getClass().getPackage().getName() + ".implementations.";
-        Class sensorImplementation = Class.forName(implementationsPackage + sensorType.name());
-
-        // find the constructor for this class
-        Constructor<?> constructor = sensorImplementation.getConstructor(Context.class);
+        // find the constructor for this sensor type
+        Constructor<?> constructor = getClass(sensorType).getConstructor(Context.class);
 
         // instantiate it
         AbstractSensor instance = (AbstractSensor) constructor.newInstance(mContext);
@@ -196,6 +222,20 @@ public class SensorHandler {
 
         // put into sensor list to avoid next instantiation
         mSensors.put(sensorType, instance);
+    }
+
+    /**
+     * Get a Class for a sensor type
+     *
+     * @param sensorType the sensor type we need
+     * @return a Class instance corresponding to the given sensor type
+     * @throws ClassNotFoundException if the sensor could not be found. This indicates a sensor type
+     *                                that is not in the correct package, or does not have the same
+     *                                name as in the enum
+     */
+    private Class getClass(SensorType sensorType) throws ClassNotFoundException {
+        String implementationsPackage = getClass().getPackage().getName() + ".implementations.";
+        return Class.forName(implementationsPackage + sensorType.name());
     }
 
     /**

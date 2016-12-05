@@ -115,7 +115,7 @@ public class ClientConnectionHandler implements OnCommandListener, DataSink, Con
      * @throws IOException if an error <b>other than</b> {@link ConnectException} occurred. If a {@link ConnectException}
      *                     occurred, the client is likely listening no longer.
      */
-    private void sendCommand(AbstractCommand command) throws IOException {
+    void sendCommand(AbstractCommand command) throws IOException {
         if (mIsConnected) {
             try {
                 mCommandConnection.sendCommand(command);
@@ -293,7 +293,7 @@ public class ClientConnectionHandler implements OnCommandListener, DataSink, Con
     public void onCommand(InetAddress inetAddress, AbstractCommand command) {
         // we only want to catch a certain subset of commands here
         switch (command.getCommandType()) {
-            case SensorChange:
+            case ChangeSensorSensitivity:
                 // update the sensitivity for the given sensor
                 ChangeSensorSensitivity sensorChangeCommand = (ChangeSensorSensitivity) command;
                 mDataScalingHandler.setSensorSensitivity(sensorChangeCommand.sensorType, sensorChangeCommand.sensitivity);

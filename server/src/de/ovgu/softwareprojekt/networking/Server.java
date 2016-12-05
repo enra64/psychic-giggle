@@ -7,10 +7,7 @@ import de.ovgu.softwareprojekt.SensorData;
 import de.ovgu.softwareprojekt.SensorType;
 import de.ovgu.softwareprojekt.callback_interfaces.ResetListener;
 import de.ovgu.softwareprojekt.control.OnCommandListener;
-import de.ovgu.softwareprojekt.control.commands.AbstractCommand;
-import de.ovgu.softwareprojekt.control.commands.ButtonClick;
-import de.ovgu.softwareprojekt.control.commands.ConnectionRequest;
-import de.ovgu.softwareprojekt.control.commands.EndConnection;
+import de.ovgu.softwareprojekt.control.commands.*;
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
 import de.ovgu.softwareprojekt.misc.ExceptionListener;
 
@@ -254,6 +251,22 @@ public abstract class Server implements OnCommandListener, DataSink, ClientListe
             // ignore unhandled commands
             default:
                 break;
+        }
+    }
+
+    /**
+     * Change the speed of a sensor. The default speed is the GAME speed.
+     *
+     * @param sensor the sensor to change
+     * @param speed the speed to use for sensor
+     */
+    public void setSensorSpeed(SensorType sensor, SetSensorSpeed.SensorSpeed speed) {
+        for (ClientConnectionHandler client : mClientConnections) {
+            try {
+                client.sendCommand(new SetSensorSpeed(sensor, speed));
+            } catch (IOException e) {
+                onException(this, e, "Could not update the sensor speed on client " + client.getClient());
+            }
         }
     }
 
