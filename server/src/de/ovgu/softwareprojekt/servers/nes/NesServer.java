@@ -60,17 +60,6 @@ public class NesServer extends Server {
         System.exit(0);
     }
 
-    @Override
-    public void onData(SensorData sensorData) {
-        switch (sensorData.sensorType) {
-            case RotationVector:
-                System.out.println(Arrays.toString(sensorData.data));
-                break;
-            default:
-                System.out.println("unhandled sensor data incoming");
-        }
-    }
-
     /**
      * Check whether a new client should be accepted
      *
