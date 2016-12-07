@@ -142,6 +142,7 @@ public class SensorHandler {
                 AbstractSensor sensor = getSensor(sensorType);
 
                 // set it running
+                sensor.setDataSink(mDataSink);
                 sensor.setRunning(true);
             }
             // disable the sensor if it was already instantiated
@@ -194,7 +195,7 @@ public class SensorHandler {
     }
 
     /**
-     * Retrieve a sensor. If it is not yet instantiated, return a new instance
+     * Retrieve a sensor. If it is not yet instantiated, return a new instance.
      *
      * @param sensorType the sensor type to be initiated
      * @throws NoSuchMethodException     if the sensor could not be instantiated
@@ -219,15 +220,8 @@ public class SensorHandler {
             // find the constructor for this sensor type
             Constructor<?> constructor = getClass(sensorType).getConstructor(Context.class);
 
-            // instantiate it
-            AbstractSensor instance = (AbstractSensor) constructor.newInstance(mContext);
-
-            // configure
-            instance.setRunning(true);
-            instance.setDataSink(mDataSink);
-
             // put into sensor list to avoid next instantiation
-            mSensors.put(sensorType, instance);
+            mSensors.put(sensorType, (AbstractSensor) constructor.newInstance(mContext));
         }
 
         // retrieve the sensor instance

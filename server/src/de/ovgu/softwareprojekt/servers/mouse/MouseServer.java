@@ -54,7 +54,7 @@ public class MouseServer extends Server {
         addButton("left click", LEFT_MOUSE_BUTTON);
         addButton("right click", RIGHT_MOUSE_BUTTON);
 
-        //setSensorSpeed(SensorType.Gyroscope, SetSensorSpeed.SensorSpeed.SENSOR_DELAY_GAME);
+        setSensorSpeed(SensorType.Gyroscope, SetSensorSpeed.SensorSpeed.SENSOR_DELAY_FASTEST);
     }
 
     @Override
