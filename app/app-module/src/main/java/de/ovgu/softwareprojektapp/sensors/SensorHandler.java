@@ -73,19 +73,23 @@ public class SensorHandler {
 
     /**
      * Update the sensor speed for a given sensor
-     * @param sensorType the sensor type that should change its speed
+     *
+     * @param sensorType  the sensor type that should change its speed
      * @param sensorSpeed the speed the sensor should switch to
      * @return true if the setting succeeded
      */
     public boolean setSensorSpeed(SensorType sensorType, SetSensorSpeed.SensorSpeed sensorSpeed) {
         try {
-            // get the class
-            Class<?> sensorClass = getClass(sensorType);
+            // because java does not allow abstract static methods, we have to instantiate the
+            // sensor if we want to set its static member variable defining the speed -.-
+            AbstractSensor sensor = getSensor(sensorType);
 
-            // call setSensorSpeed with sensor speed argument
-            sensorClass.getDeclaredMethod("setSensorSpeed", SetSensorSpeed.SensorSpeed.class).invoke(null, sensorSpeed);
+            // change speed
+            sensor.setSensorSpeed(sensorSpeed);
             return true;
-        } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+
+            // if anything throws, we failed.
+        } catch (InstantiationException | IOException | ClassNotFoundException | NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
             return false;
         }
     }
@@ -134,12 +138,11 @@ public class SensorHandler {
         try {
             // are we supposed to enable the sensor?
             if (enable) {
-                // already instantiated, just set it running
-                if (mSensors.containsKey(sensorType))
-                    mSensors.get(sensorType).setRunning(true);
-                    // not yet instantiated, instantiate and start
-                else
-                    instantiateSensor(sensorType);
+                // instantiate the sensor
+                AbstractSensor sensor = getSensor(sensorType);
+
+                // set it running
+                sensor.setRunning(true);
             }
             // disable the sensor if it was already instantiated
             else if (mSensors.containsKey(sensorType))
@@ -191,7 +194,7 @@ public class SensorHandler {
     }
 
     /**
-     * Instantiate a sensor
+     * Retrieve a sensor. If it is not yet instantiated, return a new instance
      *
      * @param sensorType the sensor type to be initiated
      * @throws NoSuchMethodException     if the sensor could not be instantiated
@@ -202,7 +205,7 @@ public class SensorHandler {
      * @throws ClassNotFoundException    if no sensor class with a name matching the enum value could be found
      */
     @SuppressWarnings("unchecked")
-    private void instantiateSensor(SensorType sensorType)
+    private AbstractSensor getSensor(SensorType sensorType)
             throws
             NoSuchMethodException,
             IllegalAccessException,
@@ -210,18 +213,25 @@ public class SensorHandler {
             InstantiationException,
             IOException,
             ClassNotFoundException {
-        // find the constructor for this sensor type
-        Constructor<?> constructor = getClass(sensorType).getConstructor(Context.class);
 
-        // instantiate it
-        AbstractSensor instance = (AbstractSensor) constructor.newInstance(mContext);
+        // only do an instantiation if we dont yet have a
+        if(!mSensors.containsKey(sensorType)) {
+            // find the constructor for this sensor type
+            Constructor<?> constructor = getClass(sensorType).getConstructor(Context.class);
 
-        // configure
-        instance.setRunning(true);
-        instance.setDataSink(mDataSink);
+            // instantiate it
+            AbstractSensor instance = (AbstractSensor) constructor.newInstance(mContext);
 
-        // put into sensor list to avoid next instantiation
-        mSensors.put(sensorType, instance);
+            // configure
+            instance.setRunning(true);
+            instance.setDataSink(mDataSink);
+
+            // put into sensor list to avoid next instantiation
+            mSensors.put(sensorType, instance);
+        }
+
+        // retrieve the sensor instance
+        return mSensors.get(sensorType);
     }
 
     /**

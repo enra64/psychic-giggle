@@ -241,7 +241,7 @@ public class NetworkClient implements DataSink, ExceptionListener, OnCommandList
 
     @Override
     public void onTimeout(long responseDelay) {
-
+        mTimeoutListener.onConnectionTimeout();
     }
 
     /**

@@ -4,6 +4,7 @@ import com.sun.istack.internal.Nullable;
 import de.ovgu.softwareprojekt.DataSink;
 import de.ovgu.softwareprojekt.SensorType;
 import de.ovgu.softwareprojekt.control.commands.ButtonClick;
+import de.ovgu.softwareprojekt.control.commands.SetSensorSpeed;
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
 import de.ovgu.softwareprojekt.networking.Server;
 import de.ovgu.softwareprojekt.filters.AverageMovementFilter;
@@ -52,6 +53,8 @@ public class MouseServer extends Server {
         // add left- and right click buttons
         addButton("left click", LEFT_MOUSE_BUTTON);
         addButton("right click", RIGHT_MOUSE_BUTTON);
+
+        //setSensorSpeed(SensorType.Gyroscope, SetSensorSpeed.SensorSpeed.SENSOR_DELAY_GAME);
     }
 
     @Override
