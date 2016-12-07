@@ -6,7 +6,6 @@ import android.support.annotation.NonNull;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
@@ -15,7 +14,6 @@ import java.util.Map;
 import de.ovgu.softwareprojekt.DataSink;
 import de.ovgu.softwareprojekt.SensorType;
 import de.ovgu.softwareprojekt.control.commands.SetSensorSpeed;
-import de.ovgu.softwareprojektapp.BuildConfig;
 
 /**
  * Handle instantiation and storage of sensor classes, as well as temporarily disabling them. Uses
@@ -155,31 +153,31 @@ public class SensorHandler {
     }
 
     /**
-     * Wrapper function for {@link #enableTemporarilyDisabledSensors()} and
-     * {@link #temporarilyDisableSensors()}.
+     * Wrapper function for {@link #wakeUpSensors()} and
+     * {@link #suspendSensors()}.
      *
      * @param enable true if the sensors should be enabled
      */
     public void temporarilySetSensors(boolean enable) {
         if (enable)
-            enableTemporarilyDisabledSensors();
+            wakeUpSensors();
         else
-            temporarilyDisableSensors();
+            suspendSensors();
     }
 
     /**
-     * Re-enable the sensors that were previously temporarily disabled using {@link #temporarilyDisableSensors()}
+     * Re-enable the sensors that were previously temporarily disabled using {@link #suspendSensors()}
      */
-    public void enableTemporarilyDisabledSensors() {
+    public void wakeUpSensors() {
         applySensorActivationList(mTemporarySensorActivationList);
         mSensorsTempDisabled = false;
     }
 
     /**
      * Save the sensor activation state, and temporarily disable all of them, until they are activated
-     * again with {@link #enableTemporarilyDisabledSensors()}
+     * again with {@link #wakeUpSensors()}
      */
-    public void temporarilyDisableSensors() {
+    public void suspendSensors() {
         // assemble a list of required sensors by listing the ones currently enabled
         List<SensorType> requiredSensors = new ArrayList<>();
         for (AbstractSensor sensor : mSensors.values())

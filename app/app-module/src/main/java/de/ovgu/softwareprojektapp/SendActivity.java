@@ -218,13 +218,13 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
     @Override
     protected void onPause() {
         super.onPause();
-        mSensorHandler.temporarilyDisableSensors();
+        mSensorHandler.suspendSensors();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        mSensorHandler.enableTemporarilyDisabledSensors();
+        mSensorHandler.wakeUpSensors();
         SharedPreferences sensitivitySettings = getSharedPreferences(OptionsActivity.SENSITIVITY_PREFS_NAME, 0);
         for (SensorType s : SensorType.values()) {
             mNetworkClient.sendCommand(new ChangeSensorSensitivity(s, sensitivitySettings.getInt(s.toString(), 50)));
