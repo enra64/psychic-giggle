@@ -28,9 +28,7 @@ public class MouseMover implements DataSink {
      * @throws AWTException is thrown if low level input is not allowed on device
      */
     public MouseMover() throws AWTException {
-
         mMoveBot = new Robot();
-
         resetPosToCenter();
     }
 
@@ -65,21 +63,6 @@ public class MouseMover implements DataSink {
     }
 
     /**
-     * moves Mouse according to rawData
-     *
-     * @param data x-,y-,z-Axis of gyroscope
-     */
-    public void move(float[] data) {
-        PointerInfo pi = MouseInfo.getPointerInfo();
-        Point mousePos = pi.getLocation();
-
-        int xAxis = (int) data[ZAXIS];   //Up down movement on screen is achieved my rotating phone by z-axis
-        int yAxis = (int) data[XAXIS];
-
-        mMoveBot.mouseMove(mousePos.x - xAxis, mousePos.y - yAxis);
-    }
-
-    /**
      * This Method receives a boolean and if true presses the left mouseButton and releases the button again if false
      *
      * @param isClicked
@@ -99,13 +82,23 @@ public class MouseMover implements DataSink {
         }
     }
 
+    /**
+     * moves Mouse according to rawData
+     *
+     * @param sensorData the sensor data containing the x-,y-,z-Axis of gyroscope
+     */
     @Override
     public void onData(SensorData sensorData) {
-        move(sensorData.data);
+        PointerInfo pi = MouseInfo.getPointerInfo();
+        Point mousePos = pi.getLocation();
+
+        int xAxis = (int) sensorData.data[ZAXIS];   //Up down movement on screen is achieved my rotating phone by z-axis
+        int yAxis = (int) sensorData.data[XAXIS];
+
+        mMoveBot.mouseMove(mousePos.x - xAxis, mousePos.y - yAxis);
     }
 
     @Override
     public void close() {
-
     }
 }

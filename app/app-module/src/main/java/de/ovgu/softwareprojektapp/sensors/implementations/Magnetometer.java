@@ -37,6 +37,9 @@ public class Magnetometer extends AbstractSensor {
      * @throws IOException if the sensor could not be restarted
      */
     public void setSensorSpeed(SetSensorSpeed.SensorSpeed targetSpeed) throws IOException {
+        // only restart if the sensor was registered
+        boolean restart = isRegistered();
+
         // unregister the listener
         close();
 
@@ -44,7 +47,7 @@ public class Magnetometer extends AbstractSensor {
         mSensorSpeed = targetSpeed;
 
         // re-register the listener
-        start();
+        if(restart) start();
     }
 
     /**

@@ -4,6 +4,7 @@ import com.sun.istack.internal.Nullable;
 import de.ovgu.softwareprojekt.DataSink;
 import de.ovgu.softwareprojekt.SensorType;
 import de.ovgu.softwareprojekt.control.commands.ButtonClick;
+import de.ovgu.softwareprojekt.control.commands.SetSensorSpeed;
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
 import de.ovgu.softwareprojekt.networking.Server;
 import de.ovgu.softwareprojekt.filters.AverageMovementFilter;
@@ -48,6 +49,7 @@ public class MouseServer extends Server {
 
         // register our mouse mover to receive gyroscope data
         registerDataSink(pipeline, SensorType.Gyroscope);
+        setSensorOutputRange(SensorType.Gyroscope, 100);
 
         // add left- and right click buttons
         addButton("left click", LEFT_MOUSE_BUTTON);

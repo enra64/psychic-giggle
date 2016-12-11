@@ -70,6 +70,16 @@ public abstract class Server implements OnCommandListener, DataSink, ClientListe
     private EnumMap<SensorType, HashSet<DataSink>> mDataSinks = new EnumMap<>(SensorType.class);
 
     /**
+     * Store requested speeds for all data sinks
+     */
+    private EnumMap<SensorType, SetSensorSpeed.SensorSpeed> mSensorSpeeds = new EnumMap<>(SensorType.class);
+
+    /**
+     * store requested output ranges for all sensors
+     */
+    private EnumMap<SensorType, Float> mSensorOutputRanges = new EnumMap<>(SensorType.class);
+
+    /**
      * Create a new server. It will be offline (not using any sockets) until {@link #start()} is called.
      *
      * @param serverName if not null, this name will be used. otherwise, the devices hostname is used
@@ -79,6 +89,10 @@ public abstract class Server implements OnCommandListener, DataSink, ClientListe
         // if the server name was not set, use the host name
         mServerName = serverName != null ? serverName : getHostName();
         mDiscoveryPort = discoveryPort;
+
+        // initialise the sensor speed map
+        for (SensorType sensorType : SensorType.values())
+            mSensorSpeeds.put(sensorType, SetSensorSpeed.SensorSpeed.SENSOR_DELAY_GAME);
     }
 
     /**
@@ -105,6 +119,11 @@ public abstract class Server implements OnCommandListener, DataSink, ClientListe
                 this,
                 this,
                 this);
+
+        // set the requested output ranges
+        for(Map.Entry<SensorType, Float> sensor : mSensorOutputRanges.entrySet())
+            mCurrentUnboundClientConnection.setOutputRange(sensor.getKey(), sensor.getValue());
+
         advertiseServer(mCurrentUnboundClientConnection);
     }
 
@@ -212,6 +231,9 @@ public abstract class Server implements OnCommandListener, DataSink, ClientListe
                         mCurrentUnboundClientConnection.updateSensors(mDataSinks.keySet());
                         mCurrentUnboundClientConnection.updateButtons(mButtonList);
 
+                        // send the sensor speed requirements to all clients
+                        updateSensorSpeeds();
+
                         // create new possible client connection
                         mCurrentUnboundClientConnection = new ClientConnectionHandler(
                                 mServerName,
@@ -258,16 +280,26 @@ public abstract class Server implements OnCommandListener, DataSink, ClientListe
      * Change the speed of a sensor. The default speed is the GAME speed.
      *
      * @param sensor the sensor to change
-     * @param speed the speed to use for sensor
+     * @param speed  the speed to use for sensor
      */
-    public void setSensorSpeed(SensorType sensor, SetSensorSpeed.SensorSpeed speed) {
-        for (ClientConnectionHandler client : mClientConnections) {
-            try {
-                client.sendCommand(new SetSensorSpeed(sensor, speed));
-            } catch (IOException e) {
-                onException(this, e, "Could not update the sensor speed on client " + client.getClient());
-            }
-        }
+    public void setSensorSpeed(SensorType sensor, SetSensorSpeed.SensorSpeed speed) throws IOException {
+        // change the speed for sensor x
+        mSensorSpeeds.put(sensor, speed);
+
+        // update on all clients
+        updateSensorSpeeds();
+    }
+
+    /**
+     * Change the output range of a sensor
+     *
+     * @param sensor      affected sensor
+     * @param outputRange the resulting maximum and negative minimum of the sensor output range. Default is -100 to 100.
+     */
+    public void setSensorOutputRange(SensorType sensor, float outputRange) {
+        for (ClientConnectionHandler connectionHandler : mClientConnections)
+            connectionHandler.setOutputRange(sensor, outputRange);
+        mSensorOutputRanges.put(sensor, outputRange);
     }
 
     /**
@@ -388,6 +420,17 @@ public abstract class Server implements OnCommandListener, DataSink, ClientListe
     private void updateButtons() throws IOException {
         for (ClientConnectionHandler client : mClientConnections)
             client.updateButtons(mButtonList);
+    }
+
+    /**
+     * Force each client to update the sensor speeds
+     *
+     * @throws IOException if an update command could not be sent
+     */
+    private void updateSensorSpeeds() throws IOException {
+        for (ClientConnectionHandler client : mClientConnections)
+            for (Map.Entry<SensorType, SetSensorSpeed.SensorSpeed> sensorSpeedMapping : mSensorSpeeds.entrySet())
+                client.sendCommand(new SetSensorSpeed(sensorSpeedMapping.getKey(), sensorSpeedMapping.getValue()));
     }
 
     /**

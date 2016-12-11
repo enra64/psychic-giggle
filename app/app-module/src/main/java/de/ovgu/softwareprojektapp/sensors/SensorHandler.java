@@ -6,7 +6,6 @@ import android.support.annotation.NonNull;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
@@ -15,7 +14,6 @@ import java.util.Map;
 import de.ovgu.softwareprojekt.DataSink;
 import de.ovgu.softwareprojekt.SensorType;
 import de.ovgu.softwareprojekt.control.commands.SetSensorSpeed;
-import de.ovgu.softwareprojektapp.BuildConfig;
 
 /**
  * Handle instantiation and storage of sensor classes, as well as temporarily disabling them. Uses
@@ -35,7 +33,7 @@ public class SensorHandler {
     /**
      * True if the sensors are all (possibly temporarily) unregistered
      */
-    private boolean mSensorsTempDisabled = false;
+    private boolean mSensorsSuspended = false;
 
     /**
      * Context stored for android interaction purposes
@@ -59,33 +57,35 @@ public class SensorHandler {
     }
 
     @SuppressWarnings("unchecked")
-    public boolean setRunning(List<SensorType> requiredSensors) {
+    public void setRunning(List<SensorType> requiredSensors) throws SensorNotFoundException {
         // if the sensors are currently disabled, only update the list of sensors that will be
         // enabled after starting them again
-        if (mSensorsTempDisabled) {
-            mTemporarySensorActivationList = getSensorActivationList(requiredSensors);
-            return true;
-        }
-
-        // try to apply the list of required sensors
-        return applySensorActivationList(getSensorActivationList(requiredSensors));
+        if (mSensorsSuspended)
+            mTemporarySensorActivationList = getActivatedSensors(requiredSensors);
+        else
+            // try to apply the list of required sensors
+            applySensorActivationList(getActivatedSensors(requiredSensors));
     }
 
     /**
      * Update the sensor speed for a given sensor
-     * @param sensorType the sensor type that should change its speed
+     *
+     * @param sensorType  the sensor type that should change its speed
      * @param sensorSpeed the speed the sensor should switch to
      * @return true if the setting succeeded
      */
     public boolean setSensorSpeed(SensorType sensorType, SetSensorSpeed.SensorSpeed sensorSpeed) {
         try {
-            // get the class
-            Class<?> sensorClass = getClass(sensorType);
+            // because java does not allow abstract static methods, we have to instantiate the
+            // sensor if we want to set its static member variable defining the speed -.-
+            AbstractSensor sensor = getSensor(sensorType);
 
-            // call setSensorSpeed with sensor speed argument
-            sensorClass.getDeclaredMethod("setSensorSpeed", SetSensorSpeed.SensorSpeed.class).invoke(null, sensorSpeed);
+            // change speed
+            sensor.setSensorSpeed(sensorSpeed);
             return true;
-        } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+
+            // if anything throws, we failed.
+        } catch (InstantiationException | IOException | ClassNotFoundException | NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
             return false;
         }
     }
@@ -96,7 +96,7 @@ public class SensorHandler {
      * @param requiredSensors list of required sensors
      * @return the mapping
      */
-    private EnumMap<SensorType, Boolean> getSensorActivationList(List<SensorType> requiredSensors) {
+    private EnumMap<SensorType, Boolean> getActivatedSensors(List<SensorType> requiredSensors) {
         // empty sensor activation list
         EnumMap<SensorType, Boolean> sensorActivationList = new EnumMap<>(SensorType.class);
 
@@ -115,39 +115,36 @@ public class SensorHandler {
      * Apply each sensor state from a sensor activation list
      *
      * @param activationList a mapping from sensor type to its required activation state
-     * @return true if all sensor states could be correctly applied
+     * @throws SensorNotFoundException if a sensor could not be instantiated
      */
-    private boolean applySensorActivationList(EnumMap<SensorType, Boolean> activationList) {
-        boolean success = true;
+    private void applySensorActivationList(EnumMap<SensorType, Boolean> activationList) throws SensorNotFoundException {
         for (Map.Entry<SensorType, Boolean> sensor : activationList.entrySet())
-            success = setSensor(sensor.getKey(), sensor.getValue()) && success;
-        return success;
+            setSensor(sensor.getKey(), sensor.getValue());
     }
 
     /**
      * This method tries to dis- or enable a certain sensor.
      *
      * @param sensorType the list of required sensors
-     * @return true if the sensor state has been successfully set
+     * @throws SensorNotFoundException if the sensor could not be instantiated
      */
-    private boolean setSensor(SensorType sensorType, boolean enable) {
+    private void setSensor(SensorType sensorType, boolean enable) throws SensorNotFoundException {
         try {
             // are we supposed to enable the sensor?
             if (enable) {
-                // already instantiated, just set it running
-                if (mSensors.containsKey(sensorType))
-                    mSensors.get(sensorType).setRunning(true);
-                    // not yet instantiated, instantiate and start
-                else
-                    instantiateSensor(sensorType);
+                // instantiate the sensor
+                AbstractSensor sensor = getSensor(sensorType);
+
+                // set it running
+                sensor.setDataSink(mDataSink);
+                sensor.setRunning(true);
             }
             // disable the sensor if it was already instantiated
             else if (mSensors.containsKey(sensorType))
                 mSensors.get(sensorType).setRunning(false);
         } catch (NoSuchMethodException | ClassNotFoundException | InstantiationException | InvocationTargetException | IllegalAccessException | IOException e) {
-            return false;
+            throw new SensorNotFoundException("could not " + (enable ? "enable " : "disable ") + "sensor", sensorType);
         }
-        return true;
     }
 
     /**
@@ -167,8 +164,14 @@ public class SensorHandler {
      * Re-enable the sensors that were previously temporarily disabled using {@link #temporarilyDisableSensors()}
      */
     public void enableTemporarilyDisabledSensors() {
-        applySensorActivationList(mTemporarySensorActivationList);
-        mSensorsTempDisabled = false;
+        try {
+            applySensorActivationList(mTemporarySensorActivationList);
+        } catch (SensorNotFoundException ignored) {
+            // we catch this without further reporting, because it should be impossible,
+            // since the sensors were already instantiated
+            ignored.printStackTrace();
+        }
+        mSensorsSuspended = false;
     }
 
     /**
@@ -183,15 +186,21 @@ public class SensorHandler {
                 requiredSensors.add(sensor.getSensorType());
 
         // store the old required sensors
-        mTemporarySensorActivationList = getSensorActivationList(requiredSensors);
-        mSensorsTempDisabled = true;
+        mTemporarySensorActivationList = getActivatedSensors(requiredSensors);
+        mSensorsSuspended = true;
 
         // disable all for now by requiring an empty list of sensors
-        applySensorActivationList(getSensorActivationList(new ArrayList<SensorType>()));
+        try {
+            applySensorActivationList(getActivatedSensors(new ArrayList<SensorType>()));
+        } catch (SensorNotFoundException ignored) {
+            // we catch this without further reporting, because it should be impossible,
+            // since the sensors were already instantiated
+            ignored.printStackTrace();
+        }
     }
 
     /**
-     * Instantiate a sensor
+     * Retrieve a sensor. If it is not yet instantiated, return a new instance.
      *
      * @param sensorType the sensor type to be initiated
      * @throws NoSuchMethodException     if the sensor could not be instantiated
@@ -202,7 +211,7 @@ public class SensorHandler {
      * @throws ClassNotFoundException    if no sensor class with a name matching the enum value could be found
      */
     @SuppressWarnings("unchecked")
-    private void instantiateSensor(SensorType sensorType)
+    private AbstractSensor getSensor(SensorType sensorType)
             throws
             NoSuchMethodException,
             IllegalAccessException,
@@ -210,18 +219,26 @@ public class SensorHandler {
             InstantiationException,
             IOException,
             ClassNotFoundException {
-        // find the constructor for this sensor type
-        Constructor<?> constructor = getClass(sensorType).getConstructor(Context.class);
 
-        // instantiate it
-        AbstractSensor instance = (AbstractSensor) constructor.newInstance(mContext);
+        // only do an instantiation if we dont yet have a
+        if (!mSensors.containsKey(sensorType)) {
+            // find the constructor for this sensor type
+            Constructor<?> constructor = getClass(sensorType).getConstructor(Context.class);
 
-        // configure
-        instance.setRunning(true);
-        instance.setDataSink(mDataSink);
+            // put into sensor list to avoid next instantiation
+            mSensors.put(sensorType, (AbstractSensor) constructor.newInstance(mContext));
+        }
 
-        // put into sensor list to avoid next instantiation
-        mSensors.put(sensorType, instance);
+        // retrieve the sensor instance
+        return mSensors.get(sensorType);
+    }
+
+    public float getRange(SensorType sensorType) throws SensorNotFoundException {
+        try {
+            return getSensor(sensorType).getRange();
+        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | IOException | ClassNotFoundException | InstantiationException e) {
+            throw new SensorNotFoundException("Could not get range", sensorType);
+        }
     }
 
     /**

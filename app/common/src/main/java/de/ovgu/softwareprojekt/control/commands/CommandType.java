@@ -13,5 +13,5 @@ public enum CommandType {
     ChangeSensorSensitivity,
     ResetToCenter,
     ConnectionAliveCheck,
-    SetSensorSpeed
+    SensorRangeNotification, SetSensorSpeed
 }
