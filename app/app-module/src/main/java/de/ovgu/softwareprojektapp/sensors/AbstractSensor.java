@@ -161,7 +161,7 @@ public abstract class AbstractSensor implements DataSource, SensorEventListener 
      *
      * @return true if the listener is currently registered
      */
-    boolean isRegistered() {
+    public boolean isRegistered() {
         return mListenerRegistered;
     }
 

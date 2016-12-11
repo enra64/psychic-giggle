@@ -69,7 +69,6 @@ public class MinimumAmplitudeFilter extends AbstractFilter {
 
         // calculate and return the sum of differences between both vectors
         float change = 0;
-        System.out.println("a: " + dataA.length + ", b: " + dataB.length);
 
         // we are checking for both A and B length. that is a dirty hack circumventing the problems we seem to have
         for (int i = 0; i < dataA.length && i < dataB.length; i++)
