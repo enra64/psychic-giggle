@@ -5,10 +5,10 @@ import de.ovgu.softwareprojekt.SensorData;
 
 /**
  * Created by Ulrich on 29.11.2016.
- *
- * This class receives the sensorData and normalizes (?) it to a usable value by multiplying it
- * with a base sensitivity value which can be changed by subtracting or adding a custom value to
- * the sensitivity
+ * <p>
+ * This class receives the sensorData and normalizes it to an usable value. The sensor data may be scaled using a custom
+ * factor after normalization takes place, see {@link #setCustomSensitivity(float)}. The source and target ranges
+ * may be set using one of the various constructors, or {@link #setSourceRange(float)} and {@link #setTargetRange(float)}
  */
 public class NormalizationFilter extends AbstractFilter {
     /**
@@ -17,45 +17,86 @@ public class NormalizationFilter extends AbstractFilter {
     private float mCustomSensitivity = 0f;
 
     /**
+     * The range (maximum value, and inverted minimum value) the data should be projected to
+     */
+    private float mTargetRange;
+
+    /**
+     * The range (maximum value and inverted minimum value) the data lies in
+     */
+    private float mSourceRange;
+
+    /**
      * A filter that normalizes the sensorData into usable input
      * and uses standard axes and a base sensitivity of 40f
-     * @param dataSink      where to put filtered data
+     *
+     * @param dataSink where to put filtered data
      */
-    public NormalizationFilter(DataSink dataSink){
-        this(dataSink, 0f, 0, 1, 2);
+    public NormalizationFilter(DataSink dataSink) {
+        this(dataSink, 50f, 1000f, 1000f);
     }
 
     /**
-     * standard constructor where you can choose the sensitivity
+     * A filter for normalizing incoming data
+     *
+     * @param sink              where to put filtered data
+     * @param customSensitivity the custom sensitivity value. will be applied before normalization.
+     * @param sourceRange       range of the data coming into the normalization filter
+     * @param targetRange       range the data should be projected to
      */
-    public NormalizationFilter(DataSink sink, float customSensitivity){
-        this( sink, customSensitivity, 0, 1, 2);
+    public NormalizationFilter(DataSink sink, float customSensitivity, float sourceRange, float targetRange) {
+        this(sink, customSensitivity, sourceRange, targetRange, 0, 1, 2);
     }
 
     /**
      * A filter that normalizes the sensorData into usable input
-     * @param customSensitivity custom value that is added to the base value
+     *
+     * @param sink              where to put filtered data
+     * @param customSensitivity the custom sensitivity value. will be applied before normalization.
+     * @param sourceRange       range of the data coming into the normalization filter
+     * @param targetRange       range the data should be projected to
+     * @param xaxis             TODO schöne beschreibung von diesem parameter
+     * @param yaxis
+     * @param zaxis
      */
-    public NormalizationFilter(DataSink sink, float customSensitivity,  int xaxis, int yaxis, int zaxis){
-
+    public NormalizationFilter(DataSink sink, float customSensitivity, float sourceRange, float targetRange, int xaxis, int yaxis, int zaxis) {
         super(sink, xaxis, yaxis, zaxis);
 
         mCustomSensitivity = customSensitivity;
+        mTargetRange = targetRange;
+        mSourceRange = sourceRange;
     }
 
     /**
-     * Normalizes the sensorData by multiplying it with a base sensitivity value that is modified by
-     * a custom value set by the user
+     * Normalizes the sensorData
+     *
      * @param sensorData the data received by the sensor
      */
-    public void normalize(float[] sensorData){
-        sensorData[XAXIS] *= mCustomSensitivity;
-        sensorData[YAXIS] *= mCustomSensitivity;
-        sensorData[ZAXIS] *= mCustomSensitivity;
+    private void normalize(float[] sensorData) {
+        float projectionFactor = getProjectionFactor();
+        sensorData[XAXIS] *= projectionFactor;
+        sensorData[YAXIS] *= projectionFactor;
+        sensorData[ZAXIS] *= projectionFactor;
     }
 
-    public void setCustomSensitivity(float customValue){
+    public void setCustomSensitivity(float customValue) {
         mCustomSensitivity = customValue;
+    }
+
+    /**
+     * Change the range within which the source data lies
+     *
+     * @param range float maximum. the minimum will be negative range.
+     */
+    public void setSourceRange(float range) {
+        mSourceRange = range;
+    }
+
+    /**
+     * Get the factor that must be used to project from source to target range
+     */
+    private float getProjectionFactor() {
+        return mCustomSensitivity * (mTargetRange / mSourceRange);
     }
 
     /**
@@ -67,5 +108,9 @@ public class NormalizationFilter extends AbstractFilter {
     public void onData(SensorData sensorData) {
         normalize(sensorData.data);
         mDataSink.onData(sensorData);
+    }
+
+    public void setTargetRange(float targetRange) {
+        mTargetRange = targetRange;
     }
 }
