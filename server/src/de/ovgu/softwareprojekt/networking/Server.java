@@ -1,7 +1,6 @@
 package de.ovgu.softwareprojekt.networking;
 
 import com.sun.istack.internal.Nullable;
-import com.sun.security.ntlm.Client;
 import de.ovgu.softwareprojekt.DataSink;
 import de.ovgu.softwareprojekt.SensorData;
 import de.ovgu.softwareprojekt.SensorType;
@@ -14,7 +13,8 @@ import de.ovgu.softwareprojekt.misc.ExceptionListener;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.*;
+import java.util.EnumMap;
+import java.util.HashSet;
 
 /**
  * This class encapsulates the whole server system:
@@ -31,25 +31,10 @@ public abstract class Server implements OnCommandListener, DataSink, ClientListe
     private DiscoveryServer mDiscoveryServer;
 
     /**
-     * list of buttons that should be displayed on all clients
-     */
-    private Map<Integer, String> mButtonList = new HashMap<>();
-
-    /**
-     * Name of the server as displayed to discovery clients
-     */
-    private String mServerName;
-
-    /**
-     * This is the list of all currently bound clients.
-     */
-    private List<ClientConnectionHandler> mClientConnections = new ArrayList<>();
-
-    /**
      * This is the latest unbound client connection, which makes it also the currently advertised connection. When bound,
-     * this instance will be moved to {@link #mClientConnections}, and a new instance will be set instead
+     * this instance will be moved to {@link #mClientHandlerFactory}, and a new instance will be set instead
      */
-    private ClientConnectionHandler mCurrentUnboundClientConnection;
+    private ClientConnection mCurrentUnboundClientConnection;
 
     /**
      * port where discovery packets are expected
@@ -57,9 +42,14 @@ public abstract class Server implements OnCommandListener, DataSink, ClientListe
     private final int mDiscoveryPort;
 
     /**
-     * Button id of the reset button
+     * This class is used for keeping the sensor-, button and speed requirements synchronous
      */
-    private static final int RESET_POSITION_BUTTON_ID = -1;
+    private final ClientConnectionHandler mClientHandlerFactory;
+
+    /**
+     * name of this server
+     */
+    private String mServerName;
 
     /**
      * Stores all known data sinks
@@ -68,16 +58,6 @@ public abstract class Server implements OnCommandListener, DataSink, ClientListe
      * HashSet for each sensor, so no sink can occur twice for one sensor type.
      */
     private EnumMap<SensorType, HashSet<DataSink>> mDataSinks = new EnumMap<>(SensorType.class);
-
-    /**
-     * Store requested speeds for all data sinks
-     */
-    private EnumMap<SensorType, SetSensorSpeed.SensorSpeed> mSensorSpeeds = new EnumMap<>(SensorType.class);
-
-    /**
-     * store requested output ranges for all sensors
-     */
-    private EnumMap<SensorType, Float> mSensorOutputRanges = new EnumMap<>(SensorType.class);
 
     /**
      * Create a new server. It will be offline (not using any sockets) until {@link #start()} is called.
@@ -90,9 +70,12 @@ public abstract class Server implements OnCommandListener, DataSink, ClientListe
         mServerName = serverName != null ? serverName : getHostName();
         mDiscoveryPort = discoveryPort;
 
-        // initialise the sensor speed map
-        for (SensorType sensorType : SensorType.values())
-            mSensorSpeeds.put(sensorType, SetSensorSpeed.SensorSpeed.SENSOR_DELAY_GAME);
+        mClientHandlerFactory = new ClientConnectionHandler(
+                mServerName,
+                this,
+                this,
+                this,
+                this);
     }
 
     /**
@@ -113,18 +96,7 @@ public abstract class Server implements OnCommandListener, DataSink, ClientListe
      */
     @SuppressWarnings("WeakerAccess")
     public void start() throws IOException {
-        // initialise the command and data connections
-        mCurrentUnboundClientConnection = new ClientConnectionHandler(mServerName,
-                this,
-                this,
-                this,
-                this);
-
-        // set the requested output ranges
-        for(Map.Entry<SensorType, Float> sensor : mSensorOutputRanges.entrySet())
-            mCurrentUnboundClientConnection.setOutputRange(sensor.getKey(), sensor.getValue());
-
-        advertiseServer(mCurrentUnboundClientConnection);
+        advertiseServer();
     }
 
     /**
@@ -132,8 +104,7 @@ public abstract class Server implements OnCommandListener, DataSink, ClientListe
      */
     @Override
     public void close() {
-        for (ClientConnectionHandler client : mClientConnections)
-            client.close();
+        mClientHandlerFactory.closeAll();
         mDiscoveryServer.close();
     }
 
@@ -146,53 +117,6 @@ public abstract class Server implements OnCommandListener, DataSink, ClientListe
         } catch (UnknownHostException ex) {
             return "unknown hostname";
         }
-    }
-
-    /**
-     * Register a new data sink to be included in the data stream
-     *
-     * @param dataSink        where new data from the sensor should go
-     * @param requestedSensor which sensors events are relevant
-     */
-    @SuppressWarnings("WeakerAccess")
-    public void registerDataSink(DataSink dataSink, SensorType requestedSensor) throws IOException {
-        // add new data sink list if the requested sensor type has no sinks yet
-        if (!mDataSinks.containsKey(requestedSensor))
-            mDataSinks.put(requestedSensor, new HashSet<DataSink>());
-
-        // add the new sink to the list of sink for the sensor
-        mDataSinks.get(requestedSensor).add(dataSink);
-
-        // force resetting the sensors on the client
-        updateSensors();
-    }
-
-    /**
-     * Unregister a data sink from a sensors data stream
-     *
-     * @param dataSink        the data sink to be unregistered
-     * @param requestedSensor the sensor the sink should be unregistered from
-     */
-    @SuppressWarnings("WeakerAccess")
-    public void unregisterDataSink(DataSink dataSink, SensorType requestedSensor) throws IOException {
-        mDataSinks.get(requestedSensor).remove(dataSink);
-
-        // force resetting the sensors on the client
-        updateSensors();
-    }
-
-    /**
-     * Unregister a data sink from all sensors
-     *
-     * @param dataSink which data sink to remove
-     */
-    public void unregisterDataSink(DataSink dataSink) throws IOException {
-        // unregister dataSink from all sensors it is registered to
-        for (SensorType type : mDataSinks.keySet())
-            unregisterDataSink(dataSink, type);
-
-        // force resetting the sensors on the client
-        updateSensors();
     }
 
     /**
@@ -223,30 +147,16 @@ public abstract class Server implements OnCommandListener, DataSink, ClientListe
 
 
                 if (acceptClient) {
-                    // add unbound connection to list of bound connections
-                    mClientConnections.add(mCurrentUnboundClientConnection);
-
                     try {
-                        // send the sensor- and button requirements to the new client
-                        mCurrentUnboundClientConnection.updateSensors(mDataSinks.keySet());
-                        mCurrentUnboundClientConnection.updateButtons(mButtonList);
+                        // add unbound connection to list of bound connections.
+                        // it will be automatically configured
+                        mClientHandlerFactory.addHandler(mCurrentUnboundClientConnection);
 
-                        // send the sensor speed requirements to all clients
-                        updateSensorSpeeds();
-
-                        // create new possible client connection
-                        mCurrentUnboundClientConnection = new ClientConnectionHandler(
-                                mServerName,
-                                this,
-                                this,
-                                this,
-                                this);
+                        // begin advertising the next client connection
+                        advertiseServer();
                     } catch (IOException e) {
                         onException(this, e, "Could not start listening for new client. Bad.");
                     }
-
-                    // begin advertising the next client connection
-                    advertiseServer(mCurrentUnboundClientConnection);
                 }
                 break;
             case EndConnection:
@@ -257,7 +167,7 @@ public abstract class Server implements OnCommandListener, DataSink, ClientListe
 
                 // remove that client
                 try {
-                    getClientHandler(endConnection.self).close();
+                    mClientHandlerFactory.getClientHandler(endConnection.self).close();
                 } catch (NullPointerException e) {
                     // yeah this shouldn't happen
                     onException(this, e, "Could not find client that ended connection!");
@@ -265,10 +175,10 @@ public abstract class Server implements OnCommandListener, DataSink, ClientListe
                 break;
 
             case ButtonClick:
-                onButtonClick((ButtonClick) command, getClientHandler(origin).getClient());
+                onButtonClick((ButtonClick) command, mClientHandlerFactory.getClientHandler(origin).getClient());
                 break;
             case ResetToCenter:
-                onResetPosition(getClientHandler(origin).getClient());
+                onResetPosition(mClientHandlerFactory.getClientHandler(origin).getClient());
                 break;
             // ignore unhandled commands
             default:
@@ -277,36 +187,13 @@ public abstract class Server implements OnCommandListener, DataSink, ClientListe
     }
 
     /**
-     * Change the speed of a sensor. The default speed is the GAME speed.
-     *
-     * @param sensor the sensor to change
-     * @param speed  the speed to use for sensor
-     */
-    public void setSensorSpeed(SensorType sensor, SetSensorSpeed.SensorSpeed speed) throws IOException {
-        // change the speed for sensor x
-        mSensorSpeeds.put(sensor, speed);
-
-        // update on all clients
-        updateSensorSpeeds();
-    }
-
-    /**
-     * Change the output range of a sensor
-     *
-     * @param sensor      affected sensor
-     * @param outputRange the resulting maximum and negative minimum of the sensor output range. Default is -100 to 100.
-     */
-    public void setSensorOutputRange(SensorType sensor, float outputRange) {
-        for (ClientConnectionHandler connectionHandler : mClientConnections)
-            connectionHandler.setOutputRange(sensor, outputRange);
-        mSensorOutputRanges.put(sensor, outputRange);
-    }
-
-    /**
      * Initialising the discovery server makes it possible for the client ot find use. The command- and data connection
      * need to be initialised, because they provide important information
      */
-    private void advertiseServer(ClientConnectionHandler clientConnectionHandler) {
+    private void advertiseServer() throws IOException {
+        // initialise the command and data connections
+        mCurrentUnboundClientConnection = mClientHandlerFactory.getUnboundHandler();
+
         // stop old instances
         if (mDiscoveryServer != null)
             mDiscoveryServer.close();
@@ -316,8 +203,8 @@ public abstract class Server implements OnCommandListener, DataSink, ClientListe
         mDiscoveryServer = new DiscoveryServer(
                 this,
                 mDiscoveryPort,
-                clientConnectionHandler.getCommandPort(),
-                clientConnectionHandler.getDataPort(),
+                mCurrentUnboundClientConnection.getCommandPort(),
+                mCurrentUnboundClientConnection.getDataPort(),
                 mServerName);
         mDiscoveryServer.start();
     }
@@ -330,7 +217,6 @@ public abstract class Server implements OnCommandListener, DataSink, ClientListe
      */
     @Override
     public final void onData(SensorData sensorData) {
-        // iterate over all data sinks marked as interested in this sensor type
         for (DataSink sink : mDataSinks.get(sensorData.sensorType))
             sink.onData(sensorData);
     }
@@ -342,44 +228,52 @@ public abstract class Server implements OnCommandListener, DataSink, ClientListe
      * @return false if client could not be found, true otherwise
      */
     public boolean disconnectClient(NetworkDevice client) {
-        ClientConnectionHandler connectionHandler = getClientHandler(client);
-
-        // return false if no matching client could be found
-        if (connectionHandler == null)
-            return false;
-
-        // close the client connection
-        connectionHandler.closeAndSignalClient();
-        return true;
+        return mClientHandlerFactory.close(client);
     }
 
     /**
-     * This function find the connection handler that is managing a certain client
+     * Register a new data sink to be included in the data stream
      *
-     * @param client the client that should be found
-     * @return null if no matching handler was found, or the handler.
+     * @param dataSink        where new data from the sensor should go
+     * @param requestedSensor which sensors events are relevant
      */
-    private ClientConnectionHandler getClientHandler(NetworkDevice client) {
-        for (ClientConnectionHandler clientConnection : mClientConnections)
-            // true if the clients match
-            if (clientConnection.getClient().equals(client))
-                return clientConnection;
-        return null;
+    protected void registerDataSink(DataSink dataSink, SensorType requestedSensor) throws IOException {
+        // add new data sink list if the requested sensor type has no sinks yet
+        if (!mDataSinks.containsKey(requestedSensor))
+            mDataSinks.put(requestedSensor, new HashSet<>());
+
+        // add the new sink to the list of sink for the sensor
+        mDataSinks.get(requestedSensor).add(dataSink);
+
+        // force resetting the sensors on the client
+        mClientHandlerFactory.updateSensors(mDataSinks.keySet());
     }
 
     /**
-     * This function find the connection handler that is managing a certain client, which is identified only by
-     * his address
+     * Unregister a data sink from a sensors data stream
      *
-     * @param address the address of the client that should be found
-     * @return null if no matching handler was found, or the handler.
+     * @param dataSink        the data sink to be unregistered
+     * @param requestedSensor the sensor the sink should be unregistered from
      */
-    private ClientConnectionHandler getClientHandler(InetAddress address) {
-        for (ClientConnectionHandler clientConnection : mClientConnections)
-            // true if the clients match
-            if (clientConnection.getClient().address.equals(address.getHostAddress()))
-                return clientConnection;
-        return null;
+    private void unregisterDataSink(DataSink dataSink, SensorType requestedSensor) throws IOException {
+        mDataSinks.get(requestedSensor).remove(dataSink);
+
+        // force resetting the sensors on the client
+        mClientHandlerFactory.updateSensors(mDataSinks.keySet());
+    }
+
+    /**
+     * Unregister a data sink from all sensors
+     *
+     * @param dataSink which data sink to remove
+     */
+    public void unregisterDataSink(DataSink dataSink) throws IOException {
+        // unregister dataSink from all sensors it is registered to
+        for (SensorType type : mDataSinks.keySet())
+            unregisterDataSink(dataSink, type);
+
+        // force resetting the sensors on the client
+        mClientHandlerFactory.updateSensors(mDataSinks.keySet());
     }
 
     /**
@@ -388,15 +282,8 @@ public abstract class Server implements OnCommandListener, DataSink, ClientListe
      * @param name text to be displayed on the button
      * @param id   id of the button. ids below zero are reserved.
      */
-    protected final void addButton(String name, int id) throws IOException {
-        // reserve id's below zero
-        assert (id >= 0);
-
-        // add the new button to local storage
-        mButtonList.put(id, name);
-
-        // update the button list on our clients
-        updateButtons();
+    protected void addButton(String name, int id) throws IOException {
+        mClientHandlerFactory.addButton(name, id);
     }
 
     /**
@@ -405,41 +292,26 @@ public abstract class Server implements OnCommandListener, DataSink, ClientListe
      * @param id id of the button
      */
     public void removeButton(int id) throws IOException {
-        // remove the button from local storage
-        mButtonList.remove(id);
-
-        // update the button list on our clients
-        updateButtons();
+        mClientHandlerFactory.removeButton(id);
     }
 
     /**
-     * Force each client to update his buttons
+     * Change the speed of a sensor. The default speed is the GAME speed.
      *
-     * @throws IOException if the command could not be sent
+     * @param sensor the sensor to change
+     * @param speed  the speed to use for sensor
      */
-    private void updateButtons() throws IOException {
-        for (ClientConnectionHandler client : mClientConnections)
-            client.updateButtons(mButtonList);
+    public void setSensorSpeed(SensorType sensor, SetSensorSpeed.SensorSpeed speed) throws IOException {
+        mClientHandlerFactory.setSensorSpeed(sensor, speed);
     }
 
     /**
-     * Force each client to update the sensor speeds
+     * Change the output range of a sensor
      *
-     * @throws IOException if an update command could not be sent
+     * @param sensor      affected sensor
+     * @param outputRange the resulting maximum and negative minimum of the sensor output range. Default is -100 to 100.
      */
-    private void updateSensorSpeeds() throws IOException {
-        for (ClientConnectionHandler client : mClientConnections)
-            for (Map.Entry<SensorType, SetSensorSpeed.SensorSpeed> sensorSpeedMapping : mSensorSpeeds.entrySet())
-                client.sendCommand(new SetSensorSpeed(sensorSpeedMapping.getKey(), sensorSpeedMapping.getValue()));
-    }
-
-    /**
-     * Force each client to update his required sensors
-     *
-     * @throws IOException if the command could not be sent
-     */
-    private void updateSensors() throws IOException {
-        for (ClientConnectionHandler client : mClientConnections)
-            client.updateSensors(mDataSinks.keySet());
+    protected void setSensorOutputRange(SensorType sensor, @SuppressWarnings("SameParameterValue") float outputRange){
+        mClientHandlerFactory.setSensorOutputRange(sensor, outputRange);
     }
 }

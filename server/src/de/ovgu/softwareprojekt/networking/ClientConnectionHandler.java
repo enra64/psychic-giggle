@@ -1,32 +1,48 @@
 package de.ovgu.softwareprojekt.networking;
 
-import com.sun.istack.internal.NotNull;
 import de.ovgu.softwareprojekt.DataSink;
-import de.ovgu.softwareprojekt.SensorData;
 import de.ovgu.softwareprojekt.SensorType;
-import de.ovgu.softwareprojekt.control.CommandConnection;
-import de.ovgu.softwareprojekt.control.ConnectionWatch;
 import de.ovgu.softwareprojekt.control.OnCommandListener;
-import de.ovgu.softwareprojekt.control.commands.*;
+import de.ovgu.softwareprojekt.control.commands.SetSensorSpeed;
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
 import de.ovgu.softwareprojekt.misc.ExceptionListener;
-import de.ovgu.softwareprojekt.filters.NormalizationFilter;
 
 import java.io.IOException;
-import java.net.ConnectException;
 import java.net.InetAddress;
-import java.net.SocketException;
-import java.net.UnknownHostException;
 import java.util.*;
-//EndConnectionConnectionAliveCheckSensorChange
 
-/**
- * This class manages the command- and data connection for a single client. It intercepts the following commands:
- * {@link ConnectionAliveCheck} and {@link ChangeSensorSensitivity}, never notifying the command listener of receiving
- * them. When a {@link EndConnection} command is received, all ports are closed, and the command is forwarded; no other
- * command can be sent to the client after that.
- */
-public class ClientConnectionHandler implements OnCommandListener, DataSink, ConnectionWatch.TimeoutListener {
+@SuppressWarnings("WeakerAccess")
+class ClientConnectionHandler {
+    /**
+     * Name of the server as displayed to discovery clients
+     */
+    private String mServerName;
+
+    /**
+     * Sensors required on the android devices
+     */
+    private Set<SensorType> mRequiredSensors;
+
+    /**
+     * Store requested speeds for all data sinks
+     */
+    private EnumMap<SensorType, SetSensorSpeed.SensorSpeed> mSensorSpeeds = new EnumMap<>(SensorType.class);
+
+    /**
+     * store requested output ranges for all sensors
+     */
+    private EnumMap<SensorType, Float> mSensorOutputRanges = new EnumMap<>(SensorType.class);
+
+    /**
+     * list of buttons that should be displayed on all clients
+     */
+    private Map<Integer, String> mButtonList = new HashMap<>();
+
+    /**
+     * This is the list of all currently bound clients.
+     */
+    private List<ClientConnection> mClientConnections = new ArrayList<>();
+
     /**
      * Who to notify about unhandleable exceptions
      */
@@ -43,377 +59,187 @@ public class ClientConnectionHandler implements OnCommandListener, DataSink, Con
     private ClientListener mClientListener;
 
     /**
-     * Useful when you want to receive SensorData
-     */
-    private UdpDataConnection mDataConnection;
-
-    /**
-     * Two-way communication for basically everything non-data, like enabling sensors or requesting connections
-     */
-    private CommandConnection mCommandConnection;
-
-    /**
-     * Where to put data
+     * the data sink where all data produced by the clients is put into
      */
     private DataSink mDataSink;
 
-    /**
-     * The client this instance handles
-     */
-    private NetworkDevice mClient;
-
-    /**
-     * This class handles scaling the data of each sensor
-     */
-    private DataScalingHandler mDataScalingHandler;
-
-    /**
-     * False until {@link #onClientAccepted(NetworkDevice)} has run successfully, and after {@link #close()} was called
-     */
-    private volatile boolean mIsConnected = false;
-
-    /**
-     * NetworkDevice identifying this client handler (eg name, data, command port)
-     */
-    private final NetworkDevice mSelf;
-
-    /**
-     * Used to keep track of the connection health
-     */
-    private final ConnectionWatch mConnectionWatch;
-
-    /**
-     * Create a new client connection handler, which will immediately begin listening on random ports. They may be retrieved
-     * using {@link #getCommandPort()} and {@link #getDataPort()}.
-     *
-     * @param serverName        how the client connection should identify the server
-     * @param exceptionListener Who to notify about unhandleable exceptions
-     * @param commandListener   Who to notify about commands
-     * @param dataSink          Where to put data
-     * @throws IOException when the listening process could not be started
-     */
-    ClientConnectionHandler(String serverName, ExceptionListener exceptionListener, OnCommandListener commandListener, ClientListener clientListener, DataSink dataSink) throws IOException {
+    ClientConnectionHandler(String serverName, ExceptionListener exceptionListener, OnCommandListener commandListener, ClientListener clientListener, DataSink dataSink) {
+        mServerName = serverName;
         mExceptionListener = exceptionListener;
         mCommandListener = commandListener;
         mClientListener = clientListener;
-
-        // this is our sink for everything to be able to do customized scaling for any sensor type
-        mDataScalingHandler = new DataScalingHandler(dataSink);
-        mDataSink = mDataScalingHandler;
-
-        initialiseCommandConnection();
-        initialiseDataConnection();
-
-        mSelf = new NetworkDevice(serverName, mCommandConnection.getLocalPort(), mDataConnection.getLocalPort());
-        mConnectionWatch = new ConnectionWatch(mSelf, this, mCommandConnection, exceptionListener);
+        mDataSink = dataSink;
     }
 
     /**
-     * Send a command to this client
+     * Creates a new correctly initialized unbound handler
      *
-     * @param command the command to be sent
-     * @throws IOException if an error <b>other than</b> {@link ConnectException} occurred. If a {@link ConnectException}
-     *                     occurred, the client is likely listening no longer.
+     * @throws IOException if the handler could not be initialized
      */
-    void sendCommand(AbstractCommand command) throws IOException {
-        if (mIsConnected) {
-            try {
-                mCommandConnection.sendCommand(command);
-            } catch (ConnectException e) {
-                // if the client does not listen anymore, it most probably is down
-                if (e.getMessage().contains("Connection refused")) {
-                    // notify client listener
-                    mClientListener.onClientDisconnected(mClient);
+    ClientConnection getUnboundHandler() throws IOException {
+        ClientConnection newHandler = new ClientConnection(
+                mServerName,
+                mExceptionListener,
+                mCommandListener,
+                mClientListener,
+                mDataSink);
 
-                    // close self
-                    close();
-                }
-            }
-        }
+        // set the requested output ranges
+        for (Map.Entry<SensorType, Float> sensor : mSensorOutputRanges.entrySet())
+            newHandler.setOutputRange(sensor.getKey(), sensor.getValue());
+
+        return newHandler;
     }
 
     /**
-     * Retrieve the client this connection handler is bound to
-     */
-    @NotNull
-    NetworkDevice getClient() {
-        return mClient;
-    }
-
-    /**
-     * Handle a connection request to this client connection. If acceptClient is true, this instance may not be used to
-     * handle another client.
+     * Add a new handler to the list of bound handlers and configure the client
      *
-     * @param client       the client that wants to connect
-     * @param acceptClient true if the client should be accepted, and this instance be bound to it
-     * @throws UnknownHostException if the clients address could not be parsed to an {@link java.net.InetAddress}. Unlikely...
+     * @param handler a bound handler
+     * @throws IOException if the client could not be configured
      */
-    void handleConnectionRequest(NetworkDevice client, boolean acceptClient) throws UnknownHostException {
-        // if mClient is not null, we already handled a client, but we cannot handle another one.
-        assert mClient == null;
+    void addHandler(ClientConnection handler) throws IOException {
+        mClientConnections.add(handler);
 
-        // initialise the connection to be able to send the request answer
-        mCommandConnection.setRemote(client.getInetAddress(), client.commandPort);
-
-        // accept or reject the client
-        if (acceptClient)
-            onClientAccepted(client);
-        else
-            onClientRejected();
-    }
-
-    @Override
-    public void onData(SensorData sensorData) {
-        mDataSink.onData(sensorData);
+        // send the sensor- and button requirements to the new client
+        handler.updateSensors(mRequiredSensors);
+        handler.updateButtons(mButtonList);
+        handler.updateSpeeds(mSensorSpeeds.entrySet());
     }
 
     /**
-     * Close all network interfaces this connection handler has used
+     * Close all client connections
      */
-    public void close() {
-        mCommandConnection.close();
-        mDataConnection.close();
-        mIsConnected = false;
-        mConnectionWatch.close();
+    void closeAll() {
+        for (ClientConnection clientHandler : mClientConnections)
+            clientHandler.close();
     }
 
     /**
-     * Close the ports, but beforehand send an {@link EndConnection} command to the client.
-     */
-    public void closeAndSignalClient() {
-        try {
-            sendCommand(new EndConnection(null));
-        } catch (IOException ignored) {
-            // ignore this exception, since the connection state to this client doesn't matter anymore anyways
-        }
-        close();
-    }
-
-    /**
-     * Notify a client of its acceptance and set this instance to handle that client
+     * This function find the connection handler that is managing a certain client, which is identified only by
+     * his address
      *
-     * @param client the client we will be handling
+     * @param address the address of the client that should be found
+     * @return null if no matching handler was found, or the handler.
      */
-    private void onClientAccepted(final NetworkDevice client) {
-        try {
-            // flag that we have been connected
-            mIsConnected = true;
-
-            // accept the client
-            sendCommand(new ConnectionRequestResponse(true));
-
-            // store client identification
-            mClient = client;
-
-            // start the connection watch
-            mConnectionWatch.start();
-        } catch (IOException e) {
-            mExceptionListener.onException(this, e, "could not accept client");
-        }
+    ClientConnection getClientHandler(InetAddress address) {
+        for (ClientConnection clientConnection : mClientConnections)
+            // true if the clients match
+            if (clientConnection.getClient().address.equals(address.getHostAddress()))
+                return clientConnection;
+        return null;
     }
 
     /**
-     * Return true if we are currently between {@link #onClientAccepted(NetworkDevice)} and {@link #close()}
+     * Add a button to be displayed on the clients
+     *
+     * @param name text to be displayed on the button
+     * @param id   id of the button. ids below zero are reserved.
      */
-    private boolean isConnected() {
-        return mIsConnected;
+    void addButton(String name, int id) throws IOException {
+        // reserve id's below zero
+        assert (id >= 0);
+
+        // add the new button to local storage
+        mButtonList.put(id, name);
+
+        // update the button list on our clients
+        updateButtons();
     }
 
     /**
-     * Notify a client of its rejection. This instance may continue to be used for another client.
+     * Remove a button from the clients
+     *
+     * @param id id of the button
      */
-    private void onClientRejected() {
-        try {
-            // deny the client
-            mCommandConnection.sendCommand(new ConnectionRequestResponse(false));
-        } catch (IOException e) {
-            mExceptionListener.onException(this, e, "could not reject client");
-        }
+    void removeButton(int id) throws IOException {
+        // remove the button from local storage
+        mButtonList.remove(id);
+
+        // update the button list on our clients
+        updateButtons();
     }
 
     /**
-     * Instantiate the command connection (with this as listener) and start listening for command packets
+     * Change the speed of a sensor. The default speed is the GAME speed.
+     *
+     * @param sensor the sensor to change
+     * @param speed  the speed to use for sensor
      */
-    private void initialiseCommandConnection() throws IOException {
-        // begin a new command connection, set this as callback
-        mCommandConnection = new CommandConnection(this);
+    void setSensorSpeed(SensorType sensor, SetSensorSpeed.SensorSpeed speed) throws IOException {
+        // change the speed for sensor x
+        mSensorSpeeds.put(sensor, speed);
 
-        // begin listening for commands
-        mCommandConnection.start();
+        // update on all clients
+        updateSensorSpeeds();
     }
 
     /**
-     * Instantiate the data connection (with this as listener) and start listening for data packets
+     * Change the output range of a sensor
+     *
+     * @param sensor      affected sensor
+     * @param outputRange the resulting maximum and negative minimum of the sensor output range. Default is -100 to 100.
      */
-    private void initialiseDataConnection() throws SocketException {
-        // begin a new data connection
-        mDataConnection = new UdpDataConnection();
-
-        // register a callback for data objects
-        mDataConnection.setDataSink(mDataSink);
-
-        // begin listening for SensorData objects
-        mDataConnection.start();
+    public void setSensorOutputRange(SensorType sensor, float outputRange) {
+        for (ClientConnection connectionHandler : mClientConnections)
+            connectionHandler.setOutputRange(sensor, outputRange);
+        mSensorOutputRanges.put(sensor, outputRange);
     }
 
     /**
-     * Notify the client of all required buttons
+     * This function find the connection handler that is managing a certain client
+     *
+     * @param client the client that should be found
+     * @return null if no matching handler was found, or the handler.
+     */
+    public ClientConnection getClientHandler(NetworkDevice client) {
+        for (ClientConnection clientConnection : mClientConnections)
+            // true if the clients match
+            if (clientConnection.getClient().equals(client))
+                return clientConnection;
+        return null;
+    }
+
+    boolean close(NetworkDevice client) {
+        ClientConnection connectionHandler = getClientHandler(client);
+
+        // return false if no matching client could be found
+        if (connectionHandler == null)
+            return false;
+
+        // close the client connection
+        connectionHandler.closeAndSignalClient();
+        return true;
+    }
+
+    /**
+     * Force each client to update his buttons
      *
      * @throws IOException if the command could not be sent
      */
-    void updateButtons(Map<Integer, String> buttonList) throws IOException {
-        // if the button list was changed, we need to update the clients buttons
-        sendCommand(new UpdateButtons(buttonList));
+    private void updateButtons() throws IOException {
+        for (ClientConnection client : mClientConnections)
+            client.updateButtons(mButtonList);
     }
 
     /**
-     * Notify the client of all required sensors
+     * Force each client to update the sensor speeds
+     *
+     * @throws IOException if an update command could not be sent
+     */
+    private void updateSensorSpeeds() throws IOException {
+        for (ClientConnection client : mClientConnections)
+            client.updateSpeeds(mSensorSpeeds.entrySet());
+    }
+
+
+    /**
+     * Force each client to update his required sensors
      *
      * @throws IOException if the command could not be sent
      */
     void updateSensors(Set<SensorType> requiredSensors) throws IOException {
-        sendCommand(new SetSensorCommand(new ArrayList<>(requiredSensors)));
-    }
-
-    /**
-     * @return the port the {@link CommandConnection} is listening on
-     */
-    int getCommandPort() {
-        return mCommandConnection.getLocalPort();
-    }
-
-    /**
-     * @return the port the {@link UdpDataConnection} is listening on
-     */
-    int getDataPort() {
-        return mDataConnection.getLocalPort();
-    }
-
-    @Override
-    public void onCommand(InetAddress inetAddress, AbstractCommand command) {
-        // we only want to catch a certain subset of commands here
-        switch (command.getCommandType()) {
-            case ChangeSensorSensitivity:
-                // update the sensitivity for the given sensor
-                ChangeSensorSensitivity sensorChangeCommand = (ChangeSensorSensitivity) command;
-                mDataScalingHandler.setSensorSensitivity(sensorChangeCommand.sensorType, sensorChangeCommand.sensitivity);
-                break;
-            case SensorRangeNotification:
-                SensorRangeNotification notification = (SensorRangeNotification) command;
-                mDataScalingHandler.setSourceRange(notification.type, notification.range);
-                break;
-            case ConnectionAliveCheck:
-                ConnectionAliveCheck check = (ConnectionAliveCheck) command;
-                check.answerer.address = inetAddress.getHostAddress();
-                if (check.answerer.equals(mClient))
-                    mConnectionWatch.onCheckEvent();
-                break;
-            case EndConnection:
-                close();
-                mCommandListener.onCommand(inetAddress, command);
-                break;
-            default:
-                mCommandListener.onCommand(inetAddress, command);
-        }
-    }
-
-    /**
-     * Change the output range for a certain sensor
-     * @param sensor the sensor whose data will be affected
-     * @param outputRange the maximum and negative minimum of the resulting output range
-     */
-    public void setOutputRange(SensorType sensor, float outputRange){
-        mDataScalingHandler.setOutputRange(sensor, outputRange);
-    }
-
-    /**
-     * This function may be called by the {@link ConnectionWatch} if it detects a timeout
-     *
-     * @param age the response delay, e.g. how long did the client need to respond
-     */
-    @Override
-    public void onTimeout(long age) {
-        // notify our client listener of the timeout
-        mClientListener.onClientTimeout(mClient);
-
-        // notify the client that we do no longer communicate with it in case it is still listening
-        closeAndSignalClient();
-    }
-
-    /**
-     * This class handles scaling all the data, because we may have to apply a different scaling factor to
-     * all the incoming data
-     */
-    private class DataScalingHandler implements DataSink {
-        /**
-         * Contains the scaling filters that have to be applied for each sensors
-         */
-        private EnumMap<SensorType, NormalizationFilter> mScalingFilters = new EnumMap<>(SensorType.class);
-
-        /**
-         * Create a new data scaling handler, which will multiply all incoming data with 40.
-         *
-         * @param outgoingDataSink where all outgoing data will go
-         */
-        DataScalingHandler(DataSink outgoingDataSink) {
-            for (SensorType sensorType : SensorType.values())
-                mScalingFilters.put(sensorType, new NormalizationFilter(outgoingDataSink, 50f, 10, 100));
-        }
-
-        /**
-         * Changes the scaling factor that is applied to a sensor
-         *
-         * @param sensorType  the sensor that shall be affected
-         * @param sensitivity sensitivity factor. applied before normalization
-         */
-        void setSensorSensitivity(SensorType sensorType, float sensitivity) {
-            // get the normalization filter configured for this sensor
-            NormalizationFilter sensorTypeFilter = mScalingFilters.get(sensorType);
-
-            // update the sensitivity for this sensor type
-            sensorTypeFilter.setCustomSensitivity(sensitivity);
-        }
-
-        /**
-         * This changes the range a certain sensor will be in.
-         *
-         * @param targetRange maximum and -minimum of the resulting range for this sensor
-         */
-        void setOutputRange(SensorType sensor, float targetRange) {
-            // get the normalization filter configured for this sensor
-            NormalizationFilter sensorTypeFilter = mScalingFilters.get(sensor);
-
-            // change the target range
-            sensorTypeFilter.setTargetRange(targetRange);
-        }
-
-        /**
-         * This changes the range a certain sensors data will be expected to be in
-         *
-         * @param sourceRange maximum and -minimum of the incoming range for this sensor
-         */
-        void setSourceRange(SensorType sensor, float sourceRange) {
-            // get the normalization filter configured for this sensor
-            NormalizationFilter sensorTypeFilter = mScalingFilters.get(sensor);
-
-            // change the target range
-            sensorTypeFilter.setSourceRange(sourceRange);
-        }
-
-        /**
-         * handle incoming data
-         */
-        @Override
-        public void onData(SensorData sensorData) {
-            // get the normalization filter configured for this sensor
-            NormalizationFilter sensorTypeFilter = mScalingFilters.get(sensorData.sensorType);
-
-            // let it handle the sensordata; the scaled result will be pushed into the outgoing data sink
-            sensorTypeFilter.onData(sensorData);
-        }
-
-        @Override
-        public void close() {
-        }
+        mRequiredSensors = requiredSensors;
+        for (ClientConnection client : mClientConnections)
+            client.updateSensors(mRequiredSensors);
     }
 }
