@@ -49,12 +49,11 @@ public class MouseServer extends Server {
 
         // register our mouse mover to receive gyroscope data
         registerDataSink(pipeline, SensorType.Gyroscope);
+        setSensorOutputRange(SensorType.Gyroscope, 100);
 
         // add left- and right click buttons
         addButton("left click", LEFT_MOUSE_BUTTON);
         addButton("right click", RIGHT_MOUSE_BUTTON);
-
-        setSensorSpeed(SensorType.Gyroscope, SetSensorSpeed.SensorSpeed.SENSOR_DELAY_FASTEST);
     }
 
     @Override

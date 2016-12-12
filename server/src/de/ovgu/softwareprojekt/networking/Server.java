@@ -75,6 +75,11 @@ public abstract class Server implements OnCommandListener, DataSink, ClientListe
     private EnumMap<SensorType, SetSensorSpeed.SensorSpeed> mSensorSpeeds = new EnumMap<>(SensorType.class);
 
     /**
+     * store requested output ranges for all sensors
+     */
+    private EnumMap<SensorType, Float> mSensorOutputRanges = new EnumMap<>(SensorType.class);
+
+    /**
      * Create a new server. It will be offline (not using any sockets) until {@link #start()} is called.
      *
      * @param serverName if not null, this name will be used. otherwise, the devices hostname is used
@@ -114,6 +119,11 @@ public abstract class Server implements OnCommandListener, DataSink, ClientListe
                 this,
                 this,
                 this);
+
+        // set the requested output ranges
+        for(Map.Entry<SensorType, Float> sensor : mSensorOutputRanges.entrySet())
+            mCurrentUnboundClientConnection.setOutputRange(sensor.getKey(), sensor.getValue());
+
         advertiseServer(mCurrentUnboundClientConnection);
     }
 
@@ -278,6 +288,18 @@ public abstract class Server implements OnCommandListener, DataSink, ClientListe
 
         // update on all clients
         updateSensorSpeeds();
+    }
+
+    /**
+     * Change the output range of a sensor
+     *
+     * @param sensor      affected sensor
+     * @param outputRange the resulting maximum and negative minimum of the sensor output range. Default is -100 to 100.
+     */
+    public void setSensorOutputRange(SensorType sensor, float outputRange) {
+        for (ClientConnectionHandler connectionHandler : mClientConnections)
+            connectionHandler.setOutputRange(sensor, outputRange);
+        mSensorOutputRanges.put(sensor, outputRange);
     }
 
     /**

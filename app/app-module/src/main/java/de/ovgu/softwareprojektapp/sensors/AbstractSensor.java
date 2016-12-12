@@ -93,6 +93,7 @@ public abstract class AbstractSensor implements DataSource, SensorEventListener 
 
         // register for sensor events
         Sensor sensor = mSensorManager.getDefaultSensor(mSensorType);
+
         //check if sensor exist on this device
         if (sensor == null)
             throw new IOException("Sensor not detected");
@@ -143,6 +144,20 @@ public abstract class AbstractSensor implements DataSource, SensorEventListener 
     public abstract SetSensorSpeed.SensorSpeed getSensorSpeed();
 
     /**
+     * Get the range of the sensor as reported by android
+     *
+     * @return 0 if the sensor does not exist, or the range
+     */
+    public float getRange() {
+        Sensor sensor = mSensorManager.getDefaultSensor(mSensorType);
+
+        if (sensor == null)
+            return 0;
+
+        return sensor.getMaximumRange();
+    }
+
+    /**
      * Unregister sensor listener
      */
     @Override
@@ -163,7 +178,7 @@ public abstract class AbstractSensor implements DataSource, SensorEventListener 
      *
      * @return true if the listener is currently registered
      */
-    boolean isRegistered() {
+    public boolean isRegistered() {
         return mListenerRegistered;
     }
 
