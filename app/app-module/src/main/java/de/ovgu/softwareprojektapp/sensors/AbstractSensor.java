@@ -97,6 +97,8 @@ public abstract class AbstractSensor implements DataSource, SensorEventListener 
         //check if sensor exist on this device
         if (sensor == null)
             throw new IOException("Sensor not detected");
+
+        // register a listener for this sensor
         mSensorManager.registerListener(this, sensor, translateSensorSpeed(getSensorSpeed()));
     }
 
