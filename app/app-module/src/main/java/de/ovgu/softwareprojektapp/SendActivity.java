@@ -16,6 +16,8 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.net.ConnectException;
 import java.net.InetAddress;
 import java.util.List;
@@ -28,12 +30,15 @@ import de.ovgu.softwareprojekt.control.commands.AbstractCommand;
 import de.ovgu.softwareprojekt.control.commands.ConnectionRequestResponse;
 import de.ovgu.softwareprojekt.control.commands.ChangeSensorSensitivity;
 import de.ovgu.softwareprojekt.control.commands.ResetToCenter;
+import de.ovgu.softwareprojekt.control.commands.SensorRangeNotification;
 import de.ovgu.softwareprojekt.control.commands.SetSensorCommand;
+import de.ovgu.softwareprojekt.control.commands.SetSensorSpeed;
 import de.ovgu.softwareprojekt.control.commands.UpdateButtons;
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
 import de.ovgu.softwareprojekt.misc.ExceptionListener;
 import de.ovgu.softwareprojektapp.networking.NetworkClient;
 import de.ovgu.softwareprojektapp.sensors.SensorHandler;
+import de.ovgu.softwareprojektapp.sensors.SensorNotFoundException;
 
 public class SendActivity extends AppCompatActivity implements OnCommandListener, ExceptionListener, NetworkClient.TimeoutListener {
     /**
@@ -210,8 +215,11 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
      */
     private void setSensor(final List<SensorType> requiredSensors) {
         // configure the sensor run state
-        if (!mSensorHandler.setRunning(requiredSensors))
-            UiUtil.showAlert(this, "Sensor activation error", "This device does not contain a required sensor");
+        try {
+            mSensorHandler.setRunning(requiredSensors);
+        } catch (SensorNotFoundException e) {
+            UiUtil.showAlert(this, "Sensor activation error", "This device does not contain a required sensor: " + e.getMissingSensor().name());
+        }
     }
 
     @Override
@@ -225,8 +233,16 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
         super.onResume();
         mSensorHandler.enableTemporarilyDisabledSensors();
         SharedPreferences sensitivitySettings = getSharedPreferences(OptionsActivity.SENSITIVITY_PREFS_NAME, 0);
-        for (SensorType s : SensorType.values()) {
+
+        for (SensorType s : SensorType.values())
             mNetworkClient.sendCommand(new ChangeSensorSensitivity(s, sensitivitySettings.getInt(s.toString(), 50)));
+
+        for (SensorType s : SensorType.values()) {
+            try {
+                mNetworkClient.sendCommand(new SensorRangeNotification(s, mSensorHandler.getRange(s)));
+            } catch (SensorNotFoundException e) {
+                onException(this, e, "Could not activate sensor");
+            }
         }
 
     }
@@ -278,6 +294,11 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
                 //create button with name and id
                 UpdateButtons addCom = (UpdateButtons) command;
                 createButtons(addCom);
+                break;
+            case SetSensorSpeed:
+                // update the speed for the given sensor
+                SetSensorSpeed setSpeedCommand = (SetSensorSpeed) command;
+                mSensorHandler.setSensorSpeed(setSpeedCommand.affectedSensor, setSpeedCommand.sensorSpeed);
                 break;
             // ignore unhandled commands
             default:

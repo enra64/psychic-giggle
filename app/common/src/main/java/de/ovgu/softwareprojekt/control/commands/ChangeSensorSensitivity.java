@@ -9,7 +9,7 @@ public class ChangeSensorSensitivity extends AbstractCommand {
     public int sensitivity;
 
     public ChangeSensorSensitivity(SensorType tag, int progress){
-        super(CommandType.SensorChange);
+        super(CommandType.ChangeSensorSensitivity);
         sensorType = tag;
         sensitivity = progress;
     }

@@ -115,7 +115,7 @@ public class ClientConnectionHandler implements OnCommandListener, DataSink, Con
      * @throws IOException if an error <b>other than</b> {@link ConnectException} occurred. If a {@link ConnectException}
      *                     occurred, the client is likely listening no longer.
      */
-    private void sendCommand(AbstractCommand command) throws IOException {
+    void sendCommand(AbstractCommand command) throws IOException {
         if (mIsConnected) {
             try {
                 mCommandConnection.sendCommand(command);
@@ -293,10 +293,14 @@ public class ClientConnectionHandler implements OnCommandListener, DataSink, Con
     public void onCommand(InetAddress inetAddress, AbstractCommand command) {
         // we only want to catch a certain subset of commands here
         switch (command.getCommandType()) {
-            case SensorChange:
+            case ChangeSensorSensitivity:
                 // update the sensitivity for the given sensor
                 ChangeSensorSensitivity sensorChangeCommand = (ChangeSensorSensitivity) command;
                 mDataScalingHandler.setSensorSensitivity(sensorChangeCommand.sensorType, sensorChangeCommand.sensitivity);
+                break;
+            case SensorRangeNotification:
+                SensorRangeNotification notification = (SensorRangeNotification) command;
+                mDataScalingHandler.setSourceRange(notification.type, notification.range);
                 break;
             case ConnectionAliveCheck:
                 ConnectionAliveCheck check = (ConnectionAliveCheck) command;
@@ -311,6 +315,15 @@ public class ClientConnectionHandler implements OnCommandListener, DataSink, Con
             default:
                 mCommandListener.onCommand(inetAddress, command);
         }
+    }
+
+    /**
+     * Change the output range for a certain sensor
+     * @param sensor the sensor whose data will be affected
+     * @param outputRange the maximum and negative minimum of the resulting output range
+     */
+    public void setOutputRange(SensorType sensor, float outputRange){
+        mDataScalingHandler.setOutputRange(sensor, outputRange);
     }
 
     /**
@@ -344,14 +357,14 @@ public class ClientConnectionHandler implements OnCommandListener, DataSink, Con
          */
         DataScalingHandler(DataSink outgoingDataSink) {
             for (SensorType sensorType : SensorType.values())
-                mScalingFilters.put(sensorType, new NormalizationFilter(outgoingDataSink, 50));
+                mScalingFilters.put(sensorType, new NormalizationFilter(outgoingDataSink, 50f, 10, 100));
         }
 
         /**
          * Changes the scaling factor that is applied to a sensor
          *
          * @param sensorType  the sensor that shall be affected
-         * @param sensitivity the resulting factor will be (40 + sensitivity)
+         * @param sensitivity sensitivity factor. applied before normalization
          */
         void setSensorSensitivity(SensorType sensorType, float sensitivity) {
             // get the normalization filter configured for this sensor
@@ -359,6 +372,32 @@ public class ClientConnectionHandler implements OnCommandListener, DataSink, Con
 
             // update the sensitivity for this sensor type
             sensorTypeFilter.setCustomSensitivity(sensitivity);
+        }
+
+        /**
+         * This changes the range a certain sensor will be in.
+         *
+         * @param targetRange maximum and -minimum of the resulting range for this sensor
+         */
+        void setOutputRange(SensorType sensor, float targetRange) {
+            // get the normalization filter configured for this sensor
+            NormalizationFilter sensorTypeFilter = mScalingFilters.get(sensor);
+
+            // change the target range
+            sensorTypeFilter.setTargetRange(targetRange);
+        }
+
+        /**
+         * This changes the range a certain sensors data will be expected to be in
+         *
+         * @param sourceRange maximum and -minimum of the incoming range for this sensor
+         */
+        void setSourceRange(SensorType sensor, float sourceRange) {
+            // get the normalization filter configured for this sensor
+            NormalizationFilter sensorTypeFilter = mScalingFilters.get(sensor);
+
+            // change the target range
+            sensorTypeFilter.setSourceRange(sourceRange);
         }
 
         /**
