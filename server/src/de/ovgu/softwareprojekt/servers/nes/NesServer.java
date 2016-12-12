@@ -49,6 +49,7 @@ public class NesServer extends Server {
     public NesServer(@Nullable String serverName) throws IOException {
         super(serverName);
 
+        //TODO: Do we really use the RotationVector here or shouldn't it be gyroscope+accelerometer
         registerDataSink(this, SensorType.RotationVector);
     }
 

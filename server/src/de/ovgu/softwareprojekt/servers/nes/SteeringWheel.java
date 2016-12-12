@@ -92,10 +92,12 @@ public class SteeringWheel implements DataSink{
 
     /**
      * onData is responsible for the controller input.
-     * the SensorData here is a filtered additive value of the ZAXIS for steering the kart.
-     * Steering in Super Mario Kart is based on binary values 1 - steers in direction
-     *      and 0 - does not steer in this direction
-     * @param data
+     * SensorData send here is either gyroscope or accelerometer
+     * <br/>
+     * The gyroscope steers the player and is responsible for left right movement in the menu
+     * <br/>
+     * the accelerometer is responsible for throwing items and up, down movement in the menu
+     * @param data pipeline here is either the gyroscope or acc. pipeline
      */
     @Override
     public void onData(SensorData data) {
@@ -114,13 +116,28 @@ public class SteeringWheel implements DataSink{
             }
         }
 
-        //TODO: Decide how to deal with this Accelerometer
+        //TODO: Decide how to deal with this Accelerometer correctly; 20 is a random magic number place holder
         if(data.sensorType == SensorType.Accelerometer){
+            if(data.data[ZAXIS] > 20) {
+                mSteeringBot.keyPress(KeyEvent.VK_UP);
+                mSteeringBot.keyPress(KeyEvent.VK_X);
+                mSteeringBot.keyRelease(KeyEvent.VK_X);
+                mSteeringBot.keyRelease(KeyEvent.VK_UP);
+            }
+
+            else if(data.data[ZAXIS] < 20){
+                mSteeringBot.keyPress(KeyEvent.VK_DOWN);
+                mSteeringBot.keyPress(KeyEvent.VK_X);
+                mSteeringBot.keyRelease(KeyEvent.VK_X);
+                mSteeringBot.keyRelease(KeyEvent.VK_DOWN);
+            }
         }
     }
 
+    /**
+     * Needs to be implemented due to interface but serves no purpose here
+     */
     @Override
     public void close() {
-
     }
 }
