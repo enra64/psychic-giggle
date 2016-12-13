@@ -6,8 +6,11 @@ import de.ovgu.softwareprojekt.SensorData;
 import de.ovgu.softwareprojekt.SensorType;
 import de.ovgu.softwareprojekt.control.commands.ButtonClick;
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
+import de.ovgu.softwareprojekt.filters.IntegratingFiler;
+import de.ovgu.softwareprojekt.filters.ThresholdingFilter;
 import de.ovgu.softwareprojekt.networking.Server;
 
+import java.awt.*;
 import java.io.IOException;
 import java.util.Arrays;
 
@@ -35,6 +38,10 @@ public class NesServer extends Server {
      */
     private float[] mRotationMatrix = new float[9];
 
+    /**
+     *  The steering wheel emulates the peripheral device input
+     */
+    private SteeringWheel mSteeringWheel;
 
     /**
      * preset list of controller button IDs
@@ -47,21 +54,40 @@ public class NesServer extends Server {
      *
      * @param serverName if not null, this name will be used. otherwise, the devices hostname is used
      */
-    public NesServer(@Nullable String serverName) throws IOException {
+    public NesServer(@Nullable String serverName) throws IOException, AWTException {
         super(serverName);
 
+        mSteeringWheel = new SteeringWheel();
+
         //TODO: Do we really use the RotationVector here or shouldn't it be gyroscope+accelerometer
-        registerDataSink(new DataSink() {
-            @Override
-            public void onData(SensorData sensorData) {
-                //TODO: do whatever you do
-            }
 
-            @Override
-            public void close() {
+        //TODO: See what this test brings
+        //register use of gyroscope
+        DataSink gyroPipeline = new IntegratingFiler(mSteeringWheel);
+        registerDataSink(gyroPipeline, SensorType.Gyroscope);
 
-            }
-        }, SensorType.RotationVector);
+        //register use of accelerometer
+        DataSink accPipeline = new ThresholdingFilter(mSteeringWheel, 20f);
+        registerDataSink(accPipeline, SensorType.Accelerometer);
+
+        addButton("A", A_BUTTON);
+        addButton("B", B_BUTTON);
+        addButton("Start", START_BUTTON);
+
+        //TODO: No idea if this was just a Placeholder
+
+//        registerDataSink(new DataSink() {
+//            @Override
+//            public void onData(SensorData sensorData) {
+//                //TODO: do whatever you do
+//
+//            }
+//
+//            @Override
+//            public void close() {
+//
+//            }
+//        }, SensorType.RotationVector);
     }
 
     /**
@@ -108,9 +134,13 @@ public class NesServer extends Server {
 
     @Override
     public void onResetPosition(NetworkDevice origin) {
+        //TODO: To be implemented
     }
 
     @Override
     public void onButtonClick(ButtonClick click, NetworkDevice origin) {
+        mSteeringWheel.controllerInput(click.mID, true);
+        if(!click.isHold)
+            mSteeringWheel.controllerInput(click.mID, false);
     }
 }
