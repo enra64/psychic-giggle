@@ -34,6 +34,8 @@ public class IntegratingFiler extends AbstractFilter {
         data.data[XAXIS] = mSumOfRotationX;
         data.data[YAXIS] = mSumOfRotationY;
         data.data[ZAXIS] = mSumOfRotationZ;
+
+        mDataSink.onData(data);
     }
 
 }

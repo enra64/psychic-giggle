@@ -40,49 +40,47 @@ public class SteeringWheel implements DataSink{
             case NesServer.A_BUTTON:
                 if(isPressed)
                     mSteeringBot.keyPress(KeyEvent.VK_A);
-                else
                     mSteeringBot.keyRelease(KeyEvent.VK_A);
                 break;
             case NesServer.B_BUTTON:
                 if(isPressed)
                     mSteeringBot.keyPress(KeyEvent.VK_B);
-                else
                     mSteeringBot.keyRelease(KeyEvent.VK_B);
                 break;
             case NesServer.X_BUTTON:
                 if(isPressed)
                     mSteeringBot.keyPress(KeyEvent.VK_X);
-                else
+
                     mSteeringBot.keyRelease(KeyEvent.VK_X);
                 break;
             case NesServer.Y_BUTTON:
                 if(isPressed)
                     mSteeringBot.keyPress(KeyEvent.VK_Y);
-                else
+
                     mSteeringBot.keyRelease(KeyEvent.VK_Y);
                 break;
             case NesServer.SELECT_BUTTON:
                 if(isPressed)
                     mSteeringBot.keyPress(KeyEvent.VK_SPACE);
-                else
+
                     mSteeringBot.keyRelease(KeyEvent.VK_SPACE);
                 break;
             case NesServer.START_BUTTON:
                 if(isPressed)
                     mSteeringBot.keyPress(KeyEvent.VK_ENTER);
-                else
+
                     mSteeringBot.keyRelease(KeyEvent.VK_ENTER);
                 break;
             case NesServer.R_BUTTON:
                 if(isPressed)
                     mSteeringBot.keyPress(KeyEvent.VK_R);
-                else
+
                     mSteeringBot.keyRelease(KeyEvent.VK_R);
                 break;
             case NesServer.L_BUTTON:
                 if(isPressed)
                     mSteeringBot.keyPress(KeyEvent.VK_L);
-                else
+
                     mSteeringBot.keyRelease(KeyEvent.VK_L);
                 break;
             default:
@@ -101,15 +99,13 @@ public class SteeringWheel implements DataSink{
      */
     @Override
     public void onData(SensorData data) {
-
         if(data.sensorType == SensorType.Gyroscope) {
             //TODO: DECIDE THRESHOLD VALUE FOR STEERING
-            if (data.data[ZAXIS] < -5)
+            if (data.data[ZAXIS] > 20000)
                 mSteeringBot.keyPress(KeyEvent.VK_LEFT);
 
-            else if (data.data[ZAXIS] > 5)
+            else if (data.data[ZAXIS] < -30000)
                 mSteeringBot.keyPress(KeyEvent.VK_RIGHT);
-
             else{
                 mSteeringBot.keyRelease(KeyEvent.VK_LEFT);
                 mSteeringBot.keyRelease(KeyEvent.VK_RIGHT);
@@ -117,22 +113,22 @@ public class SteeringWheel implements DataSink{
         }
 
         //TODO: Decide how to deal with this Accelerometer correctly; 20 is a random magic number place holder
-        if(data.sensorType == SensorType.Accelerometer){
-            if(data.data[ZAXIS] > 20) {
-                mSteeringBot.keyPress(KeyEvent.VK_UP);
-                mSteeringBot.keyPress(KeyEvent.VK_X);
-                mSteeringBot.keyRelease(KeyEvent.VK_X);
-                mSteeringBot.keyRelease(KeyEvent.VK_UP);
-            }
-
-            else if(data.data[ZAXIS] < 20){
-                mSteeringBot.keyPress(KeyEvent.VK_DOWN);
-                mSteeringBot.keyPress(KeyEvent.VK_X);
-                mSteeringBot.keyRelease(KeyEvent.VK_X);
-                mSteeringBot.keyRelease(KeyEvent.VK_DOWN);
-            }
-        }
+//        if(data.sensorType == SensorType.Accelerometer){
+//            if(data.data[ZAXIS] > 3500) {
+//                mSteeringBot.keyPress(KeyEvent.VK_UP);
+//                mSteeringBot.keyPress(KeyEvent.VK_X);
+//                mSteeringBot.keyRelease(KeyEvent.VK_X);
+//                mSteeringBot.keyRelease(KeyEvent.VK_UP);
+//            }
+//
+//            if(data.data[ZAXIS] < -350){
+//                mSteeringBot.keyPress(KeyEvent.VK_DOWN);
+//                mSteeringBot.keyPress(KeyEvent.VK_X);
+//                mSteeringBot.keyRelease(KeyEvent.VK_X);
+//                mSteeringBot.keyRelease(KeyEvent.VK_DOWN);
+//            }
     }
+    // }
 
     /**
      * Needs to be implemented due to interface but serves no purpose here
