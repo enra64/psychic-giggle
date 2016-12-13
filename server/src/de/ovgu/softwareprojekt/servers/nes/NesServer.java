@@ -87,6 +87,7 @@ public class NesServer extends Server {
      */
     @Override
     public boolean acceptClient(NetworkDevice newClient) {
+        System.out.println("Player " + newClient.name + " connected");
         return true;
     }
 
