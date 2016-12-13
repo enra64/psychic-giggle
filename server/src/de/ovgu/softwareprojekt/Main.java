@@ -19,7 +19,7 @@ public class Main {
 //            case "nes":
                 new NesServer(null).start();
                 System.out.println("NesServer started");
-                //break;
-        }
+//              break;
+//        }
     }
-//}
+}

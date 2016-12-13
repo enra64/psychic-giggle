@@ -59,8 +59,7 @@ public class NesServer extends Server {
 
         mSteeringWheel = new SteeringWheel();
 
-        //TODO: Do we really use the RotationVector here or shouldn't it be gyroscope+accelerometer
-
+        //TODO: Do we really use the RotationVector here or shouldn't it be gyroscope+accelerometer?
         //TODO: See what this test brings
         //register use of gyroscope
         DataSink gyroPipeline = new IntegratingFiler(mSteeringWheel);
@@ -68,7 +67,7 @@ public class NesServer extends Server {
         registerDataSink(gyroPipeline, SensorType.Gyroscope);
 
         //register use of accelerometer
-        DataSink accPipeline = new ThresholdingFilter(mSteeringWheel, 20f);
+        DataSink accPipeline = mSteeringWheel;  //Accelerometer ought to be filtered ... but what is the best approach?
         setSensorOutputRange(SensorType.Accelerometer,100);
         registerDataSink(accPipeline, SensorType.Accelerometer);
 
@@ -137,11 +136,11 @@ public class NesServer extends Server {
     @Override
     public void onResetPosition(NetworkDevice origin) {
         //TODO: To be implemented
+        //Idea: Reset Integrating filter. At start it is set to 0 which means it doesn't steer at all
     }
 
     @Override
     public void onButtonClick(ButtonClick click, NetworkDevice origin) {
-        if(click.isHold)
         mSteeringWheel.controllerInput(click.mID, true);
         if(!click.isHold)
             mSteeringWheel.controllerInput(click.mID, false);
