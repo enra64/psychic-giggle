@@ -245,7 +245,7 @@ public abstract class Server implements OnCommandListener, DataSink, ClientListe
 
         // add new data sink list if the requested sensor type has no sinks yet
         if (!mDataSinks.containsKey(requestedSensor))
-            mDataSinks.put(requestedSensor, new HashSet<>());
+            mDataSinks.put(requestedSensor, new HashSet<DataSink>());
 
         // add the new sink to the list of sink for the sensor
         mDataSinks.get(requestedSensor).add(dataSink);
