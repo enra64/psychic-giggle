@@ -11,7 +11,7 @@ import javax.swing.*;
 import java.io.IOException;
 
 public class Grapher extends Server {
-    public Grapher(GraphPanel graphPanel) {
+    public Grapher(final GraphPanel graphPanel) {
         super("graphing server");
 
         try {
