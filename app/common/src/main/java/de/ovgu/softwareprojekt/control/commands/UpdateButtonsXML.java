@@ -5,9 +5,9 @@ package de.ovgu.softwareprojekt.control.commands;
  */
 
 public class UpdateButtonsXML extends AbstractCommand{
-    String xmlContent;
+    public String xmlContent;
 
-    protected UpdateButtonsXML(String xml) {
+    public UpdateButtonsXML(String xml) {
         super(CommandType.UpdateButtonsXML);
         this.xmlContent = xml;
     }

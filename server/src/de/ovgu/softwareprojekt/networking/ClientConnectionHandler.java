@@ -1,5 +1,6 @@
 package de.ovgu.softwareprojekt.networking;
 
+import com.sun.istack.internal.Nullable;
 import de.ovgu.softwareprojekt.DataSink;
 import de.ovgu.softwareprojekt.SensorType;
 import de.ovgu.softwareprojekt.control.OnCommandListener;
@@ -62,6 +63,12 @@ class ClientConnectionHandler {
      * the data sink where all data produced by the clients is put into
      */
     private DataSink mDataSink;
+
+    /**
+     * AndroidXML for Buttonlayout
+     * is null if no AndroidXML is given or the ButtonMap is used
+     */
+    private String mButtonXML = null;
 
     ClientConnectionHandler(String serverName, ExceptionListener exceptionListener, OnCommandListener commandListener, ClientListener clientListener, DataSink dataSink) {
         mServerName = serverName;
@@ -131,6 +138,7 @@ class ClientConnectionHandler {
 
     /**
      * Add a button to be displayed on the clients
+     * clears XMLLayout
      *
      * @param name text to be displayed on the button
      * @param id   id of the button. ids below zero are reserved.
@@ -141,6 +149,8 @@ class ClientConnectionHandler {
 
         // add the new button to local storage
         mButtonList.put(id, name);
+        //in Case ButtonMap is used after ButtonXML -> ButtonXML has to be set null again
+        mButtonXML = null;
 
         // update the button list on our clients
         updateButtons();
@@ -148,15 +158,28 @@ class ClientConnectionHandler {
 
     /**
      * Remove a button from the clients
+     * clears XMLLayout
      *
-     * @param id id of the button
+     * @param  id id of the button
      */
     void removeButton(int id) throws IOException {
         // remove the button from local storage
         mButtonList.remove(id);
+        //in Case ButtonMap is used after ButtonXML -> ButtonXML has to be set null again
+        mButtonXML = null;
 
         // update the button list on our clients
         updateButtons();
+    }
+
+    /**
+     * sets mButtonXML to an incoming XML-String
+     *
+     * @param xml valid android XML layout using only linear layout and button
+     *            if string is null ButtonMap will be used
+     */
+    void setButtonLayout(@Nullable String xml){
+        this.mButtonXML = xml;
     }
 
     /**
@@ -213,12 +236,19 @@ class ClientConnectionHandler {
 
     /**
      * Force each client to update his buttons
-     *
+     * chooses between {@link ClientConnection#updateButtons(String)} and {@link ClientConnection#updateButtons(Map)}
+     * if {@link #mButtonXML} is given, it is preferred over [{@link #mButtonList}
      * @throws IOException if the command could not be sent
      */
     private void updateButtons() throws IOException {
-        for (ClientConnection client : mClientConnections)
-            client.updateButtons(mButtonList);
+        for (ClientConnection client : mClientConnections) {
+            if (mButtonXML != null) {
+                client.updateButtons(mButtonXML);
+            }
+            else if(mButtonList != null){
+                client.updateButtons(mButtonList);
+            }
+        }
     }
 
     /**

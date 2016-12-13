@@ -10,7 +10,7 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="de.ovgu.softwareprojektapp.SendActivity">
 
-    <LinearLayout
+    <de.ovgu.softwareprojektapp.LayoutParser
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -18,7 +18,7 @@
         android:id="@+id/runtime_button_parent"
         android:layout_above="@+id/compileTimeButtonLayout">
 
-    </LinearLayout>
+    </de.ovgu.softwareprojektapp.LayoutParser>
 
     <LinearLayout
         android:id="@+id/compileTimeButtonLayout"

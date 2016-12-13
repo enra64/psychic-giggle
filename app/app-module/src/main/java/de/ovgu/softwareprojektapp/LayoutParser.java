@@ -2,6 +2,7 @@ package de.ovgu.softwareprojektapp;
 
 
 import android.content.Context;
+import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
@@ -29,17 +30,28 @@ import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 import static android.widget.LinearLayout.LayoutParams.WRAP_CONTENT;
 
 public class LayoutParser extends LinearLayout {
-    private DocumentBuilder parser;
-    private final NetworkClient mNetworkClient;
+    private NetworkClient mNetworkClient = null;
 
-    public LayoutParser(Context context, NetworkClient networkClient) throws ParserConfigurationException {
+    public LayoutParser(Context context) {
         super(context);
-        parser = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+    }
+
+    public LayoutParser(Context context, AttributeSet attrs) {
+        super(context, attrs);
+    }
+
+    public LayoutParser(Context context, AttributeSet attrs, int defStyleAttr) {
+        super(context, attrs, defStyleAttr);
+    }
+
+    public void setNetworkClient(NetworkClient networkClient){
         mNetworkClient = networkClient;
     }
 
     public void createFromXML(String xmlString, LinearLayout linlay) throws InvalidLayoutException {
+        removeAllViews();
         try {
+            DocumentBuilder parser = DocumentBuilderFactory.newInstance().newDocumentBuilder();
             InputStream xmlStream = new ByteArrayInputStream(xmlString.getBytes("utf-8"));
             Document doc = parser.parse(xmlStream);
 
@@ -61,6 +73,8 @@ public class LayoutParser extends LinearLayout {
             }
         } catch (SAXException | IOException e) {
             throw new InvalidLayoutException("Invalid XML encountered");
+        } catch (ParserConfigurationException e) {
+            e.printStackTrace();
         }
     }
 

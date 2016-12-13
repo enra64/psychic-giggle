@@ -71,7 +71,7 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
     /**
      * linear layout as a space to add buttons
      */
-    private LinearLayout mRuntimeButtonLayout;
+    private LayoutParser mRuntimeButtonLayout;
 
     /**
      * The SensorHandler used to handle our sensor needs
@@ -89,7 +89,7 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
         setContentView(R.layout.activity_send);
 
         // find the layout we use to display buttons requested by the server
-        mRuntimeButtonLayout = (LinearLayout) findViewById(R.id.runtime_button_parent);
+        mRuntimeButtonLayout = (LayoutParser) findViewById(R.id.runtime_button_parent);
 
         // we create a NetworkDevice from our extras to have all the data we need in a neat package
         parseIncomingNetworkDevice();
@@ -111,6 +111,9 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
 
         // immediately try to connect to the server
         initiateConnection();
+
+        //set NetworkClient in LayoutParser
+        mRuntimeButtonLayout.setNetworkClient(mNetworkClient);
 
         // default activity result is closing by user
         setResult(RESULT_USER_STOPPED);
@@ -299,6 +302,7 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
                 break;
             case UpdateButtonsXML:
                 UpdateButtonsXML addComXML = (UpdateButtonsXML) command;
+                createButtons(addComXML);
 
             case SetSensorSpeed:
                 // update the speed for the given sensor
@@ -337,27 +341,9 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                // clear all old buttons
-                mRuntimeButtonLayout.removeAllViews();
 
-
-                for (Map.Entry<Integer, String> button : addCom.buttons.entrySet()) {
-                    Button btn = new Button(SendActivity.this);
-                    btn.setLayoutParams(new LinearLayout.LayoutParams(LinearLayoutCompat.LayoutParams.MATCH_PARENT, mRuntimeButtonLayout.getHeight() / addCom.buttons.size()));
-                    mRuntimeButtonLayout.addView(btn);
-                    btn.setText(button.getValue());
-                    btn.setTag(button.getKey());
-                    btn.setOnTouchListener(new View.OnTouchListener() {
-                        @Override
-                        public boolean onTouch(View view, MotionEvent motionEvent) {
-                            if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
-                                mNetworkClient.sendCommand(new ButtonClick((Integer) view.getTag(), true));
-                            } else if (motionEvent.getAction() == MotionEvent.ACTION_UP)
-                                mNetworkClient.sendCommand(new ButtonClick((Integer) view.getTag(), false));
-                            return true;
-                        }
-                    });
-                }
+               mRuntimeButtonLayout.createFromMap(SendActivity.this, addCom.buttons);
+                
             }
         });
     }
@@ -366,8 +352,13 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                //clear old buttons
-                mRuntimeButtonLayout.removeAllViews();
+
+                try {
+                    mRuntimeButtonLayout.createFromXML(addCom.xmlContent, mRuntimeButtonLayout);
+                } catch (InvalidLayoutException e) {
+                    UiUtil.showAlert(SendActivity.this, "invalid server configuration", "XML layout could not be parsed");
+                }
+
             }
         });
     }
