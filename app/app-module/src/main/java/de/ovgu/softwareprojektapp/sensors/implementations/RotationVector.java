@@ -22,7 +22,7 @@ public class RotationVector extends AbstractSensor {
      * @param context    android system context needed for sensors
      */
     public RotationVector(Context context) {
-        super(context, Sensor.TYPE_ROTATION_VECTOR, SensorType.Accelerometer);
+        super(context, Sensor.TYPE_ROTATION_VECTOR, SensorType.RotationVector);
     }
 
     /**
