@@ -64,10 +64,12 @@ public class NesServer extends Server {
         //TODO: See what this test brings
         //register use of gyroscope
         DataSink gyroPipeline = new IntegratingFiler(mSteeringWheel);
+        setSensorOutputRange(SensorType.Gyroscope,100);
         registerDataSink(gyroPipeline, SensorType.Gyroscope);
 
         //register use of accelerometer
         DataSink accPipeline = new ThresholdingFilter(mSteeringWheel, 20f);
+        setSensorOutputRange(SensorType.Accelerometer,100);
         registerDataSink(accPipeline, SensorType.Accelerometer);
 
         addButton("A", A_BUTTON);
@@ -139,6 +141,7 @@ public class NesServer extends Server {
 
     @Override
     public void onButtonClick(ButtonClick click, NetworkDevice origin) {
+        if(click.isHold)
         mSteeringWheel.controllerInput(click.mID, true);
         if(!click.isHold)
             mSteeringWheel.controllerInput(click.mID, false);
