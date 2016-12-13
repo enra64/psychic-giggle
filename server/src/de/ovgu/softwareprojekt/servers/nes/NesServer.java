@@ -134,9 +134,13 @@ public class NesServer extends Server {
 
     @Override
     public void onResetPosition(NetworkDevice origin) {
+        //TODO: To be implemented
     }
 
     @Override
     public void onButtonClick(ButtonClick click, NetworkDevice origin) {
+        mSteeringWheel.controllerInput(click.mID, true);
+        if(!click.isHold)
+            mSteeringWheel.controllerInput(click.mID, false);
     }
 }
