@@ -1,6 +1,7 @@
 package de.ovgu.softwareprojekt.servers.nes;
 
 import com.sun.istack.internal.Nullable;
+import de.ovgu.softwareprojekt.DataSink;
 import de.ovgu.softwareprojekt.SensorData;
 import de.ovgu.softwareprojekt.SensorType;
 import de.ovgu.softwareprojekt.control.commands.ButtonClick;
@@ -50,7 +51,17 @@ public class NesServer extends Server {
         super(serverName);
 
         //TODO: Do we really use the RotationVector here or shouldn't it be gyroscope+accelerometer
-        registerDataSink(this, SensorType.RotationVector);
+        registerDataSink(new DataSink() {
+            @Override
+            public void onData(SensorData sensorData) {
+                //TODO: do whatever you do
+            }
+
+            @Override
+            public void close() {
+
+            }
+        }, SensorType.RotationVector);
     }
 
     /**
@@ -62,9 +73,9 @@ public class NesServer extends Server {
      */
     @Override
     public void onException(Object origin, Exception exception, String info) {
-        exception.printStackTrace();
-        System.out.println("with additional information:\n" + info);
+        System.out.println("onException:\n" + info);
         System.out.println("in " + origin.getClass());
+        exception.printStackTrace();
         System.exit(0);
     }
 

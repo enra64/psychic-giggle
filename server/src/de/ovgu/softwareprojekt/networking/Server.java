@@ -13,6 +13,7 @@ import de.ovgu.softwareprojekt.misc.ExceptionListener;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.security.InvalidParameterException;
 import java.util.EnumMap;
 import java.util.HashSet;
 
@@ -238,6 +239,10 @@ public abstract class Server implements OnCommandListener, DataSink, ClientListe
      * @param requestedSensor which sensors events are relevant
      */
     protected void registerDataSink(DataSink dataSink, SensorType requestedSensor) throws IOException {
+        // dataSink *must not be* this, as that would lead to infinite recursion
+        if(this == dataSink)
+            throw new InvalidParameterException("A Server subclass cannot register itself as a data sink.");
+
         // add new data sink list if the requested sensor type has no sinks yet
         if (!mDataSinks.containsKey(requestedSensor))
             mDataSinks.put(requestedSensor, new HashSet<>());
@@ -311,7 +316,7 @@ public abstract class Server implements OnCommandListener, DataSink, ClientListe
      * @param sensor      affected sensor
      * @param outputRange the resulting maximum and negative minimum of the sensor output range. Default is -100 to 100.
      */
-    protected void setSensorOutputRange(SensorType sensor, @SuppressWarnings("SameParameterValue") float outputRange){
+    protected void setSensorOutputRange(SensorType sensor, @SuppressWarnings("SameParameterValue") float outputRange) {
         mClientHandlerFactory.setSensorOutputRange(sensor, outputRange);
     }
 }

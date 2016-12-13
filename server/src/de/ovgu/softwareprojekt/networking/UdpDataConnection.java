@@ -3,6 +3,7 @@ package de.ovgu.softwareprojekt.networking;
 import de.ovgu.softwareprojekt.DataSink;
 import de.ovgu.softwareprojekt.DataSource;
 import de.ovgu.softwareprojekt.SensorData;
+import de.ovgu.softwareprojekt.misc.ExceptionListener;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -32,10 +33,16 @@ class UdpDataConnection extends Thread implements DataSource {
     private int mLocalPort;
 
     /**
+     * Who to report bad exceptions to
+     */
+    private ExceptionListener mExceptionListener;
+
+    /**
      * Create a new UdpDataConnection that will start listening after {@link #start()} is called.
      */
-    UdpDataConnection() throws SocketException {
+    UdpDataConnection(ExceptionListener exceptionListener) throws SocketException {
         mLocalPort = findFreePort();
+        mExceptionListener = exceptionListener;
     }
 
     /**
@@ -79,6 +86,11 @@ class UdpDataConnection extends Thread implements DataSource {
 
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
+        } catch (NullPointerException e){
+            mExceptionListener.onException(
+                    UdpDataConnection.this,
+                    e,
+                    "A NullPointerException was encountered when data arrived.");
         }
     }
 

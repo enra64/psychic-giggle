@@ -234,7 +234,7 @@ public class ClientConnection implements OnCommandListener, DataSink, Connection
      */
     private void initialiseDataConnection() throws SocketException {
         // begin a new data connection
-        mDataConnection = new UdpDataConnection();
+        mDataConnection = new UdpDataConnection(mExceptionListener);
 
         // register a callback for data objects
         mDataConnection.setDataSink(mDataSink);

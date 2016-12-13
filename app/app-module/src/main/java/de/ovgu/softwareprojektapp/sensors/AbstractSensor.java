@@ -203,7 +203,7 @@ public abstract class AbstractSensor implements DataSource, SensorEventListener 
         // push data into sink
         mSink.onData(
                 new SensorData(
-                        SensorType.Gyroscope,
+                        mPsychicSensorType,
                         sensorEvent.values,
                         sensorEvent.timestamp));
     }
