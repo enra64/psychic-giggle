@@ -7,7 +7,7 @@ import de.ovgu.softwareprojekt.SensorData;
 import static java.lang.Math.abs;
 
 /**
- * This filter ignores changes in sensor data up to a certain margin to avoid zittering when trying not to move,
+ * This filter ignores changes in sensor data up to a certain margin to avoid shaking when trying not to move,
  * for example when pointing with a mouse
  */
 public class MinimumAmplitudeFilter extends AbstractFilter {

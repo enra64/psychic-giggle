@@ -98,6 +98,9 @@ public class MouseMover implements DataSink {
         mMoveBot.mouseMove(mousePos.x - xAxis, mousePos.y - yAxis);
     }
 
+    /**
+     * Needs to be implemented due to interface but serves no purpose here
+     */
     @Override
     public void close() {
     }

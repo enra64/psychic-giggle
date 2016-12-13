@@ -34,6 +34,13 @@ public class NesServer extends Server {
      */
     private float[] mRotationMatrix = new float[9];
 
+
+    /**
+     * preset list of controller button IDs
+     */
+    static final int A_BUTTON = 0, B_BUTTON = 1, X_BUTTON = 2, Y_BUTTON = 3, SELECT_BUTTON = 4, START_BUTTON = 5,
+            R_BUTTON = 6, L_BUTTON = 7;
+
     /**
      * Create a new server. It will be offline (not using any sockets) until {@link #start()} is called.
      *
@@ -42,6 +49,7 @@ public class NesServer extends Server {
     public NesServer(@Nullable String serverName) throws IOException {
         super(serverName);
 
+        //TODO: Do we really use the RotationVector here or shouldn't it be gyroscope+accelerometer
         registerDataSink(this, SensorType.RotationVector);
     }
 
