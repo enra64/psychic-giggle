@@ -263,8 +263,9 @@ public class ClientConnectionHandler implements OnCommandListener, DataSink, Con
      */
     void updateButtons(Map<Integer, String> buttonList) throws IOException {
         // if the button list was changed, we need to update the clients buttons
-        sendCommand(new UpdateButtons(buttonList));
+        sendCommand(new UpdateButtonsMap(buttonList));
     }
+    
 
     /**
      * Notify the client of all required sensors

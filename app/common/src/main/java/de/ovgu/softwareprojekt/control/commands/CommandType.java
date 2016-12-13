@@ -8,10 +8,12 @@ public enum CommandType {
     ConnectionRequestResponse,
     SetSensor,
     EndConnection,
-    AddButton,
     ButtonClick,
     ChangeSensorSensitivity,
     ResetToCenter,
     ConnectionAliveCheck,
-    SensorRangeNotification, SetSensorSpeed
+    SensorRangeNotification,
+    UpdateButtonsMap,
+    UpdateButtonsXML,
+    SetSensorSpeed
 }

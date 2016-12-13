@@ -33,7 +33,9 @@ import de.ovgu.softwareprojekt.control.commands.ResetToCenter;
 import de.ovgu.softwareprojekt.control.commands.SensorRangeNotification;
 import de.ovgu.softwareprojekt.control.commands.SetSensorCommand;
 import de.ovgu.softwareprojekt.control.commands.SetSensorSpeed;
-import de.ovgu.softwareprojekt.control.commands.UpdateButtons;
+import de.ovgu.softwareprojekt.control.commands.UpdateButtonsMap;
+import de.ovgu.softwareprojekt.control.commands.UpdateButtonsMap;
+import de.ovgu.softwareprojekt.control.commands.UpdateButtonsXML;
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
 import de.ovgu.softwareprojekt.misc.ExceptionListener;
 import de.ovgu.softwareprojektapp.networking.NetworkClient;
@@ -290,11 +292,14 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
                 setSensor(com.requiredSensors);
                 break;
             //adds a button to the activity with id and name
-            case AddButton:
+            case UpdateButtonsMap:
                 //create button with name and id
-                UpdateButtons addCom = (UpdateButtons) command;
-                createButtons(addCom);
+                UpdateButtonsMap addComMap = (UpdateButtonsMap) command;
+                createButtons(addComMap);
                 break;
+            case UpdateButtonsXML:
+                UpdateButtonsXML addComXML = (UpdateButtonsXML) command;
+
             case SetSensorSpeed:
                 // update the speed for the given sensor
                 SetSensorSpeed setSpeedCommand = (SetSensorSpeed) command;
@@ -328,7 +333,7 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
         //TODO: wörkwörk markus
     }
 
-    public void createButtons(final UpdateButtons addCom) {
+    public void createButtons(final UpdateButtonsMap addCom) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -353,6 +358,16 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
                         }
                     });
                 }
+            }
+        });
+    }
+
+    public void createButtons(final UpdateButtonsXML addCom){
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                //clear old buttons
+                mRuntimeButtonLayout.removeAllViews();
             }
         });
     }
