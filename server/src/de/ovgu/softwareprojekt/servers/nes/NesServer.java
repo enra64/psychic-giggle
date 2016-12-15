@@ -43,6 +43,8 @@ public class NesServer extends Server {
      */
     private SteeringWheel mSteeringWheel;
 
+    private IntegratingFiler mIntegratingFilter;
+
     /**
      * preset list of controller button IDs
      */
@@ -62,7 +64,8 @@ public class NesServer extends Server {
         //TODO: Do we really use the RotationVector here or shouldn't it be gyroscope+accelerometer?
         //TODO: See what this test brings
         //register use of gyroscope
-        DataSink gyroPipeline = new IntegratingFiler(mSteeringWheel);
+        mIntegratingFilter = new IntegratingFiler(mSteeringWheel);
+        DataSink gyroPipeline = mIntegratingFilter;
         setSensorOutputRange(SensorType.Gyroscope,100);
         registerDataSink(gyroPipeline, SensorType.Gyroscope);
 
@@ -135,8 +138,9 @@ public class NesServer extends Server {
 
     @Override
     public void onResetPosition(NetworkDevice origin) {
-        //TODO: To be implemented
-        //Idea: Reset Integrating filter. At start it is set to 0 which means it doesn't steer at all
+        //TODO: Use this way or unregister current gyroscope pipeline and register a new one
+        //Idea: Reset Integrating filter to 0 which means it acts as the initial position
+        mIntegratingFilter.resetFilter();
     }
 
     @Override
