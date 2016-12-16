@@ -7,6 +7,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -45,7 +46,7 @@ public class LayoutParser extends LinearLayout {
         super(context, attrs, defStyleAttr);
     }
 
-    public void setNetworkClient(NetworkClient networkClient){
+    public void setNetworkClient(NetworkClient networkClient) {
         mNetworkClient = networkClient;
     }
 
@@ -55,19 +56,18 @@ public class LayoutParser extends LinearLayout {
             DocumentBuilder parser = DocumentBuilderFactory.newInstance().newDocumentBuilder();
             InputStream xmlStream = new ByteArrayInputStream(xmlString.getBytes("utf-8"));
             Document doc = parser.parse(xmlStream);
-
             org.w3c.dom.Element root = doc.getDocumentElement();
             root.normalize();
 
             NodeList nList = root.getChildNodes();
 
-            for (int i = 0 ; i < nList.getLength(); i++){
+            for (int i = 0; i < nList.getLength(); i++) {
                 Node node = nList.item(i);
-                if(node.getNodeType() == Node.ELEMENT_NODE){
+                if (node.getNodeType() == Node.ELEMENT_NODE) {
                     org.w3c.dom.Element nodeElement = (Element) node;
-                    if(nodeElement.getTagName().equals("LinearLayout")){
-                        createFromXML(nodeElement.toString(), new LinearLayout(linlay.getContext()));
-                    } else if (nodeElement.getTagName().equals("Button")){
+                    if (nodeElement.getTagName().equals("LinearLayout")) {
+                        createFromXML(nodeElement, new LinearLayout(linlay.getContext()));
+                    } else if (nodeElement.getTagName().equals("Button")) {
                         addButtons(nodeElement, linlay);
                     }
                 }
@@ -79,7 +79,7 @@ public class LayoutParser extends LinearLayout {
         }
     }
 
-    public void createFromMap(Context context, Map<Integer, String> buttons){
+    public void createFromMap(Context context, Map<Integer, String> buttons) {
         removeAllViews();
 
         for (Map.Entry<Integer, String> button : buttons.entrySet()) {
@@ -104,24 +104,45 @@ public class LayoutParser extends LinearLayout {
     }
 
     private void addButtons(Node node, LinearLayout linlay) throws InvalidLayoutException {
-        Node weightNode = node.getAttributes().getNamedItem("layout_weight");
-        Node textNode = node.getAttributes().getNamedItem("text");
-        Node idNode = node.getAttributes().getNamedItem("id");
+        Node weightNode = node.getAttributes().getNamedItem("android:layout_weight");
+        Node textNode = node.getAttributes().getNamedItem("android:text");
+        Node idNode = node.getAttributes().getNamedItem("android:id");
         Button newButton = new Button(linlay.getContext());
-        if(idNode != null && idNode.getNodeValue() != null)
+        if (idNode == null || idNode.getNodeValue() == null)
             throw new InvalidLayoutException("Button without ID");
 
         newButton.setId(Integer.parseInt(idNode.getNodeValue()));
 
-        if(textNode == null)
+        if (textNode == null)
             newButton.setText("Button " + Integer.parseInt(idNode.getNodeValue()));
         else
             newButton.setText(textNode.getNodeValue());
 
-        if(weightNode != null){
-            LayoutParams layoutParams  = new LayoutParams(WRAP_CONTENT, WRAP_CONTENT);
+        if (weightNode != null) {
+            LayoutParams layoutParams = new LayoutParams(MATCH_PARENT, MATCH_PARENT);
             layoutParams.weight = Float.parseFloat(weightNode.getNodeValue());
+            newButton.setLayoutParams(layoutParams);
         }
         linlay.addView(newButton);
+    }
+
+    private void createFromXML(Node node, LinearLayout linlay) throws InvalidLayoutException {
+        org.w3c.dom.Element root = (Element) node;
+        root.normalize();
+
+        NodeList nList = root.getChildNodes();
+
+        for (int i = 0; i < nList.getLength(); i++) {
+            Node item = nList.item(i);
+            if (item.getNodeType() == Node.ELEMENT_NODE) {
+                org.w3c.dom.Element nodeElement = (Element) item;
+                if (nodeElement.getTagName().equals("LinearLayout")) {
+                    createFromXML(nodeElement, new LinearLayout(linlay.getContext()));
+                } else if (nodeElement.getTagName().equals("Button")) {
+                    addButtons(nodeElement, linlay);
+                }
+            }
+        }
+        addView(linlay);
     }
 }

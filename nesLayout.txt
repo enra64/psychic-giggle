@@ -1,14 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:weightSum="11">
+    android:layout_height="match_parent">
 
     <Button
-        android:text="Button"
+        android:text="Button1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/button5"
+        android:id="1"
         android:layout_weight="5"/>
 
     <LinearLayout
@@ -18,26 +17,26 @@
         android:layout_weight="1">
 
         <Button
-            android:text="Button"
+            android:text="Button2"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:id="@+id/button3"
+            android:id="2"
             android:layout_weight="1" />
 
         <Button
-            android:text="Button"
+            android:text="Button3"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:id="@+id/button4"
+            android:id="3"
             android:layout_weight="1" />
     </LinearLayout>
 
 
     <Button
-        android:text="Button"
+        android:text="Button4"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/button2"
+        android:id="4"
         android:layout_weight="5"/>
 
 </LinearLayout>

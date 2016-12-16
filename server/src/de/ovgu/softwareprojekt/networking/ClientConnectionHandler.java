@@ -109,7 +109,7 @@ class ClientConnectionHandler {
 
         // send the sensor- and button requirements to the new client
         handler.updateSensors(mRequiredSensors);
-        handler.updateButtons(mButtonList);
+        updateButtons();
         handler.updateSpeeds(mSensorSpeeds.entrySet());
     }
 
@@ -178,8 +178,10 @@ class ClientConnectionHandler {
      * @param xml valid android XML layout using only linear layout and button
      *            if string is null ButtonMap will be used
      */
-    void setButtonLayout(@Nullable String xml){
+    void setButtonLayout(@Nullable String xml) throws IOException {
         this.mButtonXML = xml;
+
+        updateButtons();
     }
 
     /**

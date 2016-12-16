@@ -303,6 +303,7 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
             case UpdateButtonsXML:
                 UpdateButtonsXML addComXML = (UpdateButtonsXML) command;
                 createButtons(addComXML);
+                break;
 
             case SetSensorSpeed:
                 // update the speed for the given sensor
@@ -337,7 +338,7 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
         //TODO: wörkwörk markus
     }
 
-    public void createButtons(final UpdateButtonsMap addCom) {
+    private void createButtons(final UpdateButtonsMap addCom) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -348,7 +349,7 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
         });
     }
 
-    public void createButtons(final UpdateButtonsXML addCom){
+    private void createButtons(final UpdateButtonsXML addCom){
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
