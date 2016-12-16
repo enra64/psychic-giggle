@@ -25,7 +25,7 @@ public class Grapher extends Server {
                 @Override
                 public void close() {
                 }
-            }, SensorType.Accelerometer);
+            }, SensorType.Gyroscope);
         } catch (IOException e) {
             e.printStackTrace();
             System.exit(1);

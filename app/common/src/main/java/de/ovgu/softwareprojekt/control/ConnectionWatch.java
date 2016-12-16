@@ -41,7 +41,7 @@ public class ConnectionWatch extends TimerTask {
     /**
      * If the time between connection check requests exceeds this time, the connection is deemed dead.
      */
-    private static final long MAXIMUM_CLIENT_RESPONSE_DELAY = 1000;
+    private static final long MAXIMUM_CLIENT_RESPONSE_DELAY = 100000000;
 
     /**
      * This is the first of two timestamps used to keep check of the delay between sending the request

@@ -33,7 +33,9 @@ import de.ovgu.softwareprojekt.control.commands.ResetToCenter;
 import de.ovgu.softwareprojekt.control.commands.SensorRangeNotification;
 import de.ovgu.softwareprojekt.control.commands.SetSensorCommand;
 import de.ovgu.softwareprojekt.control.commands.SetSensorSpeed;
-import de.ovgu.softwareprojekt.control.commands.UpdateButtons;
+import de.ovgu.softwareprojekt.control.commands.UpdateButtonsMap;
+import de.ovgu.softwareprojekt.control.commands.UpdateButtonsMap;
+import de.ovgu.softwareprojekt.control.commands.UpdateButtonsXML;
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
 import de.ovgu.softwareprojekt.misc.ExceptionListener;
 import de.ovgu.softwareprojektapp.networking.NetworkClient;
@@ -69,7 +71,7 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
     /**
      * linear layout as a space to add buttons
      */
-    private LinearLayout mRuntimeButtonLayout;
+    private LayoutParser mRuntimeButtonLayout;
 
     /**
      * The SensorHandler used to handle our sensor needs
@@ -87,7 +89,7 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
         setContentView(R.layout.activity_send);
 
         // find the layout we use to display buttons requested by the server
-        mRuntimeButtonLayout = (LinearLayout) findViewById(R.id.runtime_button_parent);
+        mRuntimeButtonLayout = (LayoutParser) findViewById(R.id.runtime_button_parent);
 
         // we create a NetworkDevice from our extras to have all the data we need in a neat package
         parseIncomingNetworkDevice();
@@ -109,6 +111,9 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
 
         // immediately try to connect to the server
         initiateConnection();
+
+        //set NetworkClient in LayoutParser
+        mRuntimeButtonLayout.setNetworkClient(mNetworkClient);
 
         // default activity result is closing by user
         setResult(RESULT_USER_STOPPED);
@@ -290,11 +295,16 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
                 setSensor(com.requiredSensors);
                 break;
             //adds a button to the activity with id and name
-            case AddButton:
+            case UpdateButtonsMap:
                 //create button with name and id
-                UpdateButtons addCom = (UpdateButtons) command;
-                createButtons(addCom);
+                UpdateButtonsMap addComMap = (UpdateButtonsMap) command;
+                createButtons(addComMap);
                 break;
+            case UpdateButtonsXML:
+                UpdateButtonsXML addComXML = (UpdateButtonsXML) command;
+                createButtons(addComXML);
+                break;
+
             case SetSensorSpeed:
                 // update the speed for the given sensor
                 SetSensorSpeed setSpeedCommand = (SetSensorSpeed) command;
@@ -328,31 +338,28 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
         //TODO: wörkwörk markus
     }
 
-    public void createButtons(final UpdateButtons addCom) {
+    private void createButtons(final UpdateButtonsMap addCom) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                // clear all old buttons
-                mRuntimeButtonLayout.removeAllViews();
 
+               mRuntimeButtonLayout.createFromMap(SendActivity.this, addCom.buttons);
 
-                for (Map.Entry<Integer, String> button : addCom.buttons.entrySet()) {
-                    Button btn = new Button(SendActivity.this);
-                    btn.setLayoutParams(new LinearLayout.LayoutParams(LinearLayoutCompat.LayoutParams.MATCH_PARENT, mRuntimeButtonLayout.getHeight() / addCom.buttons.size()));
-                    mRuntimeButtonLayout.addView(btn);
-                    btn.setText(button.getValue());
-                    btn.setTag(button.getKey());
-                    btn.setOnTouchListener(new View.OnTouchListener() {
-                        @Override
-                        public boolean onTouch(View view, MotionEvent motionEvent) {
-                            if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
-                                mNetworkClient.sendCommand(new ButtonClick((Integer) view.getTag(), true));
-                            } else if (motionEvent.getAction() == MotionEvent.ACTION_UP)
-                                mNetworkClient.sendCommand(new ButtonClick((Integer) view.getTag(), false));
-                            return true;
-                        }
-                    });
+            }
+        });
+    }
+
+    private void createButtons(final UpdateButtonsXML addCom){
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+
+                try {
+                    mRuntimeButtonLayout.createFromXML(addCom.xmlContent, mRuntimeButtonLayout);
+                } catch (InvalidLayoutException e) {
+                    UiUtil.showAlert(SendActivity.this, "invalid server configuration", "XML layout could not be parsed");
                 }
+
             }
         });
     }

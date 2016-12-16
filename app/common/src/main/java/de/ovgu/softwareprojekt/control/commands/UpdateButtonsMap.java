@@ -6,11 +6,11 @@ import java.util.Map;
  * Created by markus on 17.11.16.
  */
 
-public class UpdateButtons extends AbstractCommand {
+public class UpdateButtonsMap extends AbstractCommand {
     public Map<Integer, String> buttons;
 
-    public UpdateButtons(Map<Integer, String> buttons){
-        super(CommandType.AddButton);
+    public UpdateButtonsMap(Map<Integer, String> buttons){
+        super(CommandType.UpdateButtonsMap);
         this.buttons = buttons;
     }
 }

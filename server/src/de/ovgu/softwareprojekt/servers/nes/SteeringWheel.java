@@ -11,8 +11,7 @@ import java.awt.event.KeyEvent;
 
 /**
  * Created by Ulrich on 12.12.2016.
- * This class is responsible for steering the player in Mario Kart
- * TODO: better description for this class
+ * This class is responsible for steering the player in simple racing games
  */
 public class SteeringWheel implements NetworkDataSink {
 
@@ -27,17 +26,23 @@ public class SteeringWheel implements NetworkDataSink {
     private final int XAXIS = 0, YAXIS = 1, ZAXIS = 2;
 
     /**
+     * Meassures the time intervall between two accelerationSensor usages
+     */
+    private long lastAccActivation;
+
+    private int counter;
+
+    /**
      * @throws AWTException is thrown when low level input is prohibit by system
      */
     public SteeringWheel() throws AWTException {
-        mSteeringBot = new Robot();
+        mSteeringBot = new Robot(); //emulates peripheral device input
+        lastAccActivation = System.currentTimeMillis();
+        counter = 0;
     }
 
     public void controllerInput(int buttonID, boolean isPressed)
     {
-        //TODO: PROVIDE control.cfg for emulator or decide for a better solution
-        //I thought it is actually smarter to set it to the emulator default input - Ulrich
-
         //The following robot input is set by the button layout of a standard SNES controller
         switch(buttonID){
             case NesServer.A_BUTTON:
@@ -104,12 +109,13 @@ public class SteeringWheel implements NetworkDataSink {
      */
     @Override
     public void onData(NetworkDevice origin, SensorData data) {
+        //Check if player steers to the left or right by tilted distance
         if(data.sensorType == SensorType.Gyroscope) {
             //TODO: DECIDE THRESHOLD VALUE FOR STEERING
-            if (data.data[ZAXIS] > 20000)
+            if (data.data[ZAXIS] > 2500)
                 mSteeringBot.keyPress(KeyEvent.VK_LEFT);
 
-            else if (data.data[ZAXIS] < -30000)
+            else if (data.data[ZAXIS] < -2500)
                 mSteeringBot.keyPress(KeyEvent.VK_RIGHT);
             else{
                 mSteeringBot.keyRelease(KeyEvent.VK_LEFT);
@@ -117,23 +123,49 @@ public class SteeringWheel implements NetworkDataSink {
             }
         }
 
-        //TODO: Decide how to deal with this Accelerometer correctly; 20 is a random magic number place holder
-//        if(data.sensorType == SensorType.Accelerometer){
-//            if(data.data[ZAXIS] > 3500) {
-//                mSteeringBot.keyPress(KeyEvent.VK_UP);
-//                mSteeringBot.keyPress(KeyEvent.VK_X);
-//                mSteeringBot.keyRelease(KeyEvent.VK_X);
-//                mSteeringBot.keyRelease(KeyEvent.VK_UP);
-//            }
-//
-//            if(data.data[ZAXIS] < -350){
-//                mSteeringBot.keyPress(KeyEvent.VK_DOWN);
-//                mSteeringBot.keyPress(KeyEvent.VK_X);
-//                mSteeringBot.keyRelease(KeyEvent.VK_X);
-//                mSteeringBot.keyRelease(KeyEvent.VK_DOWN);
-//            }
+        //TODO: Decide how to deal with this Accelerometer correctly; random magic numbers place holder
+        //Decide if item should be thrown forwards or backwards
+        if(data.sensorType == SensorType.LinearAcceleration){
+            if(data.data[ZAXIS] > 500) {
+                if(checkInterval()) {
+                    mSteeringBot.keyPress(KeyEvent.VK_UP);
+                    mSteeringBot.keyPress(KeyEvent.VK_A);
+
+                }
+                else{
+                    mSteeringBot.keyRelease(KeyEvent.VK_A);
+                    mSteeringBot.keyRelease(KeyEvent.VK_UP);
+                }
+            }
+
+            if(data.data[ZAXIS] < -500){
+                if(checkInterval()) {
+                    mSteeringBot.keyPress(KeyEvent.VK_DOWN);
+                    mSteeringBot.keyPress(KeyEvent.VK_A);
+
+                }
+                else{
+                    mSteeringBot.keyRelease(KeyEvent.VK_A);
+                mSteeringBot.keyRelease(KeyEvent.VK_DOWN);
+                }
+            }
     }
-    // }
+}
+
+    /**
+     * This method checks if the last valid acceleration happened 500ms ago
+     * @return
+     */
+    private boolean checkInterval(){
+        long newActivation = System.currentTimeMillis();
+        //Check if last activation happened 500 or more milliseconds ago
+        if(newActivation - lastAccActivation > 500){
+            lastAccActivation = newActivation;
+            return true;
+        }
+        else
+            return false;
+    }
 
     /**
      * Needs to be implemented due to interface but serves no purpose here

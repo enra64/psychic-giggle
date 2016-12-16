@@ -302,6 +302,16 @@ public abstract class Server implements OnCommandListener, NetworkDataSink, Clie
     }
 
     /**
+     * sets mButtonXML to an incoming XML-String
+     *
+     * @param xml valid android XML layout using only linear layout and button
+     *            if string is null ButtonMap will be used
+     */
+    public void setButtonLayout(@Nullable String xml) throws IOException {
+        mClientHandlerFactory.setButtonLayout(xml);
+    }
+
+    /**
      * Change the speed of a sensor. The default speed is the GAME speed.
      *
      * @param sensor the sensor to change

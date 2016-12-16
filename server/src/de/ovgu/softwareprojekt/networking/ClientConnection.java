@@ -249,12 +249,24 @@ public class ClientConnection implements OnCommandListener, NetworkDataSink, Con
 
     /**
      * Notify the client of all required buttons
+     * will overwrite any settings made by {@link #updateButtons(String)}
      *
      * @throws IOException if the command could not be sent
      */
     void updateButtons(Map<Integer, String> buttonList) throws IOException {
         // if the button list was changed, we need to update the clients buttons
-        sendCommand(new UpdateButtons(buttonList));
+        sendCommand(new UpdateButtonsMap(buttonList));
+    }
+
+    /**
+     * Send client custom xml button layout
+     * will overwrite any settings made by {@link #updateButtons(Map)}
+     *
+     * @param xml valid android XML layout using only linear layout and button
+     * @throws IOException if the command could not be sent
+     */
+    void updateButtons(String xml) throws IOException {
+        sendCommand((new UpdateButtonsXML(xml)));
     }
 
     /**

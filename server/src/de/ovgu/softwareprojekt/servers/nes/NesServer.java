@@ -13,6 +13,9 @@ import de.ovgu.softwareprojekt.networking.Server;
 
 import java.awt.*;
 import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Arrays;
 
 /**
@@ -62,8 +65,6 @@ public class NesServer extends Server {
 
         mSteeringWheel = new SteeringWheel();
 
-        //TODO: Do we really use the RotationVector here or shouldn't it be gyroscope+accelerometer?
-        //TODO: See what this test brings
         //register use of gyroscope
         mIntegratingFilter = new IntegratingFiler(mSteeringWheel);
         NetworkDataSink gyroPipeline = mIntegratingFilter;
@@ -71,28 +72,11 @@ public class NesServer extends Server {
         registerDataSink(gyroPipeline, SensorType.Gyroscope);
 
         //register use of accelerometer
-        NetworkDataSink accPipeline = mSteeringWheel;  //Accelerometer ought to be filtered ... but what is the best approach?
-        setSensorOutputRange(SensorType.Accelerometer,100);
-        registerDataSink(accPipeline, SensorType.Accelerometer);
+        NetworkDataSink accPipeline = mSteeringWheel;  //LinearAcceleration ought to be filtered ... but what is the best approach?
+        setSensorOutputRange(SensorType.LinearAcceleration,100);
+        registerDataSink(accPipeline, SensorType.LinearAcceleration);
 
-        addButton("A", A_BUTTON);
-        addButton("B", B_BUTTON);
-        addButton("Start", START_BUTTON);
-
-        //TODO: No idea if this was just a Placeholder
-
-//        registerDataSink(new DataSink() {
-//            @Override
-//            public void onData(SensorData sensorData) {
-//                //TODO: do whatever you do
-//
-//            }
-//
-//            @Override
-//            public void close() {
-//
-//            }
-//        }, SensorType.RotationVector);
+    	setButtonLayout(readFile("../nesLayout.txt", "utf-8"));
     }
 
     /**
@@ -139,7 +123,6 @@ public class NesServer extends Server {
 
     @Override
     public void onResetPosition(NetworkDevice origin) {
-        //TODO: Use this way or unregister current gyroscope pipeline and register a new one
         //Idea: Reset Integrating filter to 0 which means it acts as the initial position
         mIntegratingFilter.resetFilter();
     }
@@ -149,5 +132,10 @@ public class NesServer extends Server {
         mSteeringWheel.controllerInput(click.mID, true);
         if(!click.isHold)
             mSteeringWheel.controllerInput(click.mID, false);
+    }
+
+    static String readFile(String path, String encoding) throws IOException {
+        byte[] encoded = Files.readAllBytes(Paths.get(path));
+        return new String(encoded, encoding);
     }
 }
