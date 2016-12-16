@@ -246,7 +246,7 @@ public abstract class Server implements OnCommandListener, NetworkDataSink, Clie
 
         // add new data sink list if the requested sensor type has no sinks yet
         if (!mDataSinks.containsKey(requestedSensor))
-            mDataSinks.put(requestedSensor, new HashSet<>());
+            mDataSinks.put(requestedSensor, new HashSet<NetworkDataSink>());
 
         // add the new sink to the list of sink for the sensor
         mDataSinks.get(requestedSensor).add(dataSink);
