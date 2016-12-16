@@ -34,6 +34,17 @@ public class IntegratingFiler extends AbstractFilter {
         data.data[XAXIS] = mSumOfRotationX;
         data.data[YAXIS] = mSumOfRotationY;
         data.data[ZAXIS] = mSumOfRotationZ;
+
+        mDataSink.onData(data);
+    }
+
+    /**
+     * This method sets all axes sums back to 0 in order to set a new initial position for the smart phone
+     */
+    public void resetFilter(){
+        mSumOfRotationX = 0;
+        mSumOfRotationY = 0;
+        mSumOfRotationZ = 0;
     }
 
 }

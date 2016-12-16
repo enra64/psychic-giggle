@@ -34,38 +34,39 @@ public class SteeringWheel implements DataSink{
     public void controllerInput(int buttonID, boolean isPressed)
     {
         //TODO: PROVIDE control.cfg for emulator or decide for a better solution
+        //I thought it is actually smarter to set it to the emulator default input - Ulrich
 
         //The following robot input is set by the button layout of a standard SNES controller
         switch(buttonID){
             case NesServer.A_BUTTON:
                 if(isPressed)
-                    mSteeringBot.keyPress(KeyEvent.VK_A);
-                else
-                    mSteeringBot.keyRelease(KeyEvent.VK_A);
-                break;
-            case NesServer.B_BUTTON:
-                if(isPressed)
-                    mSteeringBot.keyPress(KeyEvent.VK_B);
-                else
-                    mSteeringBot.keyRelease(KeyEvent.VK_B);
-                break;
-            case NesServer.X_BUTTON:
-                if(isPressed)
                     mSteeringBot.keyPress(KeyEvent.VK_X);
                 else
                     mSteeringBot.keyRelease(KeyEvent.VK_X);
                 break;
-            case NesServer.Y_BUTTON:
+            case NesServer.B_BUTTON:
                 if(isPressed)
-                    mSteeringBot.keyPress(KeyEvent.VK_Y);
+                    mSteeringBot.keyPress(KeyEvent.VK_Y); //May use Z actually ingame ... but shouldn't
                 else
                     mSteeringBot.keyRelease(KeyEvent.VK_Y);
                 break;
+            case NesServer.X_BUTTON:
+                if(isPressed)
+                    mSteeringBot.keyPress(KeyEvent.VK_S);
+                else
+                    mSteeringBot.keyRelease(KeyEvent.VK_S);
+                break;
+            case NesServer.Y_BUTTON:
+                if(isPressed)
+                    mSteeringBot.keyPress(KeyEvent.VK_A);
+                else
+                    mSteeringBot.keyRelease(KeyEvent.VK_A);
+                break;
             case NesServer.SELECT_BUTTON:
                 if(isPressed)
-                    mSteeringBot.keyPress(KeyEvent.VK_SPACE);
+                    mSteeringBot.keyPress(KeyEvent.VK_SHIFT); //Presses left shift or both shifts
                 else
-                    mSteeringBot.keyRelease(KeyEvent.VK_SPACE);
+                    mSteeringBot.keyRelease(KeyEvent.VK_SHIFT);
                 break;
             case NesServer.START_BUTTON:
                 if(isPressed)
@@ -75,15 +76,15 @@ public class SteeringWheel implements DataSink{
                 break;
             case NesServer.R_BUTTON:
                 if(isPressed)
-                    mSteeringBot.keyPress(KeyEvent.VK_R);
+                    mSteeringBot.keyPress(KeyEvent.VK_C);
                 else
-                    mSteeringBot.keyRelease(KeyEvent.VK_R);
+                    mSteeringBot.keyRelease(KeyEvent.VK_C);
                 break;
             case NesServer.L_BUTTON:
                 if(isPressed)
-                    mSteeringBot.keyPress(KeyEvent.VK_L);
+                    mSteeringBot.keyPress(KeyEvent.VK_D);
                 else
-                    mSteeringBot.keyRelease(KeyEvent.VK_L);
+                    mSteeringBot.keyRelease(KeyEvent.VK_D);
                 break;
             default:
                 break;
@@ -101,15 +102,13 @@ public class SteeringWheel implements DataSink{
      */
     @Override
     public void onData(SensorData data) {
-
         if(data.sensorType == SensorType.Gyroscope) {
             //TODO: DECIDE THRESHOLD VALUE FOR STEERING
-            if (data.data[ZAXIS] < -5)
+            if (data.data[ZAXIS] > 20000)
                 mSteeringBot.keyPress(KeyEvent.VK_LEFT);
 
-            else if (data.data[ZAXIS] > 5)
+            else if (data.data[ZAXIS] < -30000)
                 mSteeringBot.keyPress(KeyEvent.VK_RIGHT);
-
             else{
                 mSteeringBot.keyRelease(KeyEvent.VK_LEFT);
                 mSteeringBot.keyRelease(KeyEvent.VK_RIGHT);
@@ -117,22 +116,22 @@ public class SteeringWheel implements DataSink{
         }
 
         //TODO: Decide how to deal with this Accelerometer correctly; 20 is a random magic number place holder
-        if(data.sensorType == SensorType.Accelerometer){
-            if(data.data[ZAXIS] > 20) {
-                mSteeringBot.keyPress(KeyEvent.VK_UP);
-                mSteeringBot.keyPress(KeyEvent.VK_X);
-                mSteeringBot.keyRelease(KeyEvent.VK_X);
-                mSteeringBot.keyRelease(KeyEvent.VK_UP);
-            }
-
-            else if(data.data[ZAXIS] < 20){
-                mSteeringBot.keyPress(KeyEvent.VK_DOWN);
-                mSteeringBot.keyPress(KeyEvent.VK_X);
-                mSteeringBot.keyRelease(KeyEvent.VK_X);
-                mSteeringBot.keyRelease(KeyEvent.VK_DOWN);
-            }
-        }
+//        if(data.sensorType == SensorType.Accelerometer){
+//            if(data.data[ZAXIS] > 3500) {
+//                mSteeringBot.keyPress(KeyEvent.VK_UP);
+//                mSteeringBot.keyPress(KeyEvent.VK_X);
+//                mSteeringBot.keyRelease(KeyEvent.VK_X);
+//                mSteeringBot.keyRelease(KeyEvent.VK_UP);
+//            }
+//
+//            if(data.data[ZAXIS] < -350){
+//                mSteeringBot.keyPress(KeyEvent.VK_DOWN);
+//                mSteeringBot.keyPress(KeyEvent.VK_X);
+//                mSteeringBot.keyRelease(KeyEvent.VK_X);
+//                mSteeringBot.keyRelease(KeyEvent.VK_DOWN);
+//            }
     }
+    // }
 
     /**
      * Needs to be implemented due to interface but serves no purpose here

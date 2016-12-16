@@ -1,0 +1,35 @@
+package de.ovgu.softwareprojekt;
+
+import de.ovgu.softwareprojekt.servers.mouse.MouseServer;
+import de.ovgu.softwareprojekt.servers.nes.NesServer;
+
+
+import java.awt.*;
+import java.io.IOException;
+
+
+public class Main {
+    public static void main(String[] args) throws IOException, AWTException {
+<<<<<<< HEAD
+        switch(args.length > 0 ? args[0] : ""){
+            case "mouse":
+                new MouseServer(null).start();
+                System.out.println("MouseServer started");
+                break;
+            default:
+            case "nes":
+=======
+//        switch(args[0]){
+//            case "mouse":
+//                new MouseServer(null).start();
+//                System.out.println("MouseServer started");
+//                break;
+//            default:
+//            case "nes":
+>>>>>>> 950f95b31a7a24cebb2a22856aa787b2dc65163d
+                new NesServer(null).start();
+                System.out.println("NesServer started");
+//              break;
+//        }
+    }
+}

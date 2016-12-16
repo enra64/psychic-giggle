@@ -18,8 +18,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".SendActivity" />
-        <activity android:name=".OptionsActivity"></activity>
+        <activity
+            android:name=".SendActivity"
+            android:screenOrientation="portrait" />
+        <activity android:name=".OptionsActivity" />
     </application>
 
 </manifest>
