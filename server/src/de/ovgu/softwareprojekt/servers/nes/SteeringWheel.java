@@ -28,12 +28,15 @@ public class SteeringWheel implements DataSink{
      */
     private long lastAccActivation;
 
+    private int counter;
+
     /**
      * @throws AWTException is thrown when low level input is prohibit by system
      */
     public SteeringWheel() throws AWTException {
         mSteeringBot = new Robot(); //emulates peripheral device input
         lastAccActivation = System.currentTimeMillis();
+        counter = 0;
     }
 
     public void controllerInput(int buttonID, boolean isPressed)
@@ -107,10 +110,10 @@ public class SteeringWheel implements DataSink{
         //Check if player steers to the left or right by tilted distance
         if(data.sensorType == SensorType.Gyroscope) {
             //TODO: DECIDE THRESHOLD VALUE FOR STEERING
-            if (data.data[ZAXIS] > 40000)
+            if (data.data[ZAXIS] > 2500)
                 mSteeringBot.keyPress(KeyEvent.VK_LEFT);
 
-            else if (data.data[ZAXIS] < -40000)
+            else if (data.data[ZAXIS] < -2500)
                 mSteeringBot.keyPress(KeyEvent.VK_RIGHT);
             else{
                 mSteeringBot.keyRelease(KeyEvent.VK_LEFT);
@@ -124,8 +127,11 @@ public class SteeringWheel implements DataSink{
             if(data.data[ZAXIS] > 500) {
                 if(checkInterval()) {
                     mSteeringBot.keyPress(KeyEvent.VK_UP);
-                    mSteeringBot.keyPress(KeyEvent.VK_X);
-                    mSteeringBot.keyRelease(KeyEvent.VK_X);
+                    mSteeringBot.keyPress(KeyEvent.VK_A);
+
+                }
+                else{
+                    mSteeringBot.keyRelease(KeyEvent.VK_A);
                     mSteeringBot.keyRelease(KeyEvent.VK_UP);
                 }
             }
@@ -133,9 +139,12 @@ public class SteeringWheel implements DataSink{
             if(data.data[ZAXIS] < -500){
                 if(checkInterval()) {
                     mSteeringBot.keyPress(KeyEvent.VK_DOWN);
-                    mSteeringBot.keyPress(KeyEvent.VK_X);
-                    mSteeringBot.keyRelease(KeyEvent.VK_X);
-                    mSteeringBot.keyRelease(KeyEvent.VK_DOWN);
+                    mSteeringBot.keyPress(KeyEvent.VK_A);
+
+                }
+                else{
+                    mSteeringBot.keyRelease(KeyEvent.VK_A);
+                mSteeringBot.keyRelease(KeyEvent.VK_DOWN);
                 }
             }
     }
