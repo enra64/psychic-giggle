@@ -1,6 +1,7 @@
 package de.ovgu.softwareprojekt.networking;
 
 import de.ovgu.softwareprojekt.DataSink;
+import de.ovgu.softwareprojekt.NetworkDataSink;
 import de.ovgu.softwareprojekt.SensorType;
 import de.ovgu.softwareprojekt.control.OnCommandListener;
 import de.ovgu.softwareprojekt.control.commands.SetSensorSpeed;
@@ -61,9 +62,9 @@ class ClientConnectionHandler {
     /**
      * the data sink where all data produced by the clients is put into
      */
-    private DataSink mDataSink;
+    private NetworkDataSink mDataSink;
 
-    ClientConnectionHandler(String serverName, ExceptionListener exceptionListener, OnCommandListener commandListener, ClientListener clientListener, DataSink dataSink) {
+    ClientConnectionHandler(String serverName, ExceptionListener exceptionListener, OnCommandListener commandListener, ClientListener clientListener, NetworkDataSink dataSink) {
         mServerName = serverName;
         mExceptionListener = exceptionListener;
         mCommandListener = commandListener;

@@ -1,6 +1,7 @@
 package de.ovgu.softwareprojekt.servers.graphing;
 
 import de.ovgu.softwareprojekt.DataSink;
+import de.ovgu.softwareprojekt.NetworkDataSink;
 import de.ovgu.softwareprojekt.SensorData;
 import de.ovgu.softwareprojekt.SensorType;
 import de.ovgu.softwareprojekt.control.commands.ButtonClick;
@@ -15,9 +16,9 @@ public class Grapher extends Server {
         super("graphing server");
 
         try {
-            registerDataSink(new DataSink() {
+            registerDataSink(new NetworkDataSink() {
                 @Override
-                public void onData(SensorData data) {
+                public void onData(NetworkDevice origin, SensorData data) {
                     graphPanel.addData(data);
                 }
 

@@ -1,7 +1,9 @@
 package de.ovgu.softwareprojekt.servers.mouse;
 
 import de.ovgu.softwareprojekt.DataSink;
+import de.ovgu.softwareprojekt.NetworkDataSink;
 import de.ovgu.softwareprojekt.SensorData;
+import de.ovgu.softwareprojekt.discovery.NetworkDevice;
 
 import java.awt.*;
 import java.awt.event.InputEvent;
@@ -11,7 +13,7 @@ import java.awt.event.InputEvent;
  * <p>
  * This class gets the gyroscope data and moves the mouse accordingly
  */
-public class MouseMover implements DataSink {
+public class MouseMover implements NetworkDataSink {
 
     /**
      * is responsible for emulating hardware input
@@ -88,7 +90,7 @@ public class MouseMover implements DataSink {
      * @param sensorData the sensor data containing the x-,y-,z-Axis of gyroscope
      */
     @Override
-    public void onData(SensorData sensorData) {
+    public void onData(NetworkDevice origin, SensorData sensorData) {
         PointerInfo pi = MouseInfo.getPointerInfo();
         Point mousePos = pi.getLocation();
 

@@ -2,6 +2,7 @@ package de.ovgu.softwareprojekt.networking;
 
 import com.sun.istack.internal.Nullable;
 import de.ovgu.softwareprojekt.DataSink;
+import de.ovgu.softwareprojekt.NetworkDataSink;
 import de.ovgu.softwareprojekt.SensorData;
 import de.ovgu.softwareprojekt.SensorType;
 import de.ovgu.softwareprojekt.callback_interfaces.ResetListener;
@@ -25,7 +26,7 @@ import java.util.HashSet;
  * 3) A DataConnection to rapidly transmit sensor data
  */
 @SuppressWarnings("unused")
-public abstract class Server implements OnCommandListener, DataSink, ClientListener, ExceptionListener, ButtonListener, ResetListener {
+public abstract class Server implements OnCommandListener, NetworkDataSink, ClientListener, ExceptionListener, ButtonListener, ResetListener {
     /**
      * Server handling responding to discovery broadcasts
      */
@@ -58,7 +59,7 @@ public abstract class Server implements OnCommandListener, DataSink, ClientListe
      * This variable is an EnumMap, so iterations over the keys should be quite fast. The sinks are stored in a
      * HashSet for each sensor, so no sink can occur twice for one sensor type.
      */
-    private EnumMap<SensorType, HashSet<DataSink>> mDataSinks = new EnumMap<>(SensorType.class);
+    private EnumMap<SensorType, HashSet<NetworkDataSink>> mDataSinks = new EnumMap<>(SensorType.class);
 
     /**
      * Create a new server. It will be offline (not using any sockets) until {@link #start()} is called.
@@ -217,9 +218,9 @@ public abstract class Server implements OnCommandListener, DataSink, ClientListe
      * @param sensorData new sensor data
      */
     @Override
-    public final void onData(SensorData sensorData) {
-        for (DataSink sink : mDataSinks.get(sensorData.sensorType))
-            sink.onData(sensorData);
+    public final void onData(NetworkDevice origin, SensorData sensorData) {
+        for (NetworkDataSink sink : mDataSinks.get(sensorData.sensorType))
+            sink.onData(origin, sensorData);
     }
 
     /**
@@ -238,14 +239,14 @@ public abstract class Server implements OnCommandListener, DataSink, ClientListe
      * @param dataSink        where new data from the sensor should go
      * @param requestedSensor which sensors events are relevant
      */
-    protected void registerDataSink(DataSink dataSink, SensorType requestedSensor) throws IOException {
+    protected void registerDataSink(NetworkDataSink dataSink, SensorType requestedSensor) throws IOException {
         // dataSink *must not be* this, as that would lead to infinite recursion
         if(this == dataSink)
             throw new InvalidParameterException("A Server subclass cannot register itself as a data sink.");
 
         // add new data sink list if the requested sensor type has no sinks yet
         if (!mDataSinks.containsKey(requestedSensor))
-            mDataSinks.put(requestedSensor, new HashSet<DataSink>());
+            mDataSinks.put(requestedSensor, new HashSet<>());
 
         // add the new sink to the list of sink for the sensor
         mDataSinks.get(requestedSensor).add(dataSink);
@@ -260,7 +261,7 @@ public abstract class Server implements OnCommandListener, DataSink, ClientListe
      * @param dataSink        the data sink to be unregistered
      * @param requestedSensor the sensor the sink should be unregistered from
      */
-    private void unregisterDataSink(DataSink dataSink, SensorType requestedSensor) throws IOException {
+    private void unregisterDataSink(NetworkDataSink dataSink, SensorType requestedSensor) throws IOException {
         mDataSinks.get(requestedSensor).remove(dataSink);
 
         // force resetting the sensors on the client
@@ -272,7 +273,7 @@ public abstract class Server implements OnCommandListener, DataSink, ClientListe
      *
      * @param dataSink which data sink to remove
      */
-    public void unregisterDataSink(DataSink dataSink) throws IOException {
+    public void unregisterDataSink(NetworkDataSink dataSink) throws IOException {
         // unregister dataSink from all sensors it is registered to
         for (SensorType type : mDataSinks.keySet())
             unregisterDataSink(dataSink, type);

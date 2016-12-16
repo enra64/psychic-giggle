@@ -1,7 +1,9 @@
 package de.ovgu.softwareprojekt.filters;
 
 import de.ovgu.softwareprojekt.DataSink;
+import de.ovgu.softwareprojekt.NetworkDataSink;
 import de.ovgu.softwareprojekt.SensorData;
+import de.ovgu.softwareprojekt.discovery.NetworkDevice;
 
 /**
  * Created by Ulrich on 12.12.2016.
@@ -14,7 +16,7 @@ public class IntegratingFiler extends AbstractFilter {
 
     private float mSumOfRotationX, mSumOfRotationY, mSumOfRotationZ;
 
-    public IntegratingFiler(DataSink sink) {
+    public IntegratingFiler(NetworkDataSink sink) {
         super(sink, 0, 1, 2);
         mSumOfRotationX = 0f;
         mSumOfRotationY = 0f;
@@ -26,7 +28,7 @@ public class IntegratingFiler extends AbstractFilter {
      * @param data current values
      */
     @Override
-    public void onData(SensorData data) {
+    public void onData(NetworkDevice origin, SensorData data) {
         mSumOfRotationX += data.data[XAXIS];
         mSumOfRotationY += data.data[YAXIS];
         mSumOfRotationZ += data.data[ZAXIS];
@@ -35,7 +37,7 @@ public class IntegratingFiler extends AbstractFilter {
         data.data[YAXIS] = mSumOfRotationY;
         data.data[ZAXIS] = mSumOfRotationZ;
 
-        mDataSink.onData(data);
+        mDataSink.onData(origin, data);
     }
 
     /**

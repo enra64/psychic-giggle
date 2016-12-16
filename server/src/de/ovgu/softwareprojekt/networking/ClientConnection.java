@@ -2,6 +2,7 @@ package de.ovgu.softwareprojekt.networking;
 
 import com.sun.istack.internal.NotNull;
 import de.ovgu.softwareprojekt.DataSink;
+import de.ovgu.softwareprojekt.NetworkDataSink;
 import de.ovgu.softwareprojekt.SensorData;
 import de.ovgu.softwareprojekt.SensorType;
 import de.ovgu.softwareprojekt.control.CommandConnection;
@@ -24,7 +25,7 @@ import java.util.*;
  * them. When a {@link EndConnection} command is received, all ports are closed, and the command is forwarded; no other
  * command can be sent to the client after that.
  */
-public class ClientConnection implements OnCommandListener, DataSink, ConnectionWatch.TimeoutListener {
+public class ClientConnection implements OnCommandListener, NetworkDataSink, ConnectionWatch.TimeoutListener {
     /**
      * Who to notify about unhandleable exceptions
      */
@@ -53,7 +54,7 @@ public class ClientConnection implements OnCommandListener, DataSink, Connection
     /**
      * Where to put data
      */
-    private DataSink mDataSink;
+    private NetworkDataSink mDataSink;
 
     /**
      * The client this instance handles
@@ -85,7 +86,7 @@ public class ClientConnection implements OnCommandListener, DataSink, Connection
      * @param dataSink          Where to put data
      * @throws IOException when the listening process could not be started
      */
-    ClientConnection(String serverName, ExceptionListener exceptionListener, OnCommandListener commandListener, ClientListener clientListener, DataSink dataSink) throws IOException {
+    ClientConnection(String serverName, ExceptionListener exceptionListener, OnCommandListener commandListener, ClientListener clientListener, NetworkDataSink dataSink) throws IOException {
         mExceptionListener = exceptionListener;
         mCommandListener = commandListener;
         mClientListener = clientListener;
@@ -157,8 +158,8 @@ public class ClientConnection implements OnCommandListener, DataSink, Connection
     }
 
     @Override
-    public void onData(SensorData sensorData) {
-        mDataSink.onData(sensorData);
+    public void onData(NetworkDevice origin, SensorData sensorData) {
+        mDataSink.onData(origin, sensorData);
     }
 
     /**
@@ -193,11 +194,14 @@ public class ClientConnection implements OnCommandListener, DataSink, Connection
             // flag that we have been connected
             mIsConnected = true;
 
-            // accept the client
-            sendCommand(new ConnectionRequestResponse(true));
+            // notify the data connection of its client
+            mDataConnection.setClient(client);
 
             // store client identification
             mClient = client;
+
+            // accept the client
+            sendCommand(new ConnectionRequestResponse(true));
 
             // start the connection watch
             mConnectionWatch.start();

@@ -2,6 +2,7 @@ package de.ovgu.softwareprojekt.servers.mouse;
 
 import com.sun.istack.internal.Nullable;
 import de.ovgu.softwareprojekt.DataSink;
+import de.ovgu.softwareprojekt.NetworkDataSink;
 import de.ovgu.softwareprojekt.SensorType;
 import de.ovgu.softwareprojekt.control.commands.ButtonClick;
 import de.ovgu.softwareprojekt.control.commands.SetSensorSpeed;
@@ -46,7 +47,7 @@ public class MouseServer extends Server {
         mMouseMover = new MouseMover();
 
         // this is how we currently define a filter pipeline:
-        DataSink pipeline = new AverageMovementFilter(3, new ThresholdingFilter(mMouseMover, 5f));
+        NetworkDataSink pipeline = new AverageMovementFilter(3, new ThresholdingFilter(mMouseMover, 5f));
 
         // register our mouse mover to receive gyroscope data
         registerDataSink(pipeline, SensorType.Gyroscope);

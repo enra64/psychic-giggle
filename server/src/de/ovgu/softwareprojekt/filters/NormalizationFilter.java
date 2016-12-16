@@ -1,7 +1,10 @@
 package de.ovgu.softwareprojekt.filters;
 
 import de.ovgu.softwareprojekt.DataSink;
+import de.ovgu.softwareprojekt.NetworkDataSink;
+import de.ovgu.softwareprojekt.NetworkDataSource;
 import de.ovgu.softwareprojekt.SensorData;
+import de.ovgu.softwareprojekt.discovery.NetworkDevice;
 
 /**
  * Created by Ulrich on 29.11.2016.
@@ -32,7 +35,7 @@ public class NormalizationFilter extends AbstractFilter {
      *
      * @param dataSink where to put filtered data
      */
-    public NormalizationFilter(DataSink dataSink) {
+    public NormalizationFilter(NetworkDataSink dataSink) {
         this(dataSink, 50f, 1000f, 1000f);
     }
 
@@ -44,7 +47,7 @@ public class NormalizationFilter extends AbstractFilter {
      * @param sourceRange       range of the data coming into the normalization filter
      * @param targetRange       range the data should be projected to
      */
-    public NormalizationFilter(DataSink sink, float customSensitivity, float sourceRange, float targetRange) {
+    public NormalizationFilter(NetworkDataSink sink, float customSensitivity, float sourceRange, float targetRange) {
         this(sink, customSensitivity, sourceRange, targetRange, 0, 1, 2);
     }
 
@@ -59,7 +62,7 @@ public class NormalizationFilter extends AbstractFilter {
      * @param yaxis
      * @param zaxis
      */
-    public NormalizationFilter(DataSink sink, float customSensitivity, float sourceRange, float targetRange, int xaxis, int yaxis, int zaxis) {
+    public NormalizationFilter(NetworkDataSink sink, float customSensitivity, float sourceRange, float targetRange, int xaxis, int yaxis, int zaxis) {
         super(sink, xaxis, yaxis, zaxis);
 
         mCustomSensitivity = customSensitivity;
@@ -105,9 +108,9 @@ public class NormalizationFilter extends AbstractFilter {
      * @param sensorData sensor data to process
      */
     @Override
-    public void onData(SensorData sensorData) {
+    public void onData(NetworkDevice origin, SensorData sensorData) {
         normalize(sensorData.data);
-        mDataSink.onData(sensorData);
+        mDataSink.onData(origin, sensorData);
     }
 
     public void setTargetRange(float targetRange) {

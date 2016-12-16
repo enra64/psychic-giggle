@@ -1,7 +1,9 @@
 package de.ovgu.softwareprojekt.filters;
 
 import de.ovgu.softwareprojekt.DataSink;
+import de.ovgu.softwareprojekt.NetworkDataSink;
 import de.ovgu.softwareprojekt.SensorData;
+import de.ovgu.softwareprojekt.discovery.NetworkDevice;
 
 
 import static java.lang.Math.abs;
@@ -28,7 +30,7 @@ public class MinimumAmplitudeFilter extends AbstractFilter {
      * @param dataSink      where to put filtered data
      * @param minimumChange the minimum of change a new data element must represent to be let through
      */
-    public MinimumAmplitudeFilter(DataSink dataSink, float minimumChange) {
+    public MinimumAmplitudeFilter(NetworkDataSink dataSink, float minimumChange) {
         super(dataSink, 0, 1, 2);
         mMinimumChange = minimumChange;
     }
@@ -39,7 +41,7 @@ public class MinimumAmplitudeFilter extends AbstractFilter {
      * @param sensorData sensor data to process
      */
     @Override
-    public void onData(SensorData sensorData) {
+    public void onData(NetworkDevice origin, SensorData sensorData) {
         // initialise the storage vector on first data because we do not know its length beforehand
         if (mLastValue == null)
             mLastValue = new float[sensorData.data.length];
@@ -53,7 +55,7 @@ public class MinimumAmplitudeFilter extends AbstractFilter {
             System.arraycopy(sensorData.data, 0, mLastValue, 0, mLastValue.length);
         }
         // notify attached sink of new data
-        mDataSink.onData(sensorData);
+        mDataSink.onData(origin, sensorData);
     }
 
     /**

@@ -1,8 +1,10 @@
 package de.ovgu.softwareprojekt.servers.nes;
 
 import de.ovgu.softwareprojekt.DataSink;
+import de.ovgu.softwareprojekt.NetworkDataSink;
 import de.ovgu.softwareprojekt.SensorData;
 import de.ovgu.softwareprojekt.SensorType;
+import de.ovgu.softwareprojekt.discovery.NetworkDevice;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -12,7 +14,7 @@ import java.awt.event.KeyEvent;
  * This class is responsible for steering the player in Mario Kart
  * TODO: better description for this class
  */
-public class SteeringWheel implements DataSink{
+public class SteeringWheel implements NetworkDataSink {
 
     /**
      * is responsible for emulating hardware input
@@ -101,7 +103,7 @@ public class SteeringWheel implements DataSink{
      * @param data pipeline here is either the gyroscope or acc. pipeline
      */
     @Override
-    public void onData(SensorData data) {
+    public void onData(NetworkDevice origin, SensorData data) {
         if(data.sensorType == SensorType.Gyroscope) {
             //TODO: DECIDE THRESHOLD VALUE FOR STEERING
             if (data.data[ZAXIS] > 20000)

@@ -2,6 +2,8 @@ package de.ovgu.softwareprojekt.filters;
 
 import de.ovgu.softwareprojekt.DataSink;
 import de.ovgu.softwareprojekt.DataSource;
+import de.ovgu.softwareprojekt.NetworkDataSink;
+import de.ovgu.softwareprojekt.NetworkDataSource;
 
 import java.io.IOException;
 
@@ -10,12 +12,12 @@ import java.io.IOException;
  * This abstract filter implements a lot of the interface methods used by the inherited classes and
  * provides the DataSink and axes
  */
-public abstract class AbstractFilter implements DataSink, DataSource {
+public abstract class AbstractFilter implements NetworkDataSink, NetworkDataSource {
 
     protected final int XAXIS, YAXIS, ZAXIS;
-    protected DataSink mDataSink;
+    protected NetworkDataSink mDataSink;
 
-    public AbstractFilter(DataSink sink, int xaxis, int yaxis, int zaxis) {
+    public AbstractFilter(NetworkDataSink sink, int xaxis, int yaxis, int zaxis) {
         mDataSink = sink;
         XAXIS = xaxis;
         YAXIS = yaxis;
@@ -28,7 +30,7 @@ public abstract class AbstractFilter implements DataSink, DataSource {
      * @param dataSink any implementation of the {@link DataSink} interface
      */
     @Override
-    public void setDataSink(DataSink dataSink) {
+    public void setDataSink(NetworkDataSink dataSink) {
         mDataSink = dataSink;
     }
 

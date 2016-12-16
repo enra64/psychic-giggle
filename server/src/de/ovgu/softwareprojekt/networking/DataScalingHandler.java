@@ -1,8 +1,10 @@
 package de.ovgu.softwareprojekt.networking;
 
 import de.ovgu.softwareprojekt.DataSink;
+import de.ovgu.softwareprojekt.NetworkDataSink;
 import de.ovgu.softwareprojekt.SensorData;
 import de.ovgu.softwareprojekt.SensorType;
+import de.ovgu.softwareprojekt.discovery.NetworkDevice;
 import de.ovgu.softwareprojekt.filters.NormalizationFilter;
 
 import java.util.EnumMap;
@@ -11,7 +13,7 @@ import java.util.EnumMap;
  * This class handles scaling all the data, because we may have to apply a different scaling factor to
  * all the incoming data
  */
-public class DataScalingHandler implements DataSink {
+public class DataScalingHandler implements NetworkDataSink {
     /**
      * Contains the scaling filters that have to be applied for each sensors
      */
@@ -22,7 +24,7 @@ public class DataScalingHandler implements DataSink {
      *
      * @param outgoingDataSink where all outgoing data will go
      */
-    DataScalingHandler(DataSink outgoingDataSink) {
+    DataScalingHandler(NetworkDataSink outgoingDataSink) {
         for (SensorType sensorType : SensorType.values())
             mScalingFilters.put(sensorType, new NormalizationFilter(outgoingDataSink, 50f, 10, 100));
     }
@@ -71,12 +73,12 @@ public class DataScalingHandler implements DataSink {
      * handle incoming data
      */
     @Override
-    public void onData(SensorData sensorData) {
+    public void onData(NetworkDevice origin, SensorData sensorData) {
         // get the normalization filter configured for this sensor
         NormalizationFilter sensorTypeFilter = mScalingFilters.get(sensorData.sensorType);
 
         // let it handle the sensordata; the scaled result will be pushed into the outgoing data sink
-        sensorTypeFilter.onData(sensorData);
+        sensorTypeFilter.onData(origin, sensorData);
     }
 
     @Override

@@ -1,7 +1,9 @@
 package de.ovgu.softwareprojekt.filters;
 
 import de.ovgu.softwareprojekt.DataSink;
+import de.ovgu.softwareprojekt.NetworkDataSink;
 import de.ovgu.softwareprojekt.SensorData;
+import de.ovgu.softwareprojekt.discovery.NetworkDevice;
 
 /**
  * Created by Ulrich on 28.11.2016.
@@ -30,7 +32,7 @@ public class AverageMovementFilter extends AbstractFilter {
      * @param avgSampSize how many values should be used to calculate the average
      * @param dataSink    where to put the filtered data
      */
-    public AverageMovementFilter(int avgSampSize, DataSink dataSink) {
+    public AverageMovementFilter(int avgSampSize, NetworkDataSink dataSink) {
         this(avgSampSize, dataSink, 0, 1, 2);
     }
 
@@ -43,7 +45,7 @@ public class AverageMovementFilter extends AbstractFilter {
      * @param yaxis
      * @param zaxis
      */
-    public AverageMovementFilter(int avgSampSize, DataSink dataSink, int xaxis, int yaxis, int zaxis) {
+    public AverageMovementFilter(int avgSampSize, NetworkDataSink dataSink, int xaxis, int yaxis, int zaxis) {
         super(dataSink, xaxis, yaxis, zaxis);
 
         //The sample Size must be bigger than 0 or we would not create an average at all or even divide by zero
@@ -96,10 +98,10 @@ public class AverageMovementFilter extends AbstractFilter {
      * @param sensorData sensor data to process
      */
     @Override
-    public void onData(SensorData sensorData) {
+    public void onData(NetworkDevice origin, SensorData sensorData) {
         filter(sensorData.data);
 
-        mDataSink.onData(sensorData);
+        mDataSink.onData(origin, sensorData);
     }
 
 }

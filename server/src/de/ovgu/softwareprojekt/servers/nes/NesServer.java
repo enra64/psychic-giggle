@@ -2,6 +2,7 @@ package de.ovgu.softwareprojekt.servers.nes;
 
 import com.sun.istack.internal.Nullable;
 import de.ovgu.softwareprojekt.DataSink;
+import de.ovgu.softwareprojekt.NetworkDataSink;
 import de.ovgu.softwareprojekt.SensorData;
 import de.ovgu.softwareprojekt.SensorType;
 import de.ovgu.softwareprojekt.control.commands.ButtonClick;
@@ -65,12 +66,12 @@ public class NesServer extends Server {
         //TODO: See what this test brings
         //register use of gyroscope
         mIntegratingFilter = new IntegratingFiler(mSteeringWheel);
-        DataSink gyroPipeline = mIntegratingFilter;
+        NetworkDataSink gyroPipeline = mIntegratingFilter;
         setSensorOutputRange(SensorType.Gyroscope,100);
         registerDataSink(gyroPipeline, SensorType.Gyroscope);
 
         //register use of accelerometer
-        DataSink accPipeline = mSteeringWheel;  //Accelerometer ought to be filtered ... but what is the best approach?
+        NetworkDataSink accPipeline = mSteeringWheel;  //Accelerometer ought to be filtered ... but what is the best approach?
         setSensorOutputRange(SensorType.Accelerometer,100);
         registerDataSink(accPipeline, SensorType.Accelerometer);
 

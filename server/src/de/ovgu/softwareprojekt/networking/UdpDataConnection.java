@@ -1,8 +1,7 @@
 package de.ovgu.softwareprojekt.networking;
 
-import de.ovgu.softwareprojekt.DataSink;
-import de.ovgu.softwareprojekt.DataSource;
-import de.ovgu.softwareprojekt.SensorData;
+import de.ovgu.softwareprojekt.*;
+import de.ovgu.softwareprojekt.discovery.NetworkDevice;
 import de.ovgu.softwareprojekt.misc.ExceptionListener;
 
 import java.io.ByteArrayInputStream;
@@ -16,11 +15,11 @@ import java.net.SocketException;
  * This class listens for udp packets containing {@link SensorData} objects, and notifies a listener of new data.
  * The listener must be
  */
-class UdpDataConnection extends Thread implements DataSource {
+class UdpDataConnection extends Thread implements NetworkDataSource {
     /**
      * Incoming sensor data will be forwareded here
      */
-    private DataSink mDataSink;
+    private NetworkDataSink mDataSink;
 
     /**
      * true as long as the server should listen on the udp port
@@ -38,11 +37,22 @@ class UdpDataConnection extends Thread implements DataSource {
     private ExceptionListener mExceptionListener;
 
     /**
+     * The client that is connected to the udp connection
+     */
+    private NetworkDevice mClient;
+
+
+
+    /**
      * Create a new UdpDataConnection that will start listening after {@link #start()} is called.
      */
     UdpDataConnection(ExceptionListener exceptionListener) throws SocketException {
         mLocalPort = findFreePort();
         mExceptionListener = exceptionListener;
+    }
+
+    void setClient(NetworkDevice client){
+        mClient = client;
     }
 
     /**
@@ -78,10 +88,10 @@ class UdpDataConnection extends Thread implements DataSource {
 
                 // parse incoming object
                 ByteArrayInputStream input = new ByteArrayInputStream(appData);
-                ObjectInputStream oinput = new ObjectInputStream(input);
+                ObjectInputStream objectInputStream = new ObjectInputStream(input);
 
                 // notify listener
-                mDataSink.onData((SensorData) oinput.readObject());
+                mDataSink.onData(mClient, (SensorData) objectInputStream.readObject());
             }
 
         } catch (IOException | ClassNotFoundException e) {
@@ -95,7 +105,7 @@ class UdpDataConnection extends Thread implements DataSource {
     }
 
     @Override
-    public void setDataSink(DataSink sink) {
+    public void setDataSink(NetworkDataSink sink) {
         mDataSink = sink;
     }
 
