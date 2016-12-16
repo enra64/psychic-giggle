@@ -9,8 +9,7 @@ import java.awt.event.KeyEvent;
 
 /**
  * Created by Ulrich on 12.12.2016.
- * This class is responsible for steering the player in Mario Kart
- * TODO: better description for this class
+ * This class is responsible for steering the player in simple racing games
  */
 public class SteeringWheel implements DataSink{
 
@@ -33,7 +32,6 @@ public class SteeringWheel implements DataSink{
 
     public void controllerInput(int buttonID, boolean isPressed)
     {
-        //TODO: PROVIDE control.cfg for emulator or decide for a better solution
         //I thought it is actually smarter to set it to the emulator default input - Ulrich
 
         //The following robot input is set by the button layout of a standard SNES controller
@@ -104,10 +102,10 @@ public class SteeringWheel implements DataSink{
     public void onData(SensorData data) {
         if(data.sensorType == SensorType.Gyroscope) {
             //TODO: DECIDE THRESHOLD VALUE FOR STEERING
-            if (data.data[ZAXIS] > 20000)
+            if (data.data[ZAXIS] > 40000)
                 mSteeringBot.keyPress(KeyEvent.VK_LEFT);
 
-            else if (data.data[ZAXIS] < -30000)
+            else if (data.data[ZAXIS] < -40000)
                 mSteeringBot.keyPress(KeyEvent.VK_RIGHT);
             else{
                 mSteeringBot.keyRelease(KeyEvent.VK_LEFT);
@@ -115,23 +113,23 @@ public class SteeringWheel implements DataSink{
             }
         }
 
-        //TODO: Decide how to deal with this Accelerometer correctly; 20 is a random magic number place holder
-//        if(data.sensorType == SensorType.Accelerometer){
-//            if(data.data[ZAXIS] > 3500) {
-//                mSteeringBot.keyPress(KeyEvent.VK_UP);
+        //TODO: Decide how to deal with this Accelerometer correctly; random magic numbers place holder
+        if(data.sensorType == SensorType.LinearAcceleration){
+            if(data.data[ZAXIS] > 500) {
+                mSteeringBot.keyPress(KeyEvent.VK_UP);
+//                mSteeringBot.keyPress(KeyEvent.VK_X);     //These both lines are commented for test purposes
+//                mSteeringBot.keyRelease(KeyEvent.VK_X);
+                mSteeringBot.keyRelease(KeyEvent.VK_UP);
+            }
+
+            if(data.data[ZAXIS] < -500){
+                mSteeringBot.keyPress(KeyEvent.VK_DOWN);
 //                mSteeringBot.keyPress(KeyEvent.VK_X);
 //                mSteeringBot.keyRelease(KeyEvent.VK_X);
-//                mSteeringBot.keyRelease(KeyEvent.VK_UP);
-//            }
-//
-//            if(data.data[ZAXIS] < -350){
-//                mSteeringBot.keyPress(KeyEvent.VK_DOWN);
-//                mSteeringBot.keyPress(KeyEvent.VK_X);
-//                mSteeringBot.keyRelease(KeyEvent.VK_X);
-//                mSteeringBot.keyRelease(KeyEvent.VK_DOWN);
-//            }
+                mSteeringBot.keyRelease(KeyEvent.VK_DOWN);
+            }
     }
-    // }
+}
 
     /**
      * Needs to be implemented due to interface but serves no purpose here
