@@ -61,15 +61,14 @@ public class NesServer extends Server {
 
         mSteeringWheel = new SteeringWheel();
 
-        //TODO: See what this test brings
         //register use of gyroscope
         mIntegratingFilter = new IntegratingFiler(mSteeringWheel);
         DataSink gyroPipeline = mIntegratingFilter;
         setSensorOutputRange(SensorType.Gyroscope,100);
         registerDataSink(gyroPipeline, SensorType.Gyroscope);
 
-        //register use of accelerometer
-        DataSink accPipeline = mSteeringWheel;  //Accelerometer ought to be filtered ... but what is the best approach?
+        //register use of linearAccelerometer, i.e. acceleration without gravity
+        DataSink accPipeline = new ThresholdingFilter(mSteeringWheel, 100f);
         setSensorOutputRange(SensorType.LinearAcceleration,100);
         registerDataSink(accPipeline, SensorType.LinearAcceleration);
 
