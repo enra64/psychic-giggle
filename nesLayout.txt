@@ -4,10 +4,10 @@
     android:layout_height="match_parent">
 
     <Button
-        android:text="Button1"
+        android:text="A"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="1"
+        android:id="0"
         android:layout_weight="5"/>
 
     <LinearLayout
@@ -17,26 +17,25 @@
         android:layout_weight="1">
 
         <Button
-            android:text="Button2"
+            android:text="START"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:id="2"
+            android:id="5"
             android:layout_weight="1" />
 
         <Button
-            android:text="Button3"
+            android:text="SELECT"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:id="3"
+            android:id="4"
             android:layout_weight="1" />
     </LinearLayout>
 
 
     <Button
-        android:text="Button4"
+        android:text="B"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="4"
+        android:id="1"
         android:layout_weight="5"/>
-
 </LinearLayout>

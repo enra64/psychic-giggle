@@ -75,10 +75,7 @@ public class NesServer extends Server {
         setSensorOutputRange(SensorType.LinearAcceleration,100);
         registerDataSink(accPipeline, SensorType.LinearAcceleration);
 
-        addButton("A", A_BUTTON);
-        addButton("B", B_BUTTON);
-        addButton("Start", START_BUTTON);
-	setButtonLayout(readFile("../nesLayout.txt", "utf-8"));
+    	setButtonLayout(readFile("../nesLayout.txt", "utf-8"));
     }
 
     /**
