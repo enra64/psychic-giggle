@@ -9,5 +9,5 @@ public enum SensorType {
     Accelerometer,
     Gyroscope,
     Magnetometer,
-    RotationVector
+    LinearAcceleration, RotationVector
 }
