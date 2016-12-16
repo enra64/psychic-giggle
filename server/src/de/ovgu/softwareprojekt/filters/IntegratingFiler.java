@@ -8,7 +8,7 @@ import de.ovgu.softwareprojekt.SensorData;
  *
  * This Filter is responsible for saving previous values so that for example
  * the steering rotation is used instead of acting as if the steering wheel is back at 0
- * TODO: better description and not this whackshit
+ * TODO: better description and not this whackshit lul
  */
 public class IntegratingFiler extends AbstractFilter {
 

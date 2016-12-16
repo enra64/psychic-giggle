@@ -64,41 +64,21 @@ public class NesServer extends Server {
 
         mSteeringWheel = new SteeringWheel();
 
-        //TODO: Do we really use the RotationVector here or shouldn't it be gyroscope+accelerometer?
-        //TODO: See what this test brings
         //register use of gyroscope
         mIntegratingFilter = new IntegratingFiler(mSteeringWheel);
         DataSink gyroPipeline = mIntegratingFilter;
         setSensorOutputRange(SensorType.Gyroscope,100);
         registerDataSink(gyroPipeline, SensorType.Gyroscope);
 
-        //register use of accelerometer
-        DataSink accPipeline = mSteeringWheel;  //Accelerometer ought to be filtered ... but what is the best approach?
-        setSensorOutputRange(SensorType.Accelerometer,100);
-        registerDataSink(accPipeline, SensorType.Accelerometer);
+        //register use of linearAccelerometer, i.e. acceleration without gravity
+        DataSink accPipeline = new ThresholdingFilter(mSteeringWheel, 100f);
+        setSensorOutputRange(SensorType.LinearAcceleration,100);
+        registerDataSink(accPipeline, SensorType.LinearAcceleration);
 
-
-
-        /*addButton("A", A_BUTTON);
+        addButton("A", A_BUTTON);
         addButton("B", B_BUTTON);
-        addButton("Start", START_BUTTON);*/
-
-        setButtonLayout(readFile("../nesLayout.txt", "utf-8")) ;
-
-        //TODO: No idea if this was just a Placeholder
-
-//        registerDataSink(new DataSink() {
-//            @Override
-//            public void onData(SensorData sensorData) {
-//                //TODO: do whatever you do
-//
-//            }
-//
-//            @Override
-//            public void close() {
-//
-//            }
-//        }, SensorType.RotationVector);
+        addButton("Start", START_BUTTON);
+	setButtonLayout(readFile("../nesLayout.txt", "utf-8"));
     }
 
     /**
@@ -145,7 +125,6 @@ public class NesServer extends Server {
 
     @Override
     public void onResetPosition(NetworkDevice origin) {
-        //TODO: Use this way or unregister current gyroscope pipeline and register a new one
         //Idea: Reset Integrating filter to 0 which means it acts as the initial position
         mIntegratingFilter.resetFilter();
     }
