@@ -26,6 +26,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import de.ovgu.softwareprojekt.control.commands.ButtonClick;
 import de.ovgu.softwareprojektapp.networking.NetworkClient;
 
+import static android.view.ViewGroup.LayoutParams.FILL_PARENT;
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 import static android.widget.LinearLayout.LayoutParams.WRAP_CONTENT;
 
@@ -83,7 +84,9 @@ public class LayoutParser extends LinearLayout {
 
         for (Map.Entry<Integer, String> button : buttons.entrySet()) {
             Button btn = new Button(context);
-            btn.setLayoutParams(new LayoutParams(MATCH_PARENT, MATCH_PARENT));
+            LinearLayout.LayoutParams lp = new LayoutParams(MATCH_PARENT, MATCH_PARENT);
+            lp.weight = 1;
+            btn.setLayoutParams(lp);
             addView(btn);
             btn.setText(button.getValue());
             btn.setTag(button.getKey());

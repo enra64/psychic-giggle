@@ -12,6 +12,9 @@ import de.ovgu.softwareprojekt.networking.Server;
 
 import java.awt.*;
 import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Arrays;
 
 /**
@@ -70,9 +73,13 @@ public class NesServer extends Server {
         DataSink accPipeline = new ThresholdingFilter(mSteeringWheel, 20f);
         registerDataSink(accPipeline, SensorType.Accelerometer);
 
-        addButton("A", A_BUTTON);
+
+
+        /*addButton("A", A_BUTTON);
         addButton("B", B_BUTTON);
-        addButton("Start", START_BUTTON);
+        addButton("Start", START_BUTTON);*/
+
+        setButtonLayout(readFile("../nesLayout.txt", "utf-8")) ;
 
         //TODO: No idea if this was just a Placeholder
 
@@ -142,5 +149,10 @@ public class NesServer extends Server {
         mSteeringWheel.controllerInput(click.mID, true);
         if(!click.isHold)
             mSteeringWheel.controllerInput(click.mID, false);
+    }
+
+    static String readFile(String path, String encoding) throws IOException {
+        byte[] encoded = Files.readAllBytes(Paths.get(path));
+        return new String(encoded, encoding);
     }
 }

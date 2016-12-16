@@ -306,7 +306,7 @@ public abstract class Server implements OnCommandListener, DataSink, ClientListe
      * @param xml valid android XML layout using only linear layout and button
      *            if string is null ButtonMap will be used
      */
-    void setButtonLayout(@Nullable String xml){
+    public void setButtonLayout(@Nullable String xml){
         mClientHandlerFactory.setButtonLayout(xml);
     }
 

@@ -343,7 +343,7 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
             public void run() {
 
                mRuntimeButtonLayout.createFromMap(SendActivity.this, addCom.buttons);
-                
+
             }
         });
     }
