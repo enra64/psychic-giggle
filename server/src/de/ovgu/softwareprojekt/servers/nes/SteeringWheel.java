@@ -1,10 +1,11 @@
 package de.ovgu.softwareprojekt.servers.nes;
 
-import de.ovgu.softwareprojekt.DataSink;
 import de.ovgu.softwareprojekt.NetworkDataSink;
 import de.ovgu.softwareprojekt.SensorData;
 import de.ovgu.softwareprojekt.SensorType;
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
+import de.ovgu.softwareprojekt.filters.IntegratingFiler;
+import sun.security.krb5.internal.ktab.KeyTabConstants;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -30,53 +31,46 @@ public class SteeringWheel implements NetworkDataSink {
      */
     private long lastAccActivation;
 
+    /**
+     * This filter is used for integrating the gyroscope data
+     */
+    private IntegratingFiler mIntegratingFilter;
+
+    private ButtonConfig mButtonConfig;
+
     private int counter;
 
     /**
      * @throws AWTException is thrown when low level input is prohibit by system
      */
-    public SteeringWheel() throws AWTException {
+    public SteeringWheel(ButtonConfig config) throws AWTException {
         mSteeringBot = new Robot(); //emulates peripheral device input
         lastAccActivation = System.currentTimeMillis();
         counter = 0;
+        mButtonConfig = config;
     }
 
-    public void controllerInput(int buttonID, boolean isPressed)
-    {
-        int event = -1;
-        switch (buttonID){
-            case NesServer.A_BUTTON:
-                event = KeyEvent.VK_X;
-                break;
-            case NesServer.B_BUTTON:
-                // May use Z actually ingame ... but shouldn't
-                event = KeyEvent.VK_Y;
-                break;
-            case NesServer.X_BUTTON:
-                event = KeyEvent.VK_S;
-                break;
-            case NesServer.Y_BUTTON:
-                event = KeyEvent.VK_A;
-                break;
-            case NesServer.SELECT_BUTTON:
-                // Presses left shift or both shifts
-                event = KeyEvent.VK_SHIFT;
-                break;
-            case NesServer.START_BUTTON:
-                event = KeyEvent.VK_ENTER;
-                break;
-            case NesServer.R_BUTTON:
-                event = KeyEvent.VK_C;
-                break;
-            case NesServer.L_BUTTON:
-                event = KeyEvent.VK_D;
-                break;
-        }
+    public void setIntegratingFilter(IntegratingFiler filter) {
+        mIntegratingFilter = filter;
+    }
 
-        if(isPressed)
-            mSteeringBot.keyPress(event);
-        else
-            mSteeringBot.keyRelease(event);
+    public void resetIntegratingFilter() {
+        mIntegratingFilter.resetFilter();
+    }
+
+    public void controllerInput(int buttonID, boolean isPressed) {
+        Integer event = mButtonConfig.mapInput(buttonID);
+
+        if (event != null) {
+            if (isPressed)
+                mSteeringBot.keyPress(event);
+            else
+                mSteeringBot.keyRelease(event);
+        }
+    }
+
+    public ButtonConfig getButtonConfig(){
+        return mButtonConfig;
     }
 
     /**
@@ -86,19 +80,20 @@ public class SteeringWheel implements NetworkDataSink {
      * The gyroscope steers the player and is responsible for left right movement in the menu
      * <br/>
      * the accelerometer is responsible for throwing items and up, down movement in the menu
+     *
      * @param data pipeline here is either the gyroscope or acc. pipeline
      */
     @Override
     public void onData(NetworkDevice origin, SensorData data) {
         //Check if player steers to the left or right by tilted distance
-        if(data.sensorType == SensorType.Gyroscope) {
+        if (data.sensorType == SensorType.Gyroscope) {
             //TODO: DECIDE THRESHOLD VALUE FOR STEERING
             if (data.data[ZAXIS] > 2500)
                 mSteeringBot.keyPress(KeyEvent.VK_LEFT);
 
             else if (data.data[ZAXIS] < -2500)
                 mSteeringBot.keyPress(KeyEvent.VK_RIGHT);
-            else{
+            else {
                 mSteeringBot.keyRelease(KeyEvent.VK_LEFT);
                 mSteeringBot.keyRelease(KeyEvent.VK_RIGHT);
             }
@@ -106,45 +101,43 @@ public class SteeringWheel implements NetworkDataSink {
 
         //TODO: Decide how to deal with this Accelerometer correctly; random magic numbers place holder
         //Decide if item should be thrown forwards or backwards
-        if(data.sensorType == SensorType.LinearAcceleration){
-            if(data.data[ZAXIS] > 500) {
-                if(checkInterval()) {
+        if (data.sensorType == SensorType.LinearAcceleration) {
+            if (data.data[ZAXIS] > 500) {
+                if (checkInterval()) {
                     mSteeringBot.keyPress(KeyEvent.VK_UP);
                     mSteeringBot.keyPress(KeyEvent.VK_A);
 
-                }
-                else{
+                } else {
                     mSteeringBot.keyRelease(KeyEvent.VK_A);
                     mSteeringBot.keyRelease(KeyEvent.VK_UP);
                 }
             }
 
-            if(data.data[ZAXIS] < -500){
-                if(checkInterval()) {
+            if (data.data[ZAXIS] < -500) {
+                if (checkInterval()) {
                     mSteeringBot.keyPress(KeyEvent.VK_DOWN);
                     mSteeringBot.keyPress(KeyEvent.VK_A);
 
-                }
-                else{
+                } else {
                     mSteeringBot.keyRelease(KeyEvent.VK_A);
-                mSteeringBot.keyRelease(KeyEvent.VK_DOWN);
+                    mSteeringBot.keyRelease(KeyEvent.VK_DOWN);
                 }
             }
+        }
     }
-}
 
     /**
      * This method checks if the last valid acceleration happened 500ms ago
+     *
      * @return
      */
-    private boolean checkInterval(){
+    private boolean checkInterval() {
         long newActivation = System.currentTimeMillis();
         //Check if last activation happened 500 or more milliseconds ago
-        if(newActivation - lastAccActivation > 500){
+        if (newActivation - lastAccActivation > 500) {
             lastAccActivation = newActivation;
             return true;
-        }
-        else
+        } else
             return false;
     }
 
