@@ -13,7 +13,7 @@ import java.awt.event.KeyEvent;
  * Created by Ulrich on 12.12.2016.
  * This class is responsible for steering the player in simple racing games
  */
-public class SteeringWheel implements NetworkDataSink {
+public class SteeringWheel implements NetworkDataSink, AccelerationPhaseDetection.AccelerationListener {
 
     /**
      * is responsible for emulating hardware input
@@ -93,44 +93,17 @@ public class SteeringWheel implements NetworkDataSink {
         //Check if player steers to the left or right by tilted distance
         if(data.sensorType == SensorType.Gyroscope) {
             //TODO: DECIDE THRESHOLD VALUE FOR STEERING
-            if (data.data[ZAXIS] > 2500)
+            if (data.data[ZAXIS] > 30000)
                 mSteeringBot.keyPress(KeyEvent.VK_LEFT);
 
-            else if (data.data[ZAXIS] < -2500)
+            else if (data.data[ZAXIS] < -30000)
                 mSteeringBot.keyPress(KeyEvent.VK_RIGHT);
+
             else{
                 mSteeringBot.keyRelease(KeyEvent.VK_LEFT);
                 mSteeringBot.keyRelease(KeyEvent.VK_RIGHT);
             }
         }
-
-        //TODO: Decide how to deal with this Accelerometer correctly; random magic numbers place holder
-        //Decide if item should be thrown forwards or backwards
-        if(data.sensorType == SensorType.LinearAcceleration){
-            if(data.data[ZAXIS] > 500) {
-                if(checkInterval()) {
-                    mSteeringBot.keyPress(KeyEvent.VK_UP);
-                    mSteeringBot.keyPress(KeyEvent.VK_A);
-
-                }
-                else{
-                    mSteeringBot.keyRelease(KeyEvent.VK_A);
-                    mSteeringBot.keyRelease(KeyEvent.VK_UP);
-                }
-            }
-
-            if(data.data[ZAXIS] < -500){
-                if(checkInterval()) {
-                    mSteeringBot.keyPress(KeyEvent.VK_DOWN);
-                    mSteeringBot.keyPress(KeyEvent.VK_A);
-
-                }
-                else{
-                    mSteeringBot.keyRelease(KeyEvent.VK_A);
-                mSteeringBot.keyRelease(KeyEvent.VK_DOWN);
-                }
-            }
-    }
 }
 
     /**
@@ -142,6 +115,7 @@ public class SteeringWheel implements NetworkDataSink {
         //Check if last activation happened 500 or more milliseconds ago
         if(newActivation - lastAccActivation > 500){
             lastAccActivation = newActivation;
+            counter=0;
             return true;
         }
         else
@@ -153,5 +127,39 @@ public class SteeringWheel implements NetworkDataSink {
      */
     @Override
     public void close() {
+    }
+
+    @Override
+    public void onUpMovement() {
+        if(checkInterval()) {
+            System.out.println("down,a on ");
+            mSteeringBot.keyPress(KeyEvent.VK_DOWN);
+            mSteeringBot.delay(30);
+            mSteeringBot.keyPress(KeyEvent.VK_A);
+            counter++;
+        }
+        else{
+            System.out.println("down,a off ");
+            mSteeringBot.keyRelease(KeyEvent.VK_A);
+            mSteeringBot.delay(30);
+            mSteeringBot.keyRelease(KeyEvent.VK_DOWN);
+        }
+    }
+
+    @Override
+    public void onDownMovement() {
+        if(checkInterval()) {
+            System.out.println("up,a on ");
+            mSteeringBot.keyPress(KeyEvent.VK_UP);
+            mSteeringBot.delay(30);
+            mSteeringBot.keyPress(KeyEvent.VK_A);
+            counter++;
+        }
+        else{
+            System.out.println("up,a off ");
+            mSteeringBot.keyRelease(KeyEvent.VK_A);
+            mSteeringBot.delay(30);
+            mSteeringBot.keyRelease(KeyEvent.VK_UP);
+        }
     }
 }

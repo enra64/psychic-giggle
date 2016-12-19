@@ -72,9 +72,10 @@ public class NesServer extends Server {
         registerDataSink(gyroPipeline, SensorType.Gyroscope);
 
         //register use of accelerometer
-        NetworkDataSink accPipeline = mSteeringWheel;  //LinearAcceleration ought to be filtered ... but what is the best approach?
+        //NetworkDataSink accPipeline = mSteeringWheel;  //LinearAcceleration ought to be filtered ... but what is the best approach?
         setSensorOutputRange(SensorType.LinearAcceleration,100);
-        registerDataSink(accPipeline, SensorType.LinearAcceleration);
+        //registerDataSink(accPipeline, SensorType.LinearAcceleration);
+        registerDataSink(new AccelerationPhaseDetection(mSteeringWheel), SensorType.LinearAcceleration);
 
     	setButtonLayout(readFile("../nesLayout.txt", "utf-8"));
     }

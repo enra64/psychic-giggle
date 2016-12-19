@@ -6,6 +6,7 @@ import de.ovgu.softwareprojekt.SensorData;
 import de.ovgu.softwareprojekt.SensorType;
 import de.ovgu.softwareprojekt.control.commands.ButtonClick;
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
+import de.ovgu.softwareprojekt.filters.IntegratingFiler;
 import de.ovgu.softwareprojekt.networking.Server;
 
 import javax.swing.*;
@@ -16,16 +17,18 @@ public class Grapher extends Server {
         super("graphing server");
 
         try {
-            registerDataSink(new NetworkDataSink() {
+            NetworkDataSink graphomat = new NetworkDataSink() {
                 @Override
-                public void onData(NetworkDevice origin, SensorData data) {
-                    graphPanel.addData(data);
+                public void onData(NetworkDevice networkDevice, SensorData sensorData) {
+                    graphPanel.addData(sensorData);
                 }
 
                 @Override
                 public void close() {
+
                 }
-            }, SensorType.Gyroscope);
+            };
+            registerDataSink((graphomat), SensorType.LinearAcceleration);
         } catch (IOException e) {
             e.printStackTrace();
             System.exit(1);
