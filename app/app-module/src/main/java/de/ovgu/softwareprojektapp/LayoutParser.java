@@ -7,7 +7,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -27,12 +26,15 @@ import javax.xml.parsers.ParserConfigurationException;
 import de.ovgu.softwareprojekt.control.commands.ButtonClick;
 import de.ovgu.softwareprojektapp.networking.NetworkClient;
 
-import static android.view.ViewGroup.LayoutParams.FILL_PARENT;
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
-import static android.widget.LinearLayout.LayoutParams.WRAP_CONTENT;
 
 public class LayoutParser extends LinearLayout {
+
+    /**
+     * The network client organises all our communication with the server
+     */
     private NetworkClient mNetworkClient = null;
+
 
     public LayoutParser(Context context) {
         super(context);
@@ -46,10 +48,22 @@ public class LayoutParser extends LinearLayout {
         super(context, attrs, defStyleAttr);
     }
 
+    /**
+     * initialise NetworkClient
+     *
+     * @param networkClient
+     */
     public void setNetworkClient(NetworkClient networkClient) {
         mNetworkClient = networkClient;
     }
 
+    /**
+     * parse Nodes from a given XMLlayoutString
+     *
+     * @param xmlString given XMLlayout as String
+     * @param linlay    linear layout to put the buttons in
+     * @throws InvalidLayoutException triggered if xml is invalid
+     */
     public void createFromXML(String xmlString, LinearLayout linlay) throws InvalidLayoutException {
         removeAllViews();
         try {
@@ -79,6 +93,12 @@ public class LayoutParser extends LinearLayout {
         }
     }
 
+    /**
+     * create Buttons in a given Context from a buttonsmap
+     *
+     * @param context given Context
+     * @param buttons map with Buttons and IDs
+     */
     public void createFromMap(Context context, Map<Integer, String> buttons) {
         removeAllViews();
 
@@ -103,19 +123,28 @@ public class LayoutParser extends LinearLayout {
         }
     }
 
+    /**
+     * create button from parsed node
+     *
+     * @param node   parsed node
+     * @param linlay layout to put button in
+     * @throws InvalidLayoutException if button has no ID
+     */
     private void addButtons(Node node, LinearLayout linlay) throws InvalidLayoutException {
+        //get node attributes
         Node weightNode = node.getAttributes().getNamedItem("android:layout_weight");
         Node textNode = node.getAttributes().getNamedItem("android:text");
         Node idNode = node.getAttributes().getNamedItem("android:id");
+
         Button newButton = new Button(linlay.getContext());
 
-        newButton.setOnTouchListener(new OnTouchListener() {
+        newButton.setOnTouchListener(new OnTouchListener() { //set actions on touch
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
                 if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
                     mNetworkClient.sendCommand(new ButtonClick(view.getId(), true));
                     return true;
-                } else if (motionEvent.getAction() == MotionEvent.ACTION_UP){
+                } else if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
                     mNetworkClient.sendCommand(new ButtonClick(view.getId(), false));
                     return true;
                 }
@@ -141,6 +170,13 @@ public class LayoutParser extends LinearLayout {
         linlay.addView(newButton);
     }
 
+    /**
+     * is called when a linear layout is nested in the xmllayoutfile
+     *
+     * @param node   given nested node
+     * @param linlay layout to create buttons in
+     * @throws InvalidLayoutException
+     */
     private void createFromXML(Node node, LinearLayout linlay) throws InvalidLayoutException {
         org.w3c.dom.Element root = (Element) node;
         root.normalize();
