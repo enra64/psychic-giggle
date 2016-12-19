@@ -43,59 +43,40 @@ public class SteeringWheel implements NetworkDataSink {
 
     public void controllerInput(int buttonID, boolean isPressed)
     {
-        //The following robot input is set by the button layout of a standard SNES controller
-        switch(buttonID){
+        int event = -1;
+        switch (buttonID){
             case NesServer.A_BUTTON:
-                if(isPressed)
-                    mSteeringBot.keyPress(KeyEvent.VK_X);
-                else
-                    mSteeringBot.keyRelease(KeyEvent.VK_X);
+                event = KeyEvent.VK_X;
                 break;
             case NesServer.B_BUTTON:
-                if(isPressed)
-                    mSteeringBot.keyPress(KeyEvent.VK_Y); //May use Z actually ingame ... but shouldn't
-                else
-                    mSteeringBot.keyRelease(KeyEvent.VK_Y);
+                // May use Z actually ingame ... but shouldn't
+                event = KeyEvent.VK_Y;
                 break;
             case NesServer.X_BUTTON:
-                if(isPressed)
-                    mSteeringBot.keyPress(KeyEvent.VK_S);
-                else
-                    mSteeringBot.keyRelease(KeyEvent.VK_S);
+                event = KeyEvent.VK_S;
                 break;
             case NesServer.Y_BUTTON:
-                if(isPressed)
-                    mSteeringBot.keyPress(KeyEvent.VK_A);
-                else
-                    mSteeringBot.keyRelease(KeyEvent.VK_A);
+                event = KeyEvent.VK_A;
                 break;
             case NesServer.SELECT_BUTTON:
-                if(isPressed)
-                    mSteeringBot.keyPress(KeyEvent.VK_SHIFT); //Presses left shift or both shifts
-                else
-                    mSteeringBot.keyRelease(KeyEvent.VK_SHIFT);
+                // Presses left shift or both shifts
+                event = KeyEvent.VK_SHIFT;
                 break;
             case NesServer.START_BUTTON:
-                if(isPressed)
-                    mSteeringBot.keyPress(KeyEvent.VK_ENTER);
-                else
-                    mSteeringBot.keyRelease(KeyEvent.VK_ENTER);
+                event = KeyEvent.VK_ENTER;
                 break;
             case NesServer.R_BUTTON:
-                if(isPressed)
-                    mSteeringBot.keyPress(KeyEvent.VK_C);
-                else
-                    mSteeringBot.keyRelease(KeyEvent.VK_C);
+                event = KeyEvent.VK_C;
                 break;
             case NesServer.L_BUTTON:
-                if(isPressed)
-                    mSteeringBot.keyPress(KeyEvent.VK_D);
-                else
-                    mSteeringBot.keyRelease(KeyEvent.VK_D);
-                break;
-            default:
+                event = KeyEvent.VK_D;
                 break;
         }
+
+        if(isPressed)
+            mSteeringBot.keyPress(event);
+        else
+            mSteeringBot.keyRelease(event);
     }
 
     /**
