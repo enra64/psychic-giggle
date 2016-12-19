@@ -1,25 +1,20 @@
 package de.ovgu.softwareprojekt.servers.nes;
 
 import com.sun.istack.internal.Nullable;
-import de.ovgu.softwareprojekt.DataSink;
-import de.ovgu.softwareprojekt.NetworkDataSink;
-import de.ovgu.softwareprojekt.SensorData;
 import de.ovgu.softwareprojekt.SensorType;
 import de.ovgu.softwareprojekt.control.commands.ButtonClick;
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
 import de.ovgu.softwareprojekt.filters.IntegratingFiler;
-import de.ovgu.softwareprojekt.filters.ThresholdingFilter;
 import de.ovgu.softwareprojekt.networking.Server;
 
 import java.awt.*;
-import java.awt.event.KeyEvent;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Properties;
+import java.util.Stack;
 
 /**
  * This server is designed to create NES controller input from gyroscope data
@@ -31,6 +26,10 @@ public class NesServer extends Server {
      */
     private HashMap<NetworkDevice, SteeringWheel> mSteeringWheels = new HashMap<>();
 
+    /**
+     * This stack stores all available button configs. they will get taken out as more
+     * clients connect, and stored back when clients are removed
+     */
     private Stack<ButtonConfig> mButtonConfigs = new Stack<>();
 
     /**
@@ -52,6 +51,10 @@ public class NesServer extends Server {
     	super.setButtonLayout(readFile("../nesLayout.txt", "utf-8"));
     }
 
+    /**
+     * Loads all available button mappings from ../keys.properties
+     * @throws IOException if the file could not be found
+     */
     private void loadButtonMappings() throws IOException {
         FileInputStream input = new FileInputStream("../keys.properties");
         Properties prop = new Properties();

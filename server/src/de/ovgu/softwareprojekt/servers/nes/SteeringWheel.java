@@ -36,6 +36,10 @@ public class SteeringWheel implements NetworkDataSink {
      */
     private IntegratingFiler mIntegratingFilter;
 
+    /**
+     * This button config stores the awt buttons that should be pressed on certain app button
+     * presses
+     */
     private ButtonConfig mButtonConfig;
 
     private int counter;
@@ -43,22 +47,34 @@ public class SteeringWheel implements NetworkDataSink {
     /**
      * @throws AWTException is thrown when low level input is prohibit by system
      */
-    public SteeringWheel(ButtonConfig config) throws AWTException {
+    SteeringWheel(ButtonConfig config) throws AWTException {
         mSteeringBot = new Robot(); //emulates peripheral device input
         lastAccActivation = System.currentTimeMillis();
         counter = 0;
         mButtonConfig = config;
     }
 
-    public void setIntegratingFilter(IntegratingFiler filter) {
+    /**
+     * Set the integrating filter used for this steering wheel
+     * @param filter the filter to be used
+     */
+    void setIntegratingFilter(IntegratingFiler filter) {
         mIntegratingFilter = filter;
     }
 
-    public void resetIntegratingFilter() {
+    /**
+     * Call {@link IntegratingFiler#resetFilter()}.
+     */
+    void resetIntegratingFilter() {
         mIntegratingFilter.resetFilter();
     }
 
-    public void controllerInput(int buttonID, boolean isPressed) {
+    /**
+     * Map app button input to robot events
+     * @param buttonID the pressed buttons id
+     * @param isPressed whether it is currently pressed or not
+     */
+    void controllerInput(int buttonID, boolean isPressed) {
         Integer event = mButtonConfig.mapInput(buttonID);
 
         if (event != null) {
@@ -69,7 +85,10 @@ public class SteeringWheel implements NetworkDataSink {
         }
     }
 
-    public ButtonConfig getButtonConfig(){
+    /**
+     * Get the button config this steering wheel uses
+     */
+    ButtonConfig getButtonConfig(){
         return mButtonConfig;
     }
 
