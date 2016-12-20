@@ -5,37 +5,81 @@ import de.ovgu.softwareprojekt.SensorData;
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
 
 /**
- * Created by arne on 12/19/16.
+ * This class may be used to detect sudden movements in the z-axis of linear acceleration of a device.
+ * The movement is expected to return to the original position.
  */
 public class AccelerationPhaseDetection implements NetworkDataSink {
+    /**
+     * This interface must be implemented if you want to be notified of the detected movements
+     */
     public interface AccelerationListener {
+        /**
+         * Called when an up-movement has been detected
+         */
         void onUpMovement();
+
+        /**
+         * Called when a down-movement has been detected
+         */
         void onDownMovement();
     }
 
-    private AccelerationListener mListener;
-
-    private static final int TIMEOUT = 10;
-
-    public AccelerationPhaseDetection(AccelerationListener listener){
+    /**
+     * Create a new acceleration phase detection class.
+     * @param listener this listener will be notified when movements have been identified
+     */
+    AccelerationPhaseDetection(AccelerationListener listener) {
         mListener = listener;
     }
 
-    private boolean
-            mDownCycle = false,
-            mDownPhase2 = false,
-            mDownPhase3 = false;
-
+    /**
+     * This counter is used for aborting phase waits, avoiding bad recognition of the next
+     * event due to bad phase state.
+     */
     private int mTimeoutCounter = 0;
 
+    /**
+     * This is the maximum event count the detector will wait until the current cycle is aborted.
+     */
+    private static final int TIMEOUT = 10;
+
+    /**
+     * State variables determining the current state of an up movement. True if the phase is currently live.
+     */
     private boolean
             mUpCycle = false,
             mUpPhase2 = false,
             mUpPhase3 = false;
 
+    /**
+     * State variables determining the current state of an up movement. True if the phase is currently live.
+     */
+    private boolean
+            mDownCycle = false,
+            mDownPhase2 = false,
+            mDownPhase3 = false;
+
+    /**
+     * The listener we call back when a cycle begins
+     */
+    private AccelerationListener mListener;
+
     @Override
     public void onData(NetworkDevice networkDevice, SensorData sensorData) {
-        onData(sensorData.data[2] > 500, sensorData.data[2] < -500);
+        int threshold = getThreshold();
+        onData(sensorData.data[2] > threshold, sensorData.data[2] < -threshold);
+    }
+
+    /**
+     * Get the different threshold values for detecting phase switches
+     * @return one of three different thresholds, depending on the expected amplitude
+     */
+    private int getThreshold(){
+        if(mUpPhase3 || mDownPhase3)
+            return 150;
+        if(mUpPhase2 || mDownPhase2)
+            return 1000;
+        return 500;
     }
 
     private void onData(boolean up, boolean down) {
@@ -59,20 +103,20 @@ public class AccelerationPhaseDetection implements NetworkDataSink {
             }
         }
 
-        if(!mDownCycle){
-            if(mUpCycle){
-                if((mUpPhase3 && !down && !up) || mTimeoutCounter++ > TIMEOUT){
+        if (!mDownCycle) {
+            if (mUpCycle) {
+                if ((mUpPhase3 && !down && !up) || mTimeoutCounter++ > TIMEOUT) {
                     mUpCycle = false;
                     mUpPhase2 = false;
                     mUpPhase3 = false;
                     mTimeoutCounter = 0;
                 }
-                if(mUpPhase2 && up && !down)
+                if (mUpPhase2 && up && !down)
                     mUpPhase3 = true;
-                if(down && !up)
+                if (down && !up)
                     mUpPhase2 = true;
             }
-            if(!mUpCycle && up && !down){
+            if (!mUpCycle && up && !down) {
                 mUpCycle = true;
                 mListener.onUpMovement();
             }
