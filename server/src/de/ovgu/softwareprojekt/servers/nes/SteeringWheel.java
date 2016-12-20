@@ -131,35 +131,21 @@ public class SteeringWheel implements NetworkDataSink, AccelerationPhaseDetectio
 
     @Override
     public void onUpMovement() {
-        if(checkInterval()) {
-            System.out.println("down,a on ");
-            mSteeringBot.keyPress(KeyEvent.VK_DOWN);
-            mSteeringBot.delay(30);
-            mSteeringBot.keyPress(KeyEvent.VK_A);
-            counter++;
-        }
-        else{
-            System.out.println("down,a off ");
-            mSteeringBot.keyRelease(KeyEvent.VK_A);
-            mSteeringBot.delay(30);
-            mSteeringBot.keyRelease(KeyEvent.VK_DOWN);
-        }
+        System.out.println("onUp");
+        mSteeringBot.keyPress(KeyEvent.VK_DOWN);
+        mSteeringBot.keyPress(KeyEvent.VK_A);
+        mSteeringBot.delay(30);
+        mSteeringBot.keyRelease(KeyEvent.VK_A);
+        mSteeringBot.keyRelease(KeyEvent.VK_DOWN);
     }
 
     @Override
     public void onDownMovement() {
-        if(checkInterval()) {
-            System.out.println("up,a on ");
-            mSteeringBot.keyPress(KeyEvent.VK_UP);
-            mSteeringBot.delay(30);
-            mSteeringBot.keyPress(KeyEvent.VK_A);
-            counter++;
-        }
-        else{
-            System.out.println("up,a off ");
-            mSteeringBot.keyRelease(KeyEvent.VK_A);
-            mSteeringBot.delay(30);
-            mSteeringBot.keyRelease(KeyEvent.VK_UP);
-        }
+        System.out.println("onDown");
+        mSteeringBot.keyPress(KeyEvent.VK_UP);
+        mSteeringBot.keyPress(KeyEvent.VK_A);
+        mSteeringBot.delay(30);
+        mSteeringBot.keyRelease(KeyEvent.VK_A);
+        mSteeringBot.keyRelease(KeyEvent.VK_UP);
     }
 }

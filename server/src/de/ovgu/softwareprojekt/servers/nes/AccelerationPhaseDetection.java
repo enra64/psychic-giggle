@@ -26,6 +26,7 @@ public class AccelerationPhaseDetection implements NetworkDataSink {
 
     /**
      * Create a new acceleration phase detection class.
+     *
      * @param listener this listener will be notified when movements have been identified
      */
     AccelerationPhaseDetection(AccelerationListener listener) {
@@ -44,20 +45,19 @@ public class AccelerationPhaseDetection implements NetworkDataSink {
     private static final int TIMEOUT = 10;
 
     /**
-     * State variables determining the current state of an up movement. True if the phase is currently live.
+     * True if we are currently in an up movement cycle
      */
-    private boolean
-            mUpCycle = false,
-            mUpPhase2 = false,
-            mUpPhase3 = false;
+    private boolean mUpCycle = false;
+
+    /**
+     * True if we are currently in a down movement cycle
+     */
+    private boolean mDownCycle = false;
 
     /**
      * State variables determining the current state of an up movement. True if the phase is currently live.
      */
-    private boolean
-            mDownCycle = false,
-            mDownPhase2 = false,
-            mDownPhase3 = false;
+    private boolean mPhase2 = false, mPhase3 = false;
 
     /**
      * The listener we call back when a cycle begins
@@ -72,50 +72,83 @@ public class AccelerationPhaseDetection implements NetworkDataSink {
 
     /**
      * Get the different threshold values for detecting phase switches
+     *
      * @return one of three different thresholds, depending on the expected amplitude
      */
-    private int getThreshold(){
-        if(mUpPhase3 || mDownPhase3)
+    private int getThreshold() {
+        if (mPhase3)
             return 150;
-        if(mUpPhase2 || mDownPhase2)
-            return 1000;
-        return 500;
+        if (mPhase2)
+            return 750;
+        return 750;
     }
 
+    /**
+     * This function tries to detect whether the current conditions are sufficient to either enter a
+     * cycle or advance the current movement phase
+     *
+     * @param up   true, if the current data exceeds the movement threshold
+     * @param down true, if the current data exceeds the movement threshold
+     */
     private void onData(boolean up, boolean down) {
-        System.out.println(toString());
+        //System.out.println(toString());
+
+        // only allow down cycle detection if no up cycle is live
         if (!mUpCycle) {
             if (mDownCycle) {
-                if ((mDownPhase3 && !up && !down) || mTimeoutCounter++ > TIMEOUT) {
+                // true if the cycle has ended, or the timeout has been met
+                if ((mPhase3 && !up && !down) || mTimeoutCounter++ > TIMEOUT) {
                     mDownCycle = false;
-                    mDownPhase2 = false;
-                    mDownPhase3 = false;
+                    mPhase2 = false;
+                    mPhase3 = false;
                     mTimeoutCounter = 0;
                 }
-                if (mDownPhase2 && down && !up)
-                    mDownPhase3 = true;
-                if (up && !down)
-                    mDownPhase2 = true;
+
+                // checks for phase 3 conditions (initial direction)
+                if (mPhase2 && down && !up) {
+                    mPhase3 = true;
+                    mTimeoutCounter = 0;
+                }
+
+                // check for phase 2 conditions (reversed direction)
+                if (up && !down) {
+                    mPhase2 = true;
+                    mTimeoutCounter = 0;
+                }
             }
+
+            // detect a down cycle start (initial direction)
             if (!mDownCycle && down && !up) {
                 mDownCycle = true;
                 mListener.onDownMovement();
             }
         }
 
+        // only allow up cycle detection if no down cycle is live
         if (!mDownCycle) {
             if (mUpCycle) {
-                if ((mUpPhase3 && !down && !up) || mTimeoutCounter++ > TIMEOUT) {
+                // true if the cycle has ended, or the timeout has been met
+                if ((mPhase3 && !down && !up) || mTimeoutCounter++ > TIMEOUT) {
                     mUpCycle = false;
-                    mUpPhase2 = false;
-                    mUpPhase3 = false;
+                    mPhase2 = false;
+                    mPhase3 = false;
                     mTimeoutCounter = 0;
                 }
-                if (mUpPhase2 && up && !down)
-                    mUpPhase3 = true;
-                if (down && !up)
-                    mUpPhase2 = true;
+
+                // check for phase 3 conditions (initial direction)
+                if (mPhase2 && up && !down) {
+                    mPhase3 = true;
+                    mTimeoutCounter = 0;
+                }
+
+                // check for phase 2 conditions (reversed direction)
+                if (down && !up) {
+                    mPhase2 = true;
+                    mTimeoutCounter = 0;
+                }
             }
+
+            // detect an up cycle start (initial direction)
             if (!mUpCycle && up && !down) {
                 mUpCycle = true;
                 mListener.onUpMovement();
@@ -127,16 +160,16 @@ public class AccelerationPhaseDetection implements NetworkDataSink {
     public String toString() {
         return "AccelerationPhaseDetection{" +
                 "mDownCycle=" + mDownCycle +
-                ", mDownPhase2=" + mDownPhase2 +
-                ", mDownPhase3=" + mDownPhase3 +
+                ", mPhase2=" + mPhase2 +
+                ", mPhase3=" + mPhase3 +
                 ", mUpCycle=" + mUpCycle +
-                ", mUpPhase2=" + mUpPhase2 +
-                ", mUpPhase3=" + mUpPhase3 +
                 '}';
     }
 
+    /**
+     * Does not need to do anything
+     */
     @Override
     public void close() {
-
     }
 }
