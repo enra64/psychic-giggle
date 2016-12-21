@@ -7,6 +7,7 @@ import de.ovgu.softwareprojekt.SensorData;
 import de.ovgu.softwareprojekt.SensorType;
 import de.ovgu.softwareprojekt.control.commands.ButtonClick;
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
+import de.ovgu.softwareprojekt.filters.AverageMovementFilter;
 import de.ovgu.softwareprojekt.filters.IntegratingFiler;
 import de.ovgu.softwareprojekt.filters.ThresholdingFilter;
 import de.ovgu.softwareprojekt.networking.Server;
@@ -75,7 +76,7 @@ public class NesServer extends Server {
         //NetworkDataSink accPipeline = mSteeringWheel;  //LinearAcceleration ought to be filtered ... but what is the best approach?
         setSensorOutputRange(SensorType.LinearAcceleration,100);
         //registerDataSink(accPipeline, SensorType.LinearAcceleration);
-        registerDataSink(new AccelerationPhaseDetection(mSteeringWheel), SensorType.LinearAcceleration);
+        registerDataSink(new AverageMovementFilter(10, new AccelerationPhaseDetection(mSteeringWheel)), SensorType.LinearAcceleration);
 
     	setButtonLayout(readFile("../nesLayout.txt", "utf-8"));
     }

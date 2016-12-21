@@ -77,10 +77,10 @@ public class AccelerationPhaseDetection implements NetworkDataSink {
      */
     private int getThreshold() {
         if (mPhase3)
-            return 150;
+            return 100;
         if (mPhase2)
-            return 750;
-        return 750;
+            return 300;
+        return 100;
     }
 
     /**

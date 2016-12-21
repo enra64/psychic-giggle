@@ -6,6 +6,7 @@ import de.ovgu.softwareprojekt.SensorData;
 import de.ovgu.softwareprojekt.SensorType;
 import de.ovgu.softwareprojekt.control.commands.ButtonClick;
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
+import de.ovgu.softwareprojekt.filters.AverageMovementFilter;
 import de.ovgu.softwareprojekt.filters.IntegratingFiler;
 import de.ovgu.softwareprojekt.networking.Server;
 
@@ -28,7 +29,7 @@ public class Grapher extends Server {
 
                 }
             };
-            registerDataSink((graphomat), SensorType.LinearAcceleration);
+            registerDataSink(new AverageMovementFilter(10, graphomat), SensorType.LinearAcceleration);
         } catch (IOException e) {
             e.printStackTrace();
             System.exit(1);
