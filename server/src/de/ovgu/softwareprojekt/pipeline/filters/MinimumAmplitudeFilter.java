@@ -1,19 +1,17 @@
-package de.ovgu.softwareprojekt.filters;
+package de.ovgu.softwareprojekt.pipeline.filters;
 
-import de.ovgu.softwareprojekt.DataSink;
 import de.ovgu.softwareprojekt.NetworkDataSink;
 import de.ovgu.softwareprojekt.SensorData;
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
 
-import java.util.Arrays;
 
 import static java.lang.Math.abs;
 
 /**
- * This filter zeros sensor data not exceeding a certain margin to avoid zittering when trying not to move,
+ * This filter ignores changes in sensor data up to a certain margin to avoid shaking when trying not to move,
  * for example when pointing with a mouse
  */
-public class ThresholdingFilter extends AbstractFilter {
+public class MinimumAmplitudeFilter extends AbstractFilter {
     /**
      * If the sum of changes does not at least equal this value, the last value that changed will
      * be sent as an update instead.
@@ -31,7 +29,7 @@ public class ThresholdingFilter extends AbstractFilter {
      * @param dataSink      where to put filtered data
      * @param minimumChange the minimum of change a new data element must represent to be let through
      */
-    public ThresholdingFilter(NetworkDataSink dataSink, float minimumChange) {
+    public MinimumAmplitudeFilter(NetworkDataSink dataSink, float minimumChange) {
         super(dataSink, 0, 1, 2);
         mMinimumChange = minimumChange;
     }
@@ -49,7 +47,7 @@ public class ThresholdingFilter extends AbstractFilter {
 
         // if the change does not meet the set minimum, overwrite the new data with our old, unchanged data
         if (calculateChange(sensorData.data, mLastValue) < mMinimumChange)
-            Arrays.fill(sensorData.data, 0);
+            System.arraycopy(mLastValue, 0, sensorData.data, 0, mLastValue.length);
         // if the change does meet the minimum, copy over the new values
         else {
             //System.out.println(calculateChange(sensorData.data, mLastValue));

@@ -1,11 +1,10 @@
 package de.ovgu.softwareprojekt.networking;
 
-import de.ovgu.softwareprojekt.DataSink;
 import de.ovgu.softwareprojekt.NetworkDataSink;
 import de.ovgu.softwareprojekt.SensorData;
 import de.ovgu.softwareprojekt.SensorType;
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
-import de.ovgu.softwareprojekt.filters.NormalizationFilter;
+import de.ovgu.softwareprojekt.pipeline.filters.NormalizationFilter;
 
 import java.util.EnumMap;
 

@@ -1,4 +1,4 @@
-package de.ovgu.softwareprojekt.filters;
+package de.ovgu.softwareprojekt.pipeline.splitters;
 
 import de.ovgu.softwareprojekt.DataSink;
 import de.ovgu.softwareprojekt.NetworkDataSink;

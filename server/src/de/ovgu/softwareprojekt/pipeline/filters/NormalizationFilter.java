@@ -1,8 +1,6 @@
-package de.ovgu.softwareprojekt.filters;
+package de.ovgu.softwareprojekt.pipeline.filters;
 
-import de.ovgu.softwareprojekt.DataSink;
 import de.ovgu.softwareprojekt.NetworkDataSink;
-import de.ovgu.softwareprojekt.NetworkDataSource;
 import de.ovgu.softwareprojekt.SensorData;
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
 

@@ -1,16 +1,13 @@
 package de.ovgu.softwareprojekt.servers.mouse;
 
 import com.sun.istack.internal.Nullable;
-import de.ovgu.softwareprojekt.DataSink;
 import de.ovgu.softwareprojekt.NetworkDataSink;
 import de.ovgu.softwareprojekt.SensorType;
 import de.ovgu.softwareprojekt.control.commands.ButtonClick;
-import de.ovgu.softwareprojekt.control.commands.SetSensorSpeed;
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
-import de.ovgu.softwareprojekt.filters.ThresholdingFilter;
+import de.ovgu.softwareprojekt.pipeline.filters.ThresholdingFilter;
 import de.ovgu.softwareprojekt.networking.Server;
-import de.ovgu.softwareprojekt.filters.AverageMovementFilter;
-import de.ovgu.softwareprojekt.filters.MinimumAmplitudeFilter;
+import de.ovgu.softwareprojekt.pipeline.filters.AverageMovementFilter;
 
 import java.awt.*;
 import java.io.IOException;

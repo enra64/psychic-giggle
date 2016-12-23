@@ -1,6 +1,5 @@
-package de.ovgu.softwareprojekt.filters;
+package de.ovgu.softwareprojekt.pipeline.filters;
 
-import de.ovgu.softwareprojekt.DataSink;
 import de.ovgu.softwareprojekt.NetworkDataSink;
 import de.ovgu.softwareprojekt.SensorData;
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
@@ -12,11 +11,11 @@ import de.ovgu.softwareprojekt.discovery.NetworkDevice;
  * the steering rotation is used instead of acting as if the steering wheel is back at 0
  * TODO: better description and not this whackshit lul
  */
-public class IntegratingFiler extends AbstractFilter {
+public class IntegratingFilter extends AbstractFilter {
 
     private float mSumOfRotationX, mSumOfRotationY, mSumOfRotationZ;
 
-    public IntegratingFiler(NetworkDataSink sink) {
+    public IntegratingFilter(NetworkDataSink sink) {
         super(sink, 0, 1, 2);
         mSumOfRotationX = 0f;
         mSumOfRotationY = 0f;

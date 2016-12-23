@@ -1,23 +1,18 @@
 package de.ovgu.softwareprojekt.servers.nes;
 
 import com.sun.istack.internal.Nullable;
-import de.ovgu.softwareprojekt.DataSink;
 import de.ovgu.softwareprojekt.NetworkDataSink;
-import de.ovgu.softwareprojekt.SensorData;
 import de.ovgu.softwareprojekt.SensorType;
 import de.ovgu.softwareprojekt.control.commands.ButtonClick;
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
-import de.ovgu.softwareprojekt.filters.AverageMovementFilter;
-import de.ovgu.softwareprojekt.filters.IntegratingFiler;
-import de.ovgu.softwareprojekt.filters.ThresholdingFilter;
+import de.ovgu.softwareprojekt.pipeline.filters.AverageMovementFilter;
+import de.ovgu.softwareprojekt.pipeline.filters.IntegratingFilter;
 import de.ovgu.softwareprojekt.networking.Server;
 
 import java.awt.*;
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Arrays;
 
 /**
  * This server is designed to create NES controller input from gyroscope data
@@ -48,7 +43,7 @@ public class NesServer extends Server {
      */
     private SteeringWheel mSteeringWheel;
 
-    private IntegratingFiler mIntegratingFilter;
+    private IntegratingFilter mIntegratingFilter;
 
     /**
      * preset list of controller button IDs
@@ -67,7 +62,7 @@ public class NesServer extends Server {
         mSteeringWheel = new SteeringWheel();
 
         //register use of gyroscope
-        mIntegratingFilter = new IntegratingFiler(mSteeringWheel);
+        mIntegratingFilter = new IntegratingFilter(mSteeringWheel);
         NetworkDataSink gyroPipeline = mIntegratingFilter;
         setSensorOutputRange(SensorType.Gyroscope,100);
         registerDataSink(gyroPipeline, SensorType.Gyroscope);
