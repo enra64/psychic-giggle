@@ -1,5 +1,6 @@
 package de.ovgu.softwareprojekt.pipeline.filters;
 
+import com.sun.istack.internal.Nullable;
 import de.ovgu.softwareprojekt.NetworkDataSink;
 import de.ovgu.softwareprojekt.SensorData;
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
@@ -27,10 +28,11 @@ public class ThresholdingFilter extends AbstractFilter {
     /**
      * Create a new minimum amplitude filter.
      *
-     * @param dataSink      where to put filtered data
+     * @param dataSink      either a valid network data sink, or null. if null, {@link #setDataSink(NetworkDataSink)}
+     *                      must be called prior to starting operations.
      * @param minimumChange the minimum of change a new data element must represent to be let through
      */
-    public ThresholdingFilter(NetworkDataSink dataSink, float minimumChange) {
+    public ThresholdingFilter(@Nullable NetworkDataSink dataSink, float minimumChange) {
         super(dataSink, 0, 1, 2);
         mMinimumChange = minimumChange;
     }
@@ -49,7 +51,7 @@ public class ThresholdingFilter extends AbstractFilter {
         // if the change does not meet the set minimum, overwrite the new data with our old, unchanged data
         if (calculateChange(sensorData.data, mLastValue) < mMinimumChange)
             Arrays.fill(sensorData.data, 0);
-        // if the change does meet the minimum, copy over the new values
+            // if the change does meet the minimum, copy over the new values
         else {
             //System.out.println(calculateChange(sensorData.data, mLastValue));
             System.arraycopy(sensorData.data, 0, mLastValue, 0, mLastValue.length);

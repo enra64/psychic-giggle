@@ -1,5 +1,6 @@
 package de.ovgu.softwareprojekt.pipeline.filters;
 
+import com.sun.istack.internal.Nullable;
 import de.ovgu.softwareprojekt.NetworkDataSink;
 import de.ovgu.softwareprojekt.SensorData;
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
@@ -12,14 +13,18 @@ import de.ovgu.softwareprojekt.discovery.NetworkDevice;
  * TODO: better description and not this whackshit lul
  */
 public class IntegratingFilter extends AbstractFilter {
+    /**
+     * Theses are storage variables, where the sum of al previous values is stored
+     */
+    private float mSumOfRotationX = 0, mSumOfRotationY = 0, mSumOfRotationZ = 0;
 
-    private float mSumOfRotationX, mSumOfRotationY, mSumOfRotationZ;
-
-    public IntegratingFilter(NetworkDataSink sink) {
-        super(sink, 0, 1, 2);
-        mSumOfRotationX = 0f;
-        mSumOfRotationY = 0f;
-        mSumOfRotationZ = 0f;
+    /**
+     * Create a new {@link IntegratingFilter}
+     * @param sink either a valid network data sink, or null. if null, {@link #setDataSink(NetworkDataSink)}
+     *             must be called prior to starting operations.
+     */
+    public IntegratingFilter(@Nullable NetworkDataSink sink) {
+        super(sink);
     }
 
     /**

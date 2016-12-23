@@ -1,5 +1,6 @@
 package de.ovgu.softwareprojekt.pipeline.filters;
 
+import com.sun.istack.internal.Nullable;
 import de.ovgu.softwareprojekt.NetworkDataSink;
 import de.ovgu.softwareprojekt.SensorData;
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
@@ -26,10 +27,11 @@ public class MinimumAmplitudeFilter extends AbstractFilter {
     /**
      * Create a new minimum amplitude filter.
      *
-     * @param dataSink      where to put filtered data
+     * @param dataSink either a valid network data sink, or null. if null, {@link #setDataSink(NetworkDataSink)}
+     *             must be called prior to starting operations.
      * @param minimumChange the minimum of change a new data element must represent to be let through
      */
-    public MinimumAmplitudeFilter(NetworkDataSink dataSink, float minimumChange) {
+    public MinimumAmplitudeFilter(@Nullable NetworkDataSink dataSink, float minimumChange) {
         super(dataSink, 0, 1, 2);
         mMinimumChange = minimumChange;
     }

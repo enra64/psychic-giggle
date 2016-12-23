@@ -1,5 +1,6 @@
 package de.ovgu.softwareprojekt.pipeline.filters;
 
+import com.sun.istack.internal.Nullable;
 import de.ovgu.softwareprojekt.NetworkDataSink;
 import de.ovgu.softwareprojekt.SensorData;
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
@@ -8,7 +9,6 @@ import de.ovgu.softwareprojekt.discovery.NetworkDevice;
  * Created by Ulrich on 28.11.2016.
  */
 public class AverageMovementFilter extends AbstractFilter {
-
     /**
      * This value describes how many of the previous inputs are used to calculate the mAverage movement
      */
@@ -23,28 +23,42 @@ public class AverageMovementFilter extends AbstractFilter {
      * mIndexPointer is a pointer index which loops around the first array of mAverage in order to overwrite the oldest
      * mAverage value
      */
-    private int mIndexPointer; //used for mAverage output
+    private int mIndexPointer = 0; //used for mAverage output
 
     /**
-     * A filter that uses the mAverage movement in order to create a smooth movement
+     * A filter that uses the mAverage //TODO: wtf is mAverage supposed to tell the implementator
+     * movement in order to create a smooth movement
      *
      * @param avgSampSize how many values should be used to calculate the average
-     * @param dataSink    where to put the filtered data
+     * @param dataSink    either a valid network data sink, or null. if null, {@link #setDataSink(NetworkDataSink)}
+     *                    must be called prior to starting operations.
      */
     public AverageMovementFilter(int avgSampSize, NetworkDataSink dataSink) {
         this(avgSampSize, dataSink, 0, 1, 2);
     }
 
     /**
+     * Create a new average movement filter without a configured data sink.
+     * {@link #setDataSink(NetworkDataSink)} must be called before operations may begin
+     *
+     * @param avgSampSize how many values should be used to calculate the average
+     */
+    public AverageMovementFilter(int avgSampSize) {
+        // call this constructor with null data sink
+        this(avgSampSize, null);
+    }
+
+    /**
      * A filter that uses the mAverage movement in order to create a smooth movement
      *
      * @param avgSampSize how many values should be used to calculate the average
-     * @param dataSink    where to put the filtered data
+     * @param dataSink    either a valid network data sink, or null. if null, {@link #setDataSink(NetworkDataSink)}
+     *                    must be called prior to starting operations.
      * @param xaxis
      * @param yaxis
      * @param zaxis
      */
-    public AverageMovementFilter(int avgSampSize, NetworkDataSink dataSink, int xaxis, int yaxis, int zaxis) {
+    public AverageMovementFilter(int avgSampSize, @Nullable NetworkDataSink dataSink, int xaxis, int yaxis, int zaxis) {
         super(dataSink, xaxis, yaxis, zaxis);
 
         //The sample Size must be bigger than 0 or we would not create an average at all or even divide by zero
@@ -52,7 +66,6 @@ public class AverageMovementFilter extends AbstractFilter {
 
         mAverageSampleSize = avgSampSize;
         mAverage = new float[mAverageSampleSize][3];
-        mIndexPointer = 0;
     }
 
     /**

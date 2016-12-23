@@ -1,5 +1,6 @@
 package de.ovgu.softwareprojekt.pipeline.filters;
 
+import com.sun.istack.internal.Nullable;
 import de.ovgu.softwareprojekt.NetworkDataSink;
 import de.ovgu.softwareprojekt.SensorData;
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
@@ -31,28 +32,31 @@ public class NormalizationFilter extends AbstractFilter {
      * A filter that normalizes the sensorData into usable input
      * and uses standard axes and a base sensitivity of 40f
      *
-     * @param dataSink where to put filtered data
+     * @param dataSink either a valid network data sink, or null. if null, {@link #setDataSink(NetworkDataSink)}
+     *                 must be called prior to starting operations.
      */
-    public NormalizationFilter(NetworkDataSink dataSink) {
+    public NormalizationFilter(@Nullable NetworkDataSink dataSink) {
         this(dataSink, 50f, 1000f, 1000f);
     }
 
     /**
      * A filter for normalizing incoming data
      *
-     * @param sink              where to put filtered data
+     * @param sink              either a valid network data sink, or null. if null, {@link #setDataSink(NetworkDataSink)}
+     *                          must be called prior to starting operations.
      * @param customSensitivity the custom sensitivity value. will be applied before normalization.
      * @param sourceRange       range of the data coming into the normalization filter
      * @param targetRange       range the data should be projected to
      */
-    public NormalizationFilter(NetworkDataSink sink, float customSensitivity, float sourceRange, float targetRange) {
+    public NormalizationFilter(@Nullable NetworkDataSink sink, float customSensitivity, float sourceRange, float targetRange) {
         this(sink, customSensitivity, sourceRange, targetRange, 0, 1, 2);
     }
 
     /**
      * A filter that normalizes the sensorData into usable input
      *
-     * @param sink              where to put filtered data
+     * @param sink              either a valid network data sink, or null. if null, {@link #setDataSink(NetworkDataSink)}
+     *                          must be called prior to starting operations.
      * @param customSensitivity the custom sensitivity value. will be applied before normalization.
      * @param sourceRange       range of the data coming into the normalization filter
      * @param targetRange       range the data should be projected to
@@ -60,7 +64,7 @@ public class NormalizationFilter extends AbstractFilter {
      * @param yaxis             constant which is used to determine the Y-Axis of DataSink.data[]
      * @param zaxis             constant which is used to determine the Z-Axis of DataSink.data[]
      */
-    public NormalizationFilter(NetworkDataSink sink, float customSensitivity, float sourceRange, float targetRange, int xaxis, int yaxis, int zaxis) {
+    public NormalizationFilter(@Nullable NetworkDataSink sink, float customSensitivity, float sourceRange, float targetRange, int xaxis, int yaxis, int zaxis) {
         super(sink, xaxis, yaxis, zaxis);
 
         mCustomSensitivity = customSensitivity;
