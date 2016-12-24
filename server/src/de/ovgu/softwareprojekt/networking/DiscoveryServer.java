@@ -6,6 +6,7 @@ import de.ovgu.softwareprojekt.discovery.NetworkDevice;
 import de.ovgu.softwareprojekt.misc.ExceptionListener;
 
 import java.io.IOException;
+import java.net.BindException;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketTimeoutException;
@@ -56,19 +57,21 @@ class DiscoveryServer extends DiscoveryThread {
             while (isRunning()) {
                 try {
                     listen();
-
-                // if the socket times out, we just want to check if we should listen again, so we ignore the exception
-                } catch (SocketTimeoutException ignored){
-
+                    // if the socket times out, we just want to check if we should listen again, so we ignore the exception
+                } catch (SocketTimeoutException ignored) {
                 }
             }
 
+        } catch (BindException e) {
+            mExceptionListener.onException(this, e, "The port seems to be in use already: " + mListenPort);
         } catch (IOException e) {
             mExceptionListener.onException(this, e, "DiscoveryServer: could not listen on 0.0.0.0:" + mListenPort);
+        } finally {
+            // after we finished running, our socket must be closed
+            if (getSocket() != null)
+                getSocket().close();
         }
 
-        // after we finished running, our socket must be closed
-        getSocket().close();
     }
 
     /**
@@ -78,7 +81,7 @@ class DiscoveryServer extends DiscoveryThread {
     public void close() {
         super.close();
         // wait until the socket is closed
-        while(!getSocket().isClosed());
+        while (!getSocket().isClosed()) ;
     }
 
     /**

@@ -1,5 +1,6 @@
 package de.ovgu.softwareprojekt.pipeline;
 
+import com.sun.istack.internal.Nullable;
 import de.ovgu.softwareprojekt.NetworkDataSink;
 import de.ovgu.softwareprojekt.pipeline.filters.AbstractFilter;
 
@@ -20,10 +21,19 @@ public class FilterPipelineBuilder {
     /**
      * Insert a pipeline element as the first element
      *
-     * @param sink the abstract filter that will receive the elements first
+     * @param sink the abstract filter that will be the first to receive data
      */
     public void prepend(AbstractFilter sink) {
         mPipelineElements.push(sink);
+    }
+
+    /**
+     * Insert a pipeline element as the last element
+     *
+     * @param filter the abstract filter that will be the last to receive data
+     */
+    public void append(AbstractFilter filter) {
+        mPipelineElements.add(filter);
     }
 
     /**
@@ -71,12 +81,24 @@ public class FilterPipelineBuilder {
     /**
      * Chain the listed {@link AbstractFilter} pipeline elements
      *
-     * @return head of the pipeline
+     * @return head of the pipeline, or null if no elements were added
      */
     public NetworkDataSink build() {
-        AbstractFilter result = mPipelineElements.get(0);
         for (int i = 1; i < mPipelineElements.size(); i++)
-            result.setDataSink(mPipelineElements.get(i));
-        return result;
+            mPipelineElements.get(i - 1).setDataSink(mPipelineElements.get(i));
+        return mPipelineElements.get(0);
+    }
+
+    /**
+     * Chain the given pipeline elements, putting a {@link NetworkDataSink} as the last element
+     *
+     * @param lastElement the final element to receive data from this pipeline
+     * @return head of the pipeline
+     */
+    public NetworkDataSink build(NetworkDataSink lastElement) {
+        for (int i = 1; i < mPipelineElements.size(); i++)
+            mPipelineElements.get(i - 1).setDataSink(mPipelineElements.get(i));
+        mPipelineElements.getLast().setDataSink(lastElement);
+        return mPipelineElements.get(0);
     }
 }

@@ -5,8 +5,11 @@ import de.ovgu.softwareprojekt.SensorData;
 import de.ovgu.softwareprojekt.SensorType;
 import de.ovgu.softwareprojekt.control.commands.ButtonClick;
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
+import de.ovgu.softwareprojekt.pipeline.FilterPipelineBuilder;
 import de.ovgu.softwareprojekt.pipeline.filters.AverageMovementFilter;
 import de.ovgu.softwareprojekt.networking.Server;
+import de.ovgu.softwareprojekt.pipeline.filters.ChangeThresholdingFilter;
+import de.ovgu.softwareprojekt.pipeline.filters.ThresholdingFilter;
 
 import javax.swing.*;
 import java.io.IOException;
@@ -26,7 +29,17 @@ public class Grapher extends Server {
                 public void close() {
                 }
             };
-            registerDataSink(new AverageMovementFilter(10, graphomat), SensorType.LinearAcceleration);
+
+            // only show z axis
+            graphPanel.setAxes(false, false, true);
+
+            // create our pipeline via the new and hip pipeline builder
+            FilterPipelineBuilder pipelineBuilder = new FilterPipelineBuilder();
+            pipelineBuilder.append(new AverageMovementFilter(10));
+            pipelineBuilder.append(new ThresholdingFilter(null, 10, 2));
+
+            // build the pipeline using our graphomat as an end Hpiece
+            registerDataSink(pipelineBuilder.build(graphomat), SensorType.LinearAcceleration);
         } catch (IOException e) {
             e.printStackTrace();
             System.exit(1);
@@ -66,7 +79,8 @@ public class Grapher extends Server {
 
     @Override
     public void onException(Object origin, Exception exception, String info) {
-        // naah
+        // ok guys maybe we should do something about this
+        exception.printStackTrace();
     }
 
     @Override

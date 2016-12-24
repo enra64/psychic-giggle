@@ -12,7 +12,7 @@ import static java.lang.Math.abs;
  * This filter ignores changes in sensor data up to a certain margin to avoid shaking when trying not to move,
  * for example when pointing with a mouse
  */
-public class MinimumAmplitudeFilter extends AbstractFilter {
+public class MinimumAmplitudeChangeFilter extends AbstractFilter {
     /**
      * If the sum of changes does not at least equal this value, the last value that changed will
      * be sent as an update instead.
@@ -31,7 +31,7 @@ public class MinimumAmplitudeFilter extends AbstractFilter {
      *             must be called prior to starting operations.
      * @param minimumChange the minimum of change a new data element must represent to be let through
      */
-    public MinimumAmplitudeFilter(@Nullable NetworkDataSink dataSink, float minimumChange) {
+    public MinimumAmplitudeChangeFilter(@Nullable NetworkDataSink dataSink, float minimumChange) {
         super(dataSink, 0, 1, 2);
         mMinimumChange = minimumChange;
     }

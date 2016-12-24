@@ -12,8 +12,10 @@ import java.util.List;
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
+
 /**
  * This code is taken almost unchanged from a github gist.
+ *
  * @author Rodrigo
  */
 public class GraphPanel extends JPanel {
@@ -23,6 +25,8 @@ public class GraphPanel extends JPanel {
     private Color pointColor = new Color(100, 100, 100, 180);
     private Color gridColor = new Color(200, 200, 200, 200);
     private static final Stroke GRAPH_STROKE = new BasicStroke(2f);
+
+    boolean[] mDrawAxes = new boolean[]{true, true, true};
 
     private CircularFifoQueue<float[]> dataBuffer = new CircularFifoQueue<>(512);
 
@@ -86,12 +90,15 @@ public class GraphPanel extends JPanel {
         g2.drawLine(padding + labelPadding, getHeight() - padding - labelPadding, padding + labelPadding, padding);
         g2.drawLine(padding + labelPadding, getHeight() - padding - labelPadding, getWidth() - padding, getHeight() - padding - labelPadding);
 
-        drawLine(g2, line1Color, 0);
-        drawLine(g2, line2Color, 1);
-        drawLine(g2, line3Color, 2);
+        if(mDrawAxes[0])
+            drawLine(g2, line1Color, 0);
+        if(mDrawAxes[1])
+            drawLine(g2, line2Color, 1);
+        if(mDrawAxes[2])
+            drawLine(g2, line3Color, 2);
     }
 
-    private void drawLine(Graphics2D g2, Color lineColor, int dataBufferArrayPos){
+    private void drawLine(Graphics2D g2, Color lineColor, int dataBufferArrayPos) {
         int padding = 25;
         int labelPadding = 25;
         double xScale = ((double) getWidth() - (2 * padding) - labelPadding) / (dataBuffer.size() - 1);
@@ -129,7 +136,7 @@ public class GraphPanel extends JPanel {
         double minScore = Double.MAX_VALUE;
         for (float[] score : dataBuffer) {
             float tmpMin = Float.MAX_VALUE;
-            for(Float f : score)
+            for (Float f : score)
                 tmpMin = Math.min(tmpMin, f);
 
             minScore = Math.min(minScore, tmpMin);
@@ -141,7 +148,7 @@ public class GraphPanel extends JPanel {
         double maxScore = Double.MIN_VALUE;
         for (float[] score : dataBuffer) {
             float tmpMax = -Float.MAX_VALUE;
-            for(Float f : score)
+            for (Float f : score)
                 tmpMax = Math.max(tmpMax, f);
             maxScore = Math.max(maxScore, tmpMax);
         }
@@ -153,5 +160,9 @@ public class GraphPanel extends JPanel {
         dataBuffer.add(data.data);
         invalidate();
         this.repaint();
+    }
+
+    public void setAxes(boolean axis0, boolean axis1, boolean axis2) {
+        mDrawAxes = new boolean[]{axis0, axis1, axis2};
     }
 }
