@@ -33,11 +33,14 @@ public class Grapher extends Server {
 //            pipelineBuilder.append(new TemporaryIntegratingFilter(null, 5));
 //            pipelineStart.addDataSink(pipelineBuilder.build(accelerationIntegralLine));
 
+            // normalize output to 100/-100
+            setSensorOutputRange(SensorType.LinearAcceleration, 10);
+
             // split off the current data stream
             NetworkDataSink accelerationCurrentLine = graphPanel.getDataSink(SensorType.LinearAcceleration, 2);
             pipelineBuilder = new FilterPipelineBuilder();
+            pipelineBuilder.append(new ThresholdingFilter(null, .5f, 2));
             pipelineBuilder.append(new AverageMovementFilter(5));
-            pipelineBuilder.append(new ThresholdingFilter(null, 10, 2));
             pipelineStart.addDataSink(pipelineBuilder.build(accelerationCurrentLine));
         } catch (IOException e) {
             e.printStackTrace();

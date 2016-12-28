@@ -5,9 +5,11 @@ import de.ovgu.softwareprojekt.NetworkDataSink;
 import de.ovgu.softwareprojekt.SensorType;
 import de.ovgu.softwareprojekt.control.commands.ButtonClick;
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
+import de.ovgu.softwareprojekt.pipeline.FilterPipelineBuilder;
 import de.ovgu.softwareprojekt.pipeline.filters.AverageMovementFilter;
 import de.ovgu.softwareprojekt.pipeline.filters.IntegratingFilter;
 import de.ovgu.softwareprojekt.networking.Server;
+import de.ovgu.softwareprojekt.pipeline.filters.ThresholdingFilter;
 
 import java.awt.*;
 import java.io.IOException;
@@ -61,19 +63,27 @@ public class NesServer extends Server {
 
         mSteeringWheel = new SteeringWheel();
 
+        // normalize both sensors
+        setSensorOutputRange(SensorType.LinearAcceleration,10);
+        setSensorOutputRange(SensorType.Gyroscope,100);
+
         //register use of gyroscope
         mIntegratingFilter = new IntegratingFilter(mSteeringWheel);
-        NetworkDataSink gyroPipeline = mIntegratingFilter;
-        setSensorOutputRange(SensorType.Gyroscope,100);
-        registerDataSink(gyroPipeline, SensorType.Gyroscope);
+        //TODO: TESTING RE-ADD GYRO registerDataSink(mIntegratingFilter, SensorType.Gyroscope);
 
         //register use of accelerometer
-        //NetworkDataSink accPipeline = mSteeringWheel;  //LinearAcceleration ought to be filtered ... but what is the best approach?
-        setSensorOutputRange(SensorType.LinearAcceleration,100);
-        //registerDataSink(accPipeline, SensorType.LinearAcceleration);
-        registerDataSink(new AverageMovementFilter(10, new AccelerationPhaseDetection(mSteeringWheel)), SensorType.LinearAcceleration);
+        registerDataSink(mSteeringWheel, SensorType.LinearAcceleration); //LinearAcceleration ought to be filtered ... but what is the best approach?
 
-    	setButtonLayout(readFile("../nesLayout.txt", "utf-8"));
+        // create the end, eg the phase detection system
+        NetworkDataSink end = new AccelerationPhaseDetection(mSteeringWheel);
+
+        // create a filter pipeline ending in the acceleration phase detection system
+        FilterPipelineBuilder pipelineBuilder = new FilterPipelineBuilder();
+        pipelineBuilder.append(new ThresholdingFilter(null, .5f, 2));
+        pipelineBuilder.append(new AverageMovementFilter(5));
+        registerDataSink(pipelineBuilder.build(end), SensorType.LinearAcceleration);
+
+        setButtonLayout(readFile("../nesLayout.txt", "utf-8"));
     }
 
     /**

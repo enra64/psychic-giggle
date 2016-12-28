@@ -103,7 +103,7 @@ public class GraphPanel extends JPanel {
             graphics2D.setColor(Color.BLACK);
 
             // draw the label
-            String yLabel = (int) ((min + (max - min) * (((double) i) / Y_DIVISION_COUNT))) + "";
+            String yLabel = String.format("%.2f", ((min + (max - min) * (((double) i) / Y_DIVISION_COUNT))));
             FontMetrics metrics = graphics2D.getFontMetrics();
             int labelWidth = metrics.stringWidth(yLabel);
             int labelHeight = metrics.getHeight();

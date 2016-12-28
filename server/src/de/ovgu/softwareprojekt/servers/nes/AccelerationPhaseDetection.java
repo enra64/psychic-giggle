@@ -64,9 +64,15 @@ public class AccelerationPhaseDetection implements NetworkDataSink {
      */
     private AccelerationListener mListener;
 
+    /**
+     *
+     * @param networkDevice where the data stems from
+     * @param sensorData the sensor data
+     * @param userSensitivity currently ignored to simplify detection
+     */
     @Override
-    public void onData(NetworkDevice networkDevice, SensorData sensorData) {
-        int threshold = getThreshold();
+    public void onData(NetworkDevice networkDevice, SensorData sensorData, float userSensitivity) {
+        float threshold = getThreshold();
         onData(sensorData.data[2] > threshold, sensorData.data[2] < -threshold);
     }
 
@@ -75,12 +81,13 @@ public class AccelerationPhaseDetection implements NetworkDataSink {
      *
      * @return one of three different thresholds, depending on the expected amplitude
      */
-    private int getThreshold() {
-        if (mPhase3)
-            return 100;
-        if (mPhase2)
-            return 300;
-        return 100;
+    private float getThreshold() {
+        // the 3rd & last phase has the lowest amplitudes
+        if (mPhase3) return .2f;
+        // the second phase has the highest amplitudes
+        if (mPhase2) return .75f;
+        // the first phase has medium amplitudes
+        return .75f;
     }
 
     /**
@@ -91,8 +98,6 @@ public class AccelerationPhaseDetection implements NetworkDataSink {
      * @param down true, if the current data exceeds the movement threshold
      */
     private void onData(boolean up, boolean down) {
-        //System.out.println(toString());
-
         // only allow down cycle detection if no up cycle is live
         if (!mUpCycle) {
             if (mDownCycle) {

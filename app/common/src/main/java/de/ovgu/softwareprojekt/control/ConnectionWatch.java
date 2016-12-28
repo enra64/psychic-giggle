@@ -5,6 +5,7 @@ import de.ovgu.softwareprojekt.discovery.NetworkDevice;
 import de.ovgu.softwareprojekt.misc.ExceptionListener;
 
 import java.io.IOException;
+import java.net.ConnectException;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -146,6 +147,8 @@ public class ConnectionWatch extends TimerTask {
                     // update the timestamp
                     mLastRequestTimestamp = System.currentTimeMillis();
                 }
+            } catch (ConnectException e) {
+                mTimeoutListener.onTimeout(mLastCheckEventTimestamp - mLastRequestTimestamp);
             } catch (IOException e) {
                 mExceptionListener.onException(ConnectionWatch.this, e, "CONNECTION_WATCH_CHECK_FAILED: Could not check connection; probably offline.");
             }

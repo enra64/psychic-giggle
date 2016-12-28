@@ -41,10 +41,9 @@ public class SteeringWheel implements NetworkDataSink, AccelerationPhaseDetectio
         counter = 0;
     }
 
-    public void controllerInput(int buttonID, boolean isPressed)
-    {
+    public void controllerInput(int buttonID, boolean isPressed) {
         int event = -1;
-        switch (buttonID){
+        switch (buttonID) {
             case NesServer.A_BUTTON:
                 event = KeyEvent.VK_X;
                 break;
@@ -73,7 +72,7 @@ public class SteeringWheel implements NetworkDataSink, AccelerationPhaseDetectio
                 break;
         }
 
-        if(isPressed)
+        if (isPressed)
             mSteeringBot.keyPress(event);
         else
             mSteeringBot.keyRelease(event);
@@ -86,12 +85,16 @@ public class SteeringWheel implements NetworkDataSink, AccelerationPhaseDetectio
      * The gyroscope steers the player and is responsible for left right movement in the menu
      * <br/>
      * the accelerometer is responsible for throwing items and up, down movement in the menu
-     * @param data pipeline here is either the gyroscope or acc. pipeline
+     *
+     * @param data            pipeline here is either the gyroscope or acc. pipeline //TODO das verstehe ich nicht -Arne
+     * @param origin          where the sensor data comes from
+     * @param userSensitivity the value set by the user. may be (as here) ignored when applying a custom sensitivity
+     *                        is too annoying.
      */
     @Override
-    public void onData(NetworkDevice origin, SensorData data) {
+    public void onData(NetworkDevice origin, SensorData data, float userSensitivity) {
         //Check if player steers to the left or right by tilted distance
-        if(data.sensorType == SensorType.Gyroscope) {
+        if (data.sensorType == SensorType.Gyroscope) {
             //TODO: DECIDE THRESHOLD VALUE FOR STEERING
             if (data.data[ZAXIS] > 30000)
                 mSteeringBot.keyPress(KeyEvent.VK_LEFT);
@@ -99,26 +102,26 @@ public class SteeringWheel implements NetworkDataSink, AccelerationPhaseDetectio
             else if (data.data[ZAXIS] < -30000)
                 mSteeringBot.keyPress(KeyEvent.VK_RIGHT);
 
-            else{
+            else {
                 mSteeringBot.keyRelease(KeyEvent.VK_LEFT);
                 mSteeringBot.keyRelease(KeyEvent.VK_RIGHT);
             }
         }
-}
+    }
 
     /**
      * This method checks if the last valid acceleration happened 500ms ago
+     *
      * @return
      */
-    private boolean checkInterval(){
+    private boolean checkInterval() {
         long newActivation = System.currentTimeMillis();
         //Check if last activation happened 500 or more milliseconds ago
-        if(newActivation - lastAccActivation > 500){
+        if (newActivation - lastAccActivation > 500) {
             lastAccActivation = newActivation;
-            counter=0;
+            counter = 0;
             return true;
-        }
-        else
+        } else
             return false;
     }
 
