@@ -8,6 +8,8 @@ import de.ovgu.softwareprojekt.discovery.NetworkDevice;
 import de.ovgu.softwareprojekt.pipeline.FilterPipelineBuilder;
 import de.ovgu.softwareprojekt.pipeline.filters.*;
 import de.ovgu.softwareprojekt.networking.Server;
+import de.ovgu.softwareprojekt.pipeline.splitters.PipelineDuplication;
+import de.ovgu.softwareprojekt.pipeline.splitters.SensorSplitter;
 
 import javax.swing.*;
 import java.io.IOException;
@@ -17,19 +19,26 @@ public class Grapher extends Server {
         super("graphing server");
 
         try {
+            NetworkDataSink accelerationIntegralLine = graphPanel.getDataSink(SensorType.LinearAcceleration, 2);
+            NetworkDataSink accelerationCurrentLine = graphPanel.getDataSink(SensorType.LinearAcceleration, 2);
 
-            // display z axis of lin acc meter
-            graphPanel.addLine(SensorType.LinearAcceleration, 2);
 
-            // create our pipeline via the new and hip pipeline builder
+            // register a duplication element as first
+            PipelineDuplication pipelineStart = new PipelineDuplication();
+            registerDataSink(pipelineStart, SensorType.LinearAcceleration);
+
+            // split off the integration data stream
             FilterPipelineBuilder pipelineBuilder = new FilterPipelineBuilder();
-            //pipelineBuilder.append(new AverageMovementFilter(10));
-            //pipelineBuilder.append(new ThresholdingFilter(null, 10, 2));
             pipelineBuilder.append(new AbsoluteFilter());
+            pipelineBuilder.append(new ThresholdingFilter(null, 10, 2));
             pipelineBuilder.append(new TemporaryIntegratingFilter(null, 10));
+            pipelineStart.addDataSink(pipelineBuilder.build(accelerationIntegralLine));
 
-            // build the pipeline using our graphomat as an end Hpiece
-            registerDataSink(pipelineBuilder.build(graphPanel), SensorType.LinearAcceleration);
+            // split off the current data stream
+            pipelineBuilder = new FilterPipelineBuilder();
+            pipelineBuilder.append(new AverageMovementFilter(10));
+            pipelineBuilder.append(new ThresholdingFilter(null, 10, 2));
+            pipelineStart.addDataSink(pipelineBuilder.build(accelerationCurrentLine));
         } catch (IOException e) {
             e.printStackTrace();
             System.exit(1);

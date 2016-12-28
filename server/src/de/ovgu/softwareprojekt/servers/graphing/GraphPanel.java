@@ -1,6 +1,5 @@
 package de.ovgu.softwareprojekt.servers.graphing;
 
-import com.sun.org.apache.xpath.internal.operations.Mult;
 import de.ovgu.softwareprojekt.NetworkDataSink;
 import de.ovgu.softwareprojekt.SensorData;
 import de.ovgu.softwareprojekt.SensorType;
@@ -22,7 +21,7 @@ import java.util.Timer;
  *
  * @author Rodrigo
  */
-public class GraphPanel extends JPanel implements NetworkDataSink {
+public class GraphPanel extends JPanel {
     /**
      * The set of available colors.
      */
@@ -63,11 +62,6 @@ public class GraphPanel extends JPanel implements NetworkDataSink {
      * How many vertical lines the grid should have
      */
     private static final int Y_DIVISION_COUNT = 10;
-
-    /**
-     * Map the sensor types to its available axes to the corresponding {@link MultiPointLine}
-     */
-    private HashMap<SensorType, HashMap<Integer, MultiPointLine>> mSensorMapping = new HashMap<>();
 
     private List<MultiPointLine> mLines = new ArrayList<>(8);
 
@@ -127,43 +121,22 @@ public class GraphPanel extends JPanel implements NetworkDataSink {
         double xScale = ((double) backgroundWidth) / (BUFFER_SIZE - 1);
         double yScale = ((double) backgroundHeight) / (max - min);
 
-        for (HashMap<Integer, MultiPointLine> map : mSensorMapping.values())
-            for (MultiPointLine line : map.values())
-                line.draw(graphics2D, backgroundHeight, xScale, yScale);
-    }
-
-    /**
-     * Add a new line to be drawn
-     *
-     * @param sensorType the sensor type that should use this line
-     * @param sensorAxis the sensor axis that should be drawn, probably 0, 1 or 2.
-     */
-    void addLine(SensorType sensorType, int sensorAxis) {
-        if (!mSensorMapping.containsKey(sensorType))
-            mSensorMapping.put(sensorType, new HashMap<>());
-
-        // use a random color if no predefined is left
-        Color color;
-        int lineCount = getLineCount();
-        if (lineCount < mLineColors.length)
-            color = mLineColors[lineCount];
-        else
-            color = new Color((float) Math.random(), (float) Math.random(), (float) Math.random());
-
-        MultiPointLine newLine = new MultiPointLine(color);
-        mSensorMapping.get(sensorType).put(sensorAxis, newLine);
-        mLines.add(newLine);
+        for (MultiPointLine line : mLines)
+            line.draw(graphics2D, backgroundHeight, xScale, yScale);
     }
 
     /**
      * Count the number of lines we have stored
      *
-     * @return
+     * @return number of lines we are drawing
      */
     private int getLineCount() {
         return mLines.size();
     }
 
+    /**
+     * Minimum value contained in all lines
+     */
     private float getMinValue() {
         float min = Float.MAX_VALUE;
         for (MultiPointLine line : mLines)
@@ -171,6 +144,9 @@ public class GraphPanel extends JPanel implements NetworkDataSink {
         return min;
     }
 
+    /**
+     * Maximum value contained in all lines
+     */
     private float getMaxValue() {
         float max = -Float.MAX_VALUE;
         for (MultiPointLine line : mLines)
@@ -186,34 +162,37 @@ public class GraphPanel extends JPanel implements NetworkDataSink {
      * @param sensorAxis the axis the line is for
      */
     void removeLine(SensorType sensor, int sensorAxis) {
-        if (mSensorMapping.containsKey(sensor)) {
-            mLines.remove(mSensorMapping.get(sensor).get(sensorAxis));
-            mSensorMapping.get(sensor).remove(sensorAxis);
-        }
+        // remove all matching lines
+        mLines.removeIf(line -> line.getSensorType() == sensor && line.getAxis() == sensorAxis);
     }
 
-    /**
-     * decide which line should get what data
-     *
-     * @param networkDevice
-     * @param sensorData
-     */
-    @Override
-    public void onData(NetworkDevice networkDevice, SensorData sensorData) {
-        try {
-            for (Map.Entry<Integer, MultiPointLine> entry : mSensorMapping.get(sensorData.sensorType).entrySet())
-                entry.getValue().addPoint(sensorData.data[entry.getKey()]);
-        } catch (NullPointerException e) {
-            System.out.println("Unknown sensor type received by graph panel");
-        }
+    NetworkDataSink getDataSink(SensorType sensor, final int axis) {
+        // use a random line color if no predefined is left
+        Color color;
+        int lineCount = getLineCount();
+        if (lineCount < mLineColors.length)
+            color = mLineColors[lineCount];
+        else
+            color = new Color((float) Math.random(), (float) Math.random(), (float) Math.random());
 
+        // create new line
+        MultiPointLine newLine = new MultiPointLine(color, sensor, axis);
+        mLines.add(newLine);
+
+        // return new data sink that will notify the new line of incoming data
+        return new NetworkDataSink() {
+            @Override
+            public void onData(NetworkDevice networkDevice, SensorData sensorData) {
+                newLine.addPoint(sensorData.data[axis]);
+            }
+
+            @Override
+            public void close() {
+            }
+        };
     }
 
-    @Override
-    public void close() {
-    }
-
-    GraphPanel(){
+    GraphPanel() {
         Timer repaintTimer = new Timer();
         repaintTimer.schedule(new TimerTask() {
             @Override

@@ -1,5 +1,6 @@
 package de.ovgu.softwareprojekt.servers.graphing;
 
+import de.ovgu.softwareprojekt.SensorType;
 import de.ovgu.softwareprojekt.util.RingBuffer;
 
 import java.awt.*;
@@ -34,8 +35,21 @@ public class MultiPointLine {
      */
     private Float mMinValue = Float.MAX_VALUE, mMaxValue = -Float.MAX_VALUE;
 
-    public MultiPointLine(Color lineColor) {
+    private final SensorType mSensorType;
+    private final int mAxis;
+
+    MultiPointLine(Color lineColor, SensorType sensorType, int axis) {
         mLineColor = lineColor;
+        mSensorType = sensorType;
+        mAxis = axis;
+    }
+
+    SensorType getSensorType(){
+        return mSensorType;
+    }
+
+    int getAxis(){
+        return mAxis;
     }
 
     /**
@@ -43,7 +57,7 @@ public class MultiPointLine {
      *
      * @param value the new value to display
      */
-    public void addPoint(float value) {
+    void addPoint(float value) {
         Float old = mData.add(value);
 
         // update the min/max values of this line
@@ -60,14 +74,14 @@ public class MultiPointLine {
     /**
      * Retrieve the minimum value contained in this line
      */
-    public float getMinimum() {
+    float getMinimum() {
         return mMinValue;
     }
 
     /**
      * Retrieve the maximum value contained in this line
      */
-    public float getMaximum() {
+    float getMaximum() {
         return mMaxValue;
     }
 
@@ -98,14 +112,14 @@ public class MultiPointLine {
      * @param mXScale  the x scale
      * @param mYScale  the y scale
      */
-    public void draw(Graphics2D graphics, int drawingAreaHeight,  double mXScale, double mYScale) {
+    public void draw(Graphics2D graphics, int height,  double mXScale, double mYScale) {
         Stroke oldStroke = graphics.getStroke();
 
         for (int i = 1; i < mData.size(); i++) {
             int x1 = GraphPanel.X_START + (int) ((i - 1) * mXScale);
-            int y1 = GraphPanel.Y_START + drawingAreaHeight - (int) (mData.get(i - 1) * mYScale);
+            int y1 = GraphPanel.Y_START + (int) (height - ((mData.get(i - 1))) * mYScale);
             int x2 = GraphPanel.X_START + (int) (i * mXScale);
-            int y2 = GraphPanel.Y_START + drawingAreaHeight - (int) (mData.get(i) * mYScale);
+            int y2 = GraphPanel.Y_START + (int) (height - ((mData.get(i))) * mYScale);
 
             // draw the line using a the graphing stroke and the specified color
             graphics.setColor(mLineColor);
