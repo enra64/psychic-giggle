@@ -12,48 +12,25 @@ import java.util.HashMap;
  * This class can be used to split data from various devices to different pipelines. Sensor data will not be duplicated
  * or copied, so sensor data can only be sent to a single data sink.
  */
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "WeakerAccess"})
 public class ClientSplitter implements NetworkDataSink {
-    /**
-     * This map is used to store which data sink gets data from which device
-     */
-    private HashMap<NetworkDevice, DataSink> mDataSinkMap = new HashMap<>();
-
     /**
      * This map is used to store which data sink gets data from which device
      */
     private HashMap<NetworkDevice, NetworkDataSink> mNetworkDataSinkMap = new HashMap<>();
 
     /**
-     * Add a new data sink which will receive all data sent by the specified device
-     */
-    public void addDataSink(NetworkDevice source, DataSink dataSink){
-        if(!mNetworkDataSinkMap.containsKey(source))
-            mDataSinkMap.put(source, dataSink);
-    }
-
-    /**
-     * Add a new data sink which will receive all data sent by the specified device
+     * Add a new data sink which will receive all incoming data sent by the specified device
      */
     public void addDataSink(NetworkDevice source, NetworkDataSink dataSink){
-        if(!mDataSinkMap.containsKey(source))
-            mNetworkDataSinkMap.put(source, dataSink);
+        mNetworkDataSinkMap.put(source, dataSink);
     }
 
     /**
-     * Remove the specified device
+     * Remove the specified device. Data received from this device cannot be forwarded after calling this method
      */
     public void remove(NetworkDevice device){
-        mDataSinkMap.remove(device);
         mNetworkDataSinkMap.remove(device);
-    }
-
-    /**
-     * Remove every instance of the specified data sink from this pipeline element
-     */
-    public void remove(DataSink sink){
-        // remove all entries where the data sink is sink
-        mDataSinkMap.values().removeAll(Collections.singleton(sink));
     }
 
     /**
@@ -64,14 +41,21 @@ public class ClientSplitter implements NetworkDataSink {
         mNetworkDataSinkMap.values().removeAll(Collections.singleton(sink));
     }
 
+    /**
+     * Forward incoming data to the appropriate recipient
+     * @param origin network device that sent the data
+     * @param data received data
+     * @param userSensitivity sensitivity set by the user
+     */
     @Override
     public void onData(NetworkDevice origin, SensorData data, float userSensitivity) {
-        if(mDataSinkMap.containsKey(origin))
-            mDataSinkMap.get(origin).onData(data);
         if(mNetworkDataSinkMap.containsKey(origin))
             mNetworkDataSinkMap.get(origin).onData(origin, data, userSensitivity);
     }
 
+    /**
+     * Unnecessary for this implementation
+     */
     @Override
     public void close() {
     }

@@ -75,7 +75,7 @@ public class GraphPanel extends JPanel {
     /**
      * Set what data throughput rate is displayed
      */
-    public void setThroughput(float throughput){
+    void setThroughput(float throughput){
         mThroughput = throughput;
     }
 

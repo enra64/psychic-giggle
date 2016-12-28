@@ -6,16 +6,16 @@ import de.ovgu.softwareprojekt.SensorData;
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
 
 /**
- * Created by Ulrich on 28.11.2016.
+ * This filter replaces incoming sensor data with the average over the last n values.
  */
-public class AverageMovementFilter extends AbstractFilter {
+public class AveragingFilter extends AbstractFilter {
     /**
      * This value describes how many of the previous inputs are used to calculate the mAverage movement
      */
     private final int mAverageSampleSize;
 
     /**
-     * This 2D-Array uses an array for each sensor axis to calculate the mAverage movement
+     * This 2D-Array uses an array for each sensor axis to store the last n values
      */
     private float[][] mAverage;
 
@@ -33,7 +33,7 @@ public class AverageMovementFilter extends AbstractFilter {
      * @param dataSink    either a valid network data sink, or null. if null, {@link #setDataSink(NetworkDataSink)}
      *                    must be called prior to starting operations.
      */
-    public AverageMovementFilter(int avgSampSize, NetworkDataSink dataSink) {
+    public AveragingFilter(int avgSampSize, NetworkDataSink dataSink) {
         this(avgSampSize, dataSink, 0, 1, 2);
     }
 
@@ -43,7 +43,7 @@ public class AverageMovementFilter extends AbstractFilter {
      *
      * @param avgSampSize how many values should be used to calculate the average
      */
-    public AverageMovementFilter(int avgSampSize) {
+    public AveragingFilter(int avgSampSize) {
         // call this constructor with null data sink
         this(avgSampSize, null);
     }
@@ -58,7 +58,7 @@ public class AverageMovementFilter extends AbstractFilter {
      * @param yaxis
      * @param zaxis
      */
-    public AverageMovementFilter(int avgSampSize, @Nullable NetworkDataSink dataSink, int xaxis, int yaxis, int zaxis) {
+    public AveragingFilter(int avgSampSize, @Nullable NetworkDataSink dataSink, int xaxis, int yaxis, int zaxis) {
         super(dataSink, xaxis, yaxis, zaxis);
 
         //The sample Size must be bigger than 0 or we would not create an average at all or even divide by zero

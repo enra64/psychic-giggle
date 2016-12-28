@@ -8,7 +8,6 @@ import de.ovgu.softwareprojekt.pipeline.FilterPipelineBuilder;
 import de.ovgu.softwareprojekt.pipeline.ThroughputMeasurer;
 import de.ovgu.softwareprojekt.pipeline.filters.*;
 import de.ovgu.softwareprojekt.networking.Server;
-import de.ovgu.softwareprojekt.pipeline.splitters.PipelineDuplication;
 
 import javax.swing.*;
 import java.awt.event.WindowAdapter;
@@ -55,7 +54,7 @@ public class Grapher extends Server {
         FilterPipelineBuilder pipelineBuilder = new FilterPipelineBuilder();
         pipelineBuilder.append(throughputMeasurer);
         pipelineBuilder.append(new ThresholdingFilter(null, .5f, 2));
-        pipelineBuilder.append(new AverageMovementFilter(5));
+        pipelineBuilder.append(new AveragingFilter(5));
         registerDataSink(pipelineBuilder.build(accelerationCurrentLine), SensorType.LinearAcceleration);
     }
 

@@ -9,7 +9,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 /**
- * Created by arne on 12/28/16.
+ * This {@link AbstractFilter} subclass forwards incoming data without changes, but measures how often it receives data.
  */
 public class ThroughputMeasurer extends AbstractFilter {
     /**
@@ -23,7 +23,7 @@ public class ThroughputMeasurer extends AbstractFilter {
     private int mThroughputCounter = 0;
 
     /**
-     * The
+     * The storage used for storing data throughput counts for different time spans
      */
     private RingBuffer<Integer> mDataThroughputStorage;
 

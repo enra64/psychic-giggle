@@ -27,8 +27,8 @@ public class MinimumAmplitudeChangeFilter extends AbstractFilter {
     /**
      * Create a new minimum amplitude filter.
      *
-     * @param dataSink either a valid network data sink, or null. if null, {@link #setDataSink(NetworkDataSink)}
-     *             must be called prior to starting operations.
+     * @param dataSink      either a valid network data sink, or null. if null, {@link #setDataSink(NetworkDataSink)}
+     *                      must be called prior to starting operations.
      * @param minimumChange the minimum of change a new data element must represent to be let through
      */
     public MinimumAmplitudeChangeFilter(@Nullable NetworkDataSink dataSink, float minimumChange) {
@@ -39,7 +39,9 @@ public class MinimumAmplitudeChangeFilter extends AbstractFilter {
     /**
      * Called when the next element should be filtered
      *
-     * @param sensorData sensor data to process
+     * @param sensorData      sensor data to process
+     * @param origin          the network device that sent the data
+     * @param userSensitivity the sensitivity set by the user
      */
     @Override
     public void onData(NetworkDevice origin, SensorData sensorData, float userSensitivity) {
@@ -47,14 +49,13 @@ public class MinimumAmplitudeChangeFilter extends AbstractFilter {
         if (mLastValue == null)
             mLastValue = new float[sensorData.data.length];
 
-        // if the change does not meet the set minimum, overwrite the new data with our old, unchanged data
         if (calculateChange(sensorData.data, mLastValue) < mMinimumChange)
+            // if the change does not meet the set minimum, overwrite the new data with our old, unchanged data
             System.arraycopy(mLastValue, 0, sensorData.data, 0, mLastValue.length);
-        // if the change does meet the minimum, copy over the new values
-        else {
-            //System.out.println(calculateChange(sensorData.data, mLastValue));
+        else
+            // if the change does meet the minimum, copy over the new values
             System.arraycopy(sensorData.data, 0, mLastValue, 0, mLastValue.length);
-        }
+
         // notify attached sink of new data
         mDataSink.onData(origin, sensorData, userSensitivity);
     }
@@ -78,5 +79,4 @@ public class MinimumAmplitudeChangeFilter extends AbstractFilter {
             change += abs(dataB[i] - dataA[i]);
         return change;
     }
-
 }

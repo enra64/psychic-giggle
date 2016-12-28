@@ -10,13 +10,11 @@ import java.util.Arrays;
 import static java.lang.Math.abs;
 
 /**
- * This filter zeroes sensor data when the changes do not exceeding a certain margin to avoid
- * zittering when trying not to move, for example when pointing with a mouse
+ * This filter zeroes sensor data when the difference between two successive data points is not large enough
  */
-public class ChangeThresholdingFilter extends AbstractFilter {
+public class DifferenceThresholdFilter extends AbstractFilter {
     /**
-     * If the sum of changes does not at least equal this value, the last value that changed will
-     * be sent as an update instead.
+     * If the sum of changes does not at least equal this value, the sensor data will be zeroed
      */
     private final float mMinimumChange;
 
@@ -32,7 +30,7 @@ public class ChangeThresholdingFilter extends AbstractFilter {
      *                      must be called prior to starting operations.
      * @param minimumChange the minimum of change a new data element must represent to be let through
      */
-    public ChangeThresholdingFilter(@Nullable NetworkDataSink dataSink, float minimumChange) {
+    public DifferenceThresholdFilter(@Nullable NetworkDataSink dataSink, float minimumChange) {
         super(dataSink, 0, 1, 2);
         mMinimumChange = minimumChange;
     }
@@ -40,7 +38,9 @@ public class ChangeThresholdingFilter extends AbstractFilter {
     /**
      * Called when the next element should be filtered
      *
-     * @param sensorData sensor data to process
+     * @param sensorData      sensor data to process
+     * @param origin          which network device sent the data
+     * @param userSensitivity sensitivity set by the user
      */
     @Override
     public void onData(NetworkDevice origin, SensorData sensorData, float userSensitivity) {

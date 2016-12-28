@@ -6,7 +6,7 @@ import de.ovgu.softwareprojekt.SensorType;
 import de.ovgu.softwareprojekt.control.commands.ButtonClick;
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
 import de.ovgu.softwareprojekt.pipeline.FilterPipelineBuilder;
-import de.ovgu.softwareprojekt.pipeline.filters.AverageMovementFilter;
+import de.ovgu.softwareprojekt.pipeline.filters.AveragingFilter;
 import de.ovgu.softwareprojekt.pipeline.filters.IntegratingFilter;
 import de.ovgu.softwareprojekt.networking.Server;
 import de.ovgu.softwareprojekt.pipeline.filters.ThresholdingFilter;
@@ -80,7 +80,7 @@ public class NesServer extends Server {
         // create a filter pipeline ending in the acceleration phase detection system
         FilterPipelineBuilder pipelineBuilder = new FilterPipelineBuilder();
         pipelineBuilder.append(new ThresholdingFilter(null, .5f, 2));
-        pipelineBuilder.append(new AverageMovementFilter(5));
+        pipelineBuilder.append(new AveragingFilter(5));
         registerDataSink(pipelineBuilder.build(end), SensorType.LinearAcceleration);
 
         setButtonLayout(readFile("../nesLayout.txt", "utf-8"));

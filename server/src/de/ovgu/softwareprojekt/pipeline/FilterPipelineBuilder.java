@@ -12,7 +12,7 @@ import java.util.List;
  * This builder class can only handle {@link de.ovgu.softwareprojekt.pipeline.filters.AbstractFilter}
  * subclasses, for it shall have an unified interface to chain the elements.
  */
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "WeakerAccess"})
 public class FilterPipelineBuilder {
     /**
      * This is where we store

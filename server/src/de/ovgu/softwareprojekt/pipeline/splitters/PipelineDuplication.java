@@ -11,6 +11,7 @@ import java.util.List;
 /**
  * This splitter will clone the pipeline data to each added data sink.
  */
+@SuppressWarnings("unused")
 public class PipelineDuplication implements NetworkDataSink {
     /**
      * The list of our data sinks.
@@ -26,7 +27,7 @@ public class PipelineDuplication implements NetworkDataSink {
 
     /**
      * Remove a data sink from this PipelineDuplication element. It will no longer receive data from here
-     * @param sink
+     * @param sink data sink that should no longer receive data
      */
     public void removeDataSink(NetworkDataSink sink){
         mDataSinks.remove(sink);
@@ -34,15 +35,8 @@ public class PipelineDuplication implements NetworkDataSink {
 
     @Override
     public void onData(NetworkDevice networkDevice, SensorData sensorData, float userSensitivity) {
-        if(mDataSinks.size() == 0)
-            return;
-
-        // the first time, we dont need to copy the data
-        mDataSinks.get(0).onData(networkDevice, sensorData.clone(), userSensitivity);
-
-        // all following times, clone the data
-        for(int i = 1; i < mDataSinks.size(); i++)
-            mDataSinks.get(i).onData(networkDevice, sensorData.clone(), userSensitivity);
+        // copy the data for each further recipient
+        mDataSinks.forEach(sink -> sink.onData(networkDevice, sensorData.clone(), userSensitivity));
     }
 
     /**
