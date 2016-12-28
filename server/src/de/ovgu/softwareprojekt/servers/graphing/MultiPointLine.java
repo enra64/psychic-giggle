@@ -44,11 +44,11 @@ public class MultiPointLine {
         mAxis = axis;
     }
 
-    SensorType getSensorType(){
+    SensorType getSensorType() {
         return mSensorType;
     }
 
-    int getAxis(){
+    int getAxis() {
         return mAxis;
     }
 
@@ -112,24 +112,18 @@ public class MultiPointLine {
      * @param mXScale  the x scale
      * @param mYScale  the y scale
      */
-    public void draw(Graphics2D graphics, int height,  double mXScale, double mYScale) {
-        Stroke oldStroke = graphics.getStroke();
+    void draw(Graphics2D graphics, int height, double mXScale, double mYScale) {
+        // set fitting color
+        graphics.setColor(mLineColor);
+        graphics.setStroke(GRAPH_STROKE);
 
+        // draw all lines
         for (int i = 1; i < mData.size(); i++) {
-            int x1 = GraphPanel.X_START + (int) ((i - 1) * mXScale);
-            int y1 = GraphPanel.Y_START + (int) (height - ((mData.get(i - 1))) * mYScale);
-            int x2 = GraphPanel.X_START + (int) (i * mXScale);
-            int y2 = GraphPanel.Y_START + (int) (height - ((mData.get(i))) * mYScale);
-
-            // draw the line using a the graphing stroke and the specified color
-            graphics.setColor(mLineColor);
-            graphics.setStroke(GRAPH_STROKE);
-            graphics.drawLine(x1, y1, x2, y2);
-
-            // draw a circle over the point
-            graphics.setStroke(oldStroke);
-            graphics.setColor(POINT_COLOR);
-            graphics.fillOval(x2 - 2, y2 - 2, 4, 4);
+            graphics.drawLine(
+                    GraphPanel.X_START + (int) ((i - 1) * mXScale),
+                    GraphPanel.Y_START + (int) (height - ((mData.get(i - 1))) * mYScale),
+                    GraphPanel.X_START + (int) (i * mXScale),
+                    GraphPanel.Y_START + (int) (height - ((mData.get(i))) * mYScale));
         }
     }
 }
