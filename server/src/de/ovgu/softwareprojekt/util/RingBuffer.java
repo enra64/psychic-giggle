@@ -30,18 +30,8 @@ public class RingBuffer<E> {
      * Construct a new {@link RingBuffer} with a capacity of 64.
      */
     public RingBuffer() {
-        this(64);
+        this(64, null);
     }
-
-    /**
-     * Construct a new {@link RingBuffer} with the specified capacity
-     *
-     * @param size final size of this container
-     */
-    public RingBuffer(int size) {
-        mBuffer = new ArrayList<>(size);
-    }
-
     /**
      * Construct a new {@link RingBuffer} with the specified capacity
      *
@@ -49,7 +39,7 @@ public class RingBuffer<E> {
      * @param fillWith an element that should be in every point of this container
      */
     public RingBuffer(int size, E fillWith) {
-        this(size);
+        mBuffer = new ArrayList<>(size);
         for (int i = 0; i < size; i++)
             mBuffer.add(fillWith);
         mSize = size;
@@ -94,5 +84,9 @@ public class RingBuffer<E> {
 
     public int size() {
         return mSize;
+    }
+
+    public int getCapacity() {
+        return mBuffer.size();
     }
 }

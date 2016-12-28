@@ -1,51 +1,75 @@
 package de.ovgu.softwareprojekt.servers.graphing;
 
 import de.ovgu.softwareprojekt.NetworkDataSink;
-import de.ovgu.softwareprojekt.SensorData;
 import de.ovgu.softwareprojekt.SensorType;
 import de.ovgu.softwareprojekt.control.commands.ButtonClick;
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
 import de.ovgu.softwareprojekt.pipeline.FilterPipelineBuilder;
+import de.ovgu.softwareprojekt.pipeline.ThroughputMeasurer;
 import de.ovgu.softwareprojekt.pipeline.filters.*;
 import de.ovgu.softwareprojekt.networking.Server;
 import de.ovgu.softwareprojekt.pipeline.splitters.PipelineDuplication;
-import de.ovgu.softwareprojekt.pipeline.splitters.SensorSplitter;
 
 import javax.swing.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.IOException;
+import java.util.*;
+import java.util.Timer;
 
 public class Grapher extends Server {
-    public Grapher(final GraphPanel graphPanel) {
+    Grapher(final GraphPanel graphPanel) {
         super("graphing server");
 
+        // set up throughput measurement system
+        ThroughputMeasurer throughputMeasurer = new ThroughputMeasurer(1000, 10);
+        scheduleThroughputUpdates(graphPanel, throughputMeasurer);
+
         try {
-
-            // register a duplication element as first
-            PipelineDuplication pipelineStart = new PipelineDuplication();
-            registerDataSink(pipelineStart, SensorType.LinearAcceleration);
-
-            // split off the integration data stream
-            FilterPipelineBuilder pipelineBuilder = new FilterPipelineBuilder();
-//            NetworkDataSink accelerationIntegralLine = graphPanel.getDataSink(SensorType.LinearAcceleration, 2);
-//            pipelineBuilder.append(new AbsoluteFilter());
-//            pipelineBuilder.append(new AverageMovementFilter(5));
-//            pipelineBuilder.append(new ThresholdingFilter(null, 10, 2));
-//            pipelineBuilder.append(new TemporaryIntegratingFilter(null, 5));
-//            pipelineStart.addDataSink(pipelineBuilder.build(accelerationIntegralLine));
-
-            // normalize output to 100/-100
+            // normalize output
             setSensorOutputRange(SensorType.LinearAcceleration, 10);
 
             // split off the current data stream
             NetworkDataSink accelerationCurrentLine = graphPanel.getDataSink(SensorType.LinearAcceleration, 2);
-            pipelineBuilder = new FilterPipelineBuilder();
+            FilterPipelineBuilder pipelineBuilder = new FilterPipelineBuilder();
+            pipelineBuilder.append(throughputMeasurer);
             pipelineBuilder.append(new ThresholdingFilter(null, .5f, 2));
             pipelineBuilder.append(new AverageMovementFilter(5));
-            pipelineStart.addDataSink(pipelineBuilder.build(accelerationCurrentLine));
+            registerDataSink(pipelineBuilder.build(accelerationCurrentLine), SensorType.LinearAcceleration);
         } catch (IOException e) {
             e.printStackTrace();
             System.exit(1);
         }
+
+
+    }
+
+    /**
+     * Schedule regular updates of the throughput.
+     *
+     * @param panel    the panel that should display the throughput
+     * @param measurer the ThroughputMeasurer that measures the throughput...
+     */
+    private void scheduleThroughputUpdates(GraphPanel panel, ThroughputMeasurer measurer) {
+        // schedule regular throughput updates
+        Timer timer = new Timer();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                panel.setThroughput(measurer.getThroughput());
+                panel.repaint();
+            }
+        }, 0, 1000);
+
+        // cancel the timer if the panel is closed
+        JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(panel);
+        parentFrame.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent windowEvent) {
+                super.windowClosing(windowEvent);
+                timer.cancel();
+            }
+        });
     }
 
     /**

@@ -11,16 +11,11 @@ import static java.lang.Math.abs;
 /**
  * This class contains all data and some methods necessary to deal with the data of a single line
  */
-public class MultiPointLine {
+class MultiPointLine {
     /**
      * Stroke we use for drawing
      */
     private static final Stroke GRAPH_STROKE = new BasicStroke(2f);
-
-    /**
-     * The color that is used to draw data points
-     */
-    private static final Color POINT_COLOR = new Color(100, 100, 100, 180);
 
     /**
      * The line color to be used for this line
@@ -37,19 +32,39 @@ public class MultiPointLine {
      */
     private Float mMinValue = Float.MAX_VALUE, mMaxValue = -Float.MAX_VALUE;
 
+    /**
+     * The sensor data type displayed by this line
+     */
     private final SensorType mSensorType;
+
+    /**
+     * The axis displayed by this line
+     */
     private final int mAxis;
 
+    /**
+     * Create a new line in the specified color.
+     *
+     * @param lineColor the color to use for the line
+     * @param sensorType the sensor type displayed, only for external purposes
+     * @param axis the axis of the sensor, only for external purposes
+     */
     MultiPointLine(Color lineColor, SensorType sensorType, int axis) {
         mLineColor = lineColor;
         mSensorType = sensorType;
         mAxis = axis;
     }
 
+    /**
+     * Get the sensor this line displays
+     */
     SensorType getSensorType() {
         return mSensorType;
     }
 
+    /**
+     * Get the axis this line displays
+     */
     int getAxis() {
         return mAxis;
     }

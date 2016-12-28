@@ -7,9 +7,8 @@ import de.ovgu.softwareprojekt.discovery.NetworkDevice;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.*;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Timer;
 
 /*
  * To change this template, choose Tools | Templates
@@ -44,7 +43,7 @@ public class GraphPanel extends JPanel {
     /**
      * Padding variables
      */
-    static final int PADDING = 25, LABEL_PADDING = 40;
+    private static final int PADDING = 25, LABEL_PADDING = 40;
 
     static final int BUFFER_SIZE = 512;
 
@@ -56,14 +55,29 @@ public class GraphPanel extends JPanel {
     /**
      * How wide the hatch marks are (px)
      */
-    private static final int HATCHMARK_WIDTH = 4;
+    private static final int HATCH_MARK_WIDTH = 4;
 
     /**
      * How many vertical lines the grid should have
      */
     private static final int Y_DIVISION_COUNT = 20;
 
+    /**
+     * The lines currently drawn
+     */
     private List<MultiPointLine> mLines = new ArrayList<>(8);
+
+    /**
+     * How much data/s arrives here
+     */
+    private float mThroughput = 0;
+
+    /**
+     * Set what data throughput rate is displayed
+     */
+    public void setThroughput(float throughput){
+        mThroughput = throughput;
+    }
 
     @Override
     protected void paintComponent(Graphics g) {
@@ -73,20 +87,22 @@ public class GraphPanel extends JPanel {
 
         // calculate some useful sizes
         int backgroundWidth = getWidth() - 2 * PADDING - LABEL_PADDING;
-        int xHatchMarkEnd = HATCHMARK_WIDTH + PADDING + LABEL_PADDING;
+        int xHatchMarkEnd = HATCH_MARK_WIDTH + PADDING + LABEL_PADDING;
         int xEnd = getWidth() - PADDING;
 
         int backgroundHeight = getHeight() - 2 * PADDING;
         int yEnd = getHeight() - PADDING;
 
+        FontMetrics metrics = graphics2D.getFontMetrics();
+        int textHeight = metrics.getHeight();
+
+        // draw throughput
+        String throughput = String.format("%.2f updates / s", mThroughput);
+        graphics2D.drawString(throughput, xEnd - 5 - metrics.stringWidth(throughput), Y_START);
 
         // draw white background
         graphics2D.setColor(Color.WHITE);
-        graphics2D.fillRect(
-                X_START,
-                Y_START,
-                backgroundWidth,
-                backgroundHeight);
+        graphics2D.fillRect(X_START, Y_START, backgroundWidth, backgroundHeight);
 
 
         graphics2D.setColor(Color.BLACK);
@@ -104,10 +120,7 @@ public class GraphPanel extends JPanel {
 
             // draw the label
             String yLabel = String.format("%.2f", ((min + (max - min) * (((double) i) / Y_DIVISION_COUNT))));
-            FontMetrics metrics = graphics2D.getFontMetrics();
-            int labelWidth = metrics.stringWidth(yLabel);
-            int labelHeight = metrics.getHeight();
-            graphics2D.drawString(yLabel, X_START - labelWidth - 5, y + (labelHeight / 2) - 3);
+            graphics2D.drawString(yLabel, X_START - metrics.stringWidth(yLabel) - 5, y + (textHeight / 2) - 3);
 
             // draw the hatch mark
             graphics2D.drawLine(X_START, y, xHatchMarkEnd, y);
@@ -121,6 +134,7 @@ public class GraphPanel extends JPanel {
         double xScale = ((double) backgroundWidth) / (BUFFER_SIZE - 1);
         double yScale = ((double) backgroundHeight) / (max - min);
 
+        // draw all lines
         for (MultiPointLine line : mLines)
             line.draw(graphics2D, backgroundHeight, min, xScale, yScale);
     }
@@ -153,7 +167,6 @@ public class GraphPanel extends JPanel {
             max = Math.max(max, line.getMaximum());
         return max;
     }
-
 
     /**
      * Remove a line from service
