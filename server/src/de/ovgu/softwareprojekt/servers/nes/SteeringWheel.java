@@ -8,6 +8,7 @@ import de.ovgu.softwareprojekt.discovery.NetworkDevice;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
+import java.io.IOException;
 
 /**
  * Created by Ulrich on 12.12.2016.
@@ -96,10 +97,11 @@ public class SteeringWheel implements NetworkDataSink, AccelerationPhaseDetectio
         //Check if player steers to the left or right by tilted distance
         if (data.sensorType == SensorType.Gyroscope) {
             //TODO: DECIDE THRESHOLD VALUE FOR STEERING
-            if (data.data[ZAXIS] > 30000)
+            // info: when normalized to 100, the gyro on arne's device has a diff in integrated value of 230-260 for 90°
+            if (data.data[ZAXIS] > 40)
                 mSteeringBot.keyPress(KeyEvent.VK_LEFT);
 
-            else if (data.data[ZAXIS] < -30000)
+            else if (data.data[ZAXIS] < -40)
                 mSteeringBot.keyPress(KeyEvent.VK_RIGHT);
 
             else {
@@ -107,22 +109,6 @@ public class SteeringWheel implements NetworkDataSink, AccelerationPhaseDetectio
                 mSteeringBot.keyRelease(KeyEvent.VK_RIGHT);
             }
         }
-    }
-
-    /**
-     * This method checks if the last valid acceleration happened 500ms ago
-     *
-     * @return
-     */
-    private boolean checkInterval() {
-        long newActivation = System.currentTimeMillis();
-        //Check if last activation happened 500 or more milliseconds ago
-        if (newActivation - lastAccActivation > 500) {
-            lastAccActivation = newActivation;
-            counter = 0;
-            return true;
-        } else
-            return false;
     }
 
     /**
@@ -134,21 +120,30 @@ public class SteeringWheel implements NetworkDataSink, AccelerationPhaseDetectio
 
     @Override
     public void onUpMovement() {
+        //WARNING: ONLY WORKS WHEN USING PROPERLY CONFIGURED COMPUTER
+        try { Runtime.getRuntime().exec("notify-send --expire-time=50 up"); } catch (IOException ignored) { }
+
         System.out.println("onUp");
         mSteeringBot.keyPress(KeyEvent.VK_DOWN);
-        mSteeringBot.keyPress(KeyEvent.VK_A);
+        mSteeringBot.delay(5);
+        mSteeringBot.keyPress(KeyEvent.VK_X);
         mSteeringBot.delay(30);
-        mSteeringBot.keyRelease(KeyEvent.VK_A);
+        mSteeringBot.keyRelease(KeyEvent.VK_X);
         mSteeringBot.keyRelease(KeyEvent.VK_DOWN);
     }
 
     @Override
     public void onDownMovement() {
+        //WARNING: ONLY WORKS WHEN USING PROPERLY CONFIGURED COMPUTER
+        try { Runtime.getRuntime().exec("notify-send --expire-time=50 down"); } catch (IOException ignored) { }
+
         System.out.println("onDown");
         mSteeringBot.keyPress(KeyEvent.VK_UP);
-        mSteeringBot.keyPress(KeyEvent.VK_A);
+        mSteeringBot.delay(5);
+        mSteeringBot.keyPress(KeyEvent.VK_X);
         mSteeringBot.delay(30);
-        mSteeringBot.keyRelease(KeyEvent.VK_A);
+        mSteeringBot.keyRelease(KeyEvent.VK_X);
+        mSteeringBot.delay(5);
         mSteeringBot.keyRelease(KeyEvent.VK_UP);
     }
 }

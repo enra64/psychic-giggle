@@ -26,22 +26,37 @@ public class Grapher extends Server {
         scheduleThroughputUpdates(graphPanel, throughputMeasurer);
 
         try {
-            // normalize output
-            setSensorOutputRange(SensorType.LinearAcceleration, 10);
-
-            // split off the current data stream
-            NetworkDataSink accelerationCurrentLine = graphPanel.getDataSink(SensorType.LinearAcceleration, 2);
-            FilterPipelineBuilder pipelineBuilder = new FilterPipelineBuilder();
-            pipelineBuilder.append(throughputMeasurer);
-            pipelineBuilder.append(new ThresholdingFilter(null, .5f, 2));
-            pipelineBuilder.append(new AverageMovementFilter(5));
-            registerDataSink(pipelineBuilder.build(accelerationCurrentLine), SensorType.LinearAcceleration);
+            //registerAccelerationMovementDetectionPipelineTestbed(graphPanel, throughputMeasurer);
+            registerSnesGyroTestbed(graphPanel, throughputMeasurer);
         } catch (IOException e) {
             e.printStackTrace();
             System.exit(1);
         }
+    }
 
+    private void registerSnesGyroTestbed(final GraphPanel graphPanel, ThroughputMeasurer throughputMeasurer) throws IOException {
+        // normalize output
+        setSensorOutputRange(SensorType.LinearAcceleration, 10);
 
+        // split off the current data stream
+        NetworkDataSink accelerationCurrentLine = graphPanel.getDataSink(SensorType.Gyroscope, 2);
+        FilterPipelineBuilder pipelineBuilder = new FilterPipelineBuilder();
+        pipelineBuilder.append(throughputMeasurer);
+        pipelineBuilder.append(new IntegratingFilter(null));
+        registerDataSink(pipelineBuilder.build(accelerationCurrentLine), SensorType.Gyroscope);
+    }
+
+    private void registerAccelerationMovementDetectionPipelineTestbed(final GraphPanel graphPanel, ThroughputMeasurer throughputMeasurer) throws IOException {
+        // normalize output
+        setSensorOutputRange(SensorType.LinearAcceleration, 10);
+
+        // split off the current data stream
+        NetworkDataSink accelerationCurrentLine = graphPanel.getDataSink(SensorType.LinearAcceleration, 2);
+        FilterPipelineBuilder pipelineBuilder = new FilterPipelineBuilder();
+        pipelineBuilder.append(throughputMeasurer);
+        pipelineBuilder.append(new ThresholdingFilter(null, .5f, 2));
+        pipelineBuilder.append(new AverageMovementFilter(5));
+        registerDataSink(pipelineBuilder.build(accelerationCurrentLine), SensorType.LinearAcceleration);
     }
 
     /**

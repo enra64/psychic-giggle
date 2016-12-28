@@ -69,7 +69,7 @@ public class NesServer extends Server {
 
         //register use of gyroscope
         mIntegratingFilter = new IntegratingFilter(mSteeringWheel);
-        //TODO: TESTING RE-ADD GYRO registerDataSink(mIntegratingFilter, SensorType.Gyroscope);
+        registerDataSink(mIntegratingFilter, SensorType.Gyroscope);
 
         //register use of accelerometer
         registerDataSink(mSteeringWheel, SensorType.LinearAcceleration); //LinearAcceleration ought to be filtered ... but what is the best approach?
