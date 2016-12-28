@@ -158,8 +158,8 @@ public class ClientConnection implements OnCommandListener, NetworkDataSink, Con
     }
 
     @Override
-    public void onData(NetworkDevice origin, SensorData sensorData) {
-        mDataSink.onData(origin, sensorData);
+    public void onData(NetworkDevice origin, SensorData sensorData, float userSensitivity) {
+        mDataSink.onData(origin, sensorData, userSensitivity);
     }
 
     /**

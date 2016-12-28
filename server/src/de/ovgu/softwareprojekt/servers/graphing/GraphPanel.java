@@ -182,7 +182,7 @@ public class GraphPanel extends JPanel {
         // return new data sink that will notify the new line of incoming data
         return new NetworkDataSink() {
             @Override
-            public void onData(NetworkDevice networkDevice, SensorData sensorData) {
+            public void onData(NetworkDevice networkDevice, SensorData sensorData, float userSensitivity) {
                 newLine.addPoint(sensorData.data[axis]);
                 repaint();
             }

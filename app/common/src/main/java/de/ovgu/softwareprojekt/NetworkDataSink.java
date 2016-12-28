@@ -8,14 +8,14 @@ import de.ovgu.softwareprojekt.discovery.NetworkDevice;
  */
 @SuppressWarnings("WeakerAccess")
 public interface NetworkDataSink {
-
     /**
      * onData is called whenever new data is to be processed
      *
-     * @param origin the network device which sent the data
-     * @param data the sensor data
+     * @param origin          the network device which sent the data
+     * @param data            the sensor data
+     * @param userSensitivity the sensitivity the user requested in his app settings
      */
-    void onData(NetworkDevice origin, SensorData data);
+    void onData(NetworkDevice origin, SensorData data, float userSensitivity);
 
     /**
      * called when the sink is no longer used and should no longer require resources

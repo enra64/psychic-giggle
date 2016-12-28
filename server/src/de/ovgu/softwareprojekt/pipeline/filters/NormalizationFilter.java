@@ -8,15 +8,16 @@ import de.ovgu.softwareprojekt.discovery.NetworkDevice;
 /**
  * Created by Ulrich on 29.11.2016.
  * <p>
- * This class receives the sensorData and normalizes it to an usable value. The sensor data may be scaled using a custom
- * factor after normalization takes place, see {@link #setCustomSensitivity(float)}. The source and target ranges
- * may be set using one of the various constructors, or {@link #setSourceRange(float)} and {@link #setTargetRange(float)}
+ * This class receives the sensorData and normalizes it to an usable value. The source and target ranges
+ * may be set using one of the various constructors, or {@link #setSourceRange(float)} and {@link #setTargetRange(float)}.
+ * A custom sensitivity may be set; it will replace the default value of 1. The filter ignores its third
+ * {@link #onData(NetworkDevice, SensorData, float)} parameter in any case.
  */
 public class NormalizationFilter extends AbstractFilter {
     /**
      * Allows the user to change the base value SENSITIVITY by adding or subtracting this value
      */
-    private float mCustomSensitivity = 0f;
+    private float mCustomSensitivity = 1;
 
     /**
      * The range (maximum value, and inverted minimum value) the data should be projected to
@@ -78,12 +79,16 @@ public class NormalizationFilter extends AbstractFilter {
      * @param sensorData the data received by the sensor
      */
     private void normalize(float[] sensorData) {
-        float projectionFactor = getProjectionFactor();
+        float projectionFactor = mTargetRange / mSourceRange;
         sensorData[XAXIS] *= projectionFactor;
         sensorData[YAXIS] *= projectionFactor;
         sensorData[ZAXIS] *= projectionFactor;
     }
 
+    /**
+     * Set the third {@link NetworkDataSink#onData(NetworkDevice, SensorData, float)} parameter for any incoming data.
+     * @param customValue
+     */
     public void setCustomSensitivity(float customValue) {
         mCustomSensitivity = customValue;
     }
@@ -98,24 +103,26 @@ public class NormalizationFilter extends AbstractFilter {
     }
 
     /**
-     * Get the factor that must be used to project from source to target range
+     * Change the resulting target range, as in the projection target range
+     * @param targetRange the magnitude of the minimum and maximum values
      */
-    private float getProjectionFactor() {
-        return mCustomSensitivity * (mTargetRange / mSourceRange);
+    public void setTargetRange(float targetRange) {
+        mTargetRange = targetRange;
     }
 
     /**
-     * Called when the next element should be filtered
+     * Called when the next element should be filtered. Replaces the userSensitivity parameter with the set custom
+     * sensitivity, or the default of 1.
      *
      * @param sensorData sensor data to process
      */
     @Override
-    public void onData(NetworkDevice origin, SensorData sensorData) {
+    public void onData(NetworkDevice origin, SensorData sensorData, float userSensitivity) {
         normalize(sensorData.data);
-        mDataSink.onData(origin, sensorData);
+        mDataSink.onData(origin, sensorData, mCustomSensitivity);
     }
 
-    public void setTargetRange(float targetRange) {
-        mTargetRange = targetRange;
-    }
+
+
+
 }

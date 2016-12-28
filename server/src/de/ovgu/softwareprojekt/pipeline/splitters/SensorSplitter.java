@@ -65,9 +65,9 @@ public class SensorSplitter implements NetworkDataSink {
     }
 
     @Override
-    public void onData(NetworkDevice origin, SensorData data) {
+    public void onData(NetworkDevice origin, SensorData data, float userSensitivity) {
         if(mNetworkDataSinkMap.containsKey(data.sensorType))
-            mNetworkDataSinkMap.get(data.sensorType).onData(origin, data);
+            mNetworkDataSinkMap.get(data.sensorType).onData(origin, data, userSensitivity);
         if(mDataSinkMap.containsKey(data.sensorType))
             mDataSinkMap.get(data.sensorType).onData(data);
     }

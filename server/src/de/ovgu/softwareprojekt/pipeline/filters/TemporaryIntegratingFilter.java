@@ -36,7 +36,7 @@ public class TemporaryIntegratingFilter extends AbstractFilter {
      * @param data current values
      */
     @Override
-    public void onData(NetworkDevice origin, SensorData data) {
+    public void onData(NetworkDevice origin, SensorData data, float userSensitivity) {
         // store new data
         System.arraycopy(data.data, 0, mValueStorage[mIndex++], 0, data.data.length);
 
@@ -47,7 +47,7 @@ public class TemporaryIntegratingFilter extends AbstractFilter {
         // write over data with sum
         sum(data.data);
 
-        mDataSink.onData(origin, data);
+        mDataSink.onData(origin, data, userSensitivity);
     }
 
     /**

@@ -58,11 +58,11 @@ public class ThresholdingFilter extends AbstractFilter {
      * @param sensorData sensor data to process
      */
     @Override
-    public void onData(NetworkDevice origin, SensorData sensorData) {
+    public void onData(NetworkDevice origin, SensorData sensorData, float userSensitivity) {
         // if the change does not meet the set minimum, zero the data
         if (abs(sensorData.data[mAxis]) < mMinimumAmplitude)
             Arrays.fill(sensorData.data, 0);
         // notify attached sink of new data
-        mDataSink.onData(origin, sensorData);
+        mDataSink.onData(origin, sensorData, userSensitivity);
     }
 }

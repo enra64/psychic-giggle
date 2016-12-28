@@ -8,10 +8,10 @@ import de.ovgu.softwareprojekt.discovery.NetworkDevice;
  */
 public class AbsoluteFilter extends AbstractFilter {
     @Override
-    public void onData(NetworkDevice networkDevice, SensorData sensorData) {
+    public void onData(NetworkDevice networkDevice, SensorData sensorData, float userSensitivity) {
         for(int i = 0; i < sensorData.data.length; i++)
             if(sensorData.data[i] < 0)
                 sensorData.data[i] *= -1;
-        mDataSink.onData(networkDevice, sensorData);
+        mDataSink.onData(networkDevice, sensorData, userSensitivity);
     }
 }

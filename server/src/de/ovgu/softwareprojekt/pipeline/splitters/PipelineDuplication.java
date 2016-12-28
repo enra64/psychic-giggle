@@ -33,16 +33,16 @@ public class PipelineDuplication implements NetworkDataSink {
     }
 
     @Override
-    public void onData(NetworkDevice networkDevice, SensorData sensorData) {
+    public void onData(NetworkDevice networkDevice, SensorData sensorData, float userSensitivity) {
         if(mDataSinks.size() == 0)
             return;
 
         // the first time, we dont need to copy the data
-        mDataSinks.get(0).onData(networkDevice, sensorData.clone());
+        mDataSinks.get(0).onData(networkDevice, sensorData.clone(), userSensitivity);
 
         // all following times, clone the data
         for(int i = 1; i < mDataSinks.size(); i++)
-            mDataSinks.get(i).onData(networkDevice, sensorData.clone());
+            mDataSinks.get(i).onData(networkDevice, sensorData.clone(), userSensitivity);
     }
 
     /**

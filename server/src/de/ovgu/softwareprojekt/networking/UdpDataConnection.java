@@ -91,7 +91,7 @@ class UdpDataConnection extends Thread implements NetworkDataSource {
                 ObjectInputStream objectInputStream = new ObjectInputStream(input);
 
                 // notify listener
-                mDataSink.onData(mClient, (SensorData) objectInputStream.readObject());
+                mDataSink.onData(mClient, (SensorData) objectInputStream.readObject(), -1);
             }
 
         } catch (IOException | ClassNotFoundException e) {

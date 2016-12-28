@@ -211,16 +211,18 @@ public abstract class Server implements OnCommandListener, NetworkDataSink, Clie
         mDiscoveryServer.start();
     }
 
-
     /**
-     * This onData must not be overridden to allow the data sink registration system to work
+     * onData is called whenever new data is to be processed. This function must not be overridden to allow the data sink
+     * registration system to work
      *
-     * @param sensorData new sensor data
+     * @param origin          the network device which sent the data
+     * @param data            the sensor data
+     * @param userSensitivity the sensitivity the user requested in his app settings
      */
     @Override
-    public final void onData(NetworkDevice origin, SensorData sensorData) {
-        for (NetworkDataSink sink : mDataSinks.get(sensorData.sensorType))
-            sink.onData(origin, sensorData);
+    public final void onData(NetworkDevice origin, SensorData data, float userSensitivity){
+        // relay the data to all sinks registered for this sensor type
+        mDataSinks.get(data.sensorType).forEach(sink -> sink.onData(origin, data, userSensitivity));
     }
 
     /**

@@ -110,10 +110,10 @@ public class AverageMovementFilter extends AbstractFilter {
      * @param sensorData sensor data to process
      */
     @Override
-    public void onData(NetworkDevice origin, SensorData sensorData) {
+    public void onData(NetworkDevice origin, SensorData sensorData, float userSensitivity) {
         filter(sensorData.data);
 
-        mDataSink.onData(origin, sensorData);
+        mDataSink.onData(origin, sensorData, userSensitivity);
     }
 
 }

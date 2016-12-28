@@ -72,12 +72,13 @@ public class DataScalingHandler implements NetworkDataSink {
      * handle incoming data
      */
     @Override
-    public void onData(NetworkDevice origin, SensorData sensorData) {
+    public void onData(NetworkDevice origin, SensorData sensorData, float userSensitivity) {
         // get the normalization filter configured for this sensor
         NormalizationFilter sensorTypeFilter = mScalingFilters.get(sensorData.sensorType);
 
         // let it handle the sensordata; the scaled result will be pushed into the outgoing data sink
-        sensorTypeFilter.onData(origin, sensorData);
+        // the user sensitivity parameter is ignored by NormalizationFilters!
+        sensorTypeFilter.onData(origin, sensorData, userSensitivity);
     }
 
     @Override

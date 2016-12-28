@@ -42,7 +42,7 @@ public class MinimumAmplitudeChangeFilter extends AbstractFilter {
      * @param sensorData sensor data to process
      */
     @Override
-    public void onData(NetworkDevice origin, SensorData sensorData) {
+    public void onData(NetworkDevice origin, SensorData sensorData, float userSensitivity) {
         // initialise the storage vector on first data because we do not know its length beforehand
         if (mLastValue == null)
             mLastValue = new float[sensorData.data.length];
@@ -56,7 +56,7 @@ public class MinimumAmplitudeChangeFilter extends AbstractFilter {
             System.arraycopy(sensorData.data, 0, mLastValue, 0, mLastValue.length);
         }
         // notify attached sink of new data
-        mDataSink.onData(origin, sensorData);
+        mDataSink.onData(origin, sensorData, userSensitivity);
     }
 
     /**

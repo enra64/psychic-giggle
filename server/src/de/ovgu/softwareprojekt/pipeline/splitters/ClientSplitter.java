@@ -65,11 +65,11 @@ public class ClientSplitter implements NetworkDataSink {
     }
 
     @Override
-    public void onData(NetworkDevice origin, SensorData data) {
+    public void onData(NetworkDevice origin, SensorData data, float userSensitivity) {
         if(mDataSinkMap.containsKey(origin))
             mDataSinkMap.get(origin).onData(data);
         if(mNetworkDataSinkMap.containsKey(origin))
-            mNetworkDataSinkMap.get(origin).onData(origin, data);
+            mNetworkDataSinkMap.get(origin).onData(origin, data, userSensitivity);
     }
 
     @Override
