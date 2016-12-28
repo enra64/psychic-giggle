@@ -17,19 +17,9 @@ public class Grapher extends Server {
         super("graphing server");
 
         try {
-            NetworkDataSink graphomat = new NetworkDataSink() {
-                @Override
-                public void onData(NetworkDevice networkDevice, SensorData sensorData) {
-                    graphPanel.addData(sensorData);
-                }
 
-                @Override
-                public void close() {
-                }
-            };
-
-            // only show z axis
-            graphPanel.setAxes(false, false, true);
+            // display z axis of lin acc meter
+            graphPanel.addLine(SensorType.LinearAcceleration, 2);
 
             // create our pipeline via the new and hip pipeline builder
             FilterPipelineBuilder pipelineBuilder = new FilterPipelineBuilder();
@@ -39,7 +29,7 @@ public class Grapher extends Server {
             pipelineBuilder.append(new TemporaryIntegratingFilter(null, 10));
 
             // build the pipeline using our graphomat as an end Hpiece
-            registerDataSink(pipelineBuilder.build(graphomat), SensorType.LinearAcceleration);
+            registerDataSink(pipelineBuilder.build(graphPanel), SensorType.LinearAcceleration);
         } catch (IOException e) {
             e.printStackTrace();
             System.exit(1);
