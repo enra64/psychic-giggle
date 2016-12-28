@@ -6,6 +6,8 @@ import de.ovgu.softwareprojekt.util.RingBuffer;
 import java.awt.*;
 import java.util.Objects;
 
+import static java.lang.Math.abs;
+
 /**
  * This class contains all data and some methods necessary to deal with the data of a single line
  */
@@ -108,22 +110,28 @@ public class MultiPointLine {
     /**
      * Draw this line
      *
-     * @param graphics a {@link Graphics2D} object
-     * @param mXScale  the x scale
-     * @param mYScale  the y scale
+     * @param graphics         a {@link Graphics2D} object
+     * @param backgroundHeight how high is the white background
+     * @param min              the minimum value drawn in any line
+     * @param mXScale          the x scale
+     * @param mYScale          the y scale
      */
-    void draw(Graphics2D graphics, int height, double mXScale, double mYScale) {
+    void draw(Graphics2D graphics, int backgroundHeight, float min, double mXScale, double mYScale) {
         // set fitting color
         graphics.setColor(mLineColor);
         graphics.setStroke(GRAPH_STROKE);
+
+        // the height of the negative numbers is zero if the smallest number is positive, and
+        // the absolute required height otherwise
+        int negativeHeight = min < 0 ? (int) abs(min * mYScale) : 0;
 
         // draw all lines
         for (int i = 1; i < mData.size(); i++) {
             graphics.drawLine(
                     GraphPanel.X_START + (int) ((i - 1) * mXScale),
-                    GraphPanel.Y_START + (int) (height - ((mData.get(i - 1))) * mYScale),
+                    GraphPanel.Y_START + (int) (backgroundHeight - ((mData.get(i - 1))) * mYScale) - negativeHeight,
                     GraphPanel.X_START + (int) (i * mXScale),
-                    GraphPanel.Y_START + (int) (height - ((mData.get(i))) * mYScale));
+                    GraphPanel.Y_START + (int) (backgroundHeight - ((mData.get(i))) * mYScale) - negativeHeight);
         }
     }
 }

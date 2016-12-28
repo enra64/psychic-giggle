@@ -61,7 +61,7 @@ public class GraphPanel extends JPanel {
     /**
      * How many vertical lines the grid should have
      */
-    private static final int Y_DIVISION_COUNT = 10;
+    private static final int Y_DIVISION_COUNT = 20;
 
     private List<MultiPointLine> mLines = new ArrayList<>(8);
 
@@ -122,7 +122,7 @@ public class GraphPanel extends JPanel {
         double yScale = ((double) backgroundHeight) / (max - min);
 
         for (MultiPointLine line : mLines)
-            line.draw(graphics2D, backgroundHeight, xScale, yScale);
+            line.draw(graphics2D, backgroundHeight, min, xScale, yScale);
     }
 
     /**
@@ -184,21 +184,12 @@ public class GraphPanel extends JPanel {
             @Override
             public void onData(NetworkDevice networkDevice, SensorData sensorData) {
                 newLine.addPoint(sensorData.data[axis]);
+                repaint();
             }
 
             @Override
             public void close() {
             }
         };
-    }
-
-    GraphPanel() {
-        Timer repaintTimer = new Timer();
-        repaintTimer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                repaint();
-            }
-        }, 30, 30);
     }
 }

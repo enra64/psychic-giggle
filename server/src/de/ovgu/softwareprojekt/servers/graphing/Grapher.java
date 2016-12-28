@@ -19,9 +19,6 @@ public class Grapher extends Server {
         super("graphing server");
 
         try {
-            NetworkDataSink accelerationIntegralLine = graphPanel.getDataSink(SensorType.LinearAcceleration, 2);
-            NetworkDataSink accelerationCurrentLine = graphPanel.getDataSink(SensorType.LinearAcceleration, 2);
-
 
             // register a duplication element as first
             PipelineDuplication pipelineStart = new PipelineDuplication();
@@ -29,14 +26,17 @@ public class Grapher extends Server {
 
             // split off the integration data stream
             FilterPipelineBuilder pipelineBuilder = new FilterPipelineBuilder();
-            pipelineBuilder.append(new AbsoluteFilter());
-            pipelineBuilder.append(new ThresholdingFilter(null, 10, 2));
-            pipelineBuilder.append(new TemporaryIntegratingFilter(null, 10));
-            pipelineStart.addDataSink(pipelineBuilder.build(accelerationIntegralLine));
+//            NetworkDataSink accelerationIntegralLine = graphPanel.getDataSink(SensorType.LinearAcceleration, 2);
+//            pipelineBuilder.append(new AbsoluteFilter());
+//            pipelineBuilder.append(new AverageMovementFilter(5));
+//            pipelineBuilder.append(new ThresholdingFilter(null, 10, 2));
+//            pipelineBuilder.append(new TemporaryIntegratingFilter(null, 5));
+//            pipelineStart.addDataSink(pipelineBuilder.build(accelerationIntegralLine));
 
             // split off the current data stream
+            NetworkDataSink accelerationCurrentLine = graphPanel.getDataSink(SensorType.LinearAcceleration, 2);
             pipelineBuilder = new FilterPipelineBuilder();
-            pipelineBuilder.append(new AverageMovementFilter(10));
+            pipelineBuilder.append(new AverageMovementFilter(5));
             pipelineBuilder.append(new ThresholdingFilter(null, 10, 2));
             pipelineStart.addDataSink(pipelineBuilder.build(accelerationCurrentLine));
         } catch (IOException e) {
@@ -77,23 +77,23 @@ public class Grapher extends Server {
     }
 
     @Override
-    public void onException(Object origin, Exception exception, String info) {
-        // ok guys maybe we should do something about this
-        exception.printStackTrace();
-    }
-
-    @Override
     public void onButtonClick(ButtonClick buttonClick, NetworkDevice networkDevice) {
-        // naaah
+        // naah
     }
 
     @Override
     public void onClientDisconnected(NetworkDevice networkDevice) {
-        // naaaah
+        // naaah
     }
 
     @Override
     public void onClientTimeout(NetworkDevice networkDevice) {
-        // naaaaah
+        // naaaah
+    }
+
+    @Override
+    public void onException(Object origin, Exception exception, String info) {
+        // ok guys maybe we should do something about this
+        exception.printStackTrace();
     }
 }
