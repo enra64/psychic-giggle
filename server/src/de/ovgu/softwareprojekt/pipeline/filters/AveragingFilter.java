@@ -4,26 +4,18 @@ import com.sun.istack.internal.Nullable;
 import de.ovgu.softwareprojekt.NetworkDataSink;
 import de.ovgu.softwareprojekt.SensorData;
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
+import de.ovgu.softwareprojekt.util.RingBuffer;
+
+import java.util.Arrays;
 
 /**
  * This filter replaces incoming sensor data with the average over the last n values.
  */
 public class AveragingFilter extends AbstractFilter {
     /**
-     * This value describes how many of the previous inputs are used to calculate the mAverage movement
+     * The ring buffer we use for averaging over past values
      */
-    private final int mAverageSampleSize;
-
-    /**
-     * This 2D-Array uses an array for each sensor axis to store the last n values
-     */
-    private float[][] mAverage;
-
-    /**
-     * mIndexPointer is a pointer index which loops around the first array of mAverage in order to overwrite the oldest
-     * mAverage value
-     */
-    private int mIndexPointer = 0; //used for mAverage output
+    private RingBuffer<float[]> mBuffer;
 
     /**
      * A filter that uses the mAverage //TODO: wtf is mAverage supposed to tell the implementator
@@ -64,50 +56,39 @@ public class AveragingFilter extends AbstractFilter {
         //The sample Size must be bigger than 0 or we would not create an average at all or even divide by zero
         assert avgSampSize > 0;
 
-        mAverageSampleSize = avgSampSize;
-        mAverage = new float[mAverageSampleSize][3];
+        mBuffer = new RingBuffer<>(avgSampSize, new float[]{0, 0, 0});
     }
 
     /**
-     * turns the values of the given array into more useful ones
+     * Replaces the incoming array with the average of it and its predecessors
      *
      * @param rawData hopefully the SensorData.data array
      */
     private void filter(float[] rawData) {
-
         //enter new gyroscope values
-        mAverage[mIndexPointer][0] = rawData[XAXIS];
-        mAverage[mIndexPointer][1] = rawData[YAXIS];
-        mAverage[mIndexPointer][2] = rawData[ZAXIS];
+        mBuffer.add(rawData.clone());
 
-        //create an 0f filled array used to calculate the mAverage later
-        float[] filteredData = new float[rawData.length];
+        // the raw data is no longer needed, so we can use it as a temporary variable
+        Arrays.fill(rawData, 0);
 
-        //create mAverage of all values in the sample size
-        for (int i = 0; i < mAverageSampleSize; i++) {
-            filteredData[XAXIS] += mAverage[i][XAXIS];
-            filteredData[YAXIS] += mAverage[i][YAXIS];
-            filteredData[ZAXIS] += mAverage[i][ZAXIS];
-        }
-        mIndexPointer++;
-
-        System.arraycopy(filteredData, 0, rawData, 0, rawData.length);
-
-        //mIndexPointer rotates through the array
-        if (mIndexPointer == mAverageSampleSize) {
-            mIndexPointer = 0;
+        // sum all values in mBuffer
+        for (int i = 0; i < mBuffer.size(); i++) {
+            rawData[XAXIS] += mBuffer.get(i)[XAXIS];
+            rawData[YAXIS] += mBuffer.get(i)[YAXIS];
+            rawData[ZAXIS] += mBuffer.get(i)[ZAXIS];
         }
 
-        //calculate mAverage
-        for (int i = 0; i < rawData.length; i++) {
-            rawData[i] /= mAverageSampleSize;
-        }
+        // average the values by dividing by their count
+        for (int i = 0; i < rawData.length; i++)
+            rawData[i] /= mBuffer.size();
     }
 
     /**
      * Called when the next element should be filtered
      *
-     * @param sensorData sensor data to process
+     * @param sensorData      sensor data to process
+     * @param origin          network device that sent this data
+     * @param userSensitivity sensitivity set by the user
      */
     @Override
     public void onData(NetworkDevice origin, SensorData sensorData, float userSensitivity) {
