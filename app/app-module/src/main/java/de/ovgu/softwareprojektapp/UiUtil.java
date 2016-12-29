@@ -20,7 +20,7 @@ public class UiUtil {
         });
     }
 
-    static void showAlert(final Activity host, final String title, final String message){
+    public static void showAlert(final Activity host, final String title, final String message){
         host.runOnUiThread(new Runnable() {
             @Override
             public void run() {

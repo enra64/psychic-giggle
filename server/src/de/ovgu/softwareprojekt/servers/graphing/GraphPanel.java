@@ -20,6 +20,7 @@ import java.util.List;
  *
  * @author Rodrigo
  */
+@SuppressWarnings("unused")
 public class GraphPanel extends JPanel {
     /**
      * The set of available colors.
@@ -96,18 +97,16 @@ public class GraphPanel extends JPanel {
         FontMetrics metrics = graphics2D.getFontMetrics();
         int textHeight = metrics.getHeight();
 
-        // draw throughput
-        String throughput = String.format("%.2f updates / s", mThroughput);
-        graphics2D.drawString(throughput, xEnd - 5 - metrics.stringWidth(throughput), Y_START);
-
         // draw white background
         graphics2D.setColor(Color.WHITE);
         graphics2D.fillRect(X_START, Y_START, backgroundWidth, backgroundHeight);
-
-
         graphics2D.setColor(Color.BLACK);
 
-        // create hatch marks and grid lines for y axis.
+        // draw throughput string
+        String throughput = String.format("%.2f updates / s", mThroughput);
+        graphics2D.drawString(throughput, xEnd - 5 - metrics.stringWidth(throughput), Y_START);
+
+        // create hatch marks, grid labels and grid lines for y axis.
         float min = getMinValue(), max = getMaxValue();
         for (int i = 0; i < Y_DIVISION_COUNT + 1; i++) {
             // draw the grid line
@@ -179,6 +178,13 @@ public class GraphPanel extends JPanel {
         mLines.removeIf(line -> line.getSensorType() == sensor && line.getAxis() == sensorAxis);
     }
 
+    /**
+     * Get a data sink. This new data sink corresponds to a new line in the graph, which will display the data received
+     * by this data sink.
+     * @param sensor requested sensor type
+     * @param axis requested sensor axis
+     * @return a data sink usable for pushing data into the graph
+     */
     NetworkDataSink getDataSink(SensorType sensor, final int axis) {
         // use a random line color if no predefined is left
         Color color;

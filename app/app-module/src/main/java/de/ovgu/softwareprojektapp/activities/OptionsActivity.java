@@ -1,4 +1,4 @@
-package de.ovgu.softwareprojektapp;
+package de.ovgu.softwareprojektapp.activities;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -22,6 +22,8 @@ import java.util.ArrayList;
 import de.ovgu.softwareprojekt.SensorType;
 import de.ovgu.softwareprojekt.control.CommandConnection;
 import de.ovgu.softwareprojekt.control.commands.ChangeSensorSensitivity;
+import de.ovgu.softwareprojektapp.R;
+import de.ovgu.softwareprojektapp.UiUtil;
 import de.ovgu.softwareprojektapp.networking.AsyncSendCommand;
 
 /**

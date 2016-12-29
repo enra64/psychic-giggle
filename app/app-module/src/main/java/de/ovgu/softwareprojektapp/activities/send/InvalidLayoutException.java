@@ -1,4 +1,4 @@
-package de.ovgu.softwareprojektapp;
+package de.ovgu.softwareprojektapp.activities.send;
 
 /**
  * Created by markus on 12.12.16.

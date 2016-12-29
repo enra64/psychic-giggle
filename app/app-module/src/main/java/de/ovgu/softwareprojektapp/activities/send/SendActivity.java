@@ -1,4 +1,4 @@
-package de.ovgu.softwareprojektapp;
+package de.ovgu.softwareprojektapp.activities.send;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -6,26 +6,21 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutCompat;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
-import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
-import android.widget.LinearLayout;
 
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.net.ConnectException;
 import java.net.InetAddress;
 import java.util.List;
-import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import de.ovgu.softwareprojekt.SensorType;
 import de.ovgu.softwareprojekt.control.OnCommandListener;
-import de.ovgu.softwareprojekt.control.commands.ButtonClick;
 import de.ovgu.softwareprojekt.control.commands.AbstractCommand;
 import de.ovgu.softwareprojekt.control.commands.ConnectionRequestResponse;
 import de.ovgu.softwareprojekt.control.commands.ChangeSensorSensitivity;
@@ -34,10 +29,13 @@ import de.ovgu.softwareprojekt.control.commands.SensorRangeNotification;
 import de.ovgu.softwareprojekt.control.commands.SetSensorCommand;
 import de.ovgu.softwareprojekt.control.commands.SetSensorSpeed;
 import de.ovgu.softwareprojekt.control.commands.UpdateButtonsMap;
-import de.ovgu.softwareprojekt.control.commands.UpdateButtonsMap;
 import de.ovgu.softwareprojekt.control.commands.UpdateButtonsXML;
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
 import de.ovgu.softwareprojekt.misc.ExceptionListener;
+import de.ovgu.softwareprojektapp.R;
+import de.ovgu.softwareprojektapp.UiUtil;
+import de.ovgu.softwareprojektapp.activities.DiscoveryActivity;
+import de.ovgu.softwareprojektapp.activities.OptionsActivity;
 import de.ovgu.softwareprojektapp.networking.NetworkClient;
 import de.ovgu.softwareprojektapp.sensors.SensorHandler;
 import de.ovgu.softwareprojektapp.sensors.SensorNotFoundException;
@@ -46,7 +44,7 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
     /**
      * The intent extras (the data given to us by the {@link DiscoveryActivity})
      */
-    static final String
+    public static final String
             EXTRA_SERVER_NAME = "Name",
             EXTRA_SERVER_ADDRESS = "Address",
             EXTRA_SERVER_PORT_DISCOVERY = "DiscoveryPort",
@@ -57,11 +55,12 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
     /**
      * result codes for the activity
      */
-    static final int
+    public static final int
             RESULT_SERVER_REFUSED = -1,
             RESULT_USER_STOPPED = 0,
-            RESULT_SERVER_NOT_LISTENING_ON_COMMAND_PORT = -2,
-            RESULT_SERVER_CONNECTION_TIMED_OUT = -3;
+            RESULT_SERVER_NOT_LISTENING_ON_PORT = -2,
+            RESULT_SERVER_CONNECTION_TIMED_OUT = -3,
+            RESULT_SERVER_NOT_RESPONDING_TO_REQUEST = -4;
 
     /**
      * The network client organises all our communication with the server
@@ -158,6 +157,14 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
     public void initiateConnection() {
         // display indeterminate, not cancelable wait period to user
         mConnectionProgressDialog = ProgressDialog.show(this, "Connecting", "Waiting for server response", true, false);
+
+        Timer responseTimeoutTimer = new Timer();
+        responseTimeoutTimer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                closeActivity(RESULT_SERVER_NOT_RESPONDING_TO_REQUEST);
+            }
+        }, 3000);
 
         // begin listening for commands
         mNetworkClient.requestConnection();
@@ -304,7 +311,6 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
                 UpdateButtonsXML addComXML = (UpdateButtonsXML) command;
                 createButtons(addComXML);
                 break;
-
             case SetSensorSpeed:
                 // update the speed for the given sensor
                 SetSensorSpeed setSpeedCommand = (SetSensorSpeed) command;
@@ -320,46 +326,49 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
     public void onException(Object origin, Exception exception, String info) {
         exception.printStackTrace();
 
+        // close the non-user-closeable connecting... dialog
+        if (mConnectionProgressDialog != null)
+            mConnectionProgressDialog.dismiss();
+
         // this exception is thrown when we send commands, but the server has closed its command port
-        if (exception instanceof ConnectException && exception.getMessage().contains("ECONNREFUSED")) {
-            // close the non-user-closeable connecting... dialog
-            if (mConnectionProgressDialog != null)
-                mConnectionProgressDialog.dismiss();
-
-            closeActivity(RESULT_SERVER_NOT_LISTENING_ON_COMMAND_PORT);
-        } else if (exception instanceof ConnectException && exception.getMessage().contains("ETIMEDOUT")) {
-            // close the non-user-closeable connecting... dialog
-            if (mConnectionProgressDialog != null)
-                mConnectionProgressDialog.dismiss();
-
+        if (exception instanceof ConnectException && exception.getMessage().contains("ECONNREFUSED"))
+            closeActivity(RESULT_SERVER_NOT_LISTENING_ON_PORT);
+        else if (exception instanceof ConnectException && exception.getMessage().contains("ETIMEDOUT"))
             closeActivity(RESULT_SERVER_CONNECTION_TIMED_OUT);
+        else if (exception instanceof ConnectException && exception.getMessage().contains("Socket is closed"))
+            closeActivity(RESULT_SERVER_NOT_LISTENING_ON_PORT);
+        else{
+            Log.w("spapp", "UNHANDLED EXCEPTION SENDACTIVITY:");
+            exception.printStackTrace();
         }
-
-        //TODO: wörkwörk markus
     }
 
+    /**
+     * Create buttons from a mapping from button ids to button texts
+     * @param addCom the command that was sent to change the button display
+     */
     private void createButtons(final UpdateButtonsMap addCom) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-
                mRuntimeButtonLayout.createFromMap(SendActivity.this, addCom.buttons);
-
             }
         });
     }
 
+    /**
+     * Create buttons from a xml string
+     * @param addCom the command that was sent to change the button display
+     */
     private void createButtons(final UpdateButtonsXML addCom){
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-
                 try {
-                    mRuntimeButtonLayout.createFromXML(addCom.xmlContent, mRuntimeButtonLayout);
+                    mRuntimeButtonLayout.createFromXML(addCom.xmlContent);
                 } catch (InvalidLayoutException e) {
-                    UiUtil.showAlert(SendActivity.this, "invalid server configuration", "XML layout could not be parsed");
+                    UiUtil.showAlert(SendActivity.this, "invalid server configuration", "XML button layout could not be parsed");
                 }
-
             }
         });
     }
@@ -373,6 +382,9 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
         mNetworkClient.sendCommand(new ResetToCenter());
     }
 
+    /**
+     * Open the {@link OptionsActivity}
+     */
     private void goToOptions() {
         Bundle in = getIntent().getExtras();
         Intent intent = new Intent(SendActivity.this, OptionsActivity.class);

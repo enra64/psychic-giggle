@@ -1,4 +1,4 @@
-package de.ovgu.softwareprojektapp;
+package de.ovgu.softwareprojektapp.activities;
 
 import android.content.Context;
 import android.content.Intent;
@@ -22,11 +22,15 @@ import java.util.List;
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
 import de.ovgu.softwareprojekt.discovery.OnDiscoveryListener;
 import de.ovgu.softwareprojekt.misc.ExceptionListener;
+import de.ovgu.softwareprojektapp.R;
+import de.ovgu.softwareprojektapp.activities.send.SendActivity;
+import de.ovgu.softwareprojektapp.UiUtil;
 import de.ovgu.softwareprojektapp.networking.DiscoveryClient;
 
-import static de.ovgu.softwareprojektapp.OptionsActivity.DISCOVERY_PREFS_DEVICE_NAME;
-import static de.ovgu.softwareprojektapp.OptionsActivity.DISCOVERY_PREFS_NAME;
-import static de.ovgu.softwareprojektapp.OptionsActivity.DISCOVERY_PREFS_PORT;
+import static de.ovgu.softwareprojektapp.activities.send.SendActivity.RESULT_SERVER_CONNECTION_TIMED_OUT;
+import static de.ovgu.softwareprojektapp.activities.send.SendActivity.RESULT_SERVER_NOT_LISTENING_ON_PORT;
+import static de.ovgu.softwareprojektapp.activities.send.SendActivity.RESULT_SERVER_NOT_RESPONDING_TO_REQUEST;
+import static de.ovgu.softwareprojektapp.activities.send.SendActivity.RESULT_SERVER_REFUSED;
 
 public class DiscoveryActivity extends AppCompatActivity implements OnDiscoveryListener, ExceptionListener {
     /**
@@ -59,7 +63,7 @@ public class DiscoveryActivity extends AppCompatActivity implements OnDiscoveryL
             @Override
             public void onClick(View view) {
                 // either start or stop the discovery
-                if(mDiscovery != null && mDiscovery.isRunning())
+                if (mDiscovery != null && mDiscovery.isRunning())
                     stopDiscovery();
                 else
                     startDiscovery();
@@ -130,13 +134,19 @@ public class DiscoveryActivity extends AppCompatActivity implements OnDiscoveryL
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        // request code is ignored
-        if (resultCode == SendActivity.RESULT_SERVER_REFUSED)
-            UiUtil.showAlert(this, "Connection failed", "Server refused connection");
-        else if (resultCode == SendActivity.RESULT_SERVER_NOT_LISTENING_ON_COMMAND_PORT)
-            UiUtil.showAlert(this, "Connection failed", "Server seems to be offline");
-        else if (resultCode == SendActivity.RESULT_SERVER_CONNECTION_TIMED_OUT)
-            UiUtil.showAlert(this, "Connection failed", "The server connection has timed out! Check your network configuration.");
+        switch (resultCode) {
+            case RESULT_SERVER_REFUSED:
+                UiUtil.showAlert(this, "Connection failed", "Server refused connection");
+                break;
+            case RESULT_SERVER_NOT_LISTENING_ON_PORT:
+                UiUtil.showAlert(this, "Connection failed", "Server seems to be offline");
+                break;
+            case RESULT_SERVER_CONNECTION_TIMED_OUT:
+                UiUtil.showAlert(this, "Connection failed", "The server connection has timed out! Check your network configuration.");
+                break;
+            case RESULT_SERVER_NOT_RESPONDING_TO_REQUEST:
+                UiUtil.showAlert(this, "Connection failed", "The server did not respond to the connection request in time. Please try again!");
+        }
     }
 
     /**
@@ -178,20 +188,20 @@ public class DiscoveryActivity extends AppCompatActivity implements OnDiscoveryL
     /**
      * Stop discovering
      */
-    private void stopDiscovery(){
-        if(mDiscovery != null)
+    private void stopDiscovery() {
+        if (mDiscovery != null)
             mDiscovery.close();
         setDiscoveryUserInterfaceEnabled(true);
     }
 
     private int getDiscoveryPort() {
-        SharedPreferences sharedPref = getSharedPreferences(DISCOVERY_PREFS_NAME, Context.MODE_PRIVATE);
-        return sharedPref.getInt(DISCOVERY_PREFS_PORT, 8888);
+        SharedPreferences sharedPref = getSharedPreferences(OptionsActivity.DISCOVERY_PREFS_NAME, Context.MODE_PRIVATE);
+        return sharedPref.getInt(OptionsActivity.DISCOVERY_PREFS_PORT, 8888);
     }
 
     private String getDeviceName() {
-        SharedPreferences sharedPref = getSharedPreferences(DISCOVERY_PREFS_NAME, Context.MODE_PRIVATE);
-        return sharedPref.getString(DISCOVERY_PREFS_DEVICE_NAME, Build.MODEL);
+        SharedPreferences sharedPref = getSharedPreferences(OptionsActivity.DISCOVERY_PREFS_NAME, Context.MODE_PRIVATE);
+        return sharedPref.getString(OptionsActivity.DISCOVERY_PREFS_DEVICE_NAME, Build.MODEL);
     }
 
     /**
@@ -232,6 +242,6 @@ public class DiscoveryActivity extends AppCompatActivity implements OnDiscoveryL
     @Override
     public void onException(Object origin, Exception exception, String info) {
         //TODO: wörkwörk markus (to be implemented)
-        
+
     }
 }
