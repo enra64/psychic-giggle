@@ -95,19 +95,39 @@ public class SteeringWheel implements NetworkDataSink, AccelerationPhaseDetectio
     @Override
     public void onData(NetworkDevice origin, SensorData data, float userSensitivity) {
         //Check if player steers to the left or right by tilted distance
-        if (data.sensorType == SensorType.Gyroscope) {
-            //TODO: DECIDE THRESHOLD VALUE FOR STEERING
-            // info: when normalized to 100, the gyro on arne's device has a diff in integrated value of 230-260 for 90°
-            if (data.data[ZAXIS] > 40)
+
+        if(data.sensorType == SensorType.Gravity)
+        {
+            if (data.data[YAXIS] < -5)
                 mSteeringBot.keyPress(KeyEvent.VK_LEFT);
 
-            else if (data.data[ZAXIS] < -40)
+            else if (data.data[YAXIS] > 5)
                 mSteeringBot.keyPress(KeyEvent.VK_RIGHT);
 
             else {
                 mSteeringBot.keyRelease(KeyEvent.VK_LEFT);
                 mSteeringBot.keyRelease(KeyEvent.VK_RIGHT);
-            }
+        }
+
+        //TODO: Delete this shit if gravity works better
+        if (data.sensorType == SensorType.Gyroscope) {
+            onGyroscopeSteering(data);
+        }
+    }
+    }
+
+    private void onGyroscopeSteering(SensorData data){
+        //TODO: DECIDE THRESHOLD VALUE FOR STEERING
+        // info: when normalized to 100, the gyro on arne's device has a diff in integrated value of 230-260 for 90°
+        if (data.data[ZAXIS] > 40)
+            mSteeringBot.keyPress(KeyEvent.VK_LEFT);
+
+        else if (data.data[ZAXIS] < -40)
+            mSteeringBot.keyPress(KeyEvent.VK_RIGHT);
+
+        else {
+            mSteeringBot.keyRelease(KeyEvent.VK_LEFT);
+            mSteeringBot.keyRelease(KeyEvent.VK_RIGHT);
         }
     }
 

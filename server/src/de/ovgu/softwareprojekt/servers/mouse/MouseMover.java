@@ -90,7 +90,7 @@ public class MouseMover implements NetworkDataSink {
      * @param sensorData the sensor data containing the x-,y-,z-Axis of gyroscope
      */
     @Override
-    public void onData(NetworkDevice origin, SensorData sensorData) {
+    public void onData(NetworkDevice origin, SensorData sensorData, float userSensitivity) {
         PointerInfo pi = MouseInfo.getPointerInfo();
         Point mousePos = pi.getLocation();
 
