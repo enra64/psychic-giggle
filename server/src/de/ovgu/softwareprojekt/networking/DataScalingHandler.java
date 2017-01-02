@@ -25,7 +25,7 @@ public class DataScalingHandler implements NetworkDataSink {
      */
     DataScalingHandler(NetworkDataSink outgoingDataSink) {
         for (SensorType sensorType : SensorType.values())
-            mScalingFilters.put(sensorType, new NormalizationFilter(outgoingDataSink, 50f, 10, 100));
+            mScalingFilters.put(sensorType, new NormalizationFilter(outgoingDataSink, 50f, 10, 10));
     }
 
     /**

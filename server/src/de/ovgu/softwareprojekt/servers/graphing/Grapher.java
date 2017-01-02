@@ -35,14 +35,14 @@ public class Grapher extends Server {
 
     private void registerSnesGyroTestbed(final GraphPanel graphPanel, ThroughputMeasurer throughputMeasurer) throws IOException {
         // normalize output
-        setSensorOutputRange(SensorType.LinearAcceleration, 10);
+        //setSensorOutputRange(SensorType.LinearAcceleration, 10);
 
         // split off the current data stream
-        NetworkDataSink accelerationCurrentLine = graphPanel.getDataSink(SensorType.Gyroscope, 2);
+        NetworkDataSink accelerationCurrentLine = graphPanel.getDataSink(SensorType.Orientation, 2);
         FilterPipelineBuilder pipelineBuilder = new FilterPipelineBuilder();
         pipelineBuilder.append(throughputMeasurer);
         pipelineBuilder.append(new IntegratingFilter(null));
-        registerDataSink(pipelineBuilder.build(accelerationCurrentLine), SensorType.Gyroscope);
+        registerDataSink(pipelineBuilder.build(accelerationCurrentLine), SensorType.Orientation);
     }
 
     private void registerAccelerationMovementDetectionPipelineTestbed(final GraphPanel graphPanel, ThroughputMeasurer throughputMeasurer) throws IOException {
