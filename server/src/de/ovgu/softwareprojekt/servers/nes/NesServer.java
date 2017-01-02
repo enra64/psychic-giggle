@@ -7,7 +7,6 @@ import de.ovgu.softwareprojekt.control.commands.ButtonClick;
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
 import de.ovgu.softwareprojekt.pipeline.FilterPipelineBuilder;
 import de.ovgu.softwareprojekt.pipeline.filters.AveragingFilter;
-import de.ovgu.softwareprojekt.pipeline.filters.IntegratingFilter;
 import de.ovgu.softwareprojekt.networking.Server;
 import de.ovgu.softwareprojekt.pipeline.filters.ThresholdingFilter;
 
@@ -21,31 +20,9 @@ import java.nio.file.Paths;
  */
 public class NesServer extends Server {
     /**
-     * Data we need to store for calculating the devices rotation
-     */
-    private float[] mValuesMagnet = new float[3];
-
-    /**
-     * Data we need to store for calculating the devices rotation
-     */
-    private float[] mValuesAccelerometer = new float[3];
-
-    /**
-     * Data we need to store for calculating the devices rotation
-     */
-    private float[] mValuesOrientation = new float[3];
-
-    /**
-     * Current device rotation matrix
-     */
-    private float[] mRotationMatrix = new float[9];
-
-    /**
      *  The steering wheel emulates the peripheral device input
      */
-    private SteeringWheel mSteeringWheel;
-
-    private IntegratingFilter mIntegratingFilter;
+    private SteeringWheel mSteeringWheel = new SteeringWheel();
 
     /**
      * preset list of controller button IDs
@@ -61,18 +38,26 @@ public class NesServer extends Server {
     public NesServer(@Nullable String serverName) throws IOException, AWTException {
         super(serverName);
 
-        mSteeringWheel = new SteeringWheel();
-
-        // normalize both sensors
+        // normalize both utilized sensors
         setSensorOutputRange(SensorType.LinearAcceleration,10);
         setSensorOutputRange(SensorType.Gravity,100);
 
-        //register use of gyroscope
-        //mIntegratingFilter = new IntegratingFilter(mSteeringWheel);
-        //registerDataSink(mIntegratingFilter, SensorType.Gyroscope);
-
+        // pipe the gravity sensor directly into the steering wheel
         registerDataSink(mSteeringWheel, SensorType.Gravity);
 
+        // create and register the pipeline for the up/down detection
+        registerAccelerationPhaseDetection();
+
+        // display the nes button layout
+        setButtonLayout(readFile("../nesLayout.txt", "utf-8"));
+    }
+
+    /**
+     * Create a pipeline that filters linear acceleration data so that the acceleration phase
+     * detection system can correctly recognize up/down events
+     * @throws IOException if the data sink could not be registered
+     */
+    private void registerAccelerationPhaseDetection() throws IOException {
         // create the end, eg the phase detection system
         NetworkDataSink phaseDetection = new AccelerationPhaseDetection(mSteeringWheel);
 
@@ -81,8 +66,6 @@ public class NesServer extends Server {
         pipelineBuilder.append(new ThresholdingFilter(null, .5f, 2));
         pipelineBuilder.append(new AveragingFilter(5));
         registerDataSink(pipelineBuilder.build(phaseDetection), SensorType.LinearAcceleration);
-
-        setButtonLayout(readFile("../nesLayout.txt", "utf-8"));
     }
 
     /**
@@ -129,18 +112,22 @@ public class NesServer extends Server {
 
     @Override
     public void onResetPosition(NetworkDevice origin) {
-        //Idea: Reset Integrating filter to 0 which means it acts as the initial position
-        mIntegratingFilter.resetFilter();
+        // TODO: implement reset
     }
 
     @Override
     public void onButtonClick(ButtonClick click, NetworkDevice origin) {
-        mSteeringWheel.controllerInput(click.mID, true);
-        if(!click.isHold)
-            mSteeringWheel.controllerInput(click.mID, false);
+        mSteeringWheel.controllerInput(click.mID, click.isHold);
     }
 
-    static String readFile(String path, String encoding) throws IOException {
+    /**
+     * Read all contents of a file into a string
+     * @param path file location
+     * @param encoding expected encoding
+     * @return a string representing the file content
+     * @throws IOException if the file could not be found or read
+     */
+    private static String readFile(String path, String encoding) throws IOException {
         byte[] encoded = Files.readAllBytes(Paths.get(path));
         return new String(encoded, encoding);
     }
