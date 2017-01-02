@@ -82,6 +82,11 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
      */
     ProgressDialog mConnectionProgressDialog;
 
+    /**
+     * This timer is for timing out the server response
+     */
+    private Timer mResponseTimeoutTimer;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -113,9 +118,6 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
 
         //set NetworkClient in LayoutParser
         mRuntimeButtonLayout.setNetworkClient(mNetworkClient);
-
-        // default activity result is closing by user
-        setResult(RESULT_USER_STOPPED);
     }
 
 
@@ -158,8 +160,8 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
         // display indeterminate, not cancelable wait period to user
         mConnectionProgressDialog = ProgressDialog.show(this, "Connecting", "Waiting for server response", true, false);
 
-        Timer responseTimeoutTimer = new Timer();
-        responseTimeoutTimer.schedule(new TimerTask() {
+        mResponseTimeoutTimer = new Timer();
+        mResponseTimeoutTimer.schedule(new TimerTask() {
             @Override
             public void run() {
                 closeActivity(RESULT_SERVER_NOT_RESPONDING_TO_REQUEST);
@@ -272,6 +274,9 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
      * @param granted true if the request was granted
      */
     private void handleConnectionResponse(boolean granted) {
+        // the response timeout is useless now
+        mResponseTimeoutTimer.cancel();
+
         // the progress dialog can be dismissed in any case
         mConnectionProgressDialog.dismiss();
 
