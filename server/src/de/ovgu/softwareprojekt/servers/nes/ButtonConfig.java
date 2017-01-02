@@ -1,7 +1,10 @@
 package de.ovgu.softwareprojekt.servers.nes;
 
+import org.omg.CORBA.DynAnyPackage.Invalid;
+
 import java.awt.*;
 import java.awt.event.KeyEvent;
+import java.lang.reflect.Field;
 
 /**
  * Created by arne on 12/19/16.
@@ -54,36 +57,12 @@ public class ButtonConfig {
         }
     }
     
-    static int getKeyEvent(char character){
-        switch (character) {
-            case 'a': return KeyEvent.VK_A;
-            case 'b': return KeyEvent.VK_B;
-            case 'c': return KeyEvent.VK_C;
-            case 'd': return KeyEvent.VK_D;
-            case 'e': return KeyEvent.VK_E;
-            case 'f': return KeyEvent.VK_F;
-            case 'g': return KeyEvent.VK_G;
-            case 'h': return KeyEvent.VK_H;
-            case 'i': return KeyEvent.VK_I;
-            case 'j': return KeyEvent.VK_J;
-            case 'k': return KeyEvent.VK_K;
-            case 'l': return KeyEvent.VK_L;
-            case 'm': return KeyEvent.VK_M;
-            case 'n': return KeyEvent.VK_N;
-            case 'o': return KeyEvent.VK_O;
-            case 'p': return KeyEvent.VK_P;
-            case 'q': return KeyEvent.VK_Q;
-            case 'r': return KeyEvent.VK_R;
-            case 's': return KeyEvent.VK_S;
-            case 't': return KeyEvent.VK_T;
-            case 'u': return KeyEvent.VK_U;
-            case 'v': return KeyEvent.VK_V;
-            case 'w': return KeyEvent.VK_W;
-            case 'x': return KeyEvent.VK_X;
-            case 'y': return KeyEvent.VK_Y;
-            case 'z': return KeyEvent.VK_Z;
-            default:
-                throw new IllegalArgumentException("Cannot type character " + character);
+    static int getKeyEvent(String keyEvent) throws InvalidButtonException {
+        try {
+            Field keyEventType = KeyEvent.class.getField(keyEvent);
+            return keyEventType.getInt(null);
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            throw new InvalidButtonException("\"" + keyEvent + "\"" + " could not be recognized.");
         }
     }
 }

@@ -72,18 +72,23 @@ public class NesServer extends Server {
         prop.load(input);
 
         // get the property value and print it out
-        for(int i = 3; i >= 0; i--){
-            ButtonConfig newConfig = new ButtonConfig();
-            newConfig.A = ButtonConfig.getKeyEvent(prop.getProperty("BUTTON_A_" + i).toCharArray()[0]);
-            newConfig.B = ButtonConfig.getKeyEvent(prop.getProperty("BUTTON_B_" + i).toCharArray()[0]);
-            newConfig.X = ButtonConfig.getKeyEvent(prop.getProperty("BUTTON_X_" + i).toCharArray()[0]);
-            newConfig.Y = ButtonConfig.getKeyEvent(prop.getProperty("BUTTON_Y_" + i).toCharArray()[0]);
-            newConfig.SELECT = ButtonConfig.getKeyEvent(prop.getProperty("BUTTON_SELECT_" + i).toCharArray()[0]);
-            newConfig.START = ButtonConfig.getKeyEvent(prop.getProperty("BUTTON_START_" + i).toCharArray()[0]);
-            newConfig.R = ButtonConfig.getKeyEvent(prop.getProperty("BUTTON_R_" + i).toCharArray()[0]);
-            newConfig.L = ButtonConfig.getKeyEvent(prop.getProperty("BUTTON_L_" + i).toCharArray()[0]);
-            mButtonConfigs.add(newConfig);
+        for(int player = 3; player >= 0; player--){
+            try {
+                ButtonConfig newConfig = new ButtonConfig();
+                newConfig.A = ButtonConfig.getKeyEvent(prop.getProperty("BUTTON_A_" + player));
+                newConfig.B = ButtonConfig.getKeyEvent(prop.getProperty("BUTTON_B_" + player));
+                newConfig.X = ButtonConfig.getKeyEvent(prop.getProperty("BUTTON_X_" + player));
+                newConfig.Y = ButtonConfig.getKeyEvent(prop.getProperty("BUTTON_Y_" + player));
+                newConfig.SELECT = ButtonConfig.getKeyEvent(prop.getProperty("BUTTON_SELECT_" + player));
+                newConfig.START = ButtonConfig.getKeyEvent(prop.getProperty("BUTTON_START_" + player));
+                newConfig.R = ButtonConfig.getKeyEvent(prop.getProperty("BUTTON_R_" + player));
+                newConfig.L = ButtonConfig.getKeyEvent(prop.getProperty("BUTTON_L_" + player));
+                mButtonConfigs.add(newConfig);
+            } catch (InvalidButtonException e){
+                System.out.println("Player " + player + ": Keycode " + e.getMessage());
+            }
         }
+
     }
 
     /**
@@ -188,6 +193,7 @@ public class NesServer extends Server {
      * @return a string representing the file content
      * @throws IOException if the file could not be found or read
      */
+    @SuppressWarnings("SameParameterValue")
     private static String readFile(String path, String encoding) throws IOException {
         byte[] encoded = Files.readAllBytes(Paths.get(path));
         return new String(encoded, encoding);
