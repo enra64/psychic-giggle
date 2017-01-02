@@ -75,13 +75,13 @@ public class NesServer extends Server {
         registerDataSink(mSteeringWheel, SensorType.LinearAcceleration); //LinearAcceleration ought to be filtered ... but what is the best approach?
 
         // create the end, eg the phase detection system
-        NetworkDataSink end = new AccelerationPhaseDetection(mSteeringWheel);
+        NetworkDataSink phaseDetection = new AccelerationPhaseDetection(mSteeringWheel);
 
         // create a filter pipeline ending in the acceleration phase detection system
         FilterPipelineBuilder pipelineBuilder = new FilterPipelineBuilder();
         pipelineBuilder.append(new ThresholdingFilter(null, .5f, 2));
         pipelineBuilder.append(new AveragingFilter(5));
-        registerDataSink(pipelineBuilder.build(end), SensorType.LinearAcceleration);
+        registerDataSink(pipelineBuilder.build(phaseDetection), SensorType.LinearAcceleration);
 
         setButtonLayout(readFile("../nesLayout.txt", "utf-8"));
     }

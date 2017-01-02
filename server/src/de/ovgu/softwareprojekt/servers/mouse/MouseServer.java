@@ -45,7 +45,7 @@ public class MouseServer extends Server {
         mMouseMover = new MouseMover();
 
         // this is how we currently define a filter pipeline:
-        NetworkDataSink pipeline = new UserSensitivityMultiplicator(new AveragingFilter(3, new DifferenceThresholdFilter(mMouseMover, 5f)));
+        NetworkDataSink pipeline = new UserSensitivityMultiplicator(new AveragingFilter(3, new DifferenceThresholdFilter(mMouseMover, .1f)));
 
         // register our mouse mover to receive gyroscope data
         registerDataSink(pipeline, SensorType.Gyroscope);
