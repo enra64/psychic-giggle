@@ -5,24 +5,35 @@ import de.ovgu.softwareprojekt.NetworkDataSink;
 import de.ovgu.softwareprojekt.SensorType;
 import de.ovgu.softwareprojekt.control.commands.ButtonClick;
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
+import de.ovgu.softwareprojekt.networking.Server;
 import de.ovgu.softwareprojekt.pipeline.FilterPipelineBuilder;
 import de.ovgu.softwareprojekt.pipeline.filters.AveragingFilter;
-import de.ovgu.softwareprojekt.networking.Server;
 import de.ovgu.softwareprojekt.pipeline.filters.ThresholdingFilter;
 
 import java.awt.*;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.Properties;
+import java.util.Stack;
 
 /**
  * This server is designed to create NES controller input from gyroscope data
  */
 public class NesServer extends Server {
     /**
-     *  The steering wheel emulates the peripheral device input
+     * This variable stores our steering wheels, mapped from network devices so we
+     * can easily access the correct one.
      */
-    private SteeringWheel mSteeringWheel = new SteeringWheel();
+    private HashMap<NetworkDevice, SteeringWheel> mSteeringWheels = new HashMap<>();
+
+    /**
+     * This stack stores all available button configs. they will get taken out as more
+     * clients connect, and stored back when clients are removed
+     */
+    private Stack<ButtonConfig> mButtonConfigs = new Stack<>();
 
     /**
      * preset list of controller button IDs
@@ -42,14 +53,37 @@ public class NesServer extends Server {
         setSensorOutputRange(SensorType.LinearAcceleration,10);
         setSensorOutputRange(SensorType.Gravity,100);
 
-        // pipe the gravity sensor directly into the steering wheel
-        registerDataSink(mSteeringWheel, SensorType.Gravity);
+        // load button mappings: which player presses what when
+        loadButtonMappings();
 
-        // create and register the pipeline for the up/down detection
-        registerAccelerationPhaseDetection();
+    	// display the nes button layout
+        super.setButtonLayout(readFile("../nesLayout.txt", "utf-8"));
+    }
 
-        // display the nes button layout
-        setButtonLayout(readFile("../nesLayout.txt", "utf-8"));
+    /**
+     * Loads all available button mappings from ../keys.properties
+     * @throws IOException if the file could not be found
+     */
+    private void loadButtonMappings() throws IOException {
+        FileInputStream input = new FileInputStream("../keys.properties");
+        Properties prop = new Properties();
+
+        // load a properties file
+        prop.load(input);
+
+        // get the property value and print it out
+        for(int i = 3; i >= 0; i--){
+            ButtonConfig newConfig = new ButtonConfig();
+            newConfig.A = ButtonConfig.getKeyEvent(prop.getProperty("BUTTON_A_" + i).toCharArray()[0]);
+            newConfig.B = ButtonConfig.getKeyEvent(prop.getProperty("BUTTON_B_" + i).toCharArray()[0]);
+            newConfig.X = ButtonConfig.getKeyEvent(prop.getProperty("BUTTON_X_" + i).toCharArray()[0]);
+            newConfig.Y = ButtonConfig.getKeyEvent(prop.getProperty("BUTTON_Y_" + i).toCharArray()[0]);
+            newConfig.SELECT = ButtonConfig.getKeyEvent(prop.getProperty("BUTTON_SELECT_" + i).toCharArray()[0]);
+            newConfig.START = ButtonConfig.getKeyEvent(prop.getProperty("BUTTON_START_" + i).toCharArray()[0]);
+            newConfig.R = ButtonConfig.getKeyEvent(prop.getProperty("BUTTON_R_" + i).toCharArray()[0]);
+            newConfig.L = ButtonConfig.getKeyEvent(prop.getProperty("BUTTON_L_" + i).toCharArray()[0]);
+            mButtonConfigs.add(newConfig);
+        }
     }
 
     /**
@@ -57,9 +91,9 @@ public class NesServer extends Server {
      * detection system can correctly recognize up/down events
      * @throws IOException if the data sink could not be registered
      */
-    private void registerAccelerationPhaseDetection() throws IOException {
+    private void registerAccelerationPhaseDetection(SteeringWheel wheel) throws IOException {
         // create the end, eg the phase detection system
-        NetworkDataSink phaseDetection = new AccelerationPhaseDetection(mSteeringWheel);
+        NetworkDataSink phaseDetection = new AccelerationPhaseDetection(wheel);
 
         // create a filter pipeline ending in the acceleration phase detection system
         FilterPipelineBuilder pipelineBuilder = new FilterPipelineBuilder();
@@ -92,6 +126,23 @@ public class NesServer extends Server {
     @Override
     public boolean acceptClient(NetworkDevice newClient) {
         System.out.println("Player " + newClient.name + " connected");
+        try {
+            // create a new steering wheel
+            SteeringWheel newWheel = new SteeringWheel(mButtonConfigs.pop());
+
+	// pipe the gravity sensor directly into the steering wheel
+        registerDataSink(newWheel, SensorType.Gravity);
+
+        // create and register the pipeline for the up/down detection
+        registerAccelerationPhaseDetection(newWheel);
+
+            // add the steering wheel to the list of network devices
+            mSteeringWheels.put(newClient, newWheel);
+        } catch (AWTException | IOException e) {
+            e.printStackTrace();
+            // yeah this shouldnt happen
+        }
+
         return true;
     }
 
@@ -103,11 +154,21 @@ public class NesServer extends Server {
     @Override
     public void onClientDisconnected(NetworkDevice disconnectedClient) {
         System.out.println("Player " + disconnectedClient.name + " disconnected!");
+
+        // put back the button config
+        mButtonConfigs.push(mSteeringWheels.get(disconnectedClient).getButtonConfig());
+
+        mSteeringWheels.remove(disconnectedClient);
     }
 
     @Override
     public void onClientTimeout(NetworkDevice timeoutClient) {
         System.out.println("Player " + timeoutClient.name + " had a timeout!");
+
+        // put back the button config that was used by the removed client
+        mButtonConfigs.push(mSteeringWheels.get(timeoutClient).getButtonConfig());
+
+        mSteeringWheels.remove(timeoutClient);
     }
 
     @Override
@@ -117,7 +178,7 @@ public class NesServer extends Server {
 
     @Override
     public void onButtonClick(ButtonClick click, NetworkDevice origin) {
-        mSteeringWheel.controllerInput(click.mID, click.isHold);
+        mSteeringWheels.get(origin).controllerInput(click.mID, click.isHold);
     }
 
     /**

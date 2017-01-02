@@ -31,52 +31,45 @@ public class SteeringWheel implements NetworkDataSink, AccelerationPhaseDetectio
      */
     private long lastAccActivation;
 
+    /**
+     * This button config stores the awt buttons that should be pressed on certain app button
+     * presses
+     */
+    private ButtonConfig mButtonConfig;
+
     private int counter;
 
     /**
      * @throws AWTException is thrown when low level input is prohibit by system
      */
-    public SteeringWheel() throws AWTException {
+    SteeringWheel(ButtonConfig config) throws AWTException {
         mSteeringBot = new Robot(); //emulates peripheral device input
         lastAccActivation = System.currentTimeMillis();
         counter = 0;
+        mButtonConfig = config;
     }
 
-    public void controllerInput(int buttonID, boolean isPressed) {
-        int event = -1;
-        switch (buttonID) {
-            case NesServer.A_BUTTON:
-                event = KeyEvent.VK_X;
-                break;
-            case NesServer.B_BUTTON:
-                // May use Z actually ingame ... but shouldn't
-                event = KeyEvent.VK_Y;
-                break;
-            case NesServer.X_BUTTON:
-                event = KeyEvent.VK_S;
-                break;
-            case NesServer.Y_BUTTON:
-                event = KeyEvent.VK_A;
-                break;
-            case NesServer.SELECT_BUTTON:
-                // Presses left shift or both shifts
-                event = KeyEvent.VK_SHIFT;
-                break;
-            case NesServer.START_BUTTON:
-                event = KeyEvent.VK_ENTER;
-                break;
-            case NesServer.R_BUTTON:
-                event = KeyEvent.VK_C;
-                break;
-            case NesServer.L_BUTTON:
-                event = KeyEvent.VK_D;
-                break;
-        }
+    /**
+     * Map app button input to robot events
+     * @param buttonID the pressed buttons id
+     * @param isPressed whether it is currently pressed or not
+     */
+    void controllerInput(int buttonID, boolean isPressed) {
+        Integer event = mButtonConfig.mapInput(buttonID);
 
-        if (isPressed)
-            mSteeringBot.keyPress(event);
-        else
-            mSteeringBot.keyRelease(event);
+        if (event != null) {
+            if (isPressed)
+                mSteeringBot.keyPress(event);
+            else
+                mSteeringBot.keyRelease(event);
+        }
+    }
+
+    /**
+     * Get the button config this steering wheel uses
+     */
+    ButtonConfig getButtonConfig(){
+        return mButtonConfig;
     }
 
     /**
@@ -107,29 +100,11 @@ public class SteeringWheel implements NetworkDataSink, AccelerationPhaseDetectio
             else {
                 mSteeringBot.keyRelease(KeyEvent.VK_LEFT);
                 mSteeringBot.keyRelease(KeyEvent.VK_RIGHT);
+            }
         }
 
-        //TODO: Delete this shit if gravity works better
-        if (data.sensorType == SensorType.Gyroscope) {
-            onGyroscopeSteering(data);
-        }
-    }
     }
 
-    private void onGyroscopeSteering(SensorData data){
-        //TODO: DECIDE THRESHOLD VALUE FOR STEERING
-        // info: when normalized to 100, the gyro on arne's device has a diff in integrated value of 230-260 for 90°
-        if (data.data[ZAXIS] > 40)
-            mSteeringBot.keyPress(KeyEvent.VK_LEFT);
-
-        else if (data.data[ZAXIS] < -40)
-            mSteeringBot.keyPress(KeyEvent.VK_RIGHT);
-
-        else {
-            mSteeringBot.keyRelease(KeyEvent.VK_LEFT);
-            mSteeringBot.keyRelease(KeyEvent.VK_RIGHT);
-        }
-    }
 
     /**
      * Needs to be implemented due to interface but serves no purpose here
