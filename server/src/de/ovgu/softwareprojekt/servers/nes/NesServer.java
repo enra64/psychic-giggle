@@ -65,16 +65,13 @@ public class NesServer extends Server {
 
         // normalize both sensors
         setSensorOutputRange(SensorType.LinearAcceleration,10);
-        //setSensorOutputRange(SensorType.Gravity,100);
+        setSensorOutputRange(SensorType.Gravity,100);
 
         //register use of gyroscope
         //mIntegratingFilter = new IntegratingFilter(mSteeringWheel);
         //registerDataSink(mIntegratingFilter, SensorType.Gyroscope);
 
         registerDataSink(mSteeringWheel, SensorType.Gravity);
-
-        //register use of accelerometer
-        registerDataSink(mSteeringWheel, SensorType.LinearAcceleration); //LinearAcceleration ought to be filtered ... but what is the best approach?
 
         // create the end, eg the phase detection system
         NetworkDataSink end = new AccelerationPhaseDetection(mSteeringWheel);
