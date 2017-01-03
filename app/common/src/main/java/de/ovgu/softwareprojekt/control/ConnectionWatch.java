@@ -35,6 +35,11 @@ public class ConnectionWatch extends TimerTask {
     }
 
     /**
+     * True if the timer is currently scheduled
+     */
+    private boolean mIsStarted;
+
+    /**
      * This timer is used for scheduling the "still-alive" requests to our client
      */
     private Timer mConnectionCheckTimer = new Timer();
@@ -131,6 +136,8 @@ public class ConnectionWatch extends TimerTask {
         mLastRequestTimestamp = mLastCheckEventTimestamp;
         // in one second, begin requesting a "still-alive" beep from the clients once per second
         mConnectionCheckTimer.scheduleAtFixedRate(this, 900, 500);
+
+        mIsStarted = true;
     }
 
     @Override
@@ -172,5 +179,13 @@ public class ConnectionWatch extends TimerTask {
      */
     public void onCheckEvent() {
         mLastCheckEventTimestamp = System.currentTimeMillis();
+    }
+
+    /**
+     * Get the running state of this connection watch
+     * @return true if the watch is running (eg its timer has been scheduled)
+     */
+    public boolean started() {
+        return mIsStarted;
     }
 }

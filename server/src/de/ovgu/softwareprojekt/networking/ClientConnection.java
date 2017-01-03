@@ -117,8 +117,9 @@ public class ClientConnection implements OnCommandListener, NetworkDataSink, Con
             } catch (ConnectException e) {
                 // if the client does not listen anymore, it most probably is down
                 if (e.getMessage().contains("Connection refused")) {
-                    // notify client listener
-                    mClientListener.onClientDisconnected(mClient);
+                    // notify client listener only if we have not been closed
+                    if(mIsConnected)
+                        mClientListener.onClientDisconnected(mClient);
 
                     // close self
                     close();
@@ -342,7 +343,8 @@ public class ClientConnection implements OnCommandListener, NetworkDataSink, Con
     @Override
     public void onTimeout(long age) {
         // notify our client listener of the timeout
-        mClientListener.onClientTimeout(mClient);
+        if(mIsConnected)
+            mClientListener.onClientTimeout(mClient);
 
         // notify the client that we do no longer communicate with it in case it is still listening
         closeAndSignalClient();

@@ -68,7 +68,12 @@ class ClientConnectionHandler {
     private String mButtonXML = null;
 
 
-    ClientConnectionHandler(String serverName, ExceptionListener exceptionListener, OnCommandListener commandListener, ClientListener clientListener, NetworkDataSink dataSink) {
+    ClientConnectionHandler(
+            String serverName,
+            ExceptionListener exceptionListener,
+            OnCommandListener commandListener,
+            ClientListener clientListener,
+            NetworkDataSink dataSink) {
         mServerName = serverName;
         mExceptionListener = exceptionListener;
         mCommandListener = commandListener;
@@ -228,6 +233,9 @@ class ClientConnectionHandler {
         // return false if no matching client could be found
         if (connectionHandler == null)
             return false;
+
+        // delete the connection handler
+        mClientConnections.remove(connectionHandler);
 
         // close the client connection
         connectionHandler.closeAndSignalClient();

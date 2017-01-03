@@ -29,14 +29,13 @@ class ButtonConfig {
             case A_BUTTON:
                 return A;
             case B_BUTTON:
-                // May use Z actually ingame ... but shouldn't
                 return B;
             case X_BUTTON:
                 return X;
             case Y_BUTTON:
                 return Y;
+            // Presses left shift or both shifts
             case SELECT_BUTTON:
-                // Presses left shift or both shifts
                 return SELECT;
             case START_BUTTON:
                 return START;

@@ -81,7 +81,7 @@ public class DiscoveryClient extends DiscoveryThread {
             while (isRunning()) {
                 try {
                     listen();
-                    // ignore timeoutexceptions, they are necessary to be able to check isRunning()
+                    // ignore timeoutexceptions, they are necessary to be able to check started()
                 } catch (SocketTimeoutException ignored) {
                 }
             }

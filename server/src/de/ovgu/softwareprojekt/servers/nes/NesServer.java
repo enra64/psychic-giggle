@@ -29,6 +29,8 @@ public class NesServer extends Server {
      */
     private HashMap<NetworkDevice, SteeringWheel> mSteeringWheels = new HashMap<>();
 
+    private HashMap<NetworkDevice, NetworkDataSink> mAccPhaseDetectors = new HashMap<>();
+
     /**
      * This stack stores all available button configs. they will get taken out as more
      * clients connect, and stored back when clients are removed
@@ -94,9 +96,10 @@ public class NesServer extends Server {
      * Create a pipeline that filters linear acceleration data so that the acceleration phase
      * detection system can correctly recognize up/down events
      *
+     * @param wheel the SteeringWheel getting the up/down events
      * @throws IOException if the data sink could not be registered
      */
-    private void registerAccelerationPhaseDetection(SteeringWheel wheel) throws IOException {
+    private NetworkDataSink getAccelerationPhaseDetection(SteeringWheel wheel) throws IOException {
         // create the end, eg the phase detection system
         NetworkDataSink phaseDetection = new AccelerationPhaseDetection(wheel);
 
@@ -104,7 +107,7 @@ public class NesServer extends Server {
         FilterPipelineBuilder pipelineBuilder = new FilterPipelineBuilder();
         pipelineBuilder.append(new ThresholdingFilter(null, .5f, 2));
         pipelineBuilder.append(new AveragingFilter(5));
-        registerDataSink(pipelineBuilder.build(phaseDetection), SensorType.LinearAcceleration);
+        return pipelineBuilder.build(phaseDetection);
     }
 
     /**
@@ -138,8 +141,10 @@ public class NesServer extends Server {
             // pipe the gravity sensor directly into the steering wheel
             registerDataSink(newWheel, SensorType.Gravity);
 
-            // create and register the pipeline for the up/down detection
-            registerAccelerationPhaseDetection(newWheel);
+            // create, store and register the pipeline for the up/down detection
+            NetworkDataSink apd = getAccelerationPhaseDetection(newWheel);
+            registerDataSink(apd, SensorType.LinearAcceleration);
+            mAccPhaseDetectors.put(newClient, apd);
 
             // add the steering wheel to the list of network devices
             mSteeringWheels.put(newClient, newWheel);
@@ -160,20 +165,31 @@ public class NesServer extends Server {
     public void onClientDisconnected(NetworkDevice disconnectedClient) {
         System.out.println("Player " + disconnectedClient.name + " disconnected!");
 
-        // put back the button config
-        mButtonConfigs.push(mSteeringWheels.get(disconnectedClient).getButtonConfig());
-
-        mSteeringWheels.remove(disconnectedClient);
+        removeClient(disconnectedClient);
     }
 
     @Override
     public void onClientTimeout(NetworkDevice timeoutClient) {
         System.out.println("Player " + timeoutClient.name + " had a timeout!");
 
-        // put back the button config that was used by the removed client
-        mButtonConfigs.push(mSteeringWheels.get(timeoutClient).getButtonConfig());
+        removeClient(timeoutClient);
+    }
 
-        mSteeringWheels.remove(timeoutClient);
+    private void removeClient(NetworkDevice removeClient){
+        if(mSteeringWheels.get(removeClient) != null){
+            // put back the button config that was used by the removed client
+            mButtonConfigs.push(mSteeringWheels.get(removeClient).getButtonConfig());
+
+            // delete the steering wheel
+            mSteeringWheels.remove(removeClient);
+        }
+
+        // unregister its data sinks
+        try {
+            unregisterDataSink(mAccPhaseDetectors.get(removeClient));
+            unregisterDataSink(mSteeringWheels.get(removeClient));
+        } catch (IOException | NullPointerException ignored) {
+        }
     }
 
     @Override

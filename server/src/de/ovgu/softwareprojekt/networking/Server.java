@@ -248,7 +248,7 @@ public abstract class Server implements OnCommandListener, NetworkDataSink, Clie
 
         // add new data sink list if the requested sensor type has no sinks yet
         if (!mDataSinks.containsKey(requestedSensor))
-            mDataSinks.put(requestedSensor, new HashSet<NetworkDataSink>());
+            mDataSinks.put(requestedSensor, new HashSet<>());
 
         // add the new sink to the list of sink for the sensor
         mDataSinks.get(requestedSensor).add(dataSink);
@@ -265,6 +265,10 @@ public abstract class Server implements OnCommandListener, NetworkDataSink, Clie
      */
     private void unregisterDataSink(NetworkDataSink dataSink, SensorType requestedSensor) throws IOException {
         mDataSinks.get(requestedSensor).remove(dataSink);
+
+        // remove the sensor if it no longer has any data sinks
+        if(mDataSinks.get(requestedSensor).size() == 0)
+            mDataSinks.remove(requestedSensor);
 
         // force resetting the sensors on the client
         mClientHandlerFactory.updateSensors(mDataSinks.keySet());

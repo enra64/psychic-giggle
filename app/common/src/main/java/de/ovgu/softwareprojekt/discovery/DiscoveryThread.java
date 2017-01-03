@@ -60,7 +60,7 @@ public abstract class DiscoveryThread extends Thread {
      * This function must be overridden to complete the DiscoveryThread. You probably want to do something like
      * <pre>
      *     {@code
-     *     while(isRunning()){
+     *     while(started()){
      *         listen();
      *     }
      *     }

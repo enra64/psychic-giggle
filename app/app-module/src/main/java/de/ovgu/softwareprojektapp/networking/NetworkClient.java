@@ -3,10 +3,7 @@ package de.ovgu.softwareprojektapp.networking;
 import android.os.AsyncTask;
 
 import java.io.IOException;
-import java.net.ConnectException;
 import java.net.InetAddress;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import de.ovgu.softwareprojekt.DataSink;
 import de.ovgu.softwareprojekt.DataSource;
@@ -136,15 +133,6 @@ public class NetworkClient implements DataSink, ExceptionListener, OnCommandList
     }
 
     /**
-     * Start a timer that periodically checks whether we have recently communicated with the server.
-     * If the last connection is too old, it gives alarm, as the connection has probably timed out
-     */
-    private void startConnectionCheckTimer() {
-        // set the last connection to NOW (+ execution delay of timer) to avoid immediate disconnect
-        mConnectionWatch.start();
-    }
-
-    /**
      * Request a connection with the configured server
      */
     public void requestConnection() {
@@ -228,8 +216,8 @@ public class NetworkClient implements DataSink, ExceptionListener, OnCommandList
             case ConnectionRequestResponse:
                 ConnectionRequestResponse res = (ConnectionRequestResponse) command;
                 // if the connection was granted, start the connection check timer
-                if(res.grant)
-                    startConnectionCheckTimer();
+                if(res.grant && !mConnectionWatch.started())
+                    mConnectionWatch.start();
 
                 // relay the connection request
                 mCommandListener.onCommand(origin, command);
