@@ -32,7 +32,7 @@ public class MinimumAmplitudeChangeFilter extends AbstractFilter {
      * @param minimumChange the minimum of change a new data element must represent to be let through
      */
     public MinimumAmplitudeChangeFilter(@Nullable NetworkDataSink dataSink, float minimumChange) {
-        super(dataSink, 0, 1, 2);
+        super(dataSink);
         mMinimumChange = minimumChange;
     }
 

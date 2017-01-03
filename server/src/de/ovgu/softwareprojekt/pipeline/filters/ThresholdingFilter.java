@@ -33,7 +33,7 @@ public class ThresholdingFilter extends AbstractFilter {
      * @param axis             the axis which must reach <code>minimumAmplitude</code>, x->0, y->1, z->2
      */
     public ThresholdingFilter(@Nullable NetworkDataSink dataSink, float minimumAmplitude, int axis) {
-        super(dataSink, 0, 1, 2);
+        super(dataSink);
         mMinimumAmplitude = minimumAmplitude;
 
         switch (axis) {
