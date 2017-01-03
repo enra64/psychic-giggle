@@ -9,6 +9,7 @@ import de.ovgu.softwareprojekt.networking.Server;
 import de.ovgu.softwareprojekt.pipeline.FilterPipelineBuilder;
 import de.ovgu.softwareprojekt.pipeline.filters.AveragingFilter;
 import de.ovgu.softwareprojekt.pipeline.filters.ThresholdingFilter;
+import de.ovgu.softwareprojekt.pipeline.filters.UserSensitivityMultiplicator;
 
 import java.awt.*;
 import java.io.FileInputStream;
@@ -47,13 +48,14 @@ public class NesServer extends Server {
 
         // normalize both utilized sensors
         setSensorOutputRange(SensorType.LinearAcceleration, 10);
-        setSensorOutputRange(SensorType.Gravity, 100);
+        setSensorOutputRange(SensorType.Gravity, 333);
 
         // load button mappings: which player presses what when
         loadButtonMappings();
 
         // display the nes button layout
         super.setButtonLayout(readFile("../nesLayout.txt", "utf-8"));
+
     }
 
     /**

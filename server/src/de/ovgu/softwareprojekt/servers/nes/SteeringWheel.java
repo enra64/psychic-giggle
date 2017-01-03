@@ -91,9 +91,9 @@ public class SteeringWheel implements NetworkDataSink, AccelerationPhaseDetectio
 
         if(data.sensorType == SensorType.Gravity)
         {
-            if (data.data[YAXIS] < -15)
+            if (data.data[YAXIS] < -userSensitivity)
                 mSteeringBot.keyPress(mButtonConfig.LEFT);
-            else if (data.data[YAXIS] > 15)
+            else if (data.data[YAXIS] > userSensitivity)
                 mSteeringBot.keyPress(mButtonConfig.RIGHT);
 
             else {
