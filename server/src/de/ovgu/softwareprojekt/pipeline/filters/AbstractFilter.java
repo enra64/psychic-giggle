@@ -22,7 +22,7 @@ public abstract class AbstractFilter implements NetworkDataSink, NetworkDataSour
     protected NetworkDataSink mDataSink;
 
     /**
-     * Create a new {@link AbstractFilter} with the default axes.
+     * Create a new {@link AbstractFilter}.
      * @param sink either a valid network data sink, or null. if null, {@link #setDataSink(NetworkDataSink)}
      *             must be called prior to starting operations.
      */
@@ -31,12 +31,11 @@ public abstract class AbstractFilter implements NetworkDataSink, NetworkDataSour
     }
 
     /**
-     * Create a new {@link AbstractFilter} with the default axes
+     * Create a new {@link AbstractFilter} with a null DataSink
      */
-    public AbstractFilter(){
-
+    protected AbstractFilter() {
+        this(null);
     }
-
 
     /**
      * Save the data sink to be used for pushing new data

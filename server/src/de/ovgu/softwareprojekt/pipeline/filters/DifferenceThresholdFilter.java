@@ -31,7 +31,7 @@ public class DifferenceThresholdFilter extends AbstractFilter {
      * @param minimumChange the minimum of change a new data element must represent to be let through
      */
     public DifferenceThresholdFilter(@Nullable NetworkDataSink dataSink, float minimumChange) {
-        super(dataSink, 0, 1, 2);
+        super(dataSink);
         mMinimumChange = minimumChange;
     }
 
