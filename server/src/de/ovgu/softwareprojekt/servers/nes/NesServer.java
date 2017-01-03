@@ -36,12 +36,6 @@ public class NesServer extends Server {
     private Stack<ButtonConfig> mButtonConfigs = new Stack<>();
 
     /**
-     * preset list of controller button IDs
-     */
-    static final int A_BUTTON = 0, B_BUTTON = 1, X_BUTTON = 2, Y_BUTTON = 3, SELECT_BUTTON = 4, START_BUTTON = 5,
-            R_BUTTON = 6, L_BUTTON = 7;
-
-    /**
      * Create a new server. It will be offline (not using any sockets) until {@link #start()} is called.
      *
      * @param serverName if not null, this name will be used. otherwise, the devices hostname is used
@@ -50,18 +44,19 @@ public class NesServer extends Server {
         super(serverName);
 
         // normalize both utilized sensors
-        setSensorOutputRange(SensorType.LinearAcceleration,10);
-        setSensorOutputRange(SensorType.Gravity,100);
+        setSensorOutputRange(SensorType.LinearAcceleration, 10);
+        setSensorOutputRange(SensorType.Gravity, 100);
 
         // load button mappings: which player presses what when
         loadButtonMappings();
 
-    	// display the nes button layout
+        // display the nes button layout
         super.setButtonLayout(readFile("../nesLayout.txt", "utf-8"));
     }
 
     /**
      * Loads all available button mappings from ../keys.properties
+     *
      * @throws IOException if the file could not be found
      */
     private void loadButtonMappings() throws IOException {
@@ -72,7 +67,7 @@ public class NesServer extends Server {
         prop.load(input);
 
         // get the property value and print it out
-        for(int player = 3; player >= 0; player--){
+        for (int player = 3; player >= 0; player--) {
             try {
                 ButtonConfig newConfig = new ButtonConfig();
                 newConfig.A = ButtonConfig.getKeyEvent(prop.getProperty("BUTTON_A_" + player));
@@ -83,8 +78,12 @@ public class NesServer extends Server {
                 newConfig.START = ButtonConfig.getKeyEvent(prop.getProperty("BUTTON_START_" + player));
                 newConfig.R = ButtonConfig.getKeyEvent(prop.getProperty("BUTTON_R_" + player));
                 newConfig.L = ButtonConfig.getKeyEvent(prop.getProperty("BUTTON_L_" + player));
+                newConfig.LEFT = ButtonConfig.getKeyEvent(prop.getProperty("BUTTON_LEFT_" + player));
+                newConfig.UP = ButtonConfig.getKeyEvent(prop.getProperty("BUTTON_UP_" + player));
+                newConfig.RIGHT = ButtonConfig.getKeyEvent(prop.getProperty("BUTTON_RIGHT_" + player));
+                newConfig.DOWN = ButtonConfig.getKeyEvent(prop.getProperty("BUTTON_DOWN_" + player));
                 mButtonConfigs.add(newConfig);
-            } catch (InvalidButtonException e){
+            } catch (InvalidButtonException e) {
                 System.out.println("Player " + player + ": Keycode " + e.getMessage());
             }
         }
@@ -94,6 +93,7 @@ public class NesServer extends Server {
     /**
      * Create a pipeline that filters linear acceleration data so that the acceleration phase
      * detection system can correctly recognize up/down events
+     *
      * @throws IOException if the data sink could not be registered
      */
     private void registerAccelerationPhaseDetection(SteeringWheel wheel) throws IOException {
@@ -135,11 +135,11 @@ public class NesServer extends Server {
             // create a new steering wheel
             SteeringWheel newWheel = new SteeringWheel(mButtonConfigs.pop());
 
-	// pipe the gravity sensor directly into the steering wheel
-        registerDataSink(newWheel, SensorType.Gravity);
+            // pipe the gravity sensor directly into the steering wheel
+            registerDataSink(newWheel, SensorType.Gravity);
 
-        // create and register the pipeline for the up/down detection
-        registerAccelerationPhaseDetection(newWheel);
+            // create and register the pipeline for the up/down detection
+            registerAccelerationPhaseDetection(newWheel);
 
             // add the steering wheel to the list of network devices
             mSteeringWheels.put(newClient, newWheel);
@@ -188,7 +188,8 @@ public class NesServer extends Server {
 
     /**
      * Read all contents of a file into a string
-     * @param path file location
+     *
+     * @param path     file location
      * @param encoding expected encoding
      * @return a string representing the file content
      * @throws IOException if the file could not be found or read

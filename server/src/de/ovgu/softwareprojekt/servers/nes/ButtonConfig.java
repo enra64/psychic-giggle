@@ -1,62 +1,62 @@
 package de.ovgu.softwareprojekt.servers.nes;
 
-import org.omg.CORBA.DynAnyPackage.Invalid;
-
-import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.lang.reflect.Field;
 
 /**
  * Created by arne on 12/19/16.
  */
-public class ButtonConfig {
-    public int A, B, X, Y, SELECT, START, R, L;
+class ButtonConfig {
+    int A, B, X, Y, SELECT, START, R, L, RIGHT, LEFT, UP, DOWN;
 
-    public ButtonConfig(){
+    /**
+     * preset list of controller button IDs
+     */
+    private static final int A_BUTTON = 0, B_BUTTON = 1, X_BUTTON = 2, Y_BUTTON = 3, SELECT_BUTTON = 4, START_BUTTON = 5,
+            R_BUTTON = 6, L_BUTTON = 7, LEFT_BUTTON = 8, UP_BUTTON = 9, RIGHT_BUTTON = 10, DOWN_BUTTON = 11;
 
-    }
-
-    public ButtonConfig(int a, int b, int x, int y, int SELECT, int START, int r, int l) {
-        A = a;
-        B = b;
-        X = x;
-        Y = y;
-        this.SELECT = SELECT;
-        this.START = START;
-        R = r;
-        L = l;
+    ButtonConfig(){
     }
 
     /**
      * Map a button id to a awt key event code
+     *
      * @param psychicButtonId the button code sent by the app
      * @return null, or the corresponding awt button code
      */
     public Integer mapInput(int psychicButtonId) {
         switch (psychicButtonId) {
-            case NesServer.A_BUTTON:
+            case A_BUTTON:
                 return A;
-            case NesServer.B_BUTTON:
+            case B_BUTTON:
                 // May use Z actually ingame ... but shouldn't
                 return B;
-            case NesServer.X_BUTTON:
+            case X_BUTTON:
                 return X;
-            case NesServer.Y_BUTTON:
+            case Y_BUTTON:
                 return Y;
-            case NesServer.SELECT_BUTTON:
+            case SELECT_BUTTON:
                 // Presses left shift or both shifts
                 return SELECT;
-            case NesServer.START_BUTTON:
+            case START_BUTTON:
                 return START;
-            case NesServer.R_BUTTON:
+            case R_BUTTON:
                 return R;
-            case NesServer.L_BUTTON:
+            case L_BUTTON:
                 return L;
+            case LEFT_BUTTON:
+                return LEFT;
+            case UP_BUTTON:
+                return UP;
+            case RIGHT_BUTTON:
+                return RIGHT;
+            case DOWN_BUTTON:
+                return DOWN;
             default:
                 return null;
         }
     }
-    
+
     static int getKeyEvent(String keyEvent) throws InvalidButtonException {
         try {
             Field keyEventType = KeyEvent.class.getField(keyEvent);

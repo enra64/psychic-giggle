@@ -92,17 +92,15 @@ public class SteeringWheel implements NetworkDataSink, AccelerationPhaseDetectio
         if(data.sensorType == SensorType.Gravity)
         {
             if (data.data[YAXIS] < -15)
-                mSteeringBot.keyPress(KeyEvent.VK_LEFT);
-
+                mSteeringBot.keyPress(mButtonConfig.LEFT);
             else if (data.data[YAXIS] > 15)
-                mSteeringBot.keyPress(KeyEvent.VK_RIGHT);
+                mSteeringBot.keyPress(mButtonConfig.RIGHT);
 
             else {
-                mSteeringBot.keyRelease(KeyEvent.VK_LEFT);
-                mSteeringBot.keyRelease(KeyEvent.VK_RIGHT);
+                mSteeringBot.keyRelease(mButtonConfig.LEFT);
+                mSteeringBot.keyRelease(mButtonConfig.RIGHT);
             }
         }
-
     }
 
 
@@ -119,26 +117,26 @@ public class SteeringWheel implements NetworkDataSink, AccelerationPhaseDetectio
         try { Runtime.getRuntime().exec("notify-send --expire-time=50 up"); } catch (IOException ignored) { }
 
         System.out.println("onUp");
-        mSteeringBot.keyPress(KeyEvent.VK_DOWN);
+        mSteeringBot.keyPress(mButtonConfig.DOWN);
         mSteeringBot.delay(5);
-        mSteeringBot.keyPress(KeyEvent.VK_X);
+        mSteeringBot.keyPress(mButtonConfig.A);
         mSteeringBot.delay(30);
-        mSteeringBot.keyRelease(KeyEvent.VK_X);
-        mSteeringBot.keyRelease(KeyEvent.VK_DOWN);
+        mSteeringBot.keyRelease(mButtonConfig.A);
+        mSteeringBot.keyRelease(mButtonConfig.DOWN);
     }
 
     @Override
     public void onDownMovement() {
-        //WARNING: ONLY WORKS WHEN USING PROPERLY CONFIGURED COMPUTER
+        //WARNING: ONLY WORKS WHEN USING PROPERLY CONFIGURED COMPUTER (i3, notify-send)
         try { Runtime.getRuntime().exec("notify-send --expire-time=50 down"); } catch (IOException ignored) { }
 
         System.out.println("onDown");
-        mSteeringBot.keyPress(KeyEvent.VK_UP);
+        mSteeringBot.keyPress(mButtonConfig.UP);
         mSteeringBot.delay(5);
-        mSteeringBot.keyPress(KeyEvent.VK_X);
+        mSteeringBot.keyPress(mButtonConfig.A);
         mSteeringBot.delay(30);
-        mSteeringBot.keyRelease(KeyEvent.VK_X);
+        mSteeringBot.keyRelease(mButtonConfig.A);
         mSteeringBot.delay(5);
-        mSteeringBot.keyRelease(KeyEvent.VK_UP);
+        mSteeringBot.keyRelease(mButtonConfig.UP);
     }
 }
