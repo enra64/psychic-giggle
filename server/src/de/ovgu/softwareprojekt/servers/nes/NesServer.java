@@ -178,7 +178,6 @@ public class NesServer extends Server {
 
     @Override
     public void onResetPosition(NetworkDevice origin) {
-        // TODO: implement reset
     }
 
     @Override
