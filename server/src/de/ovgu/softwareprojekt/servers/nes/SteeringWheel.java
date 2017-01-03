@@ -11,7 +11,7 @@ import java.awt.event.KeyEvent;
 import java.io.IOException;
 
 /**
- * Created by Ulrich on 12.12.2016.
+ * Created by Ulrich on 12.12.2016
  * This class is responsible for steering the player in simple racing games
  */
 public class SteeringWheel implements NetworkDataSink, AccelerationPhaseDetection.AccelerationListener {
@@ -80,7 +80,7 @@ public class SteeringWheel implements NetworkDataSink, AccelerationPhaseDetectio
      * <br/>
      * the accelerometer is responsible for throwing items and up, down movement in the menu
      *
-     * @param data            pipeline here is either the gyroscope or acc. pipeline //TODO das verstehe ich nicht -Arne
+     * @param data            contains sensor data
      * @param origin          where the sensor data comes from
      * @param userSensitivity the value set by the user. may be (as here) ignored when applying a custom sensitivity
      *                        is too annoying.

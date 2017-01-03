@@ -160,7 +160,8 @@ public class ConnectionWatch extends TimerTask {
                 mExceptionListener.onException(ConnectionWatch.this, e, "CONNECTION_WATCH_CHECK_FAILED: Could not check connection; probably offline.");
             }
         } else {
-            if ((System.currentTimeMillis() - mLastCheckEventTimestamp) > MAXIMUM_CLIENT_RESPONSE_DELAY)
+            long delay = System.currentTimeMillis() - mLastCheckEventTimestamp;
+            if (delay > MAXIMUM_CLIENT_RESPONSE_DELAY)
                 mTimeoutListener.onTimeout(mLastCheckEventTimestamp - mLastRequestTimestamp);
         }
     }

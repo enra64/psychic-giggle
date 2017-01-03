@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -241,7 +242,9 @@ public class DiscoveryActivity extends AppCompatActivity implements OnDiscoveryL
 
     @Override
     public void onException(Object origin, Exception exception, String info) {
-        //TODO: wörkwörk markus (to be implemented)
+
+        Log.w(origin.toString(), info, exception);
+        exception.printStackTrace();
 
     }
 }
