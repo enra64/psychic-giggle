@@ -13,10 +13,8 @@ import java.io.IOException;
  * provides the DataSink and axes
  */
 public abstract class AbstractFilter implements NetworkDataSink, NetworkDataSource {
-    /**
-     * TODO some axis swapping thing
-     */
-    protected final int XAXIS, YAXIS, ZAXIS;
+    // constants are the standard ids from android sensors/sensor data
+    protected final int XAXIS = 0, YAXIS = 1, ZAXIS =2;
 
     /**
      * The data sink all data processed by this filter will be dumped into
@@ -24,25 +22,11 @@ public abstract class AbstractFilter implements NetworkDataSink, NetworkDataSour
     protected NetworkDataSink mDataSink;
 
     /**
-     *
-     * @param sink either a valid network data sink, or null. if null, {@link #setDataSink(NetworkDataSink)}
-     *             must be called prior to starting operations.
-     * @param xaxis // TODO see AbstractFilter.java:52
-     * @param yaxis
-     * @param zaxis
-     */
-    public AbstractFilter(@Nullable NetworkDataSink sink, int xaxis, int yaxis, int zaxis) {
-        this(xaxis, yaxis, zaxis);
-        mDataSink = sink;
-    }
-
-    /**
      * Create a new {@link AbstractFilter} with the default axes.
      * @param sink either a valid network data sink, or null. if null, {@link #setDataSink(NetworkDataSink)}
      *             must be called prior to starting operations.
      */
     public AbstractFilter(@Nullable NetworkDataSink sink) {
-        this();
         mDataSink = sink;
     }
 
@@ -50,23 +34,9 @@ public abstract class AbstractFilter implements NetworkDataSink, NetworkDataSour
      * Create a new {@link AbstractFilter} with the default axes
      */
     public AbstractFilter(){
-        this(0, 1, 2);
+
     }
 
-    /**
-     * Create a new abstract filter with specified axes
-     * @param xaxis //TODO we still have no idea what these axes mean. do the child classes need to
-     *                TODO properly implement this to work?? could we possibly override onData to swap
-     *                TODO the values before giving them to child classes? is that even possible?
-     *                TODO maybe some kind of forced super() call in the onData?
-     * @param yaxis //TODO do not remove this todo until we have a proper description
-     * @param zaxis //TODO team "uuuh we have no todos left" im looking at you
-     */
-    public AbstractFilter(int xaxis, int yaxis, int zaxis){
-        XAXIS = xaxis;
-        YAXIS = yaxis;
-        ZAXIS = zaxis;
-    }
 
     /**
      * Save the data sink to be used for pushing new data
