@@ -97,11 +97,12 @@ public class NesServer extends Server {
      * detection system can correctly recognize up/down events
      *
      * @param wheel the SteeringWheel getting the up/down events
+     * @param newClient
      * @throws IOException if the data sink could not be registered
      */
-    private NetworkDataSink getAccelerationPhaseDetection(SteeringWheel wheel) throws IOException {
+    private NetworkDataSink getAccelerationPhaseDetection(SteeringWheel wheel, NetworkDevice newClient) throws IOException {
         // create the end, eg the phase detection system
-        NetworkDataSink phaseDetection = new AccelerationPhaseDetection(wheel);
+        NetworkDataSink phaseDetection = new AccelerationPhaseDetection(wheel, newClient);
 
         // create a filter pipeline ending in the acceleration phase detection system
         FilterPipelineBuilder pipelineBuilder = new FilterPipelineBuilder();
@@ -142,7 +143,7 @@ public class NesServer extends Server {
             registerDataSink(newWheel, SensorType.Gravity);
 
             // create, store and register the pipeline for the up/down detection
-            NetworkDataSink apd = getAccelerationPhaseDetection(newWheel);
+            NetworkDataSink apd = getAccelerationPhaseDetection(newWheel, newClient);
             registerDataSink(apd, SensorType.LinearAcceleration);
             mAccPhaseDetectors.put(newClient, apd);
 
@@ -175,6 +176,10 @@ public class NesServer extends Server {
         removeClient(timeoutClient);
     }
 
+    /**
+     * De-initializes a client in this server
+     * @param removeClient the client to be removed
+     */
     private void removeClient(NetworkDevice removeClient){
         if(mSteeringWheels.get(removeClient) != null){
             // put back the button config that was used by the removed client

@@ -14,7 +14,7 @@ import java.net.InetAddress;
 import java.util.*;
 
 @SuppressWarnings("WeakerAccess")
-class ClientConnectionHandler {
+class ClientConnectionHandler implements ClientListener {
     /**
      * Name of the server as displayed to discovery clients
      */
@@ -91,7 +91,7 @@ class ClientConnectionHandler {
                 mServerName,
                 mExceptionListener,
                 mCommandListener,
-                mClientListener,
+                this,
                 mDataSink);
 
         // set the requested output ranges
@@ -246,14 +246,14 @@ class ClientConnectionHandler {
      * Force each client to update his buttons
      * chooses between {@link ClientConnection#updateButtons(String)} and {@link ClientConnection#updateButtons(Map)}
      * if {@link #mButtonXML} is given, it is preferred over [{@link #mButtonList}
+     *
      * @throws IOException if the command could not be sent
      */
     private void updateButtons() throws IOException {
         for (ClientConnection client : mClientConnections) {
             if (mButtonXML != null) {
                 client.updateButtons(mButtonXML);
-            }
-            else if(mButtonList != null){
+            } else if (mButtonList != null) {
                 client.updateButtons(mButtonList);
             }
         }
@@ -279,5 +279,34 @@ class ClientConnectionHandler {
         mRequiredSensors = requiredSensors;
         for (ClientConnection client : mClientConnections)
             client.updateSensors(mRequiredSensors);
+    }
+
+    /**
+     * Forward the accept client message to the client listener
+     *
+     * @param newClient the new clients identification
+     * @return true if the client should be accepted
+     */
+    @Override
+    public boolean acceptClient(NetworkDevice newClient) {
+        return mClientListener.acceptClient(newClient);
+    }
+
+    @Override
+    public void onClientDisconnected(NetworkDevice disconnectedClient) {
+        // remove the client from the list of known connections
+        mClientConnections.remove(getClientHandler(disconnectedClient));
+
+        // forward the disconnect
+        mClientListener.onClientDisconnected(disconnectedClient);
+    }
+
+    @Override
+    public void onClientTimeout(NetworkDevice timeoutClient) {
+        // remove the client from the list of known connections
+        mClientConnections.remove(getClientHandler(timeoutClient));
+
+        // forward the timeout
+        mClientListener.onClientTimeout(timeoutClient);
     }
 }
