@@ -10,6 +10,7 @@ import de.ovgu.softwareprojekt.pipeline.FilterPipelineBuilder;
 import de.ovgu.softwareprojekt.pipeline.filters.AveragingFilter;
 import de.ovgu.softwareprojekt.pipeline.filters.ThresholdingFilter;
 import de.ovgu.softwareprojekt.pipeline.filters.UserSensitivityMultiplicator;
+import de.ovgu.softwareprojekt.pipeline.splitters.ClientSplitter;
 
 import java.awt.*;
 import java.io.FileInputStream;
@@ -39,6 +40,16 @@ public class NesServer extends Server {
     private Stack<ButtonConfig> mButtonConfigs = new Stack<>();
 
     /**
+     * This client splitter makes sure that all linear acceleration data is only sent to the correct pipeline
+     */
+    private ClientSplitter mLinearAccelerationSplitter = new ClientSplitter();
+
+    /**
+     * This client splitter makes sure that all gravity data is only sent to the correct pipeline
+     */
+    private ClientSplitter mGravitySplitter = new ClientSplitter();
+
+    /**
      * Create a new server. It will be offline (not using any sockets) until {@link #start()} is called.
      *
      * @param serverName if not null, this name will be used. otherwise, the devices hostname is used
@@ -56,6 +67,8 @@ public class NesServer extends Server {
         // display the nes button layout
         super.setButtonLayout(readFile("../nesLayout.txt", "utf-8"));
 
+        registerDataSink(mGravitySplitter, SensorType.Gravity);
+        registerDataSink(mLinearAccelerationSplitter, SensorType.LinearAcceleration);
     }
 
     /**
@@ -99,12 +112,11 @@ public class NesServer extends Server {
      * detection system can correctly recognize up/down events
      *
      * @param wheel the SteeringWheel getting the up/down events
-     * @param newClient
      * @throws IOException if the data sink could not be registered
      */
-    private NetworkDataSink getAccelerationPhaseDetection(SteeringWheel wheel, NetworkDevice newClient) throws IOException {
+    private NetworkDataSink getAccelerationPhaseDetection(SteeringWheel wheel) throws IOException {
         // create the end, eg the phase detection system
-        NetworkDataSink phaseDetection = new AccelerationPhaseDetection(wheel, newClient);
+        NetworkDataSink phaseDetection = new AccelerationPhaseDetection(wheel);
 
         // create a filter pipeline ending in the acceleration phase detection system
         FilterPipelineBuilder pipelineBuilder = new FilterPipelineBuilder();
@@ -139,14 +151,14 @@ public class NesServer extends Server {
         System.out.println("Player " + newClient.name + " connected");
         try {
             // create a new steering wheel
-            SteeringWheel newWheel = new SteeringWheel(mButtonConfigs.pop());
+            SteeringWheel newWheel = new SteeringWheel(mButtonConfigs.pop(), newClient);
 
             // pipe the gravity sensor directly into the steering wheel
-            registerDataSink(newWheel, SensorType.Gravity);
+            mGravitySplitter.addDataSink(newClient, newWheel);
 
             // create, store and register the pipeline for the up/down detection
-            NetworkDataSink apd = getAccelerationPhaseDetection(newWheel, newClient);
-            registerDataSink(apd, SensorType.LinearAcceleration);
+            NetworkDataSink apd = getAccelerationPhaseDetection(newWheel);
+            mLinearAccelerationSplitter.addDataSink(newClient, apd);
             mAccPhaseDetectors.put(newClient, apd);
 
             // add the steering wheel to the list of network devices

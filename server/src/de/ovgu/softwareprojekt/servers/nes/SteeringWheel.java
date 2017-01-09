@@ -37,15 +37,12 @@ public class SteeringWheel implements NetworkDataSink, AccelerationPhaseDetectio
      */
     private ButtonConfig mButtonConfig;
 
-    private int counter;
-
     /**
      * @throws AWTException is thrown when low level input is prohibit by system
      */
-    SteeringWheel(ButtonConfig config) throws AWTException {
+    SteeringWheel(ButtonConfig config, NetworkDevice newClient) throws AWTException {
         mSteeringBot = new Robot(); //emulates peripheral device input
         lastAccActivation = System.currentTimeMillis();
-        counter = 0;
         mButtonConfig = config;
     }
 

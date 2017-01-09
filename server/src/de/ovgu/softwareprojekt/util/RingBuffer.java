@@ -70,6 +70,11 @@ public class RingBuffer<E> {
         if (mSize < mBuffer.size())
             mSize++;
 
+        if(mIndex == mBuffer.size()){
+            System.out.println("index = size");
+            return mBuffer.get(mBuffer.size());
+        }
+
         E tmp = mBuffer.get(mIndex);
 
         // set the element

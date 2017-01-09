@@ -65,6 +65,9 @@ class ClientConnectionHandler implements ClientListener {
      */
     private NetworkDataSink mDataSink;
 
+    /**
+     * This string is either null or the current description of the button layout.
+     */
     private String mButtonXML = null;
 
 
@@ -268,7 +271,6 @@ class ClientConnectionHandler implements ClientListener {
         for (ClientConnection client : mClientConnections)
             client.updateSpeeds(mSensorSpeeds.entrySet());
     }
-
 
     /**
      * Force each client to update his required sensors

@@ -29,9 +29,8 @@ public class AccelerationPhaseDetection implements NetworkDataSink {
      *
      * @param listener this listener will be notified when movements have been identified
      */
-    AccelerationPhaseDetection(AccelerationListener listener, NetworkDevice client) {
+    AccelerationPhaseDetection(AccelerationListener listener) {
         mListener = listener;
-        mClient = client;
     }
 
     /**
@@ -39,11 +38,6 @@ public class AccelerationPhaseDetection implements NetworkDataSink {
      * event due to bad phase state.
      */
     private int mTimeoutCounter = 0;
-
-    /**
-     * The network device of which we should
-     */
-    private NetworkDevice mClient;
 
     /**
      * This is the maximum event count the detector will wait until the current cycle is aborted.
@@ -71,17 +65,14 @@ public class AccelerationPhaseDetection implements NetworkDataSink {
     private AccelerationListener mListener;
 
     /**
-     *
-     * @param networkDevice where the data stems from
-     * @param sensorData the sensor data
+     * @param networkDevice   where the data stems from
+     * @param sensorData      the sensor data
      * @param userSensitivity currently ignored to simplify detection
      */
     @Override
     public void onData(NetworkDevice networkDevice, SensorData sensorData, float userSensitivity) {
-        if(networkDevice.equals(mClient)) {
-            float threshold = getThreshold();
-            onData(sensorData.data[2] > threshold, sensorData.data[2] < -threshold);
-        }
+        float threshold = getThreshold();
+        onData(sensorData.data[2] > threshold, sensorData.data[2] < -threshold);
     }
 
     /**

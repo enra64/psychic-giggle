@@ -1,7 +1,6 @@
 package de.ovgu.softwareprojekt.networking;
 
 import com.sun.istack.internal.Nullable;
-import de.ovgu.softwareprojekt.DataSink;
 import de.ovgu.softwareprojekt.NetworkDataSink;
 import de.ovgu.softwareprojekt.SensorData;
 import de.ovgu.softwareprojekt.SensorType;
@@ -25,7 +24,7 @@ import java.util.HashSet;
  * 2) A CommandConnection to be able to reliable communicate about important stuff, like enabling sensors
  * 3) A DataConnection to rapidly transmit sensor data
  */
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "WeakerAccess"})
 public abstract class Server implements OnCommandListener, NetworkDataSink, ClientListener, ExceptionListener, ButtonListener, ResetListener {
     /**
      * Server handling responding to discovery broadcasts
@@ -161,21 +160,6 @@ public abstract class Server implements OnCommandListener, NetworkDataSink, Clie
                     }
                 }
                 break;
-            case EndConnection:
-                // notify listener of disconnect
-                EndConnection endConnection = (EndConnection) command;
-                endConnection.self.address = origin.getHostAddress();
-                onClientDisconnected(endConnection.self);
-
-                // remove that client
-                try {
-                    mClientHandlerFactory.getClientHandler(endConnection.self).close();
-                } catch (NullPointerException e) {
-                    // yeah this shouldn't happen
-                    onException(this, e, "Could not find client that ended connection!");
-                }
-                break;
-
             case ButtonClick:
                 onButtonClick((ButtonClick) command, mClientHandlerFactory.getClientHandler(origin).getClient());
                 break;
@@ -222,7 +206,11 @@ public abstract class Server implements OnCommandListener, NetworkDataSink, Clie
     @Override
     public final void onData(NetworkDevice origin, SensorData data, float userSensitivity){
         // relay the data to all sinks registered for this sensor type
-        mDataSinks.get(data.sensorType).forEach(sink -> sink.onData(origin, data, userSensitivity));
+        //mDataSinks.get(data.sensorType).forEach(sink -> sink.onData(origin, data, userSensitivity));
+        HashSet<NetworkDataSink> registeredSinks = mDataSinks.get(data.sensorType);
+        for(NetworkDataSink sink : registeredSinks)
+            sink.onData(origin, data, userSensitivity);
+
     }
 
     /**
