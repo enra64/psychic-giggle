@@ -78,12 +78,10 @@ public class AccelerationPhaseDetection implements NetworkDataSink {
      */
     @Override
     public void onData(NetworkDevice networkDevice, SensorData sensorData, float userSensitivity) {
-        if(networkDevice.equals(mClient)){
+        if(networkDevice.equals(mClient)) {
             float threshold = getThreshold();
             onData(sensorData.data[2] > threshold, sensorData.data[2] < -threshold);
         }
-        else
-            System.out.println("na");
     }
 
     /**
