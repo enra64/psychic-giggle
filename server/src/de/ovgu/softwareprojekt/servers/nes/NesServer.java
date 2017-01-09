@@ -150,7 +150,7 @@ public class NesServer extends Server {
         System.out.println("Player " + newClient.name + " connected");
         try {
             // create a new steering wheel
-            SteeringWheel newWheel = new SteeringWheel(mButtonConfigs.pop(), newClient);
+            SteeringWheel newWheel = new SteeringWheel(mButtonConfigs.pop());
 
             // pipe the gravity sensor directly into the steering wheel
             mGravitySplitter.addDataSink(newClient, newWheel);
