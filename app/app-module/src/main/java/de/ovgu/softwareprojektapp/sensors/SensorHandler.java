@@ -124,8 +124,9 @@ public class SensorHandler {
             setSensor(sensor.getKey(), sensor.getValue());
     }
 
-    //Keine gute Idee, aber alles für die Wissenschaft
-    //TODO: Maybe not a safe idea
+    /**
+     * returns a EnumMap with all sensors
+     */
     public EnumMap<SensorType, AbstractSensor> getSensors()
     {
         return mSensors;

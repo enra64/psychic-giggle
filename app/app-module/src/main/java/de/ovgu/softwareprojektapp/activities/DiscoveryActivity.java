@@ -121,16 +121,9 @@ public class DiscoveryActivity extends AppCompatActivity implements OnDiscoveryL
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.menu_settings) {
 
-            //Act as if every sensor is active, when there is no server connection yet
-            boolean[] activeSensors = new boolean[SensorType.values().length];
-            for(int i = 0; i < SensorType.values().length; i++)
-            {
-                activeSensors[i] = true;
-            }
 
             //create intent to open OptionsActivity with extra information about activeSensors-status
             Intent intent = new Intent(DiscoveryActivity.this, OptionsActivity.class);
-            intent.putExtra(OptionsActivity.EXTRA_ACTIVE_SENSORS, activeSensors);
             DiscoveryActivity.this.startActivity(intent);
         }
         // invoke the superclass if we didn't want to handle the click

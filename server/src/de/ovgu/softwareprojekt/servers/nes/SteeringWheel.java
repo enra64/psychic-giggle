@@ -144,4 +144,20 @@ public class SteeringWheel implements NetworkDataSink, AccelerationPhaseDetectio
         mSteeringBot.delay(5);
         mSteeringBot.keyRelease(mButtonConfig.UP);
     }
+
+    public void releaseAllKeys()
+    {
+        mSteeringBot.keyRelease(mButtonConfig.A);
+        mSteeringBot.keyRelease(mButtonConfig.B);
+        mSteeringBot.keyRelease(mButtonConfig.X);
+        mSteeringBot.keyRelease(mButtonConfig.Y);
+        mSteeringBot.keyRelease(mButtonConfig.LEFT);
+        mSteeringBot.keyRelease(mButtonConfig.RIGHT);
+        mSteeringBot.keyRelease(mButtonConfig.UP);
+        mSteeringBot.keyRelease(mButtonConfig.DOWN);
+        mSteeringBot.keyRelease(mButtonConfig.L);
+        mSteeringBot.keyRelease(mButtonConfig.R);
+        mSteeringBot.keyRelease(mButtonConfig.START);
+        mSteeringBot.keyRelease(mButtonConfig.SELECT);
+    }
 }

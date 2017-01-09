@@ -52,7 +52,7 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
             EXTRA_SERVER_PORT_COMMAND = "CommandPort",
             EXTRA_SERVER_PORT_DATA = "DataPort",
             EXTRA_SELF_NAME = "SelfName",
-            EXTRA_ACTIVE_SENSORS = "ActiveSensor"; // TODO: May rename this one
+            EXTRA_ACTIVE_SENSORS = "ActiveSensor";
 
     /**
      * result codes for the activity

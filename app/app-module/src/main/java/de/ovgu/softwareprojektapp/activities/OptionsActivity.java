@@ -39,7 +39,7 @@ public class OptionsActivity extends AppCompatActivity implements SeekBar.OnSeek
     static final String
             EXTRA_SERVER_ADDRESS = "Address",
             EXTRA_SERVER_PORT_COMMAND = "CommandPort",
-            EXTRA_ACTIVE_SENSORS = "ActiveSensor"; //TODO: May rename this one
+            EXTRA_ACTIVE_SENSORS = "ActiveSensor";
 
     /**
      * the linear layout containing all options
@@ -133,12 +133,12 @@ public class OptionsActivity extends AppCompatActivity implements SeekBar.OnSeek
      */
     private void createSensorOptions() {
 
-        Bundle getExtras = getIntent().getExtras();
+        boolean[] sensors = getIntent().getBooleanArrayExtra(EXTRA_ACTIVE_SENSORS);
 
         for (int i = 0; i < mNumberOfSensors; i++) {
             //only create seekbar and text if the server needs these sensors or
             //when there is no server connection
-            if(getExtras.getBooleanArray(EXTRA_ACTIVE_SENSORS)[i]){
+            if(sensors == null || sensors[i]){
                 // Create a header for the seekbar
                 TextView text = new TextView(OptionsActivity.this);
                 text.setText(SensorType.values()[i].toString());
