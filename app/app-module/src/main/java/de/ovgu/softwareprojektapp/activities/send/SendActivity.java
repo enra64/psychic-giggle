@@ -3,6 +3,7 @@ package de.ovgu.softwareprojektapp.activities.send;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.hardware.Sensor;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -50,7 +51,8 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
             EXTRA_SERVER_PORT_DISCOVERY = "DiscoveryPort",
             EXTRA_SERVER_PORT_COMMAND = "CommandPort",
             EXTRA_SERVER_PORT_DATA = "DataPort",
-            EXTRA_SELF_NAME = "SelfName";
+            EXTRA_SELF_NAME = "SelfName",
+            EXTRA_ACTIVE_SENSORS = "ActiveSensor"; // TODO: May rename this one
 
     /**
      * result codes for the activity
@@ -392,9 +394,16 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
      */
     private void goToOptions() {
         Bundle in = getIntent().getExtras();
+
+        boolean[] activeSensors = new boolean[SensorType.values().length];
+        for(int i = 0; i < SensorType.values().length; i++)
+        {
+            activeSensors[i] = mSensorHandler.getSensors().get(SensorType.values()[i]).isRegistered();
+        }
         Intent intent = new Intent(SendActivity.this, OptionsActivity.class);
         intent.putExtra(EXTRA_SERVER_PORT_COMMAND, in.getInt(EXTRA_SERVER_PORT_COMMAND));
         intent.putExtra(EXTRA_SERVER_ADDRESS, in.getString(EXTRA_SERVER_ADDRESS));
+        intent.putExtra(EXTRA_ACTIVE_SENSORS, activeSensors);
         SendActivity.this.startActivity(intent);
     }
 }

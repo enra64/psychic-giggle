@@ -124,6 +124,13 @@ public class SensorHandler {
             setSensor(sensor.getKey(), sensor.getValue());
     }
 
+    //Keine gute Idee, aber alles für die Wissenschaft
+    //TODO: Maybe not a safe idea
+    public EnumMap<SensorType, AbstractSensor> getSensors()
+    {
+        return mSensors;
+    }
+
     /**
      * This method tries to dis- or enable a certain sensor.
      *
@@ -144,6 +151,7 @@ public class SensorHandler {
             // disable the sensor if it was already instantiated
             else if (mSensors.containsKey(sensorType))
                 mSensors.get(sensorType).setRunning(false);
+
         } catch (NoSuchMethodException | ClassNotFoundException | InstantiationException | InvocationTargetException | IllegalAccessException | IOException e) {
             throw new SensorNotFoundException("could not " + (enable ? "enable " : "disable ") + "sensor", sensorType);
         }

@@ -20,6 +20,7 @@ import java.security.InvalidParameterException;
 import java.util.LinkedList;
 import java.util.List;
 
+import de.ovgu.softwareprojekt.SensorType;
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
 import de.ovgu.softwareprojekt.discovery.OnDiscoveryListener;
 import de.ovgu.softwareprojekt.misc.ExceptionListener;
@@ -118,8 +119,20 @@ public class DiscoveryActivity extends AppCompatActivity implements OnDiscoveryL
      */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.menu_settings)
-            startActivity(new Intent(this, OptionsActivity.class));
+        if (item.getItemId() == R.id.menu_settings) {
+
+            //Act as if every sensor is active, when there is no server connection yet
+            boolean[] activeSensors = new boolean[SensorType.values().length];
+            for(int i = 0; i < SensorType.values().length; i++)
+            {
+                activeSensors[i] = true;
+            }
+
+            //create intent to open OptionsActivity with extra information about activeSensors-status
+            Intent intent = new Intent(DiscoveryActivity.this, OptionsActivity.class);
+            intent.putExtra(OptionsActivity.EXTRA_ACTIVE_SENSORS, activeSensors);
+            DiscoveryActivity.this.startActivity(intent);
+        }
         // invoke the superclass if we didn't want to handle the click
         return super.onOptionsItemSelected(item);
     }
