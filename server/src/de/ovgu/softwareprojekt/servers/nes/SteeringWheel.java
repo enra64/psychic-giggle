@@ -1,11 +1,13 @@
 package de.ovgu.softwareprojekt.servers.nes;
 
+import de.ovgu.softwareprojekt.DataSink;
 import de.ovgu.softwareprojekt.NetworkDataSink;
 import de.ovgu.softwareprojekt.SensorData;
 import de.ovgu.softwareprojekt.SensorType;
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
 
 import java.awt.*;
+import java.awt.event.KeyEvent;
 import java.io.IOException;
 
 /**
@@ -31,9 +33,14 @@ public class SteeringWheel implements NetworkDataSink, AccelerationPhaseDetectio
     private ButtonConfig mButtonConfig;
 
     /**
+     * Constant which describes the maximum sensitivty value
+     */
+    private final int MAX_SENSITIVITY = 100;
+
+    /**
      * @throws AWTException is thrown when low level input is prohibit by system
      */
-    SteeringWheel(ButtonConfig config, NetworkDevice newClient) throws AWTException {
+    SteeringWheel(ButtonConfig config) throws AWTException {
         mSteeringBot = new Robot(); //emulates peripheral device input
         mButtonConfig = config;
     }
@@ -80,9 +87,9 @@ public class SteeringWheel implements NetworkDataSink, AccelerationPhaseDetectio
 
         if(data.sensorType == SensorType.Gravity)
         {
-            if (data.data[YAXIS] < -userSensitivity)
+            if (data.data[YAXIS] < (-MAX_SENSITIVITY + userSensitivity))
                 mSteeringBot.keyPress(mButtonConfig.LEFT);
-            else if (data.data[YAXIS] > userSensitivity)
+            else if (data.data[YAXIS] >(MAX_SENSITIVITY - userSensitivity))
                 mSteeringBot.keyPress(mButtonConfig.RIGHT);
 
             else {
@@ -127,5 +134,21 @@ public class SteeringWheel implements NetworkDataSink, AccelerationPhaseDetectio
         mSteeringBot.keyRelease(mButtonConfig.A);
         mSteeringBot.delay(5);
         mSteeringBot.keyRelease(mButtonConfig.UP);
+    }
+
+    public void releaseAllKeys()
+    {
+        mSteeringBot.keyRelease(mButtonConfig.A);
+        mSteeringBot.keyRelease(mButtonConfig.B);
+        mSteeringBot.keyRelease(mButtonConfig.X);
+        mSteeringBot.keyRelease(mButtonConfig.Y);
+        mSteeringBot.keyRelease(mButtonConfig.LEFT);
+        mSteeringBot.keyRelease(mButtonConfig.RIGHT);
+        mSteeringBot.keyRelease(mButtonConfig.UP);
+        mSteeringBot.keyRelease(mButtonConfig.DOWN);
+        mSteeringBot.keyRelease(mButtonConfig.L);
+        mSteeringBot.keyRelease(mButtonConfig.R);
+        mSteeringBot.keyRelease(mButtonConfig.START);
+        mSteeringBot.keyRelease(mButtonConfig.SELECT);
     }
 }

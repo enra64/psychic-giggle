@@ -178,7 +178,7 @@ public class NesServer extends Server {
     @Override
     public void onClientDisconnected(NetworkDevice disconnectedClient) {
         System.out.println("Player " + disconnectedClient.name + " disconnected!");
-
+        mSteeringWheels.get(disconnectedClient).releaseAllKeys();
         removeClient(disconnectedClient);
     }
 
@@ -186,6 +186,7 @@ public class NesServer extends Server {
     public void onClientTimeout(NetworkDevice timeoutClient) {
         System.out.println("Player " + timeoutClient.name + " had a timeout!");
 
+        mSteeringWheels.get(timeoutClient).releaseAllKeys();
         removeClient(timeoutClient);
     }
 
@@ -207,6 +208,17 @@ public class NesServer extends Server {
             unregisterDataSink(mAccPhaseDetectors.get(removeClient));
             unregisterDataSink(mSteeringWheels.get(removeClient));
         } catch (IOException | NullPointerException ignored) {
+        }
+    }
+
+    @Override
+    public void close()
+    {
+        super.close();
+
+        for(SteeringWheel sw :  mSteeringWheels.values())
+        {
+            sw.releaseAllKeys();
         }
     }
 
