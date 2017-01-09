@@ -37,6 +37,11 @@ public class SteeringWheel implements NetworkDataSink, AccelerationPhaseDetectio
      */
     private ButtonConfig mButtonConfig;
 
+    /**
+     * Constant which describes the maximum sensitivty value
+     */
+    private final int MAX_SENSITIVITY = 100;
+
     private int counter;
 
     /**
@@ -91,9 +96,9 @@ public class SteeringWheel implements NetworkDataSink, AccelerationPhaseDetectio
 
         if(data.sensorType == SensorType.Gravity)
         {
-            if (data.data[YAXIS] < -userSensitivity)
+            if (data.data[YAXIS] < (-MAX_SENSITIVITY + userSensitivity))
                 mSteeringBot.keyPress(mButtonConfig.LEFT);
-            else if (data.data[YAXIS] > userSensitivity)
+            else if (data.data[YAXIS] >(MAX_SENSITIVITY - userSensitivity))
                 mSteeringBot.keyPress(mButtonConfig.RIGHT);
 
             else {
