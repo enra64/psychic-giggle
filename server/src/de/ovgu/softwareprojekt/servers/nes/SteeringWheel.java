@@ -1,13 +1,11 @@
 package de.ovgu.softwareprojekt.servers.nes;
 
-import de.ovgu.softwareprojekt.DataSink;
 import de.ovgu.softwareprojekt.NetworkDataSink;
 import de.ovgu.softwareprojekt.SensorData;
 import de.ovgu.softwareprojekt.SensorType;
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
 
 import java.awt.*;
-import java.awt.event.KeyEvent;
 import java.io.IOException;
 
 /**
@@ -27,11 +25,6 @@ public class SteeringWheel implements NetworkDataSink, AccelerationPhaseDetectio
     private final int XAXIS = 0, YAXIS = 1, ZAXIS = 2;
 
     /**
-     * Meassures the time intervall between two accelerationSensor usages
-     */
-    private long lastAccActivation;
-
-    /**
      * This button config stores the awt buttons that should be pressed on certain app button
      * presses
      */
@@ -42,7 +35,6 @@ public class SteeringWheel implements NetworkDataSink, AccelerationPhaseDetectio
      */
     SteeringWheel(ButtonConfig config, NetworkDevice newClient) throws AWTException {
         mSteeringBot = new Robot(); //emulates peripheral device input
-        lastAccActivation = System.currentTimeMillis();
         mButtonConfig = config;
     }
 

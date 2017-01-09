@@ -71,7 +71,7 @@ public class AccelerationPhaseDetection implements NetworkDataSink {
      */
     @Override
     public void onData(NetworkDevice networkDevice, SensorData sensorData, float userSensitivity) {
-        float threshold = getThreshold();
+        float threshold = getThreshold() + 240 * (((100 - userSensitivity) - 50) / 100);
         onData(sensorData.data[2] > threshold, sensorData.data[2] < -threshold);
     }
 
@@ -82,11 +82,11 @@ public class AccelerationPhaseDetection implements NetworkDataSink {
      */
     private float getThreshold() {
         // the 3rd & last phase has the lowest amplitudes
-        if (mPhase3) return .2f;
+        if (mPhase3) return 40f;
         // the second phase has the highest amplitudes
-        if (mPhase2) return .75f;
+        if (mPhase2) return 160f;
         // the first phase has medium amplitudes
-        return .75f;
+        return 160f;
     }
 
     /**
