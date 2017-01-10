@@ -1,14 +1,14 @@
 package de.ovgu.softwareprojekt.servers.nes;
 
-import de.ovgu.softwareprojekt.DataSink;
 import de.ovgu.softwareprojekt.NetworkDataSink;
 import de.ovgu.softwareprojekt.SensorData;
 import de.ovgu.softwareprojekt.SensorType;
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
 
 import java.awt.*;
-import java.awt.event.KeyEvent;
 import java.io.IOException;
+
+import static de.ovgu.softwareprojekt.servers.nes.PsychicNesButton.*;
 
 /**
  * Created by Ulrich on 12.12.2016
@@ -47,7 +47,8 @@ public class SteeringWheel implements NetworkDataSink, AccelerationPhaseDetectio
 
     /**
      * Map app button input to robot events
-     * @param buttonID the pressed buttons id
+     *
+     * @param buttonID  the pressed buttons id
      * @param isPressed whether it is currently pressed or not
      */
     void controllerInput(int buttonID, boolean isPressed) {
@@ -64,7 +65,7 @@ public class SteeringWheel implements NetworkDataSink, AccelerationPhaseDetectio
     /**
      * Get the button config this steering wheel uses
      */
-    ButtonConfig getButtonConfig(){
+    ButtonConfig getButtonConfig() {
         return mButtonConfig;
     }
 
@@ -85,16 +86,15 @@ public class SteeringWheel implements NetworkDataSink, AccelerationPhaseDetectio
     public void onData(NetworkDevice origin, SensorData data, float userSensitivity) {
         //Check if player steers to the left or right by tilted distance
 
-        if(data.sensorType == SensorType.Gravity)
-        {
+        if (data.sensorType == SensorType.Gravity) {
             if (data.data[YAXIS] < (-MAX_SENSITIVITY + userSensitivity))
-                mSteeringBot.keyPress(mButtonConfig.LEFT);
-            else if (data.data[YAXIS] >(MAX_SENSITIVITY - userSensitivity))
-                mSteeringBot.keyPress(mButtonConfig.RIGHT);
+                mSteeringBot.keyPress(mButtonConfig.mapInput(LEFT_BUTTON));
+            else if (data.data[YAXIS] > (MAX_SENSITIVITY - userSensitivity))
+                mSteeringBot.keyPress(mButtonConfig.mapInput(RIGHT_BUTTON));
 
             else {
-                mSteeringBot.keyRelease(mButtonConfig.LEFT);
-                mSteeringBot.keyRelease(mButtonConfig.RIGHT);
+                mSteeringBot.keyRelease(mButtonConfig.mapInput(LEFT_BUTTON));
+                mSteeringBot.keyRelease(mButtonConfig.mapInput(RIGHT_BUTTON));
             }
         }
     }
@@ -110,45 +110,39 @@ public class SteeringWheel implements NetworkDataSink, AccelerationPhaseDetectio
     @Override
     public void onUpMovement() {
         //WARNING: ONLY WORKS WHEN USING PROPERLY CONFIGURED COMPUTER
-        try { Runtime.getRuntime().exec("notify-send --expire-time=50 up"); } catch (IOException ignored) { }
+        try {
+            Runtime.getRuntime().exec("notify-send --expire-time=50 up");
+        } catch (IOException ignored) {
+        }
 
         System.out.println("onUp");
-        mSteeringBot.keyPress(mButtonConfig.DOWN);
+        mSteeringBot.keyPress(mButtonConfig.mapInput(DOWN_BUTTON));
         mSteeringBot.delay(5);
-        mSteeringBot.keyPress(mButtonConfig.A);
+        mSteeringBot.keyPress(mButtonConfig.mapInput(A_BUTTON));
         mSteeringBot.delay(30);
-        mSteeringBot.keyRelease(mButtonConfig.A);
-        mSteeringBot.keyRelease(mButtonConfig.DOWN);
+        mSteeringBot.keyRelease(mButtonConfig.mapInput(A_BUTTON));
+        mSteeringBot.keyRelease(mButtonConfig.mapInput(DOWN_BUTTON));
     }
 
     @Override
     public void onDownMovement() {
         //WARNING: ONLY WORKS WHEN USING PROPERLY CONFIGURED COMPUTER (i3, notify-send)
-        try { Runtime.getRuntime().exec("notify-send --expire-time=50 down"); } catch (IOException ignored) { }
+        try {
+            Runtime.getRuntime().exec("notify-send --expire-time=50 down");
+        } catch (IOException ignored) {
+        }
 
         System.out.println("onDown");
-        mSteeringBot.keyPress(mButtonConfig.UP);
+        mSteeringBot.keyPress(mButtonConfig.mapInput(UP_BUTTON));
         mSteeringBot.delay(5);
-        mSteeringBot.keyPress(mButtonConfig.A);
+        mSteeringBot.keyPress(mButtonConfig.mapInput(A_BUTTON));
         mSteeringBot.delay(30);
-        mSteeringBot.keyRelease(mButtonConfig.A);
-        mSteeringBot.delay(5);
-        mSteeringBot.keyRelease(mButtonConfig.UP);
+        mSteeringBot.keyRelease(mButtonConfig.mapInput(A_BUTTON));
+        mSteeringBot.keyRelease(mButtonConfig.mapInput(UP_BUTTON));
     }
 
-    public void releaseAllKeys()
-    {
-        mSteeringBot.keyRelease(mButtonConfig.A);
-        mSteeringBot.keyRelease(mButtonConfig.B);
-        mSteeringBot.keyRelease(mButtonConfig.X);
-        mSteeringBot.keyRelease(mButtonConfig.Y);
-        mSteeringBot.keyRelease(mButtonConfig.LEFT);
-        mSteeringBot.keyRelease(mButtonConfig.RIGHT);
-        mSteeringBot.keyRelease(mButtonConfig.UP);
-        mSteeringBot.keyRelease(mButtonConfig.DOWN);
-        mSteeringBot.keyRelease(mButtonConfig.L);
-        mSteeringBot.keyRelease(mButtonConfig.R);
-        mSteeringBot.keyRelease(mButtonConfig.START);
-        mSteeringBot.keyRelease(mButtonConfig.SELECT);
+    void releaseAllKeys() {
+        for (Integer key : mButtonConfig.getJavaButtons())
+            mSteeringBot.keyRelease(key);
     }
 }

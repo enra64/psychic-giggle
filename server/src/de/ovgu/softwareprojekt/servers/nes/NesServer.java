@@ -8,8 +8,6 @@ import de.ovgu.softwareprojekt.discovery.NetworkDevice;
 import de.ovgu.softwareprojekt.networking.Server;
 import de.ovgu.softwareprojekt.pipeline.FilterPipelineBuilder;
 import de.ovgu.softwareprojekt.pipeline.filters.AveragingFilter;
-import de.ovgu.softwareprojekt.pipeline.filters.ThresholdingFilter;
-import de.ovgu.softwareprojekt.pipeline.filters.UserSensitivityMultiplicator;
 import de.ovgu.softwareprojekt.pipeline.splitters.ClientSplitter;
 
 import java.awt.*;
@@ -22,7 +20,7 @@ import java.util.Properties;
 import java.util.Stack;
 
 /**
- * This server is designed to create NES controller input from gyroscope data
+ * This server is designed to create NES controller input from gravity and linear acceleration data
  */
 public class NesServer extends Server {
     /**
@@ -31,6 +29,10 @@ public class NesServer extends Server {
      */
     private HashMap<NetworkDevice, SteeringWheel> mSteeringWheels = new HashMap<>();
 
+    /**
+     * This variable stores our acceleration phase detectors, mapped from network devices
+     * so we can easily access the one responsible for any given network device
+     */
     private HashMap<NetworkDevice, NetworkDataSink> mAccPhaseDetectors = new HashMap<>();
 
     /**
@@ -179,10 +181,11 @@ public class NesServer extends Server {
 
     /**
      * De-initializes a client in this server
+     *
      * @param removeClient the client to be removed
      */
-    private void removeClient(NetworkDevice removeClient){
-        if(mSteeringWheels.get(removeClient) != null){
+    private void removeClient(NetworkDevice removeClient) {
+        if (mSteeringWheels.get(removeClient) != null) {
             // put back the button config that was used by the removed client
             mButtonConfigs.push(mSteeringWheels.get(removeClient).getButtonConfig());
 
@@ -199,14 +202,11 @@ public class NesServer extends Server {
     }
 
     @Override
-    public void close()
-    {
+    public void close() {
         super.close();
 
-        for(SteeringWheel sw :  mSteeringWheels.values())
-        {
+        for (SteeringWheel sw : mSteeringWheels.values())
             sw.releaseAllKeys();
-        }
     }
 
     @Override
