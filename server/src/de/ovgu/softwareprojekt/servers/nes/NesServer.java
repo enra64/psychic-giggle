@@ -10,6 +10,7 @@ import de.ovgu.softwareprojekt.pipeline.FilterPipelineBuilder;
 import de.ovgu.softwareprojekt.pipeline.filters.AveragingFilter;
 import de.ovgu.softwareprojekt.pipeline.filters.ThresholdingFilter;
 import de.ovgu.softwareprojekt.pipeline.filters.UserSensitivityMultiplicator;
+import de.ovgu.softwareprojekt.pipeline.splitters.ClientSplitter;
 
 import java.awt.*;
 import java.io.FileInputStream;
@@ -39,6 +40,16 @@ public class NesServer extends Server {
     private Stack<ButtonConfig> mButtonConfigs = new Stack<>();
 
     /**
+     * This client splitter makes sure that all linear acceleration data is only sent to the correct pipeline
+     */
+    private ClientSplitter mLinearAccelerationSplitter = new ClientSplitter();
+
+    /**
+     * This client splitter makes sure that all gravity data is only sent to the correct pipeline
+     */
+    private ClientSplitter mGravitySplitter = new ClientSplitter();
+
+    /**
      * Create a new server. It will be offline (not using any sockets) until {@link #start()} is called.
      *
      * @param serverName if not null, this name will be used. otherwise, the devices hostname is used
@@ -47,7 +58,7 @@ public class NesServer extends Server {
         super(serverName);
 
         // normalize both utilized sensors
-        setSensorOutputRange(SensorType.LinearAcceleration, 10);
+        setSensorOutputRange(SensorType.LinearAcceleration, 1000);
         setSensorOutputRange(SensorType.Gravity, 333);
 
         // load button mappings: which player presses what when
@@ -56,6 +67,8 @@ public class NesServer extends Server {
         // display the nes button layout
         super.setButtonLayout(readFile("../nesLayout.txt", "utf-8"));
 
+        registerDataSink(mGravitySplitter, SensorType.Gravity);
+        registerDataSink(mLinearAccelerationSplitter, SensorType.LinearAcceleration);
     }
 
     /**
@@ -86,16 +99,14 @@ public class NesServer extends Server {
      * detection system can correctly recognize up/down events
      *
      * @param wheel the SteeringWheel getting the up/down events
-     * @param newClient
      * @throws IOException if the data sink could not be registered
      */
-    private NetworkDataSink getAccelerationPhaseDetection(SteeringWheel wheel, NetworkDevice newClient) throws IOException {
+    private NetworkDataSink getAccelerationPhaseDetection(SteeringWheel wheel) throws IOException {
         // create the end, eg the phase detection system
-        NetworkDataSink phaseDetection = new AccelerationPhaseDetection(wheel, newClient);
+        NetworkDataSink phaseDetection = new AccelerationPhaseDetection(wheel);
 
         // create a filter pipeline ending in the acceleration phase detection system
         FilterPipelineBuilder pipelineBuilder = new FilterPipelineBuilder();
-        pipelineBuilder.append(new ThresholdingFilter(null, .5f, 2));
         pipelineBuilder.append(new AveragingFilter(5));
         return pipelineBuilder.build(phaseDetection);
     }
@@ -129,11 +140,11 @@ public class NesServer extends Server {
             SteeringWheel newWheel = new SteeringWheel(mButtonConfigs.pop());
 
             // pipe the gravity sensor directly into the steering wheel
-            registerDataSink(newWheel, SensorType.Gravity);
+            mGravitySplitter.addDataSink(newClient, newWheel);
 
             // create, store and register the pipeline for the up/down detection
-            NetworkDataSink apd = getAccelerationPhaseDetection(newWheel, newClient);
-            registerDataSink(apd, SensorType.LinearAcceleration);
+            NetworkDataSink apd = getAccelerationPhaseDetection(newWheel);
+            mLinearAccelerationSplitter.addDataSink(newClient, apd);
             mAccPhaseDetectors.put(newClient, apd);
 
             // add the steering wheel to the list of network devices
@@ -154,7 +165,7 @@ public class NesServer extends Server {
     @Override
     public void onClientDisconnected(NetworkDevice disconnectedClient) {
         System.out.println("Player " + disconnectedClient.name + " disconnected!");
-
+        mSteeringWheels.get(disconnectedClient).releaseAllKeys();
         removeClient(disconnectedClient);
     }
 
@@ -162,6 +173,7 @@ public class NesServer extends Server {
     public void onClientTimeout(NetworkDevice timeoutClient) {
         System.out.println("Player " + timeoutClient.name + " had a timeout!");
 
+        mSteeringWheels.get(timeoutClient).releaseAllKeys();
         removeClient(timeoutClient);
     }
 
@@ -183,6 +195,17 @@ public class NesServer extends Server {
             unregisterDataSink(mAccPhaseDetectors.get(removeClient));
             unregisterDataSink(mSteeringWheels.get(removeClient));
         } catch (IOException | NullPointerException ignored) {
+        }
+    }
+
+    @Override
+    public void close()
+    {
+        super.close();
+
+        for(SteeringWheel sw :  mSteeringWheels.values())
+        {
+            sw.releaseAllKeys();
         }
     }
 

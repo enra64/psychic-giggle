@@ -319,7 +319,7 @@ public class ClientConnection implements OnCommandListener, NetworkDataSink, Con
                 break;
             case EndConnection:
                 close();
-                mCommandListener.onCommand(inetAddress, command);
+                mClientListener.onClientDisconnected(mClient);
                 break;
             default:
                 mCommandListener.onCommand(inetAddress, command);

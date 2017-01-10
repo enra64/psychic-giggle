@@ -27,25 +27,21 @@ public class SteeringWheel implements NetworkDataSink, AccelerationPhaseDetectio
     private final int XAXIS = 0, YAXIS = 1, ZAXIS = 2;
 
     /**
-     * Meassures the time intervall between two accelerationSensor usages
-     */
-    private long lastAccActivation;
-
-    /**
      * This button config stores the awt buttons that should be pressed on certain app button
      * presses
      */
     private ButtonConfig mButtonConfig;
 
-    private int counter;
+    /**
+     * Constant which describes the maximum sensitivty value
+     */
+    private final int MAX_SENSITIVITY = 100;
 
     /**
      * @throws AWTException is thrown when low level input is prohibit by system
      */
     SteeringWheel(ButtonConfig config) throws AWTException {
         mSteeringBot = new Robot(); //emulates peripheral device input
-        lastAccActivation = System.currentTimeMillis();
-        counter = 0;
         mButtonConfig = config;
     }
 
@@ -91,9 +87,9 @@ public class SteeringWheel implements NetworkDataSink, AccelerationPhaseDetectio
 
         if(data.sensorType == SensorType.Gravity)
         {
-            if (data.data[YAXIS] < -userSensitivity)
+            if (data.data[YAXIS] < (-MAX_SENSITIVITY + userSensitivity))
                 mSteeringBot.keyPress(mButtonConfig.LEFT);
-            else if (data.data[YAXIS] > userSensitivity)
+            else if (data.data[YAXIS] >(MAX_SENSITIVITY - userSensitivity))
                 mSteeringBot.keyPress(mButtonConfig.RIGHT);
 
             else {
@@ -138,5 +134,21 @@ public class SteeringWheel implements NetworkDataSink, AccelerationPhaseDetectio
         mSteeringBot.keyRelease(mButtonConfig.A);
         mSteeringBot.delay(5);
         mSteeringBot.keyRelease(mButtonConfig.UP);
+    }
+
+    public void releaseAllKeys()
+    {
+        mSteeringBot.keyRelease(mButtonConfig.A);
+        mSteeringBot.keyRelease(mButtonConfig.B);
+        mSteeringBot.keyRelease(mButtonConfig.X);
+        mSteeringBot.keyRelease(mButtonConfig.Y);
+        mSteeringBot.keyRelease(mButtonConfig.LEFT);
+        mSteeringBot.keyRelease(mButtonConfig.RIGHT);
+        mSteeringBot.keyRelease(mButtonConfig.UP);
+        mSteeringBot.keyRelease(mButtonConfig.DOWN);
+        mSteeringBot.keyRelease(mButtonConfig.L);
+        mSteeringBot.keyRelease(mButtonConfig.R);
+        mSteeringBot.keyRelease(mButtonConfig.START);
+        mSteeringBot.keyRelease(mButtonConfig.SELECT);
     }
 }

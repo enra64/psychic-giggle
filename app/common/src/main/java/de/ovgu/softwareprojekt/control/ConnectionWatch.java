@@ -176,10 +176,18 @@ public class ConnectionWatch extends TimerTask {
 
     /**
      * This function is used to notify the watch of a new interaction with the communication partner.
-     * Depending on whether this
      */
     public void onCheckEvent() {
         mLastCheckEventTimestamp = System.currentTimeMillis();
+        //System.out.println("checkevent for " + mSelf);
+    }
+
+    /**
+     * This function is used to notify the watch of a new interaction with the communication partner.
+     */
+    public void onCheckEvent(String by) {
+        mLastCheckEventTimestamp = System.currentTimeMillis();
+        System.out.println("checkevent by " + by);
     }
 
     /**

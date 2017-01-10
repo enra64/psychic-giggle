@@ -10,6 +10,35 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="de.ovgu.softwareprojektapp.activities.OptionsActivity">
 
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentStart="true"
+        android:layout_above="@+id/backFromOptionsBtn">
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/SensorOptions">
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPersonName"
+                android:ems="10"
+                android:id="@+id/device_name_edit_text"
+                android:hint="@string/client_name" />
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="number"
+                android:ems="10"
+                android:id="@+id/port_edit_text" />
+        </LinearLayout>
+    </ScrollView>
+
     <Button
         android:text="Back"
         android:layout_width="wrap_content"
@@ -19,27 +48,4 @@
         android:layout_marginBottom="14dp"
         android:id="@+id/backFromOptionsBtn" />
 
-    <LinearLayout
-        android:orientation="vertical"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_alignParentStart="true"
-        android:layout_above="@+id/backFromOptionsBtn"
-        android:id="@+id/SensorOptions">
-
-        <EditText
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="textPersonName"
-            android:ems="10"
-            android:id="@+id/device_name_edit_text"
-            android:hint="@string/client_name" />
-
-        <EditText
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="number"
-            android:ems="10"
-            android:id="@+id/port_edit_text" />
-    </LinearLayout>
 </RelativeLayout>

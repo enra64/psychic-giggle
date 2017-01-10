@@ -38,7 +38,8 @@ public class OptionsActivity extends AppCompatActivity implements SeekBar.OnSeek
      */
     static final String
             EXTRA_SERVER_ADDRESS = "Address",
-            EXTRA_SERVER_PORT_COMMAND = "CommandPort";
+            EXTRA_SERVER_PORT_COMMAND = "CommandPort",
+            EXTRA_ACTIVE_SENSORS = "ActiveSensor";
 
     /**
      * the linear layout containing all options
@@ -54,6 +55,8 @@ public class OptionsActivity extends AppCompatActivity implements SeekBar.OnSeek
      * a list of seekbars, each tagged with their respective SensorType value
      */
     private ArrayList<SeekBar> mSeekBars = new ArrayList<>();
+
+    private ArrayList<TextView> mTextViews = new ArrayList<>();
 
     /**
      * The command connection used to communicate with the server
@@ -129,22 +132,39 @@ public class OptionsActivity extends AppCompatActivity implements SeekBar.OnSeek
      * Create options dynamically based on the number of sensortypes
      */
     private void createSensorOptions() {
+
+        boolean[] sensors = getIntent().getBooleanArrayExtra(EXTRA_ACTIVE_SENSORS);
+
         for (int i = 0; i < mNumberOfSensors; i++) {
-            // Create a header for the seekbar
-            TextView text = new TextView(OptionsActivity.this);
-            text.setText(SensorType.values()[i].toString());
-            text.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+            //only create seekbar and text if the server needs these sensors or
+            //when there is no server connection
+            if(sensors == null || sensors[i]){
+                // Create a header for the seekbar
+                TextView text = new TextView(OptionsActivity.this);
+                text.setText(SensorType.values()[i].toString());
+                text.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
 
-            // create the seekbar
-            SeekBar seek = new SeekBar(OptionsActivity.this);
-            seek.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
-            seek.setTag(SensorType.values()[i]);
-            seek.setOnSeekBarChangeListener(this);
+                // create the seekbar
+                SeekBar seek = new SeekBar(OptionsActivity.this);
+                seek.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+                seek.setTag(SensorType.values()[i]);
+                seek.setOnSeekBarChangeListener(this);
 
-            mSeekBars.add(seek);
+                mSeekBars.add(seek);
+                mTextViews.add(text);
 
-            mSensorOptions.addView(text);
-            mSensorOptions.addView(seek);
+                mSensorOptions.addView(text);
+                mSensorOptions.addView(seek);
+            }
+        }
+    }
+
+    //TEST: Just remove inactive sensors for now
+    public void displayActiveOptions(SensorType sensor, boolean isActive){
+
+        if(!isActive) {
+            mSensorOptions.removeView(mTextViews.get(sensor.ordinal()));
+            mSensorOptions.removeView(mSeekBars.get(sensor.ordinal()));
         }
     }
 

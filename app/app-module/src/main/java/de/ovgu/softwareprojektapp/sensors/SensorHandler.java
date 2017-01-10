@@ -125,6 +125,14 @@ public class SensorHandler {
     }
 
     /**
+     * returns a EnumMap with all sensors
+     */
+    public EnumMap<SensorType, AbstractSensor> getSensors()
+    {
+        return mSensors;
+    }
+
+    /**
      * This method tries to dis- or enable a certain sensor.
      *
      * @param sensorType the list of required sensors
@@ -144,6 +152,7 @@ public class SensorHandler {
             // disable the sensor if it was already instantiated
             else if (mSensors.containsKey(sensorType))
                 mSensors.get(sensorType).setRunning(false);
+
         } catch (NoSuchMethodException | ClassNotFoundException | InstantiationException | InvocationTargetException | IllegalAccessException | IOException e) {
             throw new SensorNotFoundException("could not " + (enable ? "enable " : "disable ") + "sensor", sensorType);
         }
