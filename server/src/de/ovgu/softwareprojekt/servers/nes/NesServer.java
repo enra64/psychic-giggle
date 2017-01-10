@@ -73,20 +73,7 @@ public class NesServer extends Server {
         // get the property value and print it out
         for (int player = 3; player >= 0; player--) {
             try {
-                ButtonConfig newConfig = new ButtonConfig();
-                newConfig.A = ButtonConfig.getKeyEvent(prop.getProperty("BUTTON_A_" + player));
-                newConfig.B = ButtonConfig.getKeyEvent(prop.getProperty("BUTTON_B_" + player));
-                newConfig.X = ButtonConfig.getKeyEvent(prop.getProperty("BUTTON_X_" + player));
-                newConfig.Y = ButtonConfig.getKeyEvent(prop.getProperty("BUTTON_Y_" + player));
-                newConfig.SELECT = ButtonConfig.getKeyEvent(prop.getProperty("BUTTON_SELECT_" + player));
-                newConfig.START = ButtonConfig.getKeyEvent(prop.getProperty("BUTTON_START_" + player));
-                newConfig.R = ButtonConfig.getKeyEvent(prop.getProperty("BUTTON_R_" + player));
-                newConfig.L = ButtonConfig.getKeyEvent(prop.getProperty("BUTTON_L_" + player));
-                newConfig.LEFT = ButtonConfig.getKeyEvent(prop.getProperty("BUTTON_LEFT_" + player));
-                newConfig.UP = ButtonConfig.getKeyEvent(prop.getProperty("BUTTON_UP_" + player));
-                newConfig.RIGHT = ButtonConfig.getKeyEvent(prop.getProperty("BUTTON_RIGHT_" + player));
-                newConfig.DOWN = ButtonConfig.getKeyEvent(prop.getProperty("BUTTON_DOWN_" + player));
-                mButtonConfigs.add(newConfig);
+                mButtonConfigs.add(new ButtonConfig(prop, player));
             } catch (InvalidButtonException e) {
                 System.out.println("Player " + player + ": Keycode " + e.getMessage());
             }
