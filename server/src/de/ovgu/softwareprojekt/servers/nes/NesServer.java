@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashMap;
+import java.util.PriorityQueue;
 import java.util.Properties;
 import java.util.Stack;
 
@@ -36,11 +37,11 @@ public class NesServer extends Server {
     private HashMap<NetworkDevice, NetworkDataSink> mAccPhaseDetectors = new HashMap<>();
 
     /**
-     * This stack stores all available button configs. they will get taken out as more
-     * clients connect, and stored back when clients are removed
+     * This priority queue stores all available button configs. they will get taken out as more
+     * clients connect, and stored back when clients are removed.
+     * Queue is automatically sorted by playerID stored in ButtonConfig
      */
-    private Stack<ButtonConfig> mButtonConfigs = new Stack<>();
-
+    private PriorityQueue<ButtonConfig> mButtonConfigs = new PriorityQueue<>();
     /**
      * This client splitter makes sure that all linear acceleration data is only sent to the correct pipeline
      */
@@ -86,7 +87,7 @@ public class NesServer extends Server {
         prop.load(input);
 
         // get the property value and print it out
-        for (int player = 3; player >= 0; player--) {
+        for (int player = 0; player < 4; player++) {
             try {
                 mButtonConfigs.add(new ButtonConfig(prop, player));
             } catch (InvalidButtonException e) {
@@ -139,7 +140,7 @@ public class NesServer extends Server {
         System.out.println("Player " + newClient.name + " connected");
         try {
             // create a new steering wheel
-            SteeringWheel newWheel = new SteeringWheel(mButtonConfigs.pop());
+            SteeringWheel newWheel = new SteeringWheel(mButtonConfigs.poll());
 
             // pipe the gravity sensor directly into the steering wheel
             mGravitySplitter.addDataSink(newClient, newWheel);
@@ -160,7 +161,7 @@ public class NesServer extends Server {
     }
 
     /**
-     * Called when a client sent a disconnect signal
+     * Called when a client sent
      *
      * @param disconnectedClient the lost client
      */
@@ -187,7 +188,7 @@ public class NesServer extends Server {
     private void removeClient(NetworkDevice removeClient) {
         if (mSteeringWheels.get(removeClient) != null) {
             // put back the button config that was used by the removed client
-            mButtonConfigs.push(mSteeringWheels.get(removeClient).getButtonConfig());
+            mButtonConfigs.add(mSteeringWheels.get(removeClient).getButtonConfig());
 
             // delete the steering wheel
             mSteeringWheels.remove(removeClient);
