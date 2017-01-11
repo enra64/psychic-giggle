@@ -124,7 +124,7 @@ public class DiscoveryClient extends DiscoveryThread {
         /**
          * Constant specifying how old a server discovery may be before it is regarded offline
          */
-        private static final long MAXIMUM_SERVER_AGE_MS = 2000;
+        private static final long MAXIMUM_SERVER_AGE_MS = 50;
 
         /**
          * Current list of known servers as well as a timestamp marking their time of discovery
