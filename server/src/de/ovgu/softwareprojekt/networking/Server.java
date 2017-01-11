@@ -25,7 +25,7 @@ import java.util.HashSet;
  * 3) A DataConnection to rapidly transmit sensor data
  */
 @SuppressWarnings({"unused", "WeakerAccess"})
-public abstract class Server implements OnCommandListener, NetworkDataSink, ClientListener, ExceptionListener, ButtonListener, ResetListener {
+public abstract class Server implements OnCommandListener, ClientListener, ExceptionListener, ButtonListener, ResetListener {
     /**
      * Server handling responding to discovery broadcasts
      */
@@ -53,12 +53,9 @@ public abstract class Server implements OnCommandListener, NetworkDataSink, Clie
     private String mServerName;
 
     /**
-     * Stores all known data sinks
-     * <p>
-     * This variable is an EnumMap, so iterations over the keys should be quite fast. The sinks are stored in a
-     * HashSet for each sensor, so no sink can occur twice for one sensor type.
+     * The data mapper is responsible for forwarding data correctly
      */
-    private EnumMap<SensorType, HashSet<NetworkDataSink>> mDataSinks = new EnumMap<>(SensorType.class);
+    private DataMapper mDataMapper = new DataMapper();
 
     /**
      * Create a new server. It will be offline (not using any sockets) until {@link #start()} is called.
@@ -76,7 +73,9 @@ public abstract class Server implements OnCommandListener, NetworkDataSink, Clie
                 this,
                 this,
                 this,
-                this);
+                mDataMapper);
+
+        mDataMapper.setConnectionHandler(mClientHandlerFactory);
     }
 
     /**
@@ -103,7 +102,6 @@ public abstract class Server implements OnCommandListener, NetworkDataSink, Clie
     /**
      * Stop listening on all ports and free them.
      */
-    @Override
     public void close() {
         mClientHandlerFactory.closeAll();
         mDiscoveryServer.close();
@@ -196,30 +194,13 @@ public abstract class Server implements OnCommandListener, NetworkDataSink, Clie
     }
 
     /**
-     * onData is called whenever new data is to be processed. This function must not be overridden to allow the data sink
-     * registration system to work
-     *
-     * @param origin          the network device which sent the data
-     * @param data            the sensor data
-     * @param userSensitivity the sensitivity the user requested in his app settings
-     */
-    @Override
-    public final void onData(NetworkDevice origin, SensorData data, float userSensitivity){
-        // relay the data to all sinks registered for this sensor type
-        //mDataSinks.get(data.sensorType).forEach(sink -> sink.onData(origin, data, userSensitivity));
-        HashSet<NetworkDataSink> registeredSinks = mDataSinks.get(data.sensorType);
-        for(NetworkDataSink sink : registeredSinks)
-            sink.onData(origin, data, userSensitivity);
-
-    }
-
-    /**
      * Closes the clients handler, and notifies the client of his disconnection
      *
      * @param client the client to be removed
      * @return false if client could not be found, true otherwise
      */
     public boolean disconnectClient(NetworkDevice client) {
+        mDataMapper.onClientRemoved(client);
         return mClientHandlerFactory.close(client);
     }
 
@@ -228,38 +209,22 @@ public abstract class Server implements OnCommandListener, NetworkDataSink, Clie
      *
      * @param dataSink        where new data from the sensor should go
      * @param requestedSensor which sensors events are relevant
+     * @throws IOException if a client could not be notified of the sensor change
      */
     protected void registerDataSink(NetworkDataSink dataSink, SensorType requestedSensor) throws IOException {
-        // dataSink *must not be* this, as that would lead to infinite recursion
-        if(this == dataSink)
-            throw new InvalidParameterException("A Server subclass cannot register itself as a data sink.");
-
-        // add new data sink list if the requested sensor type has no sinks yet
-        if (!mDataSinks.containsKey(requestedSensor))
-            mDataSinks.put(requestedSensor, new HashSet<>());
-
-        // add the new sink to the list of sink for the sensor
-        mDataSinks.get(requestedSensor).add(dataSink);
-
-        // force resetting the sensors on the client
-        mClientHandlerFactory.updateSensors(mDataSinks.keySet());
+        mDataMapper.registerDataSink(requestedSensor, dataSink);
     }
 
     /**
-     * Unregister a data sink from a sensors data stream
+     * Register a new data sink to be included in the data stream
      *
-     * @param dataSink        the data sink to be unregistered
-     * @param requestedSensor the sensor the sink should be unregistered from
+     * @param dataSink        where new data from the sensor should go
+     * @param origin          the network device which is allowed to send to this sink
+     * @param requestedSensor which sensor events are relevant
+     * @throws IOException if a client could not be notified of the sensor change
      */
-    private void unregisterDataSink(NetworkDataSink dataSink, SensorType requestedSensor) throws IOException {
-        mDataSinks.get(requestedSensor).remove(dataSink);
-
-        // remove the sensor if it no longer has any data sinks
-        if(mDataSinks.get(requestedSensor).size() == 0)
-            mDataSinks.remove(requestedSensor);
-
-        // force resetting the sensors on the client
-        mClientHandlerFactory.updateSensors(mDataSinks.keySet());
+    protected void registerDataSink(NetworkDataSink dataSink, NetworkDevice origin, SensorType requestedSensor) throws IOException {
+        mDataMapper.registerDataSink(requestedSensor, origin, dataSink);
     }
 
     /**
@@ -269,11 +234,7 @@ public abstract class Server implements OnCommandListener, NetworkDataSink, Clie
      */
     public void unregisterDataSink(NetworkDataSink dataSink) throws IOException {
         // unregister dataSink from all sensors it is registered to
-        for (SensorType type : mDataSinks.keySet())
-            unregisterDataSink(dataSink, type);
-
-        // force resetting the sensors on the client
-        mClientHandlerFactory.updateSensors(mDataSinks.keySet());
+        mDataMapper.unregisterDataSink(dataSink);
     }
 
     /**
