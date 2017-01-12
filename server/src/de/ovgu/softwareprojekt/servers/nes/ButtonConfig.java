@@ -9,13 +9,18 @@ import java.util.Properties;
 /**
  * POJO for mapping psychic button ids to java robot keycodes
  */
-class ButtonConfig {
+class ButtonConfig implements Comparable<ButtonConfig> {
 
 
     /**
      * This maps from psychic button ids (keys) to java button ids (values).
      */
     private HashMap<Integer, Integer> mMapping = new HashMap<>();
+
+    /**
+     * This value represents the identification number for each player
+     */
+    private int playerID;
 
     /**
      * Create a new ButtonConfig.
@@ -25,6 +30,7 @@ class ButtonConfig {
      * @throws InvalidButtonException if a button could not be parsed
      */
     ButtonConfig(Properties buttonProperties, int player) throws InvalidButtonException {
+        playerID = player;
         mMapping.put(PsychicNesButton.A_BUTTON.psychicId(), getKeyEvent(buttonProperties.getProperty("BUTTON_A_" + player)));
         mMapping.put(PsychicNesButton.B_BUTTON.psychicId(), getKeyEvent(buttonProperties.getProperty("BUTTON_B_" + player)));
         mMapping.put(PsychicNesButton.X_BUTTON.psychicId(), getKeyEvent(buttonProperties.getProperty("BUTTON_X_" + player)));
@@ -55,6 +61,14 @@ class ButtonConfig {
     }
 
     /**
+     *
+     * @return the ID used for the player device
+     */
+    public int getPlayerID()
+    {
+        return playerID;
+    }
+    /**
      * Get a collection of all java keys this ButtonConfig maps to
      */
     Collection<Integer> getJavaButtons() {
@@ -79,5 +93,17 @@ class ButtonConfig {
      */
     Integer mapInput(Integer psychicButtonId) {
         return mMapping.get(psychicButtonId);
+    }
+
+    @Override
+    public int compareTo(ButtonConfig o) {
+        if(this.playerID < o.getPlayerID())
+            return -1;
+
+        else if(this.playerID == o.getPlayerID())
+                return 0;
+
+        else
+            return 1;
     }
 }
