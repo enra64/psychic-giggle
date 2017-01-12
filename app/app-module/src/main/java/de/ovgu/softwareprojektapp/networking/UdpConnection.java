@@ -34,7 +34,7 @@ public class UdpConnection implements DataSink {
     /**
      * The target port on {@link #mHost} for our UDP packets
      */
-    private final int mPort;
+    private int mPort;
 
     /**
      * This exception listener is to be notified of exceptions here
@@ -69,7 +69,18 @@ public class UdpConnection implements DataSink {
      */
     @Override
     public void onData(SensorData sensorData) {
-        new SensorOut().execute(sensorData);
+        if(!mSocket.isClosed())
+            new SensorOut().execute(sensorData);
+        else
+            System.out.println("sending data on closed data connection");
+    }
+
+    /**
+     * Immediately change the port all data will be sent to
+     * @param remotePort the new port for data to arrive at
+     */
+    void setRemotePort(int remotePort) {
+        mPort = remotePort;
     }
 
     /**

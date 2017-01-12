@@ -77,6 +77,14 @@ public abstract class Server implements OnCommandListener, NetworkDataSink, Clie
                 this,
                 this,
                 this);
+
+        // SIGTERM -> close all clients, stop discovery server
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            mClientHandlerFactory.closeAll();
+            System.out.println("All clients closed");
+            mDiscoveryServer.close();
+            System.out.println("Discovery server closed");
+        }));
     }
 
     /**
@@ -161,10 +169,16 @@ public abstract class Server implements OnCommandListener, NetworkDataSink, Clie
                 }
                 break;
             case ButtonClick:
-                onButtonClick((ButtonClick) command, mClientHandlerFactory.getClientHandler(origin).getClient());
+                // ignore packets sent by unknown clients
+                ClientConnection originDevice = mClientHandlerFactory.getClientHandler(origin);
+                if (originDevice != null)
+                    onButtonClick((ButtonClick) command, originDevice.getClient());
                 break;
             case ResetToCenter:
-                onResetPosition(mClientHandlerFactory.getClientHandler(origin).getClient());
+                // ignore packets sent by unknown clients
+                ClientConnection originDev = mClientHandlerFactory.getClientHandler(origin);
+                if (originDev != null)
+                    onResetPosition(originDev.getClient());
                 break;
             // ignore unhandled commands
             default:
@@ -204,11 +218,11 @@ public abstract class Server implements OnCommandListener, NetworkDataSink, Clie
      * @param userSensitivity the sensitivity the user requested in his app settings
      */
     @Override
-    public final void onData(NetworkDevice origin, SensorData data, float userSensitivity){
+    public final void onData(NetworkDevice origin, SensorData data, float userSensitivity) {
         // relay the data to all sinks registered for this sensor type
         //mDataSinks.get(data.sensorType).forEach(sink -> sink.onData(origin, data, userSensitivity));
         HashSet<NetworkDataSink> registeredSinks = mDataSinks.get(data.sensorType);
-        for(NetworkDataSink sink : registeredSinks)
+        for (NetworkDataSink sink : registeredSinks)
             sink.onData(origin, data, userSensitivity);
 
     }
@@ -231,7 +245,7 @@ public abstract class Server implements OnCommandListener, NetworkDataSink, Clie
      */
     protected void registerDataSink(NetworkDataSink dataSink, SensorType requestedSensor) throws IOException {
         // dataSink *must not be* this, as that would lead to infinite recursion
-        if(this == dataSink)
+        if (this == dataSink)
             throw new InvalidParameterException("A Server subclass cannot register itself as a data sink.");
 
         // add new data sink list if the requested sensor type has no sinks yet
@@ -251,26 +265,12 @@ public abstract class Server implements OnCommandListener, NetworkDataSink, Clie
      * @param dataSink        the data sink to be unregistered
      * @param requestedSensor the sensor the sink should be unregistered from
      */
-    private void unregisterDataSink(NetworkDataSink dataSink, SensorType requestedSensor) throws IOException {
+    protected synchronized void unregisterDataSink(NetworkDataSink dataSink, SensorType requestedSensor) throws IOException {
         mDataSinks.get(requestedSensor).remove(dataSink);
 
         // remove the sensor if it no longer has any data sinks
-        if(mDataSinks.get(requestedSensor).size() == 0)
+        if (mDataSinks.get(requestedSensor).size() == 0)
             mDataSinks.remove(requestedSensor);
-
-        // force resetting the sensors on the client
-        mClientHandlerFactory.updateSensors(mDataSinks.keySet());
-    }
-
-    /**
-     * Unregister a data sink from all sensors
-     *
-     * @param dataSink which data sink to remove
-     */
-    public void unregisterDataSink(NetworkDataSink dataSink) throws IOException {
-        // unregister dataSink from all sensors it is registered to
-        for (SensorType type : mDataSinks.keySet())
-            unregisterDataSink(dataSink, type);
 
         // force resetting the sensors on the client
         mClientHandlerFactory.updateSensors(mDataSinks.keySet());

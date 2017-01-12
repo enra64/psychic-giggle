@@ -76,6 +76,9 @@ public class DiscoveryActivity extends AppCompatActivity implements OnDiscoveryL
         mPossibleConnections.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                if(mServerList.size() <= i)
+                    return;
+
                 // store the information of the selected server in the intent extras
                 Intent intent = new Intent(DiscoveryActivity.this, SendActivity.class);
                 intent.putExtra(SendActivity.EXTRA_SERVER_NAME, mServerList.get(i).name);
@@ -248,9 +251,7 @@ public class DiscoveryActivity extends AppCompatActivity implements OnDiscoveryL
 
     @Override
     public void onException(Object origin, Exception exception, String info) {
-
-        Log.w(origin.toString(), info, exception);
+        Log.e(origin.toString(), info, exception);
         exception.printStackTrace();
-
     }
 }

@@ -24,7 +24,19 @@ import de.ovgu.softwareprojekt.misc.ExceptionListener;
  * This thread manages sending discovery request packages and receiving answers from servers.
  */
 public class DiscoveryClient extends DiscoveryThread {
+    /**
+     * Constant specifying how old a server discovery may be before it is regarded offline
+     */
+    private static final long MAXIMUM_SERVER_AGE_MS = 50;
 
+    /**
+     * Timing variables
+     */
+    @SuppressWarnings("FieldCanBeLocal")
+    private static final int DISCOVERY_BROADCAST_DELAY = 0,
+            DISCOVERY_BROADCAST_PERIOD = 25,
+            SERVER_LIST_REFRESH_DELAY = 10,
+            SERVER_LIST_REFRESH_PERIOD = 25;
 
     /**
      * Our broadcaster handles the recurring self identification broadcasts.
@@ -58,6 +70,9 @@ public class DiscoveryClient extends DiscoveryThread {
     public DiscoveryClient(OnDiscoveryListener listener, ExceptionListener exceptionListener, int remotePort, String selfName) throws IOException {
         super(selfName);
 
+        // name thread
+        setName("DiscoveryClient");
+
         // save who wants to be notified of new servers
         mCurrentServerList = new ServerList(listener);
 
@@ -73,9 +88,9 @@ public class DiscoveryClient extends DiscoveryThread {
         try {
             setSocket(new DatagramSocket());
 
-            // send a new broadcast every four seconds, beginning now
-            mRecurringBroadcastTimer.scheduleAtFixedRate(mBroadcaster, 0, 1000);
-            mServerListTimer.scheduleAtFixedRate(mCurrentServerList, 100, 1000);
+            // send a new broadcast every n milliseconds, beginning now
+            mRecurringBroadcastTimer.scheduleAtFixedRate(mBroadcaster, DISCOVERY_BROADCAST_DELAY, DISCOVERY_BROADCAST_PERIOD);
+            mServerListTimer.scheduleAtFixedRate(mCurrentServerList, SERVER_LIST_REFRESH_DELAY, SERVER_LIST_REFRESH_PERIOD);
 
             // continously check if we should continue listening
             while (isRunning()) {
@@ -122,11 +137,6 @@ public class DiscoveryClient extends DiscoveryThread {
      */
     private class ServerList extends TimerTask {
         /**
-         * Constant specifying how old a server discovery may be before it is regarded offline
-         */
-        private static final long MAXIMUM_SERVER_AGE_MS = 50;
-
-        /**
          * Current list of known servers as well as a timestamp marking their time of discovery
          */
         private ConcurrentHashMap<NetworkDevice, Long> mCurrentServerList = new ConcurrentHashMap<>();
@@ -135,6 +145,11 @@ public class DiscoveryClient extends DiscoveryThread {
          * Listener to be called when our list of servers is updated
          */
         private OnDiscoveryListener mDiscoveryListener;
+
+        /**
+         * Flag variable to trigger updates if necessary
+         */
+        private boolean mChanged = false;
 
         /**
          * Create a new ServerList that will push the most current list to the discovery listener
@@ -154,13 +169,18 @@ public class DiscoveryClient extends DiscoveryThread {
                 // get the next devices discovery timestamp
                 long discoveryTimestamp = it.next().getValue();
 
-                // if the device is too old, remove it
-                if ((now - discoveryTimestamp) > MAXIMUM_SERVER_AGE_MS)
+                // if the device is too old, remove it and flag a change
+                if ((now - discoveryTimestamp) > MAXIMUM_SERVER_AGE_MS){
                     it.remove();
+                    mChanged = true;
+                }
             }
 
-            // notify listener of update
-            mDiscoveryListener.onServerListUpdated(getCurrentServers());
+            // notify listener of update if a change occurred
+            if(mChanged){
+                mDiscoveryListener.onServerListUpdated(getCurrentServers());
+                mChanged = false;
+            }
         }
 
         /**
@@ -174,6 +194,11 @@ public class DiscoveryClient extends DiscoveryThread {
          * Adds a server to the list or, if it already exists, updates it.
          */
         void addServer(NetworkDevice device) {
+            // the list only changed if the device was unknown
+            if(!mCurrentServerList.containsKey(device))
+                mChanged = true;
+
+            // store (possibly) new device
             mCurrentServerList.put(device, System.currentTimeMillis());
         }
     }

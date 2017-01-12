@@ -1,6 +1,7 @@
 package de.ovgu.softwareprojektapp.networking;
 
 import android.os.AsyncTask;
+import android.util.Log;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -16,6 +17,7 @@ import de.ovgu.softwareprojekt.control.commands.ConnectionAliveCheck;
 import de.ovgu.softwareprojekt.control.commands.ConnectionRequest;
 import de.ovgu.softwareprojekt.control.commands.ConnectionRequestResponse;
 import de.ovgu.softwareprojekt.control.commands.EndConnection;
+import de.ovgu.softwareprojekt.control.commands.RemapPorts;
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
 import de.ovgu.softwareprojekt.misc.ExceptionListener;
 
@@ -172,9 +174,10 @@ public class NetworkClient implements DataSink, ExceptionListener, OnCommandList
      */
     @Override
     public void close() {
+        Log.i("spapp", "closing network client on " + mSelf);
+        mConnectionWatch.close();
         mOutboundDataConnection.close();
         mCommandConnection.close();
-        mConnectionWatch.close();
     }
 
     @Override
@@ -204,14 +207,21 @@ public class NetworkClient implements DataSink, ExceptionListener, OnCommandList
      */
     @Override
     public void onCommand(InetAddress origin, AbstractCommand command) {
+        // notify the connection watch of a server contact
+        mConnectionWatch.onCheckEvent();
+
         switch (command.getCommandType()){
+            case RemapPorts:
+                RemapPorts cmd = (RemapPorts) command;
+                mCommandConnection.setRemotePort(cmd.newCommandPort);
+                mOutboundDataConnection.setRemotePort(cmd.newDataPort);
+                Log.d("spapp", "networkclient: got RemapPorts to cmd" + cmd.newCommandPort);
+                break;
             // completely handle connection checks
             case ConnectionAliveCheck:
                 ConnectionAliveCheck response = (ConnectionAliveCheck) command;
                 response.answerer = getSelf();
                 sendCommand(response);
-                // notify the connection watch of the event
-                mConnectionWatch.onCheckEvent();
                 break;
             case ConnectionRequestResponse:
                 ConnectionRequestResponse res = (ConnectionRequestResponse) command;
@@ -249,7 +259,8 @@ public class NetworkClient implements DataSink, ExceptionListener, OnCommandList
                 mExceptionListener.onException(
                         NetworkClient.this,
                         e,
-                        "NetworkClient: exception when trying to send a command");
+                        "NetworkClient: exception when trying to send a " + commands[0].getClass());
+                System.out.println("NetworkClient: exception when trying to send a " + commands[0].getClass());
             }
             return null;
         }

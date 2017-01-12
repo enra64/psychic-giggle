@@ -1,7 +1,6 @@
 package de.ovgu.softwareprojekt.networking;
 
 import com.sun.istack.internal.NotNull;
-import de.ovgu.softwareprojekt.DataSink;
 import de.ovgu.softwareprojekt.NetworkDataSink;
 import de.ovgu.softwareprojekt.SensorData;
 import de.ovgu.softwareprojekt.SensorType;
@@ -26,6 +25,11 @@ import java.util.*;
  * command can be sent to the client after that.
  */
 public class ClientConnection implements OnCommandListener, NetworkDataSink, ConnectionWatch.TimeoutListener {
+    /**
+     * This listener is to be called when we get commands from an unknown client
+     */
+    private final UnexpectedClientListener mUnexpectedClientListener;
+
     /**
      * Who to notify about unhandleable exceptions
      */
@@ -77,6 +81,11 @@ public class ClientConnection implements OnCommandListener, NetworkDataSink, Con
     private final ConnectionWatch mConnectionWatch;
 
     /**
+     * The InetAddress of our client, saved to avoid constant conversions
+     */
+    private InetAddress mClientAddress;
+
+    /**
      * Create a new client connection handler, which will immediately begin listening on random ports. They may be retrieved
      * using {@link #getCommandPort()} and {@link #getDataPort()}.
      *
@@ -86,10 +95,17 @@ public class ClientConnection implements OnCommandListener, NetworkDataSink, Con
      * @param dataSink          Where to put data
      * @throws IOException when the listening process could not be started
      */
-    ClientConnection(String serverName, ExceptionListener exceptionListener, OnCommandListener commandListener, ClientListener clientListener, NetworkDataSink dataSink) throws IOException {
+    ClientConnection(
+            String serverName,
+            ExceptionListener exceptionListener,
+            OnCommandListener commandListener,
+            ClientListener clientListener,
+            NetworkDataSink dataSink,
+            UnexpectedClientListener unexpectedClientListener) throws IOException {
         mExceptionListener = exceptionListener;
         mCommandListener = commandListener;
         mClientListener = clientListener;
+        mUnexpectedClientListener = unexpectedClientListener;
 
         // this is our sink for everything to be able to do customized scaling for any sensor type
         mDataScalingHandler = new DataScalingHandler(dataSink);
@@ -100,6 +116,7 @@ public class ClientConnection implements OnCommandListener, NetworkDataSink, Con
 
         //NetworkDevice identifying this client handler (eg name, data, command port)
         NetworkDevice self = new NetworkDevice(serverName, mCommandConnection.getLocalPort(), mDataConnection.getLocalPort());
+        System.out.println("new client connection: " + self.hashCode());
         mConnectionWatch = new ConnectionWatch(self, this, mCommandConnection, exceptionListener);
     }
 
@@ -110,7 +127,7 @@ public class ClientConnection implements OnCommandListener, NetworkDataSink, Con
      * @throws IOException if an error <b>other than</b> {@link ConnectException} occurred. If a {@link ConnectException}
      *                     occurred, the client is likely listening no longer.
      */
-    private void sendCommand(AbstractCommand command) throws IOException {
+    public void sendCommand(AbstractCommand command) throws IOException {
         if (mIsConnected) {
             try {
                 mCommandConnection.sendCommand(command);
@@ -118,7 +135,7 @@ public class ClientConnection implements OnCommandListener, NetworkDataSink, Con
                 // if the client does not listen anymore, it most probably is down
                 if (e.getMessage().contains("Connection refused")) {
                     // notify client listener only if we have not been closed
-                    if(mIsConnected)
+                    if (mIsConnected)
                         mClientListener.onClientDisconnected(mClient);
 
                     // close self
@@ -167,9 +184,9 @@ public class ClientConnection implements OnCommandListener, NetworkDataSink, Con
      * Close all network interfaces this connection handler has used
      */
     public void close() {
+        mIsConnected = false;
         mCommandConnection.close();
         mDataConnection.close();
-        mIsConnected = false;
         mConnectionWatch.close();
     }
 
@@ -178,6 +195,7 @@ public class ClientConnection implements OnCommandListener, NetworkDataSink, Con
      */
     void closeAndSignalClient() {
         try {
+            System.out.println("closing client " + mClient);
             sendCommand(new EndConnection(null));
         } catch (IOException ignored) {
             // ignore this exception, since the connection state to this client doesn't matter anymore anyways
@@ -200,6 +218,9 @@ public class ClientConnection implements OnCommandListener, NetworkDataSink, Con
 
             // store client identification
             mClient = client;
+
+            // store client address
+            mClientAddress = client.getInetAddress();
 
             // accept the client
             sendCommand(new ConnectionRequestResponse(true));
@@ -232,6 +253,8 @@ public class ClientConnection implements OnCommandListener, NetworkDataSink, Con
 
         // begin listening for commands
         mCommandConnection.start();
+
+        System.out.println("new command connection on port " + mCommandConnection.getLocalPort());
     }
 
     /**
@@ -300,6 +323,10 @@ public class ClientConnection implements OnCommandListener, NetworkDataSink, Con
 
     @Override
     public void onCommand(InetAddress inetAddress, AbstractCommand command) {
+        // ignore commands not sent by this client
+        if (!inetAddress.equals(mClientAddress))
+            mUnexpectedClientListener.onUnexpectedClient(inetAddress, command);
+
         // we only want to catch a certain subset of commands here
         switch (command.getCommandType()) {
             case ChangeSensorSensitivity:
@@ -312,14 +339,12 @@ public class ClientConnection implements OnCommandListener, NetworkDataSink, Con
                 mDataScalingHandler.setSourceRange(notification.type, notification.range);
                 break;
             case ConnectionAliveCheck:
-                ConnectionAliveCheck check = (ConnectionAliveCheck) command;
-                check.answerer.address = inetAddress.getHostAddress();
-                if (check.answerer.equals(mClient))
-                    mConnectionWatch.onCheckEvent();
+                mConnectionWatch.onCheckEvent();
                 break;
             case EndConnection:
+                if (mIsConnected)
+                    mClientListener.onClientDisconnected(mClient);
                 close();
-                mClientListener.onClientDisconnected(mClient);
                 break;
             default:
                 mCommandListener.onCommand(inetAddress, command);
@@ -328,10 +353,11 @@ public class ClientConnection implements OnCommandListener, NetworkDataSink, Con
 
     /**
      * Change the output range for a certain sensor
-     * @param sensor the sensor whose data will be affected
+     *
+     * @param sensor      the sensor whose data will be affected
      * @param outputRange the maximum and negative minimum of the resulting output range
      */
-    public void setOutputRange(SensorType sensor, float outputRange){
+    void setOutputRange(SensorType sensor, float outputRange) {
         mDataScalingHandler.setOutputRange(sensor, outputRange);
     }
 
@@ -343,10 +369,19 @@ public class ClientConnection implements OnCommandListener, NetworkDataSink, Con
     @Override
     public void onTimeout(long age) {
         // notify our client listener of the timeout
-        if(mIsConnected)
+        if (mIsConnected)
             mClientListener.onClientTimeout(mClient);
 
         // notify the client that we do no longer communicate with it in case it is still listening
         closeAndSignalClient();
+    }
+
+    /**
+     * Call this to remind the client of its ports, if it got the wrong ports at the start
+     *
+     * @throws IOException if the command could not be sent
+     */
+    void enforcePorts() throws IOException {
+        sendCommand(new RemapPorts(getDataPort(), getCommandPort()));
     }
 }

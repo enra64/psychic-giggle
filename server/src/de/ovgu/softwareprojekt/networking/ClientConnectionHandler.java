@@ -5,6 +5,9 @@ import de.ovgu.softwareprojekt.DataSink;
 import de.ovgu.softwareprojekt.NetworkDataSink;
 import de.ovgu.softwareprojekt.SensorType;
 import de.ovgu.softwareprojekt.control.OnCommandListener;
+import de.ovgu.softwareprojekt.control.commands.AbstractCommand;
+import de.ovgu.softwareprojekt.control.commands.CommandType;
+import de.ovgu.softwareprojekt.control.commands.RemapPorts;
 import de.ovgu.softwareprojekt.control.commands.SetSensorSpeed;
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
 import de.ovgu.softwareprojekt.misc.ExceptionListener;
@@ -14,7 +17,7 @@ import java.net.InetAddress;
 import java.util.*;
 
 @SuppressWarnings("WeakerAccess")
-class ClientConnectionHandler implements ClientListener {
+class ClientConnectionHandler implements ClientListener, UnexpectedClientListener {
     /**
      * Name of the server as displayed to discovery clients
      */
@@ -43,7 +46,7 @@ class ClientConnectionHandler implements ClientListener {
     /**
      * This is the list of all currently bound clients.
      */
-    private List<ClientConnection> mClientConnections = new ArrayList<>();
+    private final List<ClientConnection> mClientConnections = new ArrayList<>();
 
     /**
      * Who to notify about unhandleable exceptions
@@ -95,7 +98,8 @@ class ClientConnectionHandler implements ClientListener {
                 mExceptionListener,
                 mCommandListener,
                 this,
-                mDataSink);
+                mDataSink,
+                this);
 
         // set the requested output ranges
         for (Map.Entry<SensorType, Float> sensor : mSensorOutputRanges.entrySet())
@@ -111,7 +115,9 @@ class ClientConnectionHandler implements ClientListener {
      * @throws IOException if the client could not be configured
      */
     void addHandler(ClientConnection handler) throws IOException {
-        mClientConnections.add(handler);
+        synchronized (mClientConnections) {
+            mClientConnections.add(handler);
+        }
 
         // send the sensor- and button requirements to the new client
         handler.updateSensors(mRequiredSensors);
@@ -123,8 +129,10 @@ class ClientConnectionHandler implements ClientListener {
      * Close all client connections
      */
     void closeAll() {
-        for (ClientConnection clientHandler : mClientConnections)
-            clientHandler.close();
+        synchronized (mClientConnections) {
+            for (ClientConnection clientHandler : mClientConnections)
+                clientHandler.close();
+        }
     }
 
     /**
@@ -135,10 +143,12 @@ class ClientConnectionHandler implements ClientListener {
      * @return null if no matching handler was found, or the handler.
      */
     ClientConnection getClientHandler(InetAddress address) {
-        for (ClientConnection clientConnection : mClientConnections)
-            // true if the clients match
-            if (clientConnection.getClient().address.equals(address.getHostAddress()))
-                return clientConnection;
+        synchronized (mClientConnections) {
+            for (ClientConnection clientConnection : mClientConnections)
+                // true if the clients match
+                if (clientConnection.getClient().address.equals(address.getHostAddress()))
+                    return clientConnection;
+        }
         return null;
     }
 
@@ -211,8 +221,10 @@ class ClientConnectionHandler implements ClientListener {
      * @param outputRange the resulting maximum and negative minimum of the sensor output range. Default is -100 to 100.
      */
     public void setSensorOutputRange(SensorType sensor, float outputRange) {
-        for (ClientConnection connectionHandler : mClientConnections)
-            connectionHandler.setOutputRange(sensor, outputRange);
+        synchronized (mClientConnections) {
+            for (ClientConnection connectionHandler : mClientConnections)
+                connectionHandler.setOutputRange(sensor, outputRange);
+        }
         mSensorOutputRanges.put(sensor, outputRange);
     }
 
@@ -223,10 +235,12 @@ class ClientConnectionHandler implements ClientListener {
      * @return null if no matching handler was found, or the handler.
      */
     public ClientConnection getClientHandler(NetworkDevice client) {
-        for (ClientConnection clientConnection : mClientConnections)
-            // true if the clients match
-            if (clientConnection.getClient().equals(client))
-                return clientConnection;
+        synchronized (mClientConnections) {
+            for (ClientConnection clientConnection : mClientConnections)
+                // true if the clients match
+                if (clientConnection.getClient().equals(client))
+                    return clientConnection;
+        }
         return null;
     }
 
@@ -238,7 +252,9 @@ class ClientConnectionHandler implements ClientListener {
             return false;
 
         // delete the connection handler
-        mClientConnections.remove(connectionHandler);
+        synchronized (mClientConnections) {
+            mClientConnections.remove(connectionHandler);
+        }
 
         // close the client connection
         connectionHandler.closeAndSignalClient();
@@ -253,11 +269,13 @@ class ClientConnectionHandler implements ClientListener {
      * @throws IOException if the command could not be sent
      */
     private void updateButtons() throws IOException {
-        for (ClientConnection client : mClientConnections) {
-            if (mButtonXML != null) {
-                client.updateButtons(mButtonXML);
-            } else if (mButtonList != null) {
-                client.updateButtons(mButtonList);
+        synchronized (mClientConnections) {
+            for (ClientConnection client : mClientConnections) {
+                if (mButtonXML != null) {
+                    client.updateButtons(mButtonXML);
+                } else if (mButtonList != null) {
+                    client.updateButtons(mButtonList);
+                }
             }
         }
     }
@@ -268,8 +286,10 @@ class ClientConnectionHandler implements ClientListener {
      * @throws IOException if an update command could not be sent
      */
     private void updateSensorSpeeds() throws IOException {
-        for (ClientConnection client : mClientConnections)
-            client.updateSpeeds(mSensorSpeeds.entrySet());
+        synchronized (mClientConnections) {
+            for (ClientConnection client : mClientConnections)
+                client.updateSpeeds(mSensorSpeeds.entrySet());
+        }
     }
 
     /**
@@ -277,10 +297,12 @@ class ClientConnectionHandler implements ClientListener {
      *
      * @throws IOException if the command could not be sent
      */
-    void updateSensors(Set<SensorType> requiredSensors) throws IOException {
+    synchronized void updateSensors(Set<SensorType> requiredSensors) throws IOException {
         mRequiredSensors = requiredSensors;
-        for (ClientConnection client : mClientConnections)
-            client.updateSensors(mRequiredSensors);
+        synchronized (mClientConnections) {
+            for (ClientConnection client : mClientConnections)
+                client.updateSensors(mRequiredSensors);
+        }
     }
 
     /**
@@ -297,7 +319,9 @@ class ClientConnectionHandler implements ClientListener {
     @Override
     public void onClientDisconnected(NetworkDevice disconnectedClient) {
         // remove the client from the list of known connections
-        mClientConnections.remove(getClientHandler(disconnectedClient));
+        synchronized (mClientConnections) {
+            mClientConnections.remove(getClientHandler(disconnectedClient));
+        }
 
         // forward the disconnect
         mClientListener.onClientDisconnected(disconnectedClient);
@@ -306,9 +330,31 @@ class ClientConnectionHandler implements ClientListener {
     @Override
     public void onClientTimeout(NetworkDevice timeoutClient) {
         // remove the client from the list of known connections
-        mClientConnections.remove(getClientHandler(timeoutClient));
+        synchronized (mClientConnections) {
+            mClientConnections.remove(getClientHandler(timeoutClient));
+        }
 
         // forward the timeout
         mClientListener.onClientTimeout(timeoutClient);
+    }
+
+    /**
+     * This is called when a command is received by a ClientConnection should handle another client
+     *
+     * @param badClient address of the client sending to the wrong ClientConnection
+     * @param command   the command that was received
+     */
+    @Override
+    public void onUnexpectedClient(InetAddress badClient, AbstractCommand command) {
+        // let the client register as usual, so only respond to other commands
+        if (command.getCommandType() != CommandType.ConnectionRequest) {
+            ClientConnection actualConnection = getClientHandler(badClient);
+            System.out.println("remapped " + badClient);
+            try {
+                actualConnection.enforcePorts();
+            } catch (IOException e) {
+                mExceptionListener.onException(this, e, "Could not enforce ports for bad client " + badClient);
+            }
+        }
     }
 }

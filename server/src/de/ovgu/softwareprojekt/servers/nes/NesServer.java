@@ -136,21 +136,24 @@ public class NesServer extends Server {
      */
     @Override
     public boolean acceptClient(NetworkDevice newClient) {
-        System.out.println("Player " + newClient.name + " connected");
+        System.out.println("Player " + newClient.name + " connected " + newClient.hashCode());
         try {
             // create a new steering wheel
-            SteeringWheel newWheel = new SteeringWheel(mButtonConfigs.pop());
-
-            // pipe the gravity sensor directly into the steering wheel
-            mGravitySplitter.addDataSink(newClient, newWheel);
+            SteeringWheel wheel = new SteeringWheel(mButtonConfigs.pop());
 
             // create, store and register the pipeline for the up/down detection
-            NetworkDataSink apd = getAccelerationPhaseDetection(newWheel);
+            NetworkDataSink apd = getAccelerationPhaseDetection(wheel);
+
+            // add the new client as a target for data
+            mGravitySplitter.addDataSink(newClient, wheel);
             mLinearAccelerationSplitter.addDataSink(newClient, apd);
+
+            // store a mapping from this network device to the new control stuff
+            mSteeringWheels.put(newClient, wheel);
             mAccPhaseDetectors.put(newClient, apd);
 
             // add the steering wheel to the list of network devices
-            mSteeringWheels.put(newClient, newWheel);
+            mSteeringWheels.put(newClient, wheel);
         } catch (AWTException | IOException e) {
             e.printStackTrace();
             // yeah this shouldnt happen
@@ -166,16 +169,15 @@ public class NesServer extends Server {
      */
     @Override
     public void onClientDisconnected(NetworkDevice disconnectedClient) {
-        System.out.println("Player " + disconnectedClient.name + " disconnected!");
-        mSteeringWheels.get(disconnectedClient).releaseAllKeys();
+        System.out.println("Player " + disconnectedClient.name + " disconnected! " + disconnectedClient.hashCode());
+
         removeClient(disconnectedClient);
     }
 
     @Override
     public void onClientTimeout(NetworkDevice timeoutClient) {
-        System.out.println("Player " + timeoutClient.name + " had a timeout!");
+        System.out.println("Player " + timeoutClient.name + " had a timeout! " + timeoutClient.hashCode());
 
-        mSteeringWheels.get(timeoutClient).releaseAllKeys();
         removeClient(timeoutClient);
     }
 
@@ -185,18 +187,25 @@ public class NesServer extends Server {
      * @param removeClient the client to be removed
      */
     private void removeClient(NetworkDevice removeClient) {
-        if (mSteeringWheels.get(removeClient) != null) {
+        SteeringWheel wheel = mSteeringWheels.get(removeClient);
+        if (wheel != null) {
+
             // put back the button config that was used by the removed client
-            mButtonConfigs.push(mSteeringWheels.get(removeClient).getButtonConfig());
+            mButtonConfigs.push(wheel.getButtonConfig());
+            wheel.releaseAllKeys();
 
             // delete the steering wheel
             mSteeringWheels.remove(removeClient);
+
+            // remove the client from the splitter
+            mLinearAccelerationSplitter.remove(removeClient);
+            mGravitySplitter.remove(removeClient);
         }
 
         // unregister its data sinks
         try {
-            unregisterDataSink(mAccPhaseDetectors.get(removeClient));
-            unregisterDataSink(mSteeringWheels.get(removeClient));
+            unregisterDataSink(mAccPhaseDetectors.get(removeClient), SensorType.LinearAcceleration);
+            unregisterDataSink(mSteeringWheels.get(removeClient), SensorType.Gravity);
         } catch (IOException | NullPointerException ignored) {
         }
     }

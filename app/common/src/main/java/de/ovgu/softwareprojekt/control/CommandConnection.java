@@ -108,8 +108,8 @@ public class CommandConnection {
 
     /**
      * Use this to gracefully stop operations
-     */
-    public void close() {
+     */x
+ll    public void close() {
         if (mIncomingServer != null)
             mIncomingServer.shutdown();
         mIncomingServer = null;
@@ -122,6 +122,8 @@ public class CommandConnection {
         if (mIncomingServer == null) {
             mIncomingServer = new CommandServer(this);
             mIncomingServer.start();
+
+            mIncomingServer.setName("CommandServer for " + mRemoteHost + ":" + mRemotePort);
         }
     }
 
@@ -136,6 +138,14 @@ public class CommandConnection {
     // workings only.
     private void onCommand(InetAddress origin, AbstractCommand command) {
         mCommandListener.onCommand(origin, command);
+    }
+
+    /**
+     * Immediately change the port to which commands will be sent
+     * @param remotePort the new command port
+     */
+    public void setRemotePort(int remotePort) {
+        mRemotePort = remotePort;
     }
 
 
@@ -171,6 +181,8 @@ public class CommandConnection {
          * @throws IOException when an error occurs during binding of the socket
          */
         CommandServer(CommandConnection listener) throws IOException {
+            super("CommandServer without remote");
+
             // store listener
             mListener = listener;
 

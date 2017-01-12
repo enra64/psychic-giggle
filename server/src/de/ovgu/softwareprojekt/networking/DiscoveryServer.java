@@ -39,6 +39,9 @@ class DiscoveryServer extends DiscoveryThread {
         super(selfName, localCommandPort, localDataPort);
         mListenPort = localDiscoveryPort;
         mExceptionListener = exceptionListener;
+
+        // name thread
+        setName("DiscoveryServer");
     }
 
     /**

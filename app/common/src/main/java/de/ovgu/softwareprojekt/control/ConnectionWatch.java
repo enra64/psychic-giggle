@@ -97,6 +97,7 @@ public class ConnectionWatch extends TimerTask {
      * @param self              network device identifying the local network entity
      * @param outConnection     this connection will be used to request connection checks
      */
+    @SuppressWarnings("WeakerAccess")// must be public for common
     public ConnectionWatch(
             NetworkDevice self,
             TimeoutListener timeoutListener,
@@ -109,6 +110,9 @@ public class ConnectionWatch extends TimerTask {
 
         // we are in active mode if we have an out connection
         mIsActiveMode = outConnection != null;
+
+        // set informative thread name
+        Thread.currentThread().setName("ConnectionWatch for " + mSelf);
     }
 
     /**
@@ -161,8 +165,10 @@ public class ConnectionWatch extends TimerTask {
             }
         } else {
             long delay = System.currentTimeMillis() - mLastCheckEventTimestamp;
-            if (delay > MAXIMUM_CLIENT_RESPONSE_DELAY)
+            if (delay > MAXIMUM_CLIENT_RESPONSE_DELAY) {
+                System.out.println(mSelf + " TEST disconnected");
                 mTimeoutListener.onTimeout(mLastCheckEventTimestamp - mLastRequestTimestamp);
+            }
         }
     }
 
@@ -179,15 +185,6 @@ public class ConnectionWatch extends TimerTask {
      */
     public void onCheckEvent() {
         mLastCheckEventTimestamp = System.currentTimeMillis();
-        //System.out.println("checkevent for " + mSelf);
-    }
-
-    /**
-     * This function is used to notify the watch of a new interaction with the communication partner.
-     */
-    public void onCheckEvent(String by) {
-        mLastCheckEventTimestamp = System.currentTimeMillis();
-        System.out.println("checkevent by " + by);
     }
 
     /**
