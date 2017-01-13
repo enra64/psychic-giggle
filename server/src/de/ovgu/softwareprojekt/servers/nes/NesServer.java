@@ -5,6 +5,7 @@ import de.ovgu.softwareprojekt.NetworkDataSink;
 import de.ovgu.softwareprojekt.SensorType;
 import de.ovgu.softwareprojekt.control.commands.ButtonClick;
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
+import de.ovgu.softwareprojekt.networking.ClientConnection;
 import de.ovgu.softwareprojekt.networking.Server;
 import de.ovgu.softwareprojekt.pipeline.FilterPipelineBuilder;
 import de.ovgu.softwareprojekt.pipeline.filters.AveragingFilter;
@@ -13,6 +14,8 @@ import de.ovgu.softwareprojekt.pipeline.splitters.ClientSplitter;
 import java.awt.*;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashMap;
@@ -57,6 +60,7 @@ public class NesServer extends Server {
      *
      * @param serverName if not null, this name will be used. otherwise, the devices hostname is used
      */
+
     public NesServer(@Nullable String serverName) throws IOException, AWTException {
         super(serverName);
 
@@ -152,6 +156,9 @@ public class NesServer extends Server {
 
             // add the steering wheel to the list of network devices
             mSteeringWheels.put(newClient, newWheel);
+
+
+
         } catch (AWTException | IOException e) {
             e.printStackTrace();
             // yeah this shouldnt happen
@@ -180,6 +187,23 @@ public class NesServer extends Server {
         removeClient(timeoutClient);
     }
 
+    @Override
+    public void onClientAccepted(NetworkDevice connectedClient) {
+        //PlayerID +1 because IDs start at 0
+        int playerID = mSteeringWheels.get(connectedClient).getButtonConfig().getPlayerID() + 1;
+
+        try {
+             InetAddress deviceAddress = connectedClient.getInetAddress();
+            displayNotification(0,"Player " + playerID, "You are player "+ playerID, true, deviceAddress);
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+    }
+
     /**
      * De-initializes a client in this server
      *
@@ -187,6 +211,7 @@ public class NesServer extends Server {
      */
     private void removeClient(NetworkDevice removeClient) {
         if (mSteeringWheels.get(removeClient) != null) {
+
             // put back the button config that was used by the removed client
             mButtonConfigs.add(mSteeringWheels.get(removeClient).getButtonConfig());
 

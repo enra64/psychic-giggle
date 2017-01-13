@@ -135,10 +135,11 @@ class ClientConnectionHandler implements ClientListener {
      * @return null if no matching handler was found, or the handler.
      */
     ClientConnection getClientHandler(InetAddress address) {
-        for (ClientConnection clientConnection : mClientConnections)
+        for (ClientConnection clientConnection : mClientConnections) {
             // true if the clients match
             if (clientConnection.getClient().address.equals(address.getHostAddress()))
                 return clientConnection;
+        }
         return null;
     }
 
@@ -223,6 +224,7 @@ class ClientConnectionHandler implements ClientListener {
      * @return null if no matching handler was found, or the handler.
      */
     public ClientConnection getClientHandler(NetworkDevice client) {
+
         for (ClientConnection clientConnection : mClientConnections)
             // true if the clients match
             if (clientConnection.getClient().equals(client))
@@ -311,4 +313,10 @@ class ClientConnectionHandler implements ClientListener {
         // forward the timeout
         mClientListener.onClientTimeout(timeoutClient);
     }
+
+    @Override
+    public void onClientAccepted(NetworkDevice connectedClient) {
+        mClientListener.onClientAccepted(connectedClient);
+    }
+
 }

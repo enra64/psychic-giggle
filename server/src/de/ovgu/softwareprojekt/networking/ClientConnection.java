@@ -349,4 +349,17 @@ public class ClientConnection implements OnCommandListener, NetworkDataSink, Con
         // notify the client that we do no longer communicate with it in case it is still listening
         closeAndSignalClient();
     }
+
+    /**
+     * this method sends a notification to the device which is then displayed
+     *
+     * @param id - NotificationID: should start at 0 and increases with each new notification while device is connected
+     * @param title - title of the notification
+     * @param content - content of the notification
+     * @param isOnGoing - if true, notification is not removable by user
+     * @throws IOException
+     */
+    public void displayNotification(int id ,String title, String content, boolean isOnGoing) throws IOException {
+        sendCommand(new DisplayNotification(id, title , content, isOnGoing));
+    }
 }

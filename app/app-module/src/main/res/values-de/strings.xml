@@ -2,7 +2,7 @@
 <resources>
     <string name="app_name">SoftwareprojektApp</string>
     <string name="disconnect">Trennen</string>
-    <string name="send_activity_connection_success">Verbindung erflogreich!</string>
+    <string name="send_activity_connection_success">Verbindung erfolgreich!</string>
     <string name="reposition">Zentrieren</string>
     <string name="hold_sonsors">Sensoren blockieren</string>
     <string name="settings">Einstellungen</string>

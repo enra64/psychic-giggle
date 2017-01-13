@@ -154,10 +154,13 @@ public abstract class Server implements OnCommandListener, NetworkDataSink, Clie
                         mClientHandlerFactory.addHandler(mCurrentUnboundClientConnection);
 
                         // begin advertising the next client connection
+                        // begin advertising the next client connection
                         advertiseServer();
                     } catch (IOException e) {
                         onException(this, e, "Could not start listening for new client. Bad.");
                     }
+
+                    onClientAccepted(mClientHandlerFactory.getClientHandler(origin).getClient());
                 }
                 break;
             case ButtonClick:
@@ -232,7 +235,7 @@ public abstract class Server implements OnCommandListener, NetworkDataSink, Clie
     protected void registerDataSink(NetworkDataSink dataSink, SensorType requestedSensor) throws IOException {
         // dataSink *must not be* this, as that would lead to infinite recursion
         if(this == dataSink)
-            throw new InvalidParameterException("A Server subclass cannot register itself as a data sink.");
+            throw new InvalidParameterException("A Server subclass cannot setDeviceIDregister itself as a data sink.");
 
         // add new data sink list if the requested sensor type has no sinks yet
         if (!mDataSinks.containsKey(requestedSensor))
@@ -323,5 +326,19 @@ public abstract class Server implements OnCommandListener, NetworkDataSink, Clie
      */
     protected void setSensorOutputRange(SensorType sensor, @SuppressWarnings("SameParameterValue") float outputRange) {
         mClientHandlerFactory.setSensorOutputRange(sensor, outputRange);
+    }
+    /**
+     * this method sends a notification to the device which is then displayed
+     *
+     * @param id - NotificationID: should start at 0 and increases with each new notification while device is connected
+     * @param title - title of the notification
+     * @param content - content of the notification
+     * @param isOnGoing - if true, notification is not removable by user
+     * @param deviceAddress - address of the device that shall display the notification
+     * @throws IOException
+     */
+    protected void displayNotification(int id, String title, String content, boolean isOnGoing, InetAddress deviceAddress) throws IOException {
+        mClientHandlerFactory.getClientHandler(deviceAddress).displayNotification(id, title ,content, isOnGoing);
+
     }
 }

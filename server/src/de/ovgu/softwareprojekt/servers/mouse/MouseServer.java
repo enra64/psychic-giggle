@@ -104,6 +104,11 @@ public class MouseServer extends Server {
     }
 
     @Override
+    public void onClientAccepted(NetworkDevice connectedClient) {
+
+    }
+
+    @Override
     public void onResetPosition(NetworkDevice origin) {
         mMouseMover.resetPosToCenter();
     }

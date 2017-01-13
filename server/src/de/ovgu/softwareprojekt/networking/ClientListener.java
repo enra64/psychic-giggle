@@ -27,4 +27,10 @@ public interface ClientListener {
      * @param timeoutClient the client that did not respond
      */
     void onClientTimeout(NetworkDevice timeoutClient);
+
+    /**
+     * called when a Client is successfully connected
+     * @param connectedClient the client that connected successfully
+     */
+    void onClientAccepted(NetworkDevice connectedClient);
 }
