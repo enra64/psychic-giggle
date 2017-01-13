@@ -284,8 +284,10 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
         // the progress dialog can be dismissed in any case
         mConnectionProgressDialog.dismiss();
 
-        if (granted)
+        if (granted) {
             UiUtil.showToast(this, getString(R.string.send_activity_connection_success));
+
+        }
         else
             closeActivity(RESULT_SERVER_REFUSED);
     }

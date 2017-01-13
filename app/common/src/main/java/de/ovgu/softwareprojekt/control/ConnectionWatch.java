@@ -23,6 +23,11 @@ import java.util.TimerTask;
  */
 public class ConnectionWatch extends TimerTask {
     /**
+     * This ConnectionWatch watches the connection to this remote
+     */
+    private NetworkDevice mRemote;
+
+    /**
      * Callback interface for timeouts
      */
     public interface TimeoutListener {
@@ -47,7 +52,7 @@ public class ConnectionWatch extends TimerTask {
     /**
      * If the time between connection check requests exceeds this time, the connection is deemed dead.
      */
-    private static final long MAXIMUM_CLIENT_RESPONSE_DELAY = 2000;// please do not increase this value without talking to me -Arne
+    private static final long MAXIMUM_CLIENT_RESPONSE_DELAY = 2500;// please do not increase this value without talking to me -Arne
 
     /**
      * This is the first of two timestamps used to keep check of the delay between sending the request
@@ -113,6 +118,8 @@ public class ConnectionWatch extends TimerTask {
 
         // set informative thread name
         Thread.currentThread().setName("ConnectionWatch for " + mSelf);
+
+        System.out.println("created connection watch");
     }
 
     /**
@@ -144,6 +151,17 @@ public class ConnectionWatch extends TimerTask {
         mIsStarted = true;
     }
 
+    /**
+     * Set the remote this connectionwatch should watch
+     * @param remote the target of the connection this watch watches
+     */
+    public void setRemote(NetworkDevice remote){
+        mRemote = remote;
+
+        // set informative thread name
+        Thread.currentThread().setName("ConnectionWatch for " + mSelf);
+    }
+
     @Override
     public void run() {
         if (mIsActiveMode) {
@@ -155,9 +173,13 @@ public class ConnectionWatch extends TimerTask {
                 else if (mOutConnection.isRunningAndConfigured()) {
                     mOutConnection.sendCommand(new ConnectionAliveCheck(mSelf));
 
+                    System.out.println(mRemote + " request event: " + mLastRequestTimestamp + ", diff: " + (mLastCheckEventTimestamp - mLastRequestTimestamp));
+
                     // update the timestamp
                     mLastRequestTimestamp = System.currentTimeMillis();
+
                 }
+                //System.out.println((mRemote != null ? mRemote : "unset remote") + " took " + (mLastCheckEventTimestamp - mLastRequestTimestamp) + "ms to answer");
             } catch (ConnectException e) {
                 mTimeoutListener.onTimeout(mLastCheckEventTimestamp - mLastRequestTimestamp);
             } catch (IOException e) {
@@ -168,7 +190,8 @@ public class ConnectionWatch extends TimerTask {
             if (delay > MAXIMUM_CLIENT_RESPONSE_DELAY) {
                 System.out.println(mSelf + " TEST disconnected");
                 mTimeoutListener.onTimeout(mLastCheckEventTimestamp - mLastRequestTimestamp);
-            }
+            } else
+                System.out.println("con check ok: " + mSelf.name + ": " + delay);
         }
     }
 

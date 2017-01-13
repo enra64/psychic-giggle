@@ -226,8 +226,10 @@ public class NetworkClient implements DataSink, ExceptionListener, OnCommandList
             case ConnectionRequestResponse:
                 ConnectionRequestResponse res = (ConnectionRequestResponse) command;
                 // if the connection was granted, start the connection check timer
-                if(res.grant && !mConnectionWatch.started())
+                if(res.grant && !mConnectionWatch.started()){
+                    mConnectionWatch.setRemote(mServer);
                     mConnectionWatch.start();
+                }
 
                 // relay the connection request
                 mCommandListener.onCommand(origin, command);

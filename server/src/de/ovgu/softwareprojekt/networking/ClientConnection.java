@@ -225,6 +225,9 @@ public class ClientConnection implements OnCommandListener, NetworkDataSink, Con
             // accept the client
             sendCommand(new ConnectionRequestResponse(true));
 
+            // give the connection watch the device it watches
+            mConnectionWatch.setRemote(client);
+
             // start the connection watch
             mConnectionWatch.start();
         } catch (IOException e) {
