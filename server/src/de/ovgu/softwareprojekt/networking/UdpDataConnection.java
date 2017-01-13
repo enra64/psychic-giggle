@@ -47,12 +47,16 @@ class UdpDataConnection extends Thread implements NetworkDataSource {
      * Create a new UdpDataConnection that will start listening after {@link #start()} is called.
      */
     UdpDataConnection(ExceptionListener exceptionListener) throws SocketException {
+        super("UdpDataConnection: unbound");
         mLocalPort = findFreePort();
         mExceptionListener = exceptionListener;
     }
 
     void setClient(NetworkDevice client){
         mClient = client;
+
+        // update thread name
+        setName("UdpDataConnection for " + mClient);
     }
 
     /**

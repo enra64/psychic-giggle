@@ -115,7 +115,6 @@ public class SteeringWheel implements NetworkDataSink, AccelerationPhaseDetectio
         } catch (IOException ignored) {
         }
 
-        System.out.println("onUp");
         mSteeringBot.keyPress(mButtonConfig.mapInput(DOWN_BUTTON));
         mSteeringBot.delay(5);
         mSteeringBot.keyPress(mButtonConfig.mapInput(A_BUTTON));
@@ -132,7 +131,6 @@ public class SteeringWheel implements NetworkDataSink, AccelerationPhaseDetectio
         } catch (IOException ignored) {
         }
 
-        System.out.println("onDown");
         mSteeringBot.keyPress(mButtonConfig.mapInput(UP_BUTTON));
         mSteeringBot.delay(5);
         mSteeringBot.keyPress(mButtonConfig.mapInput(A_BUTTON));

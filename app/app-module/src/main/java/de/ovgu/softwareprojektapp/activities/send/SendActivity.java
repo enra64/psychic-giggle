@@ -18,6 +18,7 @@ import android.widget.CompoundButton;
 
 import java.net.ConnectException;
 import java.net.InetAddress;
+import java.net.SocketException;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -257,6 +258,7 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
     protected void onPause() {
         super.onPause();
         mSensorHandler.suspendSensors();
+        mResponseTimeoutTimer.cancel();
     }
 
     @Override
@@ -375,6 +377,8 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
             closeActivity(RESULT_SERVER_CONNECTION_TIMED_OUT);
         else if (exception instanceof ConnectException && exception.getMessage().contains("Socket is closed"))
             closeActivity(RESULT_SERVER_NOT_LISTENING_ON_PORT);
+        else if (exception instanceof SocketException && info.contains("could not send SensorData object"))
+            Log.e("spapp", "could not send data");
         else{
             Log.w("spapp", "UNHANDLED EXCEPTION SENDACTIVITY:");
             exception.printStackTrace();

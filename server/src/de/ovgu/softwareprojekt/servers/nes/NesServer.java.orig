@@ -60,6 +60,7 @@ public class NesServer extends Server {
      *
      * @param serverName if not null, this name will be used. otherwise, the devices hostname is used
      */
+
     public NesServer(@Nullable String serverName) throws IOException, AWTException {
         super(serverName);
 
@@ -157,7 +158,14 @@ public class NesServer extends Server {
             mAccPhaseDetectors.put(newClient, apd);
 
             // add the steering wheel to the list of network devices
+<<<<<<< HEAD
+            mSteeringWheels.put(newClient, newWheel);
+
+
+
+=======
             mSteeringWheels.put(newClient, wheel);
+>>>>>>> 660b8ceadffb9ce5d2d4c5626dff15ac29fac4e4
         } catch (AWTException | IOException e) {
             e.printStackTrace();
             // yeah this shouldnt happen
@@ -183,17 +191,33 @@ public class NesServer extends Server {
         removeClient(timeoutClient);
     }
 
+    @Override
+    public void onClientAccepted(NetworkDevice connectedClient) {
+        //PlayerID +1 because IDs start at 0
+        int playerID = mSteeringWheels.get(connectedClient).getButtonConfig().getPlayerID() + 1;
+
+        try {
+             InetAddress deviceAddress = connectedClient.getInetAddress();
+            displayNotification(0,"Player " + playerID, "You are player "+ playerID, true, deviceAddress);
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+    }
+
     /**
      * De-initializes a client in this server
      *
      * @param removeClient the client to be removed
      */
     private void removeClient(NetworkDevice removeClient) {
-        SteeringWheel wheel = mSteeringWheels.get(removeClient);        
-        if (wheel != null) {
+        if (mSteeringWheels.get(removeClient) != null) {
+
             // put back the button config that was used by the removed client
-            mButtonConfigs.add(wheel.getButtonConfig());
-            wheel.releaseAllKeys();
+            mButtonConfigs.add(mSteeringWheels.get(removeClient).getButtonConfig());
 
             // delete the steering wheel
             mSteeringWheels.remove(removeClient);
@@ -240,9 +264,5 @@ public class NesServer extends Server {
     private static String readFile(String path, String encoding) throws IOException {
         byte[] encoded = Files.readAllBytes(Paths.get(path));
         return new String(encoded, encoding);
-    }
-
-    @Override
-    public void onClientAccepted(NetworkDevice connectedClient) {
     }
 }

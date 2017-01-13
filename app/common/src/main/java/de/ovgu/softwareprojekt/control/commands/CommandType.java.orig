@@ -15,8 +15,11 @@ public enum CommandType {
     SensorRangeNotification,
     UpdateButtonsMap,
     UpdateButtonsXML,
+<<<<<<< HEAD
     SetSensorSpeed,
-    DisplayNotification,
-    RemapPorts
+    DisplayNotification
 
+=======
+    RemapPorts, SetSensorSpeed
+>>>>>>> 660b8ceadffb9ce5d2d4c5626dff15ac29fac4e4
 }
