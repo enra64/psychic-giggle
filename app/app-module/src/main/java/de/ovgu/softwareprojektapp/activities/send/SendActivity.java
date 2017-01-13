@@ -352,7 +352,7 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
                 //display message
                 DisplayNotification notification = (DisplayNotification) command;
                  mBuilder = new NotificationCompat.Builder(this)
-                                .setSmallIcon(R.drawable.ic_stat_name) //TODO: we may should design another icon or so lol - ulrich
+                                .setSmallIcon(R.drawable.ic_stat_name)
                                 .setOngoing(notification.isOnGoing)
                                 .setContentTitle(notification.title)
                                 .setContentText(notification.content);
