@@ -108,8 +108,8 @@ public class CommandConnection {
 
     /**
      * Use this to gracefully stop operations
-     */x
-ll    public void close() {
+     */
+    public void close() {
         if (mIncomingServer != null)
             mIncomingServer.shutdown();
         mIncomingServer = null;
