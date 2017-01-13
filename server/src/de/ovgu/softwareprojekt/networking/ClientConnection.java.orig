@@ -1,7 +1,6 @@
 package de.ovgu.softwareprojekt.networking;
 
 import com.sun.istack.internal.NotNull;
-import de.ovgu.softwareprojekt.DataSink;
 import de.ovgu.softwareprojekt.NetworkDataSink;
 import de.ovgu.softwareprojekt.SensorData;
 import de.ovgu.softwareprojekt.SensorType;
@@ -117,6 +116,7 @@ public class ClientConnection implements OnCommandListener, NetworkDataSink, Con
 
         //NetworkDevice identifying this client handler (eg name, data, command port)
         NetworkDevice self = new NetworkDevice(serverName, mCommandConnection.getLocalPort(), mDataConnection.getLocalPort());
+        System.out.println("new client connection: " + self.hashCode());
         mConnectionWatch = new ConnectionWatch(self, this, mCommandConnection, exceptionListener);
     }
 
@@ -195,6 +195,7 @@ public class ClientConnection implements OnCommandListener, NetworkDataSink, Con
      */
     void closeAndSignalClient() {
         try {
+            System.out.println("closing client " + mClient);
             sendCommand(new EndConnection(null));
         } catch (IOException ignored) {
             // ignore this exception, since the connection state to this client doesn't matter anymore anyways
@@ -224,9 +225,6 @@ public class ClientConnection implements OnCommandListener, NetworkDataSink, Con
             // accept the client
             sendCommand(new ConnectionRequestResponse(true));
 
-            // give the connection watch the device it watches
-            mConnectionWatch.setRemote(client);
-
             // start the connection watch
             mConnectionWatch.start();
         } catch (IOException e) {
@@ -255,6 +253,8 @@ public class ClientConnection implements OnCommandListener, NetworkDataSink, Con
 
         // begin listening for commands
         mCommandConnection.start();
+
+        System.out.println("new command connection on port " + mCommandConnection.getLocalPort());
     }
 
     /**
@@ -377,15 +377,7 @@ public class ClientConnection implements OnCommandListener, NetworkDataSink, Con
     }
 
     /**
-     * Call this to remind the client of its ports, if it got the wrong ports at the start
-     *
-     * @throws IOException if the command could not be sent
-     */
-    void enforcePorts() throws IOException {
-        sendCommand(new RemapPorts(getDataPort(), getCommandPort()));
-    }
-
-    /**
+<<<<<<< HEAD
      * this method sends a notification to the device which is then displayed
      *
      * @param id - NotificationID: should start at 0 and increases with each new notification while device is connected
@@ -396,5 +388,13 @@ public class ClientConnection implements OnCommandListener, NetworkDataSink, Con
      */
     public void displayNotification(int id ,String title, String content, boolean isOnGoing) throws IOException {
         sendCommand(new DisplayNotification(id, title , content, isOnGoing));
+=======
+     * Call this to remind the client of its ports, if it got the wrong ports at the start
+     *
+     * @throws IOException if the command could not be sent
+     */
+    void enforcePorts() throws IOException {
+        sendCommand(new RemapPorts(getDataPort(), getCommandPort()));
+>>>>>>> 660b8ceadffb9ce5d2d4c5626dff15ac29fac4e4
     }
 }

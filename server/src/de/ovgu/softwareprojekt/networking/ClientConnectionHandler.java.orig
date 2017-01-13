@@ -143,11 +143,18 @@ class ClientConnectionHandler implements ClientListener, UnexpectedClientListene
      * @return null if no matching handler was found, or the handler.
      */
     ClientConnection getClientHandler(InetAddress address) {
+<<<<<<< HEAD
+        for (ClientConnection clientConnection : mClientConnections) {
+            // true if the clients match
+            if (clientConnection.getClient().address.equals(address.getHostAddress()))
+                return clientConnection;
+=======
         synchronized (mClientConnections) {
             for (ClientConnection clientConnection : mClientConnections)
                 // true if the clients match
                 if (clientConnection.getClient().address.equals(address.getHostAddress()))
                     return clientConnection;
+>>>>>>> 660b8ceadffb9ce5d2d4c5626dff15ac29fac4e4
         }
         return null;
     }
@@ -235,12 +242,20 @@ class ClientConnectionHandler implements ClientListener, UnexpectedClientListene
      * @return null if no matching handler was found, or the handler.
      */
     public ClientConnection getClientHandler(NetworkDevice client) {
+<<<<<<< HEAD
+
+        for (ClientConnection clientConnection : mClientConnections)
+            // true if the clients match
+            if (clientConnection.getClient().equals(client))
+                return clientConnection;
+=======
         synchronized (mClientConnections) {
             for (ClientConnection clientConnection : mClientConnections)
                 // true if the clients match
                 if (clientConnection.getClient().equals(client))
                     return clientConnection;
         }
+>>>>>>> 660b8ceadffb9ce5d2d4c5626dff15ac29fac4e4
         return null;
     }
 
@@ -338,6 +353,13 @@ class ClientConnectionHandler implements ClientListener, UnexpectedClientListene
         mClientListener.onClientTimeout(timeoutClient);
     }
 
+<<<<<<< HEAD
+    @Override
+    public void onClientAccepted(NetworkDevice connectedClient) {
+        mClientListener.onClientAccepted(connectedClient);
+    }
+
+=======
     /**
      * This is called when a command is received by a ClientConnection should handle another client
      *
@@ -357,9 +379,5 @@ class ClientConnectionHandler implements ClientListener, UnexpectedClientListene
             }
         }
     }
-
-    @Override
-    public void onClientAccepted(NetworkDevice connectedClient) {
-        mClientListener.onClientAccepted(connectedClient);
-    }
+>>>>>>> 660b8ceadffb9ce5d2d4c5626dff15ac29fac4e4
 }

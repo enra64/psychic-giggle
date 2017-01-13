@@ -159,6 +159,7 @@ public abstract class Server implements OnCommandListener, ClientListener, Excep
                         mClientHandlerFactory.addHandler(mCurrentUnboundClientConnection);
 
                         // begin advertising the next client connection
+                        // begin advertising the next client connection
                         advertiseServer();
                     } catch (IOException e) {
                         onException(this, e, "Could not start listening for new client. Bad.");
@@ -221,7 +222,23 @@ public abstract class Server implements OnCommandListener, ClientListener, Excep
      * @throws IOException if a client could not be notified of the sensor change
      */
     protected void registerDataSink(NetworkDataSink dataSink, SensorType requestedSensor) throws IOException {
+<<<<<<< HEAD
+        // dataSink *must not be* this, as that would lead to infinite recursion
+        if(this == dataSink)
+            throw new InvalidParameterException("A Server subclass cannot setDeviceIDregister itself as a data sink.");
+
+        // add new data sink list if the requested sensor type has no sinks yet
+        if (!mDataSinks.containsKey(requestedSensor))
+            mDataSinks.put(requestedSensor, new HashSet<>());
+
+        // add the new sink to the list of sink for the sensor
+        mDataSinks.get(requestedSensor).add(dataSink);
+
+        // force resetting the sensors on the client
+        mClientHandlerFactory.updateSensors(mDataSinks.keySet());
+=======
         mDataMapper.registerDataSink(requestedSensor, dataSink);
+>>>>>>> 660b8ceadffb9ce5d2d4c5626dff15ac29fac4e4
     }
 
     /**
@@ -304,7 +321,6 @@ public abstract class Server implements OnCommandListener, ClientListener, Excep
     protected void setSensorOutputRange(SensorType sensor, @SuppressWarnings("SameParameterValue") float outputRange) {
         mClientHandlerFactory.setSensorOutputRange(sensor, outputRange);
     }
-
     /**
      * this method sends a notification to the device which is then displayed
      *

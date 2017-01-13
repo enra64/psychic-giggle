@@ -133,6 +133,11 @@ public class Grapher extends Server {
     }
 
     @Override
+    public void onClientAccepted(NetworkDevice connectedClient) {
+
+    }
+
+    @Override
     public void onException(Object origin, Exception exception, String info) {
         // ok guys maybe we should do something about this
         exception.printStackTrace();

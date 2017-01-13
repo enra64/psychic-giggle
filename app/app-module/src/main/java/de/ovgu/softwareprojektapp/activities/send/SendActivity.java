@@ -1,12 +1,14 @@
 package de.ovgu.softwareprojektapp.activities.send;
 
+
+import android.app.NotificationManager;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.hardware.Sensor;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.app.NotificationCompat;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -28,6 +30,7 @@ import de.ovgu.softwareprojekt.control.commands.ConnectionRequestResponse;
 import de.ovgu.softwareprojekt.control.commands.ChangeSensorSensitivity;
 import de.ovgu.softwareprojekt.control.commands.ResetToCenter;
 import de.ovgu.softwareprojekt.control.commands.SensorRangeNotification;
+import de.ovgu.softwareprojekt.control.commands.DisplayNotification;
 import de.ovgu.softwareprojekt.control.commands.SetSensorCommand;
 import de.ovgu.softwareprojekt.control.commands.SetSensorSpeed;
 import de.ovgu.softwareprojekt.control.commands.UpdateButtonsMap;
@@ -90,6 +93,17 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
      */
     private Timer mResponseTimeoutTimer;
 
+    /**
+     * mBuilder to show deviceID in Notification
+     */
+    private android.support.v4.app.NotificationCompat.Builder mBuilder;
+
+    /**
+     * handle the shown Notifications
+     */
+    private NotificationManager mNotificationManager;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -100,6 +114,7 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
 
         // we create a NetworkDevice from our extras to have all the data we need in a neat package
         parseIncomingNetworkDevice();
+
 
         // create a new sensor handler to help with the sensors
         mSensorHandler = new SensorHandler(this, mNetworkClient);
@@ -268,6 +283,8 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        mNotificationManager.cancelAll();
+
         mNetworkClient.signalConnectionEnd();
         mNetworkClient.close();
     }
@@ -327,7 +344,21 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
                 SetSensorSpeed setSpeedCommand = (SetSensorSpeed) command;
                 mSensorHandler.setSensorSpeed(setSpeedCommand.affectedSensor, setSpeedCommand.sensorSpeed);
                 break;
-            // ignore unhandled commands
+            case DisplayNotification:
+
+                //set Notificationmanager in order to handle the notifications
+                mNotificationManager  = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+
+                //display message
+                DisplayNotification notification = (DisplayNotification) command;
+                 mBuilder = new NotificationCompat.Builder(this)
+                                .setSmallIcon(R.drawable.ic_stat_name) //TODO: we may should design another icon or so lol - ulrich
+                                .setOngoing(notification.isOnGoing)
+                                .setContentTitle(notification.title)
+                                .setContentText(notification.content);
+                mNotificationManager.notify(notification.id,mBuilder.build());
+                break;
+                // ignore unhandled commands
             default:
                 break;
         }
