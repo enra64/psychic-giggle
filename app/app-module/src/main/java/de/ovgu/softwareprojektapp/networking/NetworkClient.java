@@ -234,7 +234,7 @@ public class NetworkClient implements DataSink, ExceptionListener, OnCommandList
                 ConnectionRequestResponse res = (ConnectionRequestResponse) command;
                 // if the connection was granted, start the connection check timer unless the network
                 // client was alread closed
-         y       if(res.grant && !mConnectionWatch.started() && !mWasClosed){
+                if(res.grant && !mConnectionWatch.started() && !mWasClosed){
                     mConnectionWatch.setRemote(mServer);
                     mConnectionWatch.start();
                 }
