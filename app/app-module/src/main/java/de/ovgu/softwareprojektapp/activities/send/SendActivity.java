@@ -283,7 +283,9 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        mNotificationManager.cancelAll();
+
+        if(mNotificationManager != null)
+            mNotificationManager.cancelAll();
 
         mNetworkClient.signalConnectionEnd();
         mNetworkClient.close();
