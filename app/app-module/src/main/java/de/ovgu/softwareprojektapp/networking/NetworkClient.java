@@ -71,6 +71,11 @@ public class NetworkClient implements DataSink, ExceptionListener, OnCommandList
     private ConnectionWatch mConnectionWatch;
 
     /**
+     * True once {@link #close()} was called
+     */
+    private boolean mWasClosed = false;
+
+    /**
      * Create a new network client. To connect to a server, call {@link #requestConnection()}, and wait
      * for an answer from the server
      *
@@ -178,6 +183,8 @@ public class NetworkClient implements DataSink, ExceptionListener, OnCommandList
         mConnectionWatch.close();
         mOutboundDataConnection.close();
         mCommandConnection.close();
+
+        mWasClosed = true;
     }
 
     @Override
@@ -225,8 +232,9 @@ public class NetworkClient implements DataSink, ExceptionListener, OnCommandList
                 break;
             case ConnectionRequestResponse:
                 ConnectionRequestResponse res = (ConnectionRequestResponse) command;
-                // if the connection was granted, start the connection check timer
-                if(res.grant && !mConnectionWatch.started()){
+                // if the connection was granted, start the connection check timer unless the network
+                // client was alread closed
+         y       if(res.grant && !mConnectionWatch.started() && !mWasClosed){
                     mConnectionWatch.setRemote(mServer);
                     mConnectionWatch.start();
                 }
