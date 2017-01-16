@@ -9,6 +9,7 @@ import de.ovgu.softwareprojekt.control.OnCommandListener;
 import de.ovgu.softwareprojekt.control.commands.*;
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
 import de.ovgu.softwareprojekt.misc.ExceptionListener;
+import sun.net.NetworkClient;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -133,6 +134,8 @@ public abstract class Server implements OnCommandListener, ClientListener, Excep
      */
     @Override
     public void onCommand(InetAddress origin, AbstractCommand command) {
+        ClientConnection fromClient = mClientHandlerFactory.getClientHandler(origin);
+
         // decide what to do with the packet
         switch (command.getCommandType()) {
             case ConnectionRequest:
@@ -168,10 +171,12 @@ public abstract class Server implements OnCommandListener, ClientListener, Excep
                 }
                 break;
             case ButtonClick:
-                onButtonClick((ButtonClick) command, mClientHandlerFactory.getClientHandler(origin).getClient());
+                if(fromClient != null)
+                    onButtonClick((ButtonClick) command, fromClient.getClient());
                 break;
             case ResetToCenter:
-                onResetPosition(mClientHandlerFactory.getClientHandler(origin).getClient());
+                if(fromClient != null)
+                    onResetPosition(fromClient.getClient());
                 break;
             // ignore unhandled commands
             default:

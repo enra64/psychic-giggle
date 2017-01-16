@@ -194,6 +194,7 @@ public class NesServer extends Server {
             // put back the button config that was used by the removed client
             mButtonConfigs.add(wheel.getButtonConfig());
             wheel.releaseAllKeys();
+            wheel.close();
 
             // delete the steering wheel
             mSteeringWheels.remove(removeClient);
@@ -215,8 +216,10 @@ public class NesServer extends Server {
     public void close() {
         super.close();
 
-        for (SteeringWheel sw : mSteeringWheels.values())
+        for (SteeringWheel sw : mSteeringWheels.values()) {
             sw.releaseAllKeys();
+            sw.close();
+        }
     }
 
     @Override
