@@ -27,7 +27,7 @@ public class DiscoveryClient extends DiscoveryThread {
     /**
      * Constant specifying how old a server discovery may be before it is regarded offline
      */
-    private static final long MAXIMUM_SERVER_AGE_MS = 50;
+    private static final long MAXIMUM_SERVER_AGE_MS = 1000;
 
     /**
      * Timing variables
@@ -35,8 +35,8 @@ public class DiscoveryClient extends DiscoveryThread {
     @SuppressWarnings("FieldCanBeLocal")
     private static final int DISCOVERY_BROADCAST_DELAY = 0,
             DISCOVERY_BROADCAST_PERIOD = 25,
-            SERVER_LIST_REFRESH_DELAY = 10,
-            SERVER_LIST_REFRESH_PERIOD = 25;
+            SERVER_LIST_REFRESH_DELAY = 25,
+            SERVER_LIST_REFRESH_PERIOD = 10;
 
     /**
      * Our broadcaster handles the recurring self identification broadcasts.
