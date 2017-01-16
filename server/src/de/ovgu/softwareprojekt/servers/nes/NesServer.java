@@ -247,5 +247,13 @@ public class NesServer extends Server {
 
     @Override
     public void onClientAccepted(NetworkDevice connectedClient) {
+        //Get playerID and add 1, because IDs start with zero
+        int playerID = mSteeringWheels.get(connectedClient).getButtonConfig().getPlayerID()+1;
+
+        try {
+            displayNotification(0, "Player " + playerID, "You are connected as player " + playerID, true, connectedClient.getInetAddress());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
