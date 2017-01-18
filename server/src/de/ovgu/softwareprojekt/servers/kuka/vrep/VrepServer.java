@@ -3,7 +3,6 @@ package de.ovgu.softwareprojekt.servers.kuka.vrep;
 import de.ovgu.softwareprojekt.control.commands.ButtonClick;
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
 import de.ovgu.softwareprojekt.networking.Server;
-import de.ovgu.softwareprojekt.servers.kuka.LbrJoints;
 
 import static de.ovgu.softwareprojekt.servers.kuka.LbrJoints.*;
 
@@ -16,13 +15,13 @@ public class VrepServer extends Server {
     public VrepServer(){
         super(null);
 
-        System.out.println("If the following does not contain something akin to remoteApiJava.<lib>, you have a problem. probably.");
-        System.out.println(System.getProperty("java.library.path"));
-        System.load("/usr/local/lib/libremoteApiJava.so");
+        System.out.println("java.library.path: " + System.getProperty("java.library.path"));
+        System.out.flush();
 
         mVrep = new Vrep("127.0.0.1", 19997);
         mVrep.start();
-        mVrep.setJointVelocity(Joint2, 2);
+        //mVrep.setJointVelocity(Joint2, 8000);
+        mVrep.rotateJoint(Joint6, 40);
     }
 
     @Override

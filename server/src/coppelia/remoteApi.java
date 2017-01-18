@@ -26,7 +26,7 @@
 //
 // This file was automatically created for V-REP release V3.3.2 on August 29th 2016
 
-package de.ovgu.softwareprojekt.servers.kuka.vrep.coppelia;
+package coppelia;
 
 public class remoteApi
 {

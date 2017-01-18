@@ -3,14 +3,14 @@ package de.ovgu.softwareprojekt.servers.kuka.vrep;
 import de.ovgu.softwareprojekt.servers.kuka.LbrIIIIIIIIwa;
 import de.ovgu.softwareprojekt.servers.kuka.LbrJoints;
 import de.ovgu.softwareprojekt.servers.kuka.RoboticFailure;
-import de.ovgu.softwareprojekt.servers.kuka.vrep.coppelia.IntW;
-import de.ovgu.softwareprojekt.servers.kuka.vrep.coppelia.remoteApi;
+import coppelia.IntW;
+import coppelia.remoteApi;
 
 import java.util.EnumMap;
 
-import static de.ovgu.softwareprojekt.servers.kuka.vrep.coppelia.remoteApi.simx_opmode_blocking;
-import static de.ovgu.softwareprojekt.servers.kuka.vrep.coppelia.remoteApi.simx_opmode_oneshot;
-import static de.ovgu.softwareprojekt.servers.kuka.vrep.coppelia.remoteApi.simx_return_ok;
+import static coppelia.remoteApi.simx_opmode_blocking;
+import static coppelia.remoteApi.simx_opmode_oneshot;
+import static coppelia.remoteApi.simx_return_ok;
 
 /**
  * An implementation of the {@link LbrIIIIIIIIwa} interface for controlling a lbr iiwa robot in vrep
@@ -44,7 +44,7 @@ public class Vrep implements LbrIIIIIIIIwa {
 
         // get all joints
         for(int i = 1; i <= 7; i++)
-            mJointMap.put(LbrJoints.values()[i], getSimulationObject("LBR_iiwa_7_R800_joint" + i));
+            mJointMap.put(LbrJoints.values()[i - 1], getSimulationObject("LBR_iiwa_7_R800_joint" + i));
 
         // start the simulation in blocking mode to wait until it started
         mVrep.simxStartSimulation(mClientId, simx_opmode_blocking);

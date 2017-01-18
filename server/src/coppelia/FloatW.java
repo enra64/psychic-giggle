@@ -1,6 +1,6 @@
 // PUT_VREP_REMOTEAPI_COPYRIGHT_NOTICE_HERE
 
-package de.ovgu.softwareprojekt.servers.kuka.vrep.coppelia;
+package coppelia;
 
 public class FloatW
 {

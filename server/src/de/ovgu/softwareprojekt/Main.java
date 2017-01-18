@@ -19,6 +19,7 @@ public class Main {
             case "vrep":
                 new VrepServer().start();
                 System.out.println("VrepServer started");
+                break;
             default:
             case "nes":
                 new NesServer(null).start();
