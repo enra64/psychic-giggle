@@ -1,11 +1,11 @@
 package de.ovgu.softwareprojekt.servers.kuka;
 
 import de.ovgu.softwareprojekt.SensorType;
+import de.ovgu.softwareprojekt.callback_interfaces.ResetListener;
 import de.ovgu.softwareprojekt.control.commands.ButtonClick;
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
 import de.ovgu.softwareprojekt.networking.Server;
 import de.ovgu.softwareprojekt.pipeline.filters.AveragingFilter;
-import de.ovgu.softwareprojekt.pipeline.filters.IntegratingFilter;
 import de.ovgu.softwareprojekt.pipeline.splitters.Switch;
 
 import java.io.IOException;
@@ -20,6 +20,8 @@ public class KukaServer extends Server {
     private boolean mIsInMurmelMode = true;
 
     private static final int MODE_BUTTON = 0;
+
+    // if you change theses ids, you're gonna have a bad time (see joint control onButtonClick)
     private static final int
             JOINT1_BUTTON = 1,
             JOINT2_BUTTON = 2,
@@ -31,35 +33,33 @@ public class KukaServer extends Server {
 
     private Switch mModeDataSwitch;
 
+    private JointControl mJointControl;
+    private MurmelControl mMurmelControl;
+    private ResetListener mCurrentControl;
+
     public KukaServer() throws IOException {
         super(null);
 
         mRobotInterface = new Vrep("127.0.0.1", 19997);
         mRobotInterface.start();
 
-        initJoints();
         createButtons();
 
+        // create both control instances
+        mMurmelControl = new MurmelControl(mRobotInterface);
+        mCurrentControl = mMurmelControl;
+        mJointControl = new JointControl(mRobotInterface);
+
         // create a new data switch
-        mModeDataSwitch = new Switch(new AveragingFilter(3, new MurmelControl(mRobotInterface)), new JointControl(), true);
+        mModeDataSwitch = new Switch(new AveragingFilter(3, mMurmelControl), mJointControl, true);
 
         registerDataSink(mModeDataSwitch, SensorType.Gravity);
         setSensorOutputRange(SensorType.Gravity, 100);
     }
 
-    private void initJoints() {
-        mRobotInterface.rotateJointTarget(BaseRotator, 0);
-        mRobotInterface.rotateJointTarget(SecondRotator, 0);
-        mRobotInterface.rotateJointTarget(ThirdRotator, 0);
-        mRobotInterface.rotateJointTarget(ToolRotator, 10);
-        mRobotInterface.rotateJointTarget(BaseTilter, 45);
-        mRobotInterface.rotateJointTarget(SecondTilter, -45);
-        mRobotInterface.rotateJointTarget(ToolTilter, 0);
-    }
-
     @Override
     public void onResetPosition(NetworkDevice origin) {
-        initJoints();
+
     }
 
     @Override
@@ -140,7 +140,13 @@ public class KukaServer extends Server {
                 mIsInMurmelMode = !mIsInMurmelMode;
 
                 // reset the joints
-                initJoints();
+                mCurrentControl = mIsInMurmelMode ? mMurmelControl : mJointControl;
+                mCurrentControl.onResetPosition(null);
+
+                // notify the pipeline switch of the new data destination
+                mModeDataSwitch.routeToFirst(mIsInMurmelMode);
+
+                System.out.println("Switched to " + (mIsInMurmelMode ? "murmel mode" : "joint control"));
 
                 try {
                     createButtons();
@@ -149,6 +155,7 @@ public class KukaServer extends Server {
                 }
                 break;
             default:
+                mJointControl.onButtonClick(click, origin);
                 break;
         }
     }

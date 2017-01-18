@@ -26,6 +26,18 @@ public class Switch implements NetworkDataSink {
         mSecondSink = secondSink;
     }
 
+    public void routeToFirst(boolean routeToFirst){
+        mForwardToFirstSink = routeToFirst;
+    }
+
+    public void routeToFirst() {
+        mForwardToFirstSink = true;
+    }
+
+    public void routeToSecond() {
+        mForwardToFirstSink = false;
+    }
+
     /**
      * onData is called whenever new data is to be processed
      *
