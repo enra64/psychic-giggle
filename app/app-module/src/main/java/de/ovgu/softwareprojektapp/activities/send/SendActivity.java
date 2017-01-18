@@ -1,10 +1,12 @@
 package de.ovgu.softwareprojektapp.activities.send;
 
 
+import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -355,9 +357,12 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
                 DisplayNotification notification = (DisplayNotification) command;
                  mBuilder = new NotificationCompat.Builder(this)
                                 .setSmallIcon(R.drawable.ic_stat_name)
-                                .setOngoing(notification.isOnGoing)
                                 .setContentTitle(notification.title)
-                                .setContentText(notification.content);
+                                .setContentText(notification.content)
+                                .setPriority(Notification.PRIORITY_HIGH)
+                                .setDefaults(Notification.DEFAULT_ALL);
+                 if (Build.VERSION.SDK_INT >= 21)
+                    mBuilder.setVibrate(new long[0]);
                 mNotificationManager.notify(notification.id,mBuilder.build());
                 break;
                 // ignore unhandled commands
