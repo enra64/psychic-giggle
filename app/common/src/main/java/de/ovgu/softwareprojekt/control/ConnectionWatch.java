@@ -118,8 +118,6 @@ public class ConnectionWatch extends TimerTask {
 
         // set informative thread name
         Thread.currentThread().setName("ConnectionWatch for " + mSelf);
-
-        System.out.println("created connection watch");
     }
 
     /**
@@ -168,12 +166,15 @@ public class ConnectionWatch extends TimerTask {
             try {
                 // check whether the maximum delay has been breached
                 if ((mLastCheckEventTimestamp - mLastRequestTimestamp) > MAXIMUM_CLIENT_RESPONSE_DELAY) {
+                    if(mRemote.name.contains("C"))
+                        System.out.println("timeout");
                     mTimeoutListener.onTimeout(mLastCheckEventTimestamp - mLastRequestTimestamp);
                 }
                 else if (mOutConnection.isRunningAndConfigured()) {
                     mOutConnection.sendCommand(new ConnectionAliveCheck(mSelf));
 
-                    System.out.println(mRemote + " request event: " + mLastRequestTimestamp + ", diff: " + (mLastCheckEventTimestamp - mLastRequestTimestamp));
+                    if(mRemote.name.contains("C"))
+                        System.out.println(mRemote + " request event: " + mLastRequestTimestamp + ", diff: " + (mLastCheckEventTimestamp - mLastRequestTimestamp));
 
                     // update the timestamp
                     mLastRequestTimestamp = System.currentTimeMillis();
@@ -181,8 +182,12 @@ public class ConnectionWatch extends TimerTask {
                 }
                 //System.out.println((mRemote != null ? mRemote : "unset remote") + " took " + (mLastCheckEventTimestamp - mLastRequestTimestamp) + "ms to answer");
             } catch (ConnectException e) {
+                if(mRemote.name.contains("C"))
+                    System.out.println("exception 1");
                 mTimeoutListener.onTimeout(mLastCheckEventTimestamp - mLastRequestTimestamp);
             } catch (IOException e) {
+                if(mRemote.name.contains("C"))
+                    System.out.println("exception 2");
                 mExceptionListener.onException(ConnectionWatch.this, e, "CONNECTION_WATCH_CHECK_FAILED: Could not check connection; probably offline.");
             }
         } else {

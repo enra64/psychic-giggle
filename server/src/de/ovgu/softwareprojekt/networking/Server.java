@@ -78,12 +78,8 @@ public abstract class Server implements OnCommandListener, ClientListener, Excep
 
         mDataMapper.setConnectionHandler(mClientHandlerFactory);
         // SIGTERM -> close all clients, stop discovery server
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            mClientHandlerFactory.closeAll();
-            System.out.println("All clients closed");
-            mDiscoveryServer.close();
-            System.out.println("Discovery server closed");
-        }));
+        Runtime.getRuntime().addShutdownHook(new Thread(this::close));
+        System.out.println("Server started, shutdown runtime hook online");
     }
 
     /**
@@ -111,8 +107,12 @@ public abstract class Server implements OnCommandListener, ClientListener, Excep
      * Stop listening on all ports and free them.
      */
     public void close() {
+        System.out.println("Closing down");
         mClientHandlerFactory.closeAll();
+        mCurrentUnboundClientConnection.close();
+        System.out.println("All ClientConnections closed");
         mDiscoveryServer.close();
+        System.out.println("Discovery server closed");
     }
 
     /**
