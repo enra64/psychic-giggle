@@ -5,7 +5,8 @@ package de.ovgu.softwareprojekt.servers.kuka;
  */
 public interface LbrIIIIIIIIwa {
     void start();
-    void rotateJoint(LbrJoints joint, int degree);
-    void setJointVelocity(LbrJoints joint, float velocity);
+    void rotateJoint(LbrJoint joint, float degree);
+    void setJointVelocity(LbrJoint joint, float velocity);
+    void rotateJointTarget(LbrJoint joint, float degree);
     void stop();
 }

@@ -199,6 +199,18 @@ class ClientConnectionHandler implements ClientListener, UnexpectedClientListene
     }
 
     /**
+     * Remove all buttons added. Clears both buttons added using {@link #addButton(String, int)} and layouts created using
+     * {@link #setButtonLayout(String)}.
+     *
+     * @throws IOException
+     */
+    public void clearButtons() throws IOException {
+        mButtonList.clear();
+        mButtonXML = null;
+        updateButtons();
+    }
+
+    /**
      * Change the speed of a sensor. The default speed is the GAME speed.
      *
      * @param sensor the sensor to change

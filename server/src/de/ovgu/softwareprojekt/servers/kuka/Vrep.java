@@ -1,8 +1,5 @@
-package de.ovgu.softwareprojekt.servers.kuka.vrep;
+package de.ovgu.softwareprojekt.servers.kuka;
 
-import de.ovgu.softwareprojekt.servers.kuka.LbrIIIIIIIIwa;
-import de.ovgu.softwareprojekt.servers.kuka.LbrJoints;
-import de.ovgu.softwareprojekt.servers.kuka.RoboticFailure;
 import coppelia.IntW;
 import coppelia.remoteApi;
 
@@ -21,7 +18,7 @@ public class Vrep implements LbrIIIIIIIIwa {
     private remoteApi mVrep;
     private int mClientId;
 
-    private EnumMap<LbrJoints, Integer> mJointMap = new EnumMap<>(LbrJoints.class);
+    private EnumMap<LbrJoint, Integer> mJointMap = new EnumMap<>(LbrJoint.class);
 
     public Vrep(String ip, int port) {
         mAddress = ip;
@@ -44,7 +41,7 @@ public class Vrep implements LbrIIIIIIIIwa {
 
         // get all joints
         for(int i = 1; i <= 7; i++)
-            mJointMap.put(LbrJoints.values()[i - 1], getSimulationObject("LBR_iiwa_7_R800_joint" + i));
+            mJointMap.put(LbrJoint.values()[i - 1], getSimulationObject("LBR_iiwa_7_R800_joint" + i));
 
         // start the simulation in blocking mode to wait until it started
         mVrep.simxStartSimulation(mClientId, simx_opmode_blocking);
@@ -66,7 +63,17 @@ public class Vrep implements LbrIIIIIIIIwa {
     }
 
     @Override
-    public void rotateJoint(LbrJoints joint, int degree) {
+    public void rotateJoint(LbrJoint joint, float degree) {
+        // because this is oneshot mode, the return code is basically useless
+        // parameters are in radian
+        int returnCode = mVrep.simxSetJointPosition(mClientId, mJointMap.get(joint), (float) (degree * Math.PI / 180), simx_opmode_oneshot);
+
+        // check success
+        //if(returnCode != simx_return_ok) throw new RoboticFailure("Could not move " + joint + "! Tried using " + mAddress + ":" + mPort);
+    }
+
+    @Override
+    public void rotateJointTarget(LbrJoint joint, float degree) {
         // because this is oneshot mode, the return code is basically useless
         // parameters are in radian
         int returnCode = mVrep.simxSetJointTargetPosition(mClientId, mJointMap.get(joint), (float) (degree * Math.PI / 180), simx_opmode_oneshot);
@@ -76,7 +83,7 @@ public class Vrep implements LbrIIIIIIIIwa {
     }
 
     @Override
-    public void setJointVelocity(LbrJoints joint, float velocity) {
+    public void setJointVelocity(LbrJoint joint, float velocity) {
         // because this is oneshot mode, the return code is basically useless
         int returnCode = mVrep.simxSetJointTargetVelocity(mClientId, mJointMap.get(joint), velocity, simx_opmode_oneshot);
 

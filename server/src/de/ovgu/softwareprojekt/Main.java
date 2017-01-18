@@ -1,6 +1,6 @@
 package de.ovgu.softwareprojekt;
 
-import de.ovgu.softwareprojekt.servers.kuka.vrep.VrepServer;
+import de.ovgu.softwareprojekt.servers.kuka.KukaServer;
 import de.ovgu.softwareprojekt.servers.mouse.MouseServer;
 import de.ovgu.softwareprojekt.servers.nes.NesServer;
 
@@ -17,8 +17,8 @@ public class Main {
                 System.out.println("MouseServer started");
                 break;
             case "vrep":
-                new VrepServer().start();
-                System.out.println("VrepServer started");
+                new KukaServer().start();
+                System.out.println("KukaServer started");
                 break;
             default:
             case "nes":
