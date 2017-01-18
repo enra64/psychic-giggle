@@ -10,18 +10,32 @@ import de.ovgu.softwareprojekt.pipeline.splitters.Switch;
 
 import java.io.IOException;
 
-import static de.ovgu.softwareprojekt.servers.kuka.LbrJoint.*;
-
 /**
- * T
+ * This is the LBR iiwa control class. It supports two operation modes: joint control, where individual joints may be
+ * controlled using the phone pitch, and marble labyrinth control, where only the topmost joints are moved, so a marble
+ * labyrinth can be played
  */
 public class KukaServer extends Server {
-    private LbrIIIIIIIIwa mRobotInterface;
-    private boolean mIsInMurmelMode = true;
+    /**
+     * The control interface for the robot
+     */
+    private LbrIiiiiiiwa mRobotInterface;
 
+    /**
+     * If true, only the ToolTilter and the ThirdRotator joints will be used, so as to enable playing a marble labyrinth
+     */
+    private boolean mIsInMarbleMode = true;
+
+    /**
+     * This is the button id for the "change control mode" button
+     */
     private static final int MODE_BUTTON = 0;
 
-    // if you change theses ids, you're gonna have a bad time (see joint control onButtonClick)
+    /**
+     * Button ids for selecting different joints. Only needed for joint control mode
+     *
+     * NOTE: if you change theses ids, you're gonna have a bad time {@link JointControl#onButtonClick(ButtonClick, NetworkDevice)}
+     */
     private static final int
             JOINT1_BUTTON = 1,
             JOINT2_BUTTON = 2,
@@ -31,12 +45,31 @@ public class KukaServer extends Server {
             JOINT6_BUTTON = 6,
             JOINT7_BUTTON = 7;
 
+    /**
+     * This is a pipeline splitter that we use to switch between sending the joint control or the marble labyrinth control
+     * all data.
+     */
     private Switch mModeDataSwitch;
 
+    /**
+     * The joint control. Used for controlling individual joints
+     */
     private JointControl mJointControl;
-    private MurmelControl mMurmelControl;
+
+    /**
+     * The marble labyrinth control
+     */
+    private MarbleLabyrinthControl mMarbleLabyrinthControl;
+
+    /**
+     * The control mode that should currently be notified of reset events
+     */
     private ResetListener mCurrentControl;
 
+    /**
+     *
+     * @throws IOException
+     */
     public KukaServer() throws IOException {
         super(null);
 
@@ -46,22 +79,31 @@ public class KukaServer extends Server {
         createButtons();
 
         // create both control instances
-        mMurmelControl = new MurmelControl(mRobotInterface);
-        mCurrentControl = mMurmelControl;
+        mMarbleLabyrinthControl = new MarbleLabyrinthControl(mRobotInterface);
+        mCurrentControl = mMarbleLabyrinthControl;
         mJointControl = new JointControl(mRobotInterface);
 
         // create a new data switch
-        mModeDataSwitch = new Switch(new AveragingFilter(3, mMurmelControl), mJointControl, true);
+        mModeDataSwitch = new Switch(new AveragingFilter(3, mMarbleLabyrinthControl), mJointControl, true);
 
         registerDataSink(mModeDataSwitch, SensorType.Gravity);
         setSensorOutputRange(SensorType.Gravity, 100);
     }
 
+    /**
+     * Reset robot position. Appropriate target state is determined by current control class.
+     */
     @Override
     public void onResetPosition(NetworkDevice origin) {
-
+        mCurrentControl.onResetPosition(origin);
     }
 
+    /**
+     * Called when exceptions are generated that could not be handled by the framework
+     * @param o the object from where the exception originates
+     * @param e the exception that was thrown
+     * @param s additional info provided at the site of exception
+     */
     @Override
     public void onException(Object o, Exception e, String s) {
         System.out.println("Exception in " + o.getClass() + ", info: " + s);
@@ -70,7 +112,7 @@ public class KukaServer extends Server {
     }
 
     /**
-     * Check whether a new client should be accepted
+     * Accept any new client
      *
      * @param newClient the new clients identification
      * @return true if the client should be accepted, false otherwise
@@ -110,12 +152,16 @@ public class KukaServer extends Server {
         System.out.println("Accepted client " + connectedClient);
     }
 
+    /**
+     * Helper function to create all necessary buttons
+     * @throws IOException if the buttons could not be created
+     */
     private void createButtons() throws IOException {
         clearButtons();
-        addButton("Switch between murmel/general mode", MODE_BUTTON);
+        addButton("Switch between marble labyrinth and joint control mode", MODE_BUTTON);
 
-        // the joints can only be individually controlled when not in murmel mode
-        if (!mIsInMurmelMode) {
+        // the joints can only be individually controlled when not in marble mode
+        if (!mIsInMarbleMode) {
             addButton("JOINT 1", JOINT1_BUTTON);
             addButton("JOINT 2", JOINT2_BUTTON);
             addButton("JOINT 3", JOINT3_BUTTON);
@@ -134,20 +180,22 @@ public class KukaServer extends Server {
      */
     @Override
     public void onButtonClick(ButtonClick click, NetworkDevice origin) {
+        // handle buttons
         switch (click.mID) {
             case MODE_BUTTON:
                 // toggle mode
-                mIsInMurmelMode = !mIsInMurmelMode;
+                mIsInMarbleMode = !mIsInMarbleMode;
+
+                // update current control instance
+                mCurrentControl = mIsInMarbleMode ? mMarbleLabyrinthControl : mJointControl;
 
                 // reset the joints
-                mCurrentControl = mIsInMurmelMode ? mMurmelControl : mJointControl;
                 mCurrentControl.onResetPosition(null);
 
                 // notify the pipeline switch of the new data destination
-                mModeDataSwitch.routeToFirst(mIsInMurmelMode);
+                mModeDataSwitch.routeToFirst(mIsInMarbleMode);
 
-                System.out.println("Switched to " + (mIsInMurmelMode ? "murmel mode" : "joint control"));
-
+                // try to create the necessary buttons
                 try {
                     createButtons();
                 } catch (IOException e) {
@@ -155,6 +203,7 @@ public class KukaServer extends Server {
                 }
                 break;
             default:
+                // forward all other ids to the joint control, as the marble labyrinth has no further buttons
                 mJointControl.onButtonClick(click, origin);
                 break;
         }
