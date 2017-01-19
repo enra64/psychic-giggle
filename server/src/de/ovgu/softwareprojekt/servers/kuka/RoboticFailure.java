@@ -1,10 +1,14 @@
 package de.ovgu.softwareprojekt.servers.kuka;
 
 /**
- * Created by arne on 18.01.17.
+ * Exception thrown when a {@link LbrIiiiiiiwa} implementation could not execute a desired action.
  */
-public class RoboticFailure extends RuntimeException {
-    public RoboticFailure(String msg){
+class RoboticFailure extends RuntimeException {
+    /**
+     * Exception thrown when a {@link LbrIiiiiiiwa} implementation could not execute a desired action.
+     * @param msg exception information
+     */
+    RoboticFailure(String msg){
         super(msg);
     }
 }

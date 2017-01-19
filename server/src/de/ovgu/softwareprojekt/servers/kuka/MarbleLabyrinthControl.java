@@ -8,25 +8,40 @@ import de.ovgu.softwareprojekt.discovery.NetworkDevice;
 import static de.ovgu.softwareprojekt.servers.kuka.LbrJoint.*;
 
 /**
- *
+ * This class may be used for controlling the robot in a marble-labyrinth friendly way. Only the two topmost joints are
+ * moved.
  */
-public class MurmelControl implements NetworkDataSink, ResetListener {
+public class MarbleLabyrinthControl implements NetworkDataSink, ResetListener {
     /**
-     * The two axes we need for the murmel game
+     * Axis we need for the marble game
      */
     private final static int PITCH_AXIS = 1, ROLL_AXIS = 0;
 
+    /**
+     * The joints we use for expressing the pitch and roll angles
+     */
     private final static LbrJoint
             mRobotPitchJoint = LbrJoint.ToolTilter,
             mRobotRollJoint = LbrJoint.ThirdRotator;
 
+    /**
+     * The maxima of our pitch and roll joints
+     */
     private static final float
-            mRobotPitchMaximum = LbrJointRanges.getRange(mRobotPitchJoint) / 2,
-            mRobotRollMaximum = LbrJointRanges.getRange(mRobotRollJoint) / 2;
+            mRobotPitchMaximum = KukaUtil.getRange(mRobotPitchJoint) / 2,
+            mRobotRollMaximum = KukaUtil.getRange(mRobotRollJoint) / 2;
 
-    private final LbrIIIIIIIIwa mControlInterface;
+    /**
+     * The control interface for the robot
+     */
+    private final LbrIiiiiiiwa mControlInterface;
 
-    public MurmelControl(LbrIIIIIIIIwa control) {
+    /**
+     * Create a new marble labyrinth control class.
+     *
+     * @param control the control interface for the robot
+     */
+    MarbleLabyrinthControl(LbrIiiiiiiwa control) {
         mControlInterface = control;
         onResetPosition(null);
     }
@@ -40,27 +55,13 @@ public class MurmelControl implements NetworkDataSink, ResetListener {
      */
     @Override
     public void onData(NetworkDevice origin, SensorData data, float userSensitivity) {
-        float rollValue = capToRange(data.data[ROLL_AXIS] * userSensitivity * .03f, mRobotRollMaximum);
-        float pitchValue = capToRange(data.data[PITCH_AXIS] * userSensitivity * .03f, mRobotPitchMaximum);
+        float rollValue = KukaUtil.capToRange(data.data[ROLL_AXIS] * userSensitivity * .03f, mRobotRollMaximum);
+        float pitchValue = KukaUtil.capToRange(data.data[PITCH_AXIS] * userSensitivity * .03f, mRobotPitchMaximum);
 
         //System.out.println("Roll target: " + rollValue + ", pitch target: " + pitchValue);
 
         mControlInterface.rotateJointTarget(mRobotRollJoint, rollValue);
         mControlInterface.rotateJointTarget(mRobotPitchJoint, pitchValue);
-    }
-
-    /**
-     * This is a somewhat custom capping function. It uses the negative of maxDisplacement as minimum.
-     * @param value the value that should be capped
-     * @param maxDisplacement the maximum and negative minimum the value should be after this
-     * @return the capped value
-     */
-    private float capToRange(float value, float maxDisplacement) {
-        if (value > maxDisplacement)
-            return maxDisplacement;
-        if (value < -maxDisplacement)
-            return maxDisplacement;
-        return value;
     }
 
     /**
@@ -71,6 +72,11 @@ public class MurmelControl implements NetworkDataSink, ResetListener {
 
     }
 
+    /**
+     * Reset robot to a position that should make the marble labyrinth game easily playable
+     *
+     * @param origin
+     */
     @Override
     public void onResetPosition(NetworkDevice origin) {
         mControlInterface.rotateJointTarget(BaseRotator, 0);

@@ -1,7 +1,7 @@
 package de.ovgu.softwareprojekt.servers.kuka;
 
 /**
- * Created by arne on 18.01.17.
+ * An enum to make the robot joints easily identifiable
  */
 public enum LbrJoint {
     BaseRotator,

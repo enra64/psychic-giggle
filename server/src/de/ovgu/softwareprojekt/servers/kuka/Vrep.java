@@ -10,17 +10,40 @@ import static coppelia.remoteApi.simx_opmode_oneshot;
 import static coppelia.remoteApi.simx_return_ok;
 
 /**
- * An implementation of the {@link LbrIIIIIIIIwa} interface for controlling a lbr iiwa robot in vrep
+ * An implementation of the {@link LbrIiiiiiiwa} interface for controlling a kuka lbr iiwa robot in V-REP
  */
-public class Vrep implements LbrIIIIIIIIwa {
+public class Vrep implements LbrIiiiiiiwa {
+    /**
+     * Address of the simulation environment
+     */
     private String mAddress;
+
+    /**
+     * Port of the simulation environment
+     */
     private int mPort;
+
+    /**
+     * The remoteApi instance we use for communication with V-REP
+     */
     private remoteApi mVrep;
+
+    /**
+     * The client id V-REP gave us
+     */
     private int mClientId;
 
+    /**
+     * A mapping from {@link LbrJoint}s to their keys in V-REP
+     */
     private EnumMap<LbrJoint, Integer> mJointMap = new EnumMap<>(LbrJoint.class);
 
-    public Vrep(String ip, int port) {
+    /**
+     * Create a new V-REP control instance
+     * @param ip Address of the simulation environment
+     * @param port Port of the simulation environment
+     */
+    Vrep(String ip, int port) {
         mAddress = ip;
         mPort = port;
     }
@@ -47,6 +70,11 @@ public class Vrep implements LbrIIIIIIIIwa {
         mVrep.simxStartSimulation(mClientId, simx_opmode_blocking);
     }
 
+    /**
+     * Retrieve a simulation object (for example a joint)
+     * @param objectName name of the object in V-REP
+     * @return the V-REP id of this object
+     */
     private Integer getSimulationObject(String objectName) {
         // hello c style
         IntW objectHandle = new IntW(0);
@@ -62,35 +90,46 @@ public class Vrep implements LbrIIIIIIIIwa {
         return objectHandle.getValue();
     }
 
+    /**
+     * Rotate a joint.
+     *
+     * @param joint  which joint
+     * @param degree how much.
+     */
     @Override
     public void rotateJoint(LbrJoint joint, float degree) {
         // because this is oneshot mode, the return code is basically useless
         // parameters are in radian
-        int returnCode = mVrep.simxSetJointPosition(mClientId, mJointMap.get(joint), (float) (degree * Math.PI / 180), simx_opmode_oneshot);
-
-        // check success
-        //if(returnCode != simx_return_ok) throw new RoboticFailure("Could not move " + joint + "! Tried using " + mAddress + ":" + mPort);
+        mVrep.simxSetJointPosition(mClientId, mJointMap.get(joint), (float) (degree * Math.PI / 180), simx_opmode_oneshot);
     }
 
+    /**
+     * Rotate a joint to a position.
+     *
+     * @param joint  which joint
+     * @param degree where to
+     */
     @Override
     public void rotateJointTarget(LbrJoint joint, float degree) {
         // because this is oneshot mode, the return code is basically useless
         // parameters are in radian
-        int returnCode = mVrep.simxSetJointTargetPosition(mClientId, mJointMap.get(joint), (float) (degree * Math.PI / 180), simx_opmode_oneshot);
-
-        // check success
-        //if(returnCode != simx_return_ok) throw new RoboticFailure("Could not move " + joint + "! Tried using " + mAddress + ":" + mPort);
+        mVrep.simxSetJointTargetPosition(mClientId, mJointMap.get(joint), (float) (degree * Math.PI / 180), simx_opmode_oneshot);
     }
 
+    /**
+     * Set the velocity of a joint
+     * @param joint which joint
+     * @param velocity how fast
+     */
     @Override
     public void setJointVelocity(LbrJoint joint, float velocity) {
         // because this is oneshot mode, the return code is basically useless
-        int returnCode = mVrep.simxSetJointTargetVelocity(mClientId, mJointMap.get(joint), velocity, simx_opmode_oneshot);
-
-        // check success
-        //if(returnCode != simx_return_ok) throw new RoboticFailure("Could not move " + joint + "! Tried using " + mAddress + ":" + mPort);
+        mVrep.simxSetJointTargetVelocity(mClientId, mJointMap.get(joint), velocity, simx_opmode_oneshot);
     }
 
+    /**
+     * Finalize operations. The other {@link LbrIiiiiiiwa} methods, except for start(), need not be callable after calling stop().
+     */
     @Override
     public void stop() {
         mVrep.simxStopSimulation(mClientId, simx_opmode_blocking);
