@@ -22,7 +22,7 @@ public class KukaServer extends AbstractServer {
     private LbrIiiiiiiwa mRobotInterface;
 
     /**
-     * If true, only the ToolTilter and the ThirdRotator joints will be used, so as to enable playing a marble labyrinth
+     * If true, only the ToolTilter and the ToolArmRotator joints will be used, so as to enable playing a marble labyrinth
      */
     private boolean mIsInMarbleMode = true;
 
@@ -30,20 +30,6 @@ public class KukaServer extends AbstractServer {
      * This is the button id for the "change control mode" button
      */
     private static final int MODE_BUTTON = 0;
-
-    /**
-     * Button ids for selecting different joints. Only needed for joint control mode
-     *
-     * NOTE: if you change theses ids, you're gonna have a bad time. see {@link JointControl#onButtonClick(ButtonClick, NetworkDevice)}
-     */
-    private static final int
-            JOINT1_BUTTON = 1,
-            JOINT2_BUTTON = 2,
-            JOINT3_BUTTON = 3,
-            JOINT4_BUTTON = 4,
-            JOINT5_BUTTON = 5,
-            JOINT6_BUTTON = 6,
-            JOINT7_BUTTON = 7;
 
     /**
      * This is a pipeline splitter that we use to switch between sending the joint control or the marble labyrinth control
@@ -162,15 +148,15 @@ public class KukaServer extends AbstractServer {
         clearButtons();
         addButton("Switch between marble labyrinth and joint control mode", MODE_BUTTON);
 
-        // the joints can only be individually controlled when not in marble mode
-        if (!mIsInMarbleMode) {
-            addButton("JOINT 1", JOINT1_BUTTON);
-            addButton("JOINT 2", JOINT2_BUTTON);
-            addButton("JOINT 3", JOINT3_BUTTON);
-            addButton("JOINT 4", JOINT4_BUTTON);
-            addButton("JOINT 5", JOINT5_BUTTON);
-            addButton("JOINT 6", JOINT6_BUTTON);
-            addButton("JOINT 7", JOINT7_BUTTON);
+        // in marble mode, we want to be able to switch the movement directions
+        if (mIsInMarbleMode) {
+            addButton("Flip rotator direction", MarbleLabyrinthControl.FLIP_ROTATOR_BUTTON);
+            addButton("Flip tilter direction", MarbleLabyrinthControl.FLIP_TILTER_BUTTON);
+        // in joint control mode, three rotator/tilter pairs can be controlled
+        } else {
+            addButton("Control base actor pair", JointControl.BASE_PAIR_BUTTON);
+            addButton("Control center actor pair", JointControl.CENTER_PAIR_BUTTON);
+            addButton("Control tool actor pair", JointControl.TOOL_PAIR_BUTTON);
         }
     }
 
@@ -205,8 +191,10 @@ public class KukaServer extends AbstractServer {
                 }
                 break;
             default:
-                // forward all other ids to the joint control, as the marble labyrinth has no further buttons
+                // forward all other buttons to both controls.
+                // WARNING: this relies on neither class changing the robot state in a button event!
                 mJointControl.onButtonClick(click, origin);
+                mMarbleLabyrinthControl.onButtonClick(click, origin);
                 break;
         }
     }

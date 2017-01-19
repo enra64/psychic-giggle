@@ -8,7 +8,7 @@ public enum LbrJoint {
     BaseTilter,
     SecondRotator,
     SecondTilter,
-    ThirdRotator,
+    ToolArmRotator,
     ToolTilter,
     ToolRotator
 }
