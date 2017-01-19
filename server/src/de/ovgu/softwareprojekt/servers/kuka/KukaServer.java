@@ -4,7 +4,7 @@ import de.ovgu.softwareprojekt.SensorType;
 import de.ovgu.softwareprojekt.callback_interfaces.ResetListener;
 import de.ovgu.softwareprojekt.control.commands.ButtonClick;
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
-import de.ovgu.softwareprojekt.networking.Server;
+import de.ovgu.softwareprojekt.networking.AbstractServer;
 import de.ovgu.softwareprojekt.pipeline.filters.AveragingFilter;
 import de.ovgu.softwareprojekt.pipeline.splitters.Switch;
 
@@ -15,7 +15,7 @@ import java.io.IOException;
  * controlled using the phone pitch, and marble labyrinth control, where only the topmost joints are moved, so a marble
  * labyrinth can be played
  */
-public class KukaServer extends Server {
+public class KukaServer extends AbstractServer {
     /**
      * The control interface for the robot
      */

@@ -1,4 +1,4 @@
-package de.ovgu.softwareprojekt.callback_interfaces;
+package de.ovgu.softwareprojekt.networking;
 
 import de.ovgu.softwareprojekt.control.commands.AbstractCommand;
 import de.ovgu.softwareprojekt.control.commands.ButtonClick;
@@ -10,7 +10,7 @@ import java.net.InetAddress;
  * Register for events where two clients try to use the same slot.
  * This happens when two clients get the same server description by the discovery system.
  */
-public interface UnexpectedClientListener {
+interface UnexpectedClientListener {
     /**
      * Called when a ClientConnection gets messages from an unknown client
      *

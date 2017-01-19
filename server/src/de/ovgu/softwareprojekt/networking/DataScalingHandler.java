@@ -12,7 +12,7 @@ import java.util.EnumMap;
  * This class handles scaling all the data, because we may have to apply a different scaling factor to
  * all the incoming data
  */
-public class DataScalingHandler implements NetworkDataSink {
+class DataScalingHandler implements NetworkDataSink {
     /**
      * Contains the scaling filters that have to be applied for each sensors
      */

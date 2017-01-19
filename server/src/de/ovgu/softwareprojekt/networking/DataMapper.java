@@ -19,7 +19,7 @@ import java.util.function.Predicate;
  * <p>
  * It supports mapping them from (SensorType, NetworkDevice) tuples or from SensorType to NetworkDataSink.
  */
-public class DataMapper implements NetworkDataSink {
+class DataMapper implements NetworkDataSink {
     /**
      * This class is used for keeping the sensor-, button and speed requirements synchronous
      */

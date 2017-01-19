@@ -5,7 +5,7 @@ import de.ovgu.softwareprojekt.NetworkDataSink;
 import de.ovgu.softwareprojekt.SensorType;
 import de.ovgu.softwareprojekt.control.commands.ButtonClick;
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
-import de.ovgu.softwareprojekt.networking.Server;
+import de.ovgu.softwareprojekt.networking.AbstractServer;
 import de.ovgu.softwareprojekt.pipeline.FilterPipelineBuilder;
 import de.ovgu.softwareprojekt.pipeline.filters.AveragingFilter;
 import de.ovgu.softwareprojekt.pipeline.splitters.ClientSplitter;
@@ -21,7 +21,7 @@ import java.util.Properties;
 /**
  * This server is designed to create NES controller input from gravity and linear acceleration data
  */
-public class NesServer extends Server {
+public class NesServer extends AbstractServer {
     /**
      * This variable stores our steering wheels, mapped from network devices so we
      * can easily access the correct one.

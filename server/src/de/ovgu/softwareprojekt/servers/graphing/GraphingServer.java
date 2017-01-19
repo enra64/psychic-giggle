@@ -7,7 +7,7 @@ import de.ovgu.softwareprojekt.discovery.NetworkDevice;
 import de.ovgu.softwareprojekt.pipeline.FilterPipelineBuilder;
 import de.ovgu.softwareprojekt.pipeline.ThroughputMeasurer;
 import de.ovgu.softwareprojekt.pipeline.filters.*;
-import de.ovgu.softwareprojekt.networking.Server;
+import de.ovgu.softwareprojekt.networking.AbstractServer;
 
 import javax.swing.*;
 import java.awt.event.WindowAdapter;
@@ -19,7 +19,7 @@ import java.util.Timer;
 /**
  * A server for live graphing of sensor data
  */
-public class GraphingServer extends Server {
+public class GraphingServer extends AbstractServer {
 
     /**
      * Create a new GraphingServer.

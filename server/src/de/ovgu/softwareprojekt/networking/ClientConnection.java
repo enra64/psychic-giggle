@@ -5,7 +5,6 @@ import de.ovgu.softwareprojekt.NetworkDataSink;
 import de.ovgu.softwareprojekt.SensorData;
 import de.ovgu.softwareprojekt.SensorType;
 import de.ovgu.softwareprojekt.callback_interfaces.ClientListener;
-import de.ovgu.softwareprojekt.callback_interfaces.UnexpectedClientListener;
 import de.ovgu.softwareprojekt.control.CommandConnection;
 import de.ovgu.softwareprojekt.control.ConnectionWatch;
 import de.ovgu.softwareprojekt.control.OnCommandListener;
@@ -27,7 +26,7 @@ import java.util.*;
  * When a {@link EndConnection} command is received, all ports are closed, and the command is forwarded; no other
  * command can be sent to the client after that.
  */
-public class ClientConnection implements OnCommandListener, NetworkDataSink, ConnectionWatch.TimeoutListener {
+class ClientConnection implements OnCommandListener, NetworkDataSink, ConnectionWatch.TimeoutListener {
     /**
      * This listener is to be called when we get commands from an unknown client
      */

@@ -5,8 +5,8 @@ import de.ovgu.softwareprojekt.NetworkDataSink;
 import de.ovgu.softwareprojekt.SensorType;
 import de.ovgu.softwareprojekt.control.commands.ButtonClick;
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
+import de.ovgu.softwareprojekt.networking.AbstractServer;
 import de.ovgu.softwareprojekt.pipeline.filters.DifferenceThresholdFilter;
-import de.ovgu.softwareprojekt.networking.Server;
 import de.ovgu.softwareprojekt.pipeline.filters.AveragingFilter;
 import de.ovgu.softwareprojekt.pipeline.filters.UserSensitivityMultiplicator;
 
@@ -14,10 +14,10 @@ import java.awt.*;
 import java.io.IOException;
 
 /**
- * The MouseServer class is an exemplary extension of Server that enables
+ * The MouseServer class is an exemplary extension of AbstractServer that enables
  * the user to move the mouse using his phone
  */
-public class MouseServer extends Server {
+public class MouseServer extends AbstractServer {
     /**
      * Constant identifying left mouse button in app
      */
