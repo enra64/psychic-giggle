@@ -2,14 +2,15 @@ package de.ovgu.softwareprojekt.control;
 
 import de.ovgu.softwareprojekt.control.commands.AbstractCommand;
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
+import de.ovgu.softwareprojekt.misc.ExceptionListener;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.net.ConnectException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
 import java.net.UnknownHostException;
 
 /**
@@ -21,7 +22,7 @@ import java.net.UnknownHostException;
  * </p>
  * <p>
  * When you want to send commands with it, you need to configure the remote host using {@link #setRemote(InetAddress, int)}
- * first. Then you can use {@link #sendCommand(AbstractCommand)} to send any command.
+ * first. Then you can use {@link #sendCommand(AbstractCommand)} to send any {@link AbstractCommand} subclass.
  * </p>
  */
 @SuppressWarnings("WeakerAccess")
@@ -32,9 +33,9 @@ public class CommandConnection {
     private OnCommandListener mCommandListener;
 
     /**
-     * The CommandServer is responsible for listening to incoming commands
+     * The CommandListener is responsible for listening to incoming commands
      */
-    private CommandServer mIncomingServer;
+    private CommandListener mIncomingServer;
 
     /**
      * This host should receive the outbound commands
@@ -47,13 +48,19 @@ public class CommandConnection {
     private int mRemotePort = -1;
 
     /**
+     * The listener that will be notified of exceptions
+     */
+    private ExceptionListener mExceptionListener;
+
+    /**
      * New control connection. The local listening port can be retrieved using {@link #getLocalPort()} after calling {@link #start()}.
      * The remote host and port may be set using {@link #setRemote(InetAddress, int)}, commands can then be sent there using {@link #sendCommand(AbstractCommand)}
      *
      * @param listener the listener that will be notified of new commands arriving at this CommandConnection
      */
-    public CommandConnection(OnCommandListener listener) throws IOException {
+    public CommandConnection(OnCommandListener listener, ExceptionListener exceptionListener) throws IOException {
         mCommandListener = listener;
+        mExceptionListener = exceptionListener;
     }
 
     /**
@@ -90,7 +97,7 @@ public class CommandConnection {
      * @param command this command will be received by the peer
      * @throws IOException some I/O error. A ConnectException with ECONNREFUSED and ETIMEDOUT may also be thrown.
      */
-    public void sendCommand(AbstractCommand command) throws IOException{
+    public void sendCommand(AbstractCommand command) throws IOException {
         // ensure that the remote host is properly configured
         // note: this is the common project. it does not recognize androids BuildConfig.DEBUG.
         assert (mRemotePort >= 0 && (mRemoteHost != null));
@@ -102,6 +109,11 @@ public class CommandConnection {
         }
     }
 
+    /**
+     * Check whether the connection is running and configured
+     *
+     * @return true if the connection is listening and configured with a remote
+     */
     public boolean isRunningAndConfigured() {
         return mIncomingServer.isRunning() && mRemoteHost != null && mRemotePort >= 0;
     }
@@ -120,15 +132,15 @@ public class CommandConnection {
      */
     public void start() throws IOException {
         if (mIncomingServer == null) {
-            mIncomingServer = new CommandServer(this);
+            mIncomingServer = new CommandListener(this);
             mIncomingServer.start();
 
-            mIncomingServer.setName("CommandServer for " + mRemoteHost + ":" + mRemotePort);
+            mIncomingServer.setName("CommandListener for " + mRemoteHost + ":" + mRemotePort);
         }
     }
 
     /**
-     * Called whenever our CommandServer receives a command packet.
+     * Called whenever our CommandListener receives a command packet.
      *
      * @param origin  the host which sent the command
      * @param command the command we received
@@ -142,6 +154,7 @@ public class CommandConnection {
 
     /**
      * Immediately change the port to which commands will be sent
+     *
      * @param remotePort the new command port
      */
     public void setRemotePort(int remotePort) {
@@ -150,9 +163,9 @@ public class CommandConnection {
 
 
     /**
-     * The {@link CommandServer} class is used to listen to incoming commands.
+     * The {@link CommandListener} class is used to listen to incoming commands.
      */
-    private static class CommandServer extends Thread {
+    private class CommandListener extends Thread {
         /**
          * This listener is called whenever a new command object is received.
          */
@@ -174,14 +187,13 @@ public class CommandConnection {
         private ServerSocket mSocket;
 
         /**
-         * A new CommandServer instance created will open a socket on a random free port to grant listening for commands.
-         * TODO: what if the instance is created, but never started? the socket will stay open...
+         * A new CommandListener instance created will open a socket on a random free port to grant listening for commands.
          *
          * @param listener this class will be called when a new command object is received
          * @throws IOException when an error occurs during binding of the socket
          */
-        CommandServer(CommandConnection listener) throws IOException {
-            super("CommandServer without remote");
+        CommandListener(CommandConnection listener) throws IOException {
+            super("CommandListener without remote");
 
             // store listener
             mListener = listener;
@@ -203,17 +215,24 @@ public class CommandConnection {
         void shutdown() {
             // kill the running server
             mKeepRunning = false;
+
+            // try to close the socket
+            if (mSocket != null)
+                try {
+                    mSocket.close();
+                } catch (IOException e) {
+                    // ignored, because we cannot handle it anyway
+                }
         }
 
         /**
-         * Listen on socket;
-         * TODO: exception listener to handle exceptions in the thread more intelligently than "hopefully someone sees this just died"
+         * Listen on socket, forward commands
          */
         public void run() {
             // continue running till shutdown() is called
-            while (mKeepRunning) {
-                mIsRunning = true;
+            mIsRunning = true;
 
+            while (mKeepRunning) {
                 // try-with-resource: close the socket after accepting the connection
                 try (Socket connection = mSocket.accept()) {
                     // create an object input stream from the new connection
@@ -221,8 +240,11 @@ public class CommandConnection {
 
                     // call listener with new command
                     mListener.onCommand(connection.getInetAddress(), (AbstractCommand) oinput.readObject());
-                } catch (IOException | ClassNotFoundException e) {
-                    e.printStackTrace();
+                } catch (SocketException e) {
+                    CommandConnection.this.mExceptionListener.onException(CommandConnection.this, e, "Probable cause is calling close() while" +
+                            "in accept loop. If that is the case, this exception can be safely ignored");
+                } catch (ClassNotFoundException | IOException e) {
+                    CommandConnection.this.mExceptionListener.onException(CommandConnection.this, e, "Could not listen for commands");
                 }
             }
 
@@ -237,6 +259,11 @@ public class CommandConnection {
             mIsRunning = false;
         }
 
+        /**
+         * Returns true if we are currently in the listening loop
+         *
+         * @return true if we are currently in the listening loop
+         */
         public boolean isRunning() {
             return mIsRunning;
         }

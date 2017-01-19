@@ -6,7 +6,7 @@ import de.ovgu.softwareprojekt.SensorType;
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
 
 /**
- * This command may be used to switch sensors on or off
+ * This command is used to check the connection, by requiring an answer to be sent if it is received
  */
 public class ConnectionAliveCheck extends AbstractCommand {
     /**

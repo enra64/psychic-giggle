@@ -106,7 +106,7 @@ public abstract class DiscoveryThread extends Thread {
      * Check whether this threads {@link #start()} has already been called. If it returns true,
      * start() may not be called on this instance!
      */
-    public boolean hasRun(){
+    public boolean hasRun() {
         return mHasRun;
     }
 
@@ -139,6 +139,11 @@ public abstract class DiscoveryThread extends Thread {
         }
     }
 
+    /**
+     * Called when {@link #listen()} gets a discovery message
+     *
+     * @param newDevice the device that sent the message
+     */
     protected abstract void onDiscovery(NetworkDevice newDevice);
 
     /**
@@ -176,7 +181,13 @@ public abstract class DiscoveryThread extends Thread {
         mSelfDeviceId.discoveryPort = socket.getLocalPort();
     }
 
-    public void setPorts(int commandPort, int dataPort){
+    /**
+     * Call this to set the ports that will be sent as the current devices ports
+     *
+     * @param commandPort the port where we will listen for commands
+     * @param dataPort    the port where we will listen for data (if server)
+     */
+    public void setPorts(int commandPort, int dataPort) {
         mSelfDeviceId.commandPort = commandPort;
         mSelfDeviceId.dataPort = dataPort;
     }

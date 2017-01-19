@@ -5,7 +5,7 @@ import de.ovgu.softwareprojekt.control.commands.AbstractCommand;
 import java.net.InetAddress;
 
 /**
- * Subclass to be able to be notified of commands
+ * Implement this to be able to be notified of commands
  */
 @SuppressWarnings("WeakerAccess")
 public interface OnCommandListener {

@@ -82,8 +82,6 @@ public class NetworkDevice implements Serializable {
         return InetAddress.getByName(address);
     }
 
-
-
     /**
      * Returns this network device formatted as "name" at "address"
      */

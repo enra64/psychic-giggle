@@ -1,7 +1,8 @@
 package de.ovgu.softwareprojekt.control.commands;
 
 /**
- * This command may be used to switch sensors on or off
+ * This command is sent as an answer to {@link ConnectionRequest} commands, to notify of the decision
+ * to accept the client (or not).
  */
 public class ConnectionRequestResponse extends AbstractCommand {
     /**

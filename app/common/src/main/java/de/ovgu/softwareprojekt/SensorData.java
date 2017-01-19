@@ -74,6 +74,12 @@ public class SensorData implements Serializable, Cloneable, Externalizable {
         return cloned;
     }
 
+    /**
+     * This is a serialization method. Overridden to remove the need for reflection.
+     *
+     * @param objectOutput where to write the serialized object
+     * @throws IOException if serialization failed
+     */
     @Override
     public void writeExternal(ObjectOutput objectOutput) throws IOException {
         // write sensor type
@@ -81,12 +87,19 @@ public class SensorData implements Serializable, Cloneable, Externalizable {
 
         // writes data length and then data
         objectOutput.writeInt(data.length);
-        for(float f : data)
+        for (float f : data)
             objectOutput.writeFloat(f);
 
         objectOutput.writeLong(timestamp);
     }
 
+    /**
+     * This is a deserialization method. Overridden to remove the need for reflection.
+     *
+     * @param objectInput where to write the serialized object
+     * @throws IOException            if serialization failed
+     * @throws ClassNotFoundException if serialization failed
+     */
     @Override
     public void readExternal(ObjectInput objectInput) throws IOException, ClassNotFoundException {
         sensorType = SensorType.valueOf(objectInput.readUTF());
@@ -96,7 +109,7 @@ public class SensorData implements Serializable, Cloneable, Externalizable {
         data = new float[dataCount];
 
         // read back data
-        for(int i = 0; i < dataCount; i++)
+        for (int i = 0; i < dataCount; i++)
             data[i] = objectInput.readFloat();
 
         timestamp = objectInput.readLong();

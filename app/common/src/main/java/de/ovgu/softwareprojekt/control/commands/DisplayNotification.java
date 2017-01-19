@@ -1,23 +1,34 @@
 package de.ovgu.softwareprojekt.control.commands;
 
 /**
- * Created by markus on 10.01.17.
+ * This command may be used by the server to request the display of a notification.
  */
-
 public class DisplayNotification extends AbstractCommand {
     /**
-     * used to indentify the device
+     * Title of the notification
      */
     public String title;
+
+    /**
+     * Content of the notification
+     */
     public String content;
+
+    /**
+     * notification id
+     */
     public int id;
+
+    /**
+     * True if the notification should be ongoing
+     */
     public boolean isOnGoing;
 
     /**
      * command to assign an id to a device
-     * @param notificationTitle used to display the title
-     * @param notificationContent used to display content
-     * @param id used to indetify the notification
+     * @param notificationTitle title of the notification
+     * @param notificationContent content of the notification
+     * @param id used to identify the notification
      * @param isOnGoing used to decide if notification is removable by user
      */
     public DisplayNotification(int id, String notificationTitle, String notificationContent, boolean isOnGoing) {
@@ -26,7 +37,5 @@ public class DisplayNotification extends AbstractCommand {
         this.title = notificationTitle;
         this.content = notificationContent;
         this.isOnGoing = isOnGoing;
-
-
     }
 }
