@@ -26,12 +26,12 @@ public class LinearAcceleration extends AbstractSensor {
     }
 
     /**
-     * Static sensor speed definition for all accelerometer instances. defaults to sensor_delay_game.
+     * Static sensor speed definition for all LinearAcceleration instances. defaults to sensor_delay_game.
      */
     private static SetSensorSpeed.SensorSpeed mSensorSpeed = SetSensorSpeed.SensorSpeed.SENSOR_DELAY_GAME;
 
     /**
-     * update the sensor speed for all accelerometer instances
+     * update the sensor speed for all LinearAcceleration instances
      *
      * @param targetSpeed the speed the sensor should run at after this call
      * @throws IOException if the sensor could not be restarted
@@ -51,7 +51,7 @@ public class LinearAcceleration extends AbstractSensor {
     }
 
     /**
-     * Get the sensor speed currently set for all accelerometer instances
+     * Get the sensor speed currently set for all LinearAcceleration instances
      */
     @Override
     public SetSensorSpeed.SensorSpeed getSensorSpeed() {

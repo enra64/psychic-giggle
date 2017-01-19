@@ -12,7 +12,7 @@ import de.ovgu.softwareprojekt.control.commands.SetSensorSpeed;
 import de.ovgu.softwareprojektapp.sensors.AbstractSensor;
 
 /**
- * {@link DataSource} feeding accelerometer data
+ * {@link DataSource} feeding Magnetometer data
  */
 public class Magnetometer extends AbstractSensor {
     /**

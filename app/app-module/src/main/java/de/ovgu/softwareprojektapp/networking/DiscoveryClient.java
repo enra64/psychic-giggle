@@ -170,14 +170,14 @@ public class DiscoveryClient extends DiscoveryThread {
                 long discoveryTimestamp = it.next().getValue();
 
                 // if the device is too old, remove it and flag a change
-                if ((now - discoveryTimestamp) > MAXIMUM_SERVER_AGE_MS){
+                if ((now - discoveryTimestamp) > MAXIMUM_SERVER_AGE_MS) {
                     it.remove();
                     mChanged = true;
                 }
             }
 
             // notify listener of update if a change occurred
-            if(mChanged){
+            if (mChanged) {
                 mDiscoveryListener.onServerListUpdated(getCurrentServers());
                 mChanged = false;
             }
@@ -195,7 +195,7 @@ public class DiscoveryClient extends DiscoveryThread {
          */
         void addServer(NetworkDevice device) {
             // the list only changed if the device was unknown
-            if(!mCurrentServerList.containsKey(device))
+            if (!mCurrentServerList.containsKey(device))
                 mChanged = true;
 
             // store (possibly) new device

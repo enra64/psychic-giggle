@@ -12,11 +12,11 @@ import de.ovgu.softwareprojekt.control.commands.SetSensorSpeed;
 import de.ovgu.softwareprojektapp.sensors.AbstractSensor;
 
 /**
- * {@link DataSource} feeding accelerometer data
+ * {@link DataSource} feeding RotationVector data
  */
 public class RotationVector extends AbstractSensor {
     /**
-     * Create an accelerometer; does not start anything yet, use {@link #start()} or {@link #setRunning(boolean)}
+     * Create an RotationVector; does not start anything yet, use {@link #start()} or {@link #setRunning(boolean)}
      * to start receiving events
      *
      * @param context    android system context needed for sensors

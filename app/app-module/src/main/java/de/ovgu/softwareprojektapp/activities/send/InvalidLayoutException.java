@@ -1,10 +1,13 @@
 package de.ovgu.softwareprojektapp.activities.send;
 
 /**
- * Created by markus on 12.12.16.
+ * This exception is thrown when the layout file sent by the server could not be parsed
  */
-
 public class InvalidLayoutException extends Exception {
+    /**
+     * This exception is thrown when the layout file sent by the server could not be parsed
+     * @param msg reason for parsing failure
+     */
     public InvalidLayoutException(String msg){
         super(msg);
     }

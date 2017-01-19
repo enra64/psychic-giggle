@@ -12,11 +12,11 @@ import de.ovgu.softwareprojekt.control.commands.SetSensorSpeed;
 import de.ovgu.softwareprojektapp.sensors.AbstractSensor;
 
 /**
- * {@link DataSource} feeding accelerometer data
+ * {@link DataSource} feeding gravity data
  */
 public class Gravity extends AbstractSensor {
     /**
-     * Create an accelerometer; does not start anything yet, use {@link #start()} or {@link #setRunning(boolean)}
+     * Create an Gravity sensor; does not start anything yet, use {@link #start()} or {@link #setRunning(boolean)}
      * to start receiving events
      *
      * @param context android system context needed for sensors
@@ -26,12 +26,12 @@ public class Gravity extends AbstractSensor {
     }
 
     /**
-     * Static sensor speed definition for all accelerometer instances. defaults to sensor_delay_game.
+     * Static sensor speed definition for all Gravity instances. defaults to sensor_delay_game.
      */
     private static SetSensorSpeed.SensorSpeed mSensorSpeed = SetSensorSpeed.SensorSpeed.SENSOR_DELAY_GAME;
 
     /**
-     * update the sensor speed for all accelerometer instances
+     * update the sensor speed for all Gravity instances
      *
      * @param targetSpeed the speed the sensor should run at after this call
      * @throws IOException if the sensor could not be restarted
@@ -51,7 +51,7 @@ public class Gravity extends AbstractSensor {
     }
 
     /**
-     * Get the sensor speed currently set for all accelerometer instances
+     * Get the sensor speed currently set for all Gravity instances
      */
     @Override
     public SetSensorSpeed.SensorSpeed getSensorSpeed() {

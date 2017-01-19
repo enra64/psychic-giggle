@@ -7,10 +7,15 @@ import android.support.v7.app.AlertDialog;
 import android.widget.Toast;
 
 /**
- * Created by arne on 11/24/16.
+ * User interface utility functions.
  */
-
 public class UiUtil {
+    /**
+     * Display a toast using the ui thread with show length LENGTH_LONG
+     *
+     * @param host  activity that hosts the toast
+     * @param toast message the toast should display
+     */
     public static void showToast(final Activity host, final String toast) {
         host.runOnUiThread(new Runnable() {
             @Override
@@ -20,7 +25,14 @@ public class UiUtil {
         });
     }
 
-    public static void showAlert(final Activity host, final String title, final String message){
+    /**
+     * Display an alert dialog using the ui thread. The dialog will have a single OK button.
+     *
+     * @param host    activity that hosts the alert dialog
+     * @param title   title of the alert dialog
+     * @param message message of the alert dialog
+     */
+    public static void showAlert(final Activity host, final String title, final String message) {
         host.runOnUiThread(new Runnable() {
             @Override
             public void run() {

@@ -114,7 +114,7 @@ public class NetworkClient implements DataSink, ExceptionListener, OnCommandList
         // create a command connection
         try {
             // create the command connection, set this to receive incoming commands
-            mCommandConnection = new CommandConnection(this);
+            mCommandConnection = new CommandConnection(this, this);
 
             // we want to send commands to the server
             mCommandConnection.setRemote(mServer);

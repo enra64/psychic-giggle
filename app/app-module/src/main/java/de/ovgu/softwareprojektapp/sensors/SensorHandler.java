@@ -58,6 +58,12 @@ public class SensorHandler {
         mDataSink = dataSink;
     }
 
+    /**
+     * Set the list of sensors that should run
+     *
+     * @param requiredSensors the sensors that must run
+     * @throws SensorNotFoundException if a sensor is not found in the current device
+     */
     @SuppressWarnings("unchecked")
     public void setRunning(List<SensorType> requiredSensors) throws SensorNotFoundException {
         // if the sensors are currently disabled, only update the list of sensors that will be
@@ -127,8 +133,7 @@ public class SensorHandler {
     /**
      * returns a EnumMap with all sensors
      */
-    public EnumMap<SensorType, AbstractSensor> getSensors()
-    {
+    public EnumMap<SensorType, AbstractSensor> getSensors() {
         return mSensors;
     }
 
@@ -244,6 +249,13 @@ public class SensorHandler {
         return mSensors.get(sensorType);
     }
 
+    /**
+     * Get the range of a sensor as reported by android
+     *
+     * @param sensorType the sensor type of which we range is requested
+     * @return range of the sensor as given by android
+     * @throws SensorNotFoundException if the sensor is not available in this device
+     */
     public float getRange(SensorType sensorType) throws SensorNotFoundException {
         try {
             return getSensor(sensorType).getRange();

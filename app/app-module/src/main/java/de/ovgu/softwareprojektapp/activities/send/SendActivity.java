@@ -93,7 +93,7 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
     /**
      * This timer is for timing out the server response
      */
-    private Timer mResponseTimeoutTimer;
+    private Timer mConnectionResponseTimeoutTimer;
 
     /**
      * mBuilder to show deviceID in Notification
@@ -140,7 +140,9 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
         mRuntimeButtonLayout.setNetworkClient(mNetworkClient);
     }
 
-
+    /**
+     * Connection timeout callback
+     */
     @Override
     public void onConnectionTimeout() {
         // close the activity with an appropriate result code
@@ -180,8 +182,8 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
         // display indeterminate, not cancelable wait period to user
         mConnectionProgressDialog = ProgressDialog.show(this, "Connecting", "Waiting for server response", true, false);
 
-        mResponseTimeoutTimer = new Timer();
-        mResponseTimeoutTimer.schedule(new TimerTask() {
+        mConnectionResponseTimeoutTimer = new Timer();
+        mConnectionResponseTimeoutTimer.schedule(new TimerTask() {
             @Override
             public void run() {
                 closeActivity(RESULT_SERVER_NOT_RESPONDING_TO_REQUEST);
@@ -256,37 +258,47 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
         }
     }
 
+    /**
+     * Suspend sensors, cancel connection response timeout timer
+     */
     @Override
     protected void onPause() {
         super.onPause();
         mSensorHandler.suspendSensors();
-        mResponseTimeoutTimer.cancel();
+        mConnectionResponseTimeoutTimer.cancel();
     }
 
+    /**
+     * Wake up sensors and refresh sensor range and sensitivity
+     */
     @Override
     protected void onResume() {
         super.onResume();
+
+        // wake up the sensors again
         mSensorHandler.wakeUpSensors();
+
+        // refresh sensor sensitivity settings and sensor ranges
         SharedPreferences sensitivitySettings = getSharedPreferences(OptionsActivity.SENSITIVITY_PREFS_NAME, 0);
-
-        for (SensorType s : SensorType.values())
-            mNetworkClient.sendCommand(new ChangeSensorSensitivity(s, sensitivitySettings.getInt(s.toString(), 50)));
-
         for (SensorType s : SensorType.values()) {
             try {
+                mNetworkClient.sendCommand(new ChangeSensorSensitivity(s, sensitivitySettings.getInt(s.toString(), 50)));
                 mNetworkClient.sendCommand(new SensorRangeNotification(s, mSensorHandler.getRange(s)));
             } catch (SensorNotFoundException e) {
-                onException(this, e, "Could not activate sensor");
+                onException(this, e, "Could not get sensor range");
             }
         }
 
     }
 
+    /**
+     * close connection, remove all notifications
+     */
     @Override
     protected void onDestroy() {
         super.onDestroy();
 
-        if(mNotificationManager != null)
+        if (mNotificationManager != null)
             mNotificationManager.cancelAll();
 
         mNetworkClient.signalConnectionEnd();
@@ -300,7 +312,7 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
      */
     private void handleConnectionResponse(boolean granted) {
         // the response timeout is useless now
-        mResponseTimeoutTimer.cancel();
+        mConnectionResponseTimeoutTimer.cancel();
 
         // the progress dialog can be dismissed in any case
         mConnectionProgressDialog.dismiss();
@@ -308,8 +320,7 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
         if (granted) {
             UiUtil.showToast(this, getString(R.string.send_activity_connection_success));
 
-        }
-        else
+        } else
             closeActivity(RESULT_SERVER_REFUSED);
     }
 
@@ -351,21 +362,21 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
             case DisplayNotification:
 
                 //set Notificationmanager in order to handle the notifications
-                mNotificationManager  = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+                mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 
                 //display message
                 DisplayNotification notification = (DisplayNotification) command;
-                 mBuilder = new NotificationCompat.Builder(this)
-                                .setSmallIcon(R.drawable.ic_stat_name)
-                                .setContentTitle(notification.title)
-                                .setContentText(notification.content)
-                                .setPriority(Notification.PRIORITY_HIGH)
-                                .setDefaults(Notification.DEFAULT_ALL);
-                 if (Build.VERSION.SDK_INT >= 21)
+                mBuilder = new NotificationCompat.Builder(this)
+                        .setSmallIcon(R.drawable.ic_stat_name)
+                        .setContentTitle(notification.title)
+                        .setContentText(notification.content)
+                        .setPriority(Notification.PRIORITY_HIGH)
+                        .setDefaults(Notification.DEFAULT_ALL);
+                if (Build.VERSION.SDK_INT >= 21)
                     mBuilder.setVibrate(new long[0]);
-                mNotificationManager.notify(notification.id,mBuilder.build());
+                mNotificationManager.notify(notification.id, mBuilder.build());
                 break;
-                // ignore unhandled commands
+            // ignore unhandled commands
             default:
                 break;
         }
@@ -388,7 +399,7 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
             closeActivity(RESULT_SERVER_NOT_LISTENING_ON_PORT);
         else if (exception instanceof SocketException && info.contains("could not send SensorData object"))
             Log.e("spapp", "could not send data");
-        else{
+        else {
             Log.w("spapp", "UNHANDLED EXCEPTION SENDACTIVITY:");
             exception.printStackTrace();
         }
@@ -396,22 +407,24 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
 
     /**
      * Create buttons from a mapping from button ids to button texts
+     *
      * @param addCom the command that was sent to change the button display
      */
     private void createButtons(final UpdateButtonsMap addCom) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-               mRuntimeButtonLayout.createFromMap(SendActivity.this, addCom.buttons);
+                mRuntimeButtonLayout.createFromMap(SendActivity.this, addCom.buttons);
             }
         });
     }
 
     /**
      * Create buttons from a xml string
+     *
      * @param addCom the command that was sent to change the button display
      */
-    private void createButtons(final UpdateButtonsXML addCom){
+    private void createButtons(final UpdateButtonsXML addCom) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -440,8 +453,7 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
         Bundle in = getIntent().getExtras();
 
         boolean[] activeSensors = new boolean[SensorType.values().length];
-        for(int i = 0; i < SensorType.values().length; i++)
-        {
+        for (int i = 0; i < SensorType.values().length; i++) {
             activeSensors[i] = mSensorHandler.getSensors().get(SensorType.values()[i]).isRegistered();
         }
         Intent intent = new Intent(SendActivity.this, OptionsActivity.class);

@@ -52,6 +52,10 @@ public class UdpConnection implements DataSink {
         mExceptionListener = listener;
     }
 
+    /**
+     * Get the port the udp connection uses locally
+     * @return the port the udp connection uses locally
+     */
     public int getLocalPort(){
         return mSocket.getLocalPort();
     }

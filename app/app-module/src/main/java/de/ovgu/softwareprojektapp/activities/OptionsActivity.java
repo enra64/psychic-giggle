@@ -8,6 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.EditText;
@@ -23,6 +24,7 @@ import java.util.ArrayList;
 import de.ovgu.softwareprojekt.SensorType;
 import de.ovgu.softwareprojekt.control.CommandConnection;
 import de.ovgu.softwareprojekt.control.commands.ChangeSensorSensitivity;
+import de.ovgu.softwareprojekt.misc.ExceptionListener;
 import de.ovgu.softwareprojektapp.R;
 import de.ovgu.softwareprojektapp.UiUtil;
 import de.ovgu.softwareprojektapp.networking.AsyncSendCommand;
@@ -57,6 +59,9 @@ public class OptionsActivity extends AppCompatActivity implements SeekBar.OnSeek
      */
     private ArrayList<SeekBar> mSeekBars = new ArrayList<>();
 
+    /**
+     * the text views used for displaying the sensor name
+     */
     private ArrayList<TextView> mTextViews = new ArrayList<>();
 
     /**
@@ -109,7 +114,13 @@ public class OptionsActivity extends AppCompatActivity implements SeekBar.OnSeek
         Bundle givenExtras = getIntent().getExtras();
         try {
             // new CommandConnection from Server address and command port
-            mComCon = new CommandConnection(null);
+            mComCon = new CommandConnection(null, new ExceptionListener() {
+                @Override
+                public void onException(Object origin, Exception exception, String info) {
+                    Log.w("OriginActivity", info );
+                    exception.printStackTrace();
+                }
+            });
 
             // jump to catch block if no extras were given
             if(givenExtras == null)
@@ -161,16 +172,6 @@ public class OptionsActivity extends AppCompatActivity implements SeekBar.OnSeek
             }
         }
     }
-
-    //TEST: Just remove inactive sensors for now
-    public void displayActiveOptions(SensorType sensor, boolean isActive){
-
-        if(!isActive) {
-            mSensorOptions.removeView(mTextViews.get(sensor.ordinal()));
-            mSensorOptions.removeView(mSeekBars.get(sensor.ordinal()));
-        }
-    }
-
 
     /**
      * Parse the discovery port from the edittext for the discovery port
