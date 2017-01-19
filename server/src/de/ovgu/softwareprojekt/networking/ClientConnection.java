@@ -1,7 +1,7 @@
 package de.ovgu.softwareprojekt.networking;
 
 import com.sun.istack.internal.NotNull;
-import de.ovgu.softwareprojekt.NetworkDataSink;
+import de.ovgu.softwareprojekt.networking.NetworkDataSink;
 import de.ovgu.softwareprojekt.SensorData;
 import de.ovgu.softwareprojekt.SensorType;
 import de.ovgu.softwareprojekt.callback_interfaces.ClientListener;
@@ -259,7 +259,7 @@ class ClientConnection implements OnCommandListener, NetworkDataSink, Connection
      */
     private void initialiseCommandConnection() throws IOException {
         // begin a new command connection, set this as callback
-        mCommandConnection = new CommandConnection(this);
+        mCommandConnection = new CommandConnection(this, mExceptionListener);
 
         // begin listening for commands
         mCommandConnection.start();

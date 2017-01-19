@@ -19,7 +19,7 @@ public interface DataSource {
     void start() throws IOException;
 
     /**
-     * called when the source is no longer used
+     * called when the source is no longer used and should no longer consume resources
      */
     void close();
 }

@@ -1,7 +1,7 @@
 package de.ovgu.softwareprojekt.pipeline.splitters;
 
 import de.ovgu.softwareprojekt.DataSink;
-import de.ovgu.softwareprojekt.NetworkDataSink;
+import de.ovgu.softwareprojekt.networking.NetworkDataSink;
 import de.ovgu.softwareprojekt.SensorData;
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
 

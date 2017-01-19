@@ -84,7 +84,8 @@ public class CommandConnection {
     /**
      * Assigns a new remote target for commands
      *
-     * @param device remote device. must have address and commandport configured!
+     * @param device remote device. Must have address and commandPort configured!
+     * @throws UnknownHostException if the address was invalid
      */
     public void setRemote(NetworkDevice device) throws UnknownHostException {
         setRemote(device.getInetAddress(), device.commandPort);
@@ -129,6 +130,7 @@ public class CommandConnection {
 
     /**
      * Use this to start listening for commands. Does not throw if called multiple times.
+     * @throws IOException if the port for command listening could not be bound
      */
     public void start() throws IOException {
         if (mIncomingServer == null) {

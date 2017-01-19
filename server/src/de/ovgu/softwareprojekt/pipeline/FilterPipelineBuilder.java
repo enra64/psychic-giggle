@@ -1,8 +1,8 @@
 package de.ovgu.softwareprojekt.pipeline;
 
 import com.sun.istack.internal.Nullable;
-import de.ovgu.softwareprojekt.NetworkDataSink;
-import de.ovgu.softwareprojekt.NetworkDataSource;
+import de.ovgu.softwareprojekt.networking.NetworkDataSink;
+import de.ovgu.softwareprojekt.networking.NetworkDataSource;
 import de.ovgu.softwareprojekt.pipeline.filters.AbstractFilter;
 
 import java.util.LinkedList;

@@ -5,7 +5,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 /**
- * This object is used to identify our network devices
+ * This object is used to identify psychic network devices
  */
 @SuppressWarnings("WeakerAccess")
 public class NetworkDevice implements Serializable {
