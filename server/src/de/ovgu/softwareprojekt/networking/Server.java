@@ -270,6 +270,10 @@ public abstract class Server implements OnCommandListener, ClientListener, Excep
     protected void addButton(String name, int id) throws IOException {
         mClientHandlerFactory.addButton(name, id);
     }
+    
+    public void clearButtons() throws IOException {
+        mClientHandlerFactory.clearButtons();
+    }
 
     /**
      * Remove a button from the clients

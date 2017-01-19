@@ -25,37 +25,35 @@ public class Grapher extends Server {
         scheduleThroughputUpdates(graphPanel, throughputMeasurer);
 
         try {
-            //registerAccelerationMovementDetectionPipelineTestbed(graphPanel, throughputMeasurer);
-            registerSnesGyroTestbed(graphPanel, throughputMeasurer);
+            registerGyroTestbed(graphPanel, throughputMeasurer);
         } catch (IOException e) {
             e.printStackTrace();
             System.exit(1);
         }
     }
 
-    private void registerSnesGyroTestbed(final GraphPanel graphPanel, ThroughputMeasurer throughputMeasurer) throws IOException {
+    /**
+     * Register a gyro testbed (all axes), normalized with range 100 and the throughput measurer
+     * @param graphPanel the graph panel to use for display
+     * @param throughputMeasurer the throughput measurer that should be connected
+     * @throws IOException if the testbed couldnt be brought online
+     */
+    private void registerGyroTestbed(final GraphPanel graphPanel, ThroughputMeasurer throughputMeasurer) throws IOException {
         // normalize output
-        //setSensorOutputRange(SensorType.LinearAcceleration, 10);
+        setSensorOutputRange(SensorType.Gyroscope, 100);
 
-        // split off the current data stream
-        NetworkDataSink accelerationCurrentLine = graphPanel.getDataSink(SensorType.Orientation, 2);
+        // register the throughput measuring stream
+        NetworkDataSink accelerationCurrentLine = graphPanel.getDataSink(SensorType.Gyroscope, 0);
         FilterPipelineBuilder pipelineBuilder = new FilterPipelineBuilder();
         pipelineBuilder.append(throughputMeasurer);
         pipelineBuilder.append(new IntegratingFilter(null));
-        registerDataSink(pipelineBuilder.build(accelerationCurrentLine), SensorType.Orientation);
-    }
+        registerDataSink(pipelineBuilder.build(accelerationCurrentLine), SensorType.Gyroscope);
 
-    private void registerAccelerationMovementDetectionPipelineTestbed(final GraphPanel graphPanel, ThroughputMeasurer throughputMeasurer) throws IOException {
-        // normalize output
-        setSensorOutputRange(SensorType.LinearAcceleration, 10);
-
-        // split off the current data stream
-        NetworkDataSink accelerationCurrentLine = graphPanel.getDataSink(SensorType.LinearAcceleration, 2);
-        FilterPipelineBuilder pipelineBuilder = new FilterPipelineBuilder();
-        pipelineBuilder.append(throughputMeasurer);
-        pipelineBuilder.append(new ThresholdingFilter(null, .5f, 2));
-        pipelineBuilder.append(new AveragingFilter(5));
-        registerDataSink(pipelineBuilder.build(accelerationCurrentLine), SensorType.LinearAcceleration);
+        // register the two other axes
+        NetworkDataSink accelerationCurrentLine1 = graphPanel.getDataSink(SensorType.Gyroscope, 1);
+        NetworkDataSink accelerationCurrentLine2 = graphPanel.getDataSink(SensorType.Gyroscope, 2);
+        registerDataSink(accelerationCurrentLine1, SensorType.Gyroscope);
+        registerDataSink(accelerationCurrentLine2, SensorType.Gyroscope);
     }
 
     /**
