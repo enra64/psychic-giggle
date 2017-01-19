@@ -1,10 +1,11 @@
 package de.ovgu.softwareprojekt.networking;
 
 import com.sun.istack.internal.NotNull;
-import de.ovgu.softwareprojekt.DataSink;
 import de.ovgu.softwareprojekt.NetworkDataSink;
 import de.ovgu.softwareprojekt.SensorData;
 import de.ovgu.softwareprojekt.SensorType;
+import de.ovgu.softwareprojekt.callback_interfaces.ClientListener;
+import de.ovgu.softwareprojekt.callback_interfaces.UnexpectedClientListener;
 import de.ovgu.softwareprojekt.control.CommandConnection;
 import de.ovgu.softwareprojekt.control.ConnectionWatch;
 import de.ovgu.softwareprojekt.control.OnCommandListener;
@@ -21,8 +22,9 @@ import java.util.*;
 
 /**
  * This class manages the command- and data connection for a single client. It intercepts the following commands:
- * {@link ConnectionAliveCheck} and {@link ChangeSensorSensitivity}, never notifying the command listener of receiving
- * them. When a {@link EndConnection} command is received, all ports are closed, and the command is forwarded; no other
+ * {@link ConnectionAliveCheck} and {@link ChangeSensorSensitivity} and {@link SensorRangeNotification} and
+ * {@link EndConnection}, never notifying the command listener of receiving them or converting them to listener calls.
+ * When a {@link EndConnection} command is received, all ports are closed, and the command is forwarded; no other
  * command can be sent to the client after that.
  */
 public class ClientConnection implements OnCommandListener, NetworkDataSink, ConnectionWatch.TimeoutListener {
@@ -127,7 +129,8 @@ public class ClientConnection implements OnCommandListener, NetworkDataSink, Con
      * @throws IOException if an error <b>other than</b> {@link ConnectException} occurred. If a {@link ConnectException}
      *                     occurred, the client is likely listening no longer.
      */
-    public void sendCommand(AbstractCommand command) throws IOException {
+    @SuppressWarnings("WeakerAccess")
+    void sendCommand(AbstractCommand command) throws IOException {
         if (mIsConnected) {
             try {
                 mCommandConnection.sendCommand(command);
@@ -302,12 +305,20 @@ public class ClientConnection implements OnCommandListener, NetworkDataSink, Con
         sendCommand(new SetSensorCommand(new ArrayList<>(requiredSensors)));
     }
 
+    /**
+     * Update the desired sensor speeds on all clients
+     *
+     * @param speedSet desired sensor speed set
+     * @throws IOException if the command could not be sent
+     */
     void updateSpeeds(Set<Map.Entry<SensorType, SetSensorSpeed.SensorSpeed>> speedSet) throws IOException {
         for (Map.Entry<SensorType, SetSensorSpeed.SensorSpeed> sensorSpeedMapping : speedSet)
             sendCommand(new SetSensorSpeed(sensorSpeedMapping.getKey(), sensorSpeedMapping.getValue()));
     }
 
     /**
+     * Get the port the {@link CommandConnection} is listening on
+     *
      * @return the port the {@link CommandConnection} is listening on
      */
     int getCommandPort() {
@@ -315,12 +326,20 @@ public class ClientConnection implements OnCommandListener, NetworkDataSink, Con
     }
 
     /**
+     * Get the port the {@link UdpDataConnection} is listening on
+     *
      * @return the port the {@link UdpDataConnection} is listening on
      */
     int getDataPort() {
         return mDataConnection.getLocalPort();
     }
 
+    /**
+     * Called whenever a new command arrives
+     *
+     * @param inetAddress hostname of whoever sent the packet
+     * @param command     the command that was sent
+     */
     @Override
     public void onCommand(InetAddress inetAddress, AbstractCommand command) {
         // ignore commands not sent by this client
@@ -388,13 +407,13 @@ public class ClientConnection implements OnCommandListener, NetworkDataSink, Con
     /**
      * this method sends a notification to the device which is then displayed
      *
-     * @param id - NotificationID: should start at 0 and increases with each new notification while device is connected
-     * @param title - title of the notification
-     * @param content - content of the notification
+     * @param id        - NotificationID: should start at 0 and increases with each new notification while device is connected
+     * @param title     - title of the notification
+     * @param content   - content of the notification
      * @param isOnGoing - if true, notification is not removable by user
      * @throws IOException
      */
-    public void displayNotification(int id ,String title, String content, boolean isOnGoing) throws IOException {
-        sendCommand(new DisplayNotification(id, title , content, isOnGoing));
+    void displayNotification(int id, String title, String content, boolean isOnGoing) throws IOException {
+        sendCommand(new DisplayNotification(id, title, content, isOnGoing));
     }
 }

@@ -2,21 +2,18 @@ package de.ovgu.softwareprojekt.networking;
 
 import com.sun.istack.internal.Nullable;
 import de.ovgu.softwareprojekt.NetworkDataSink;
-import de.ovgu.softwareprojekt.SensorData;
 import de.ovgu.softwareprojekt.SensorType;
+import de.ovgu.softwareprojekt.callback_interfaces.ButtonListener;
+import de.ovgu.softwareprojekt.callback_interfaces.ClientListener;
 import de.ovgu.softwareprojekt.callback_interfaces.ResetListener;
 import de.ovgu.softwareprojekt.control.OnCommandListener;
 import de.ovgu.softwareprojekt.control.commands.*;
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
 import de.ovgu.softwareprojekt.misc.ExceptionListener;
-import sun.net.NetworkClient;
 
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.security.InvalidParameterException;
-import java.util.EnumMap;
-import java.util.HashSet;
 
 /**
  * This class encapsulates the whole server system:
@@ -46,7 +43,7 @@ public abstract class Server implements OnCommandListener, ClientListener, Excep
     /**
      * This class is used for keeping the sensor-, button and speed requirements synchronous
      */
-    private final ClientConnectionHandler mClientHandlerFactory;
+    private final ClientConnectionManager mClientHandlerFactory;
 
     /**
      * name of this server
@@ -69,7 +66,7 @@ public abstract class Server implements OnCommandListener, ClientListener, Excep
         mServerName = serverName != null ? serverName : getHostName();
         mDiscoveryPort = discoveryPort;
 
-        mClientHandlerFactory = new ClientConnectionHandler(
+        mClientHandlerFactory = new ClientConnectionManager(
                 mServerName,
                 this,
                 this,

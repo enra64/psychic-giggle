@@ -23,9 +23,9 @@ public class DataMapper implements NetworkDataSink {
     /**
      * This class is used for keeping the sensor-, button and speed requirements synchronous
      */
-    private ClientConnectionHandler mConnectionHandler;
+    private ClientConnectionManager mConnectionHandler;
 
-    void setConnectionHandler(ClientConnectionHandler connectionHandler){
+    void setConnectionHandler(ClientConnectionManager connectionHandler){
         mConnectionHandler = connectionHandler;
     }
 

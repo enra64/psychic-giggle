@@ -1,4 +1,4 @@
-package de.ovgu.softwareprojekt.networking;
+package de.ovgu.softwareprojekt.callback_interfaces;
 
 import de.ovgu.softwareprojekt.control.commands.ButtonClick;
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;

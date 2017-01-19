@@ -3,6 +3,8 @@ package de.ovgu.softwareprojekt.networking;
 import com.sun.istack.internal.Nullable;
 import de.ovgu.softwareprojekt.NetworkDataSink;
 import de.ovgu.softwareprojekt.SensorType;
+import de.ovgu.softwareprojekt.callback_interfaces.ClientListener;
+import de.ovgu.softwareprojekt.callback_interfaces.UnexpectedClientListener;
 import de.ovgu.softwareprojekt.control.OnCommandListener;
 import de.ovgu.softwareprojekt.control.commands.AbstractCommand;
 import de.ovgu.softwareprojekt.control.commands.CommandType;
@@ -14,8 +16,20 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.util.*;
 
+/**
+ * The client connection manager handles the expected client state (sensor speeds, button config etc),
+ * as well as the ClientConnection instances used to allow communication with the clients.
+ * <p>
+ * Configuration functions include:
+ * <ul>
+ * <li>{@link #setSensorOutputRange(SensorType, float)}</li>
+ * <li>{@link #addButton(String, int)}</li>
+ * <li>{@link #setButtonLayout(String)}</li>
+ * <li>{@link #setSensorSpeed(SensorType, SetSensorSpeed.SensorSpeed)}</li>
+ * </ul>
+ */
 @SuppressWarnings("WeakerAccess")
-class ClientConnectionHandler implements ClientListener, UnexpectedClientListener {
+class ClientConnectionManager implements ClientListener, UnexpectedClientListener {
     /**
      * Name of the server as displayed to discovery clients
      */
@@ -72,7 +86,16 @@ class ClientConnectionHandler implements ClientListener, UnexpectedClientListene
     private String mButtonXML = null;
 
 
-    ClientConnectionHandler(
+    /**
+     * Create a new ClientConnectionManager
+     *
+     * @param serverName        how the server is called
+     * @param exceptionListener what should be called if an exception occurs in managed code
+     * @param commandListener   who should be notified of commands
+     * @param clientListener    who should be notified of client events
+     * @param dataSink          who should get all the data
+     */
+    ClientConnectionManager(
             String serverName,
             ExceptionListener exceptionListener,
             OnCommandListener commandListener,
@@ -128,8 +151,7 @@ class ClientConnectionHandler implements ClientListener, UnexpectedClientListene
      */
     void closeAll() {
         synchronized (mClientConnections) {
-            for (ClientConnection clientHandler : mClientConnections)
-                clientHandler.close();
+            mClientConnections.forEach(ClientConnection::close);
         }
     }
 
@@ -202,7 +224,7 @@ class ClientConnectionHandler implements ClientListener, UnexpectedClientListene
      * Remove all buttons added. Clears both buttons added using {@link #addButton(String, int)} and layouts created using
      * {@link #setButtonLayout(String)}.
      *
-     * @throws IOException
+     * @throws IOException if the update could not be sent to all devices
      */
     public void clearButtons() throws IOException {
         mButtonList.clear();
@@ -215,6 +237,7 @@ class ClientConnectionHandler implements ClientListener, UnexpectedClientListene
      *
      * @param sensor the sensor to change
      * @param speed  the speed to use for sensor
+     * @throws IOException if the update could not be sent to all devices
      */
     void setSensorSpeed(SensorType sensor, SetSensorSpeed.SensorSpeed speed) throws IOException {
         // change the speed for sensor x
@@ -232,8 +255,7 @@ class ClientConnectionHandler implements ClientListener, UnexpectedClientListene
      */
     public void setSensorOutputRange(SensorType sensor, float outputRange) {
         synchronized (mClientConnections) {
-            for (ClientConnection connectionHandler : mClientConnections)
-                connectionHandler.setOutputRange(sensor, outputRange);
+            mClientConnections.forEach(con -> con.setOutputRange(sensor, outputRange));
         }
         mSensorOutputRanges.put(sensor, outputRange);
     }
@@ -254,6 +276,12 @@ class ClientConnectionHandler implements ClientListener, UnexpectedClientListene
         return null;
     }
 
+    /**
+     * Close the ClientConnection handling a client
+     *
+     * @param client the NetworkDevice that is no longer required
+     * @return true if the client was found
+     */
     boolean close(NetworkDevice client) {
         ClientConnection connectionHandler = getClientHandler(client);
 
@@ -276,7 +304,7 @@ class ClientConnectionHandler implements ClientListener, UnexpectedClientListene
      * chooses between {@link ClientConnection#updateButtons(String)} and {@link ClientConnection#updateButtons(Map)}
      * if {@link #mButtonXML} is given, it is preferred over [{@link #mButtonList}
      *
-     * @throws IOException if the command could not be sent
+     * @throws IOException if the update command could not be sent to a client
      */
     private void updateButtons() throws IOException {
         synchronized (mClientConnections) {
@@ -326,6 +354,11 @@ class ClientConnectionHandler implements ClientListener, UnexpectedClientListene
         return mClientListener.acceptClient(newClient);
     }
 
+    /**
+     * Called when a ClientConnection detects disconnection of its device
+     *
+     * @param disconnectedClient the client that did not respond
+     */
     @Override
     public void onClientDisconnected(NetworkDevice disconnectedClient) {
         // remove the client from the list of known connections
@@ -337,6 +370,11 @@ class ClientConnectionHandler implements ClientListener, UnexpectedClientListene
         mClientListener.onClientDisconnected(disconnectedClient);
     }
 
+    /**
+     * Called when a ClientConnection detects timeout of its device
+     *
+     * @param timeoutClient the client that did not respond
+     */
     @Override
     public void onClientTimeout(NetworkDevice timeoutClient) {
         // remove the client from the list of known connections
@@ -368,6 +406,11 @@ class ClientConnectionHandler implements ClientListener, UnexpectedClientListene
         }
     }
 
+    /**
+     * Called when the ClientConnection confirms connection success. We just forward here
+     *
+     * @param connectedClient the client that connected successfully
+     */
     @Override
     public void onClientAccepted(NetworkDevice connectedClient) {
         mClientListener.onClientAccepted(connectedClient);

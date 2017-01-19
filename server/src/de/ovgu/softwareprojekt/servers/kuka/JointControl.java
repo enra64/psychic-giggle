@@ -5,7 +5,7 @@ import de.ovgu.softwareprojekt.SensorData;
 import de.ovgu.softwareprojekt.callback_interfaces.ResetListener;
 import de.ovgu.softwareprojekt.control.commands.ButtonClick;
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
-import de.ovgu.softwareprojekt.networking.ButtonListener;
+import de.ovgu.softwareprojekt.callback_interfaces.ButtonListener;
 
 /**
  * The joint control class controls a single joint using pitch data

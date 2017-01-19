@@ -3,7 +3,7 @@ package de.ovgu.softwareprojekt.servers.kuka;
 /**
  * Small helper class for common robot needs.
  */
-public class KukaUtil {
+class KukaUtil {
     /**
      * This is a somewhat custom value clamping function. It uses the negative of maxDisplacement as minimum.
      *
