@@ -21,35 +21,43 @@ public class ClientSplitter implements NetworkDataSink {
 
     /**
      * Add a new data sink which will receive all incoming data sent by the specified device
+     *
+     * @param source   the device that must send the data
+     * @param dataSink the sink that will receive data sent by the specified device
      */
-    public void addDataSink(NetworkDevice source, NetworkDataSink dataSink){
+    public void addDataSink(NetworkDevice source, NetworkDataSink dataSink) {
         mNetworkDataSinkMap.put(source, dataSink);
     }
 
     /**
      * Remove the specified device. Data received from this device cannot be forwarded after calling this method
+     *
+     * @param device the device that will be ignored by this {@link ClientSplitter} from now on
      */
-    public void remove(NetworkDevice device){
+    public void remove(NetworkDevice device) {
         mNetworkDataSinkMap.remove(device);
     }
 
     /**
      * Remove every instance of the specified data sink from this pipeline element
+     *
+     * @param sink the sink that should no longer receive data by this {@link ClientSplitter}
      */
-    public void remove(NetworkDataSink sink){
+    public void remove(NetworkDataSink sink) {
         // remove all entries where the data sink is sink
         mNetworkDataSinkMap.values().removeAll(Collections.singleton(sink));
     }
 
     /**
      * Forward incoming data to the appropriate recipient
-     * @param origin network device that sent the data
-     * @param data received data
+     *
+     * @param origin          network device that sent the data
+     * @param data            received data
      * @param userSensitivity sensitivity set by the user
      */
     @Override
     public void onData(NetworkDevice origin, SensorData data, float userSensitivity) {
-        if(mNetworkDataSinkMap.containsKey(origin))
+        if (mNetworkDataSinkMap.containsKey(origin))
             mNetworkDataSinkMap.get(origin).onData(origin, data, userSensitivity);
     }
 

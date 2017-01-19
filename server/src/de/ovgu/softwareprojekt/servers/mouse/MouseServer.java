@@ -37,6 +37,8 @@ public class MouseServer extends AbstractServer {
      * Create a new server. It will be offline (not using any sockets) until {@link #start()} is called.
      *
      * @param serverName if not null, this name will be used. otherwise, the devices hostname is used
+     * @throws IOException  if an issue with the phone communication arose
+     * @throws AWTException if your device does not support javas {@link Robot} input
      */
     public MouseServer(@Nullable String serverName) throws IOException, AWTException {
         super(serverName);

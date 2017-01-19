@@ -62,7 +62,7 @@ class ButtonConfig implements Comparable<ButtonConfig> {
     }
 
     /**
-     * Convert a VK_<KEY> string to a KeyEvent.VK_<KEY> integer
+     * Convert a {@literal VK_<KEY>} string to a KeyEvent.{@literal VK_<KEY>} integer
      *
      * @param keyEvent a string representation of the key psychicButtonId
      * @return an integer representation of the key psychicButtonId
@@ -88,6 +88,8 @@ class ButtonConfig implements Comparable<ButtonConfig> {
 
     /**
      * Get a collection of all java keys this ButtonConfig maps to
+     *
+     * @return collection of integer java button ids like {@link KeyEvent#VK_SPACE}
      */
     Collection<Integer> getJavaButtons() {
         return mMapping.values();
@@ -117,8 +119,8 @@ class ButtonConfig implements Comparable<ButtonConfig> {
      * Compare ButtonConfigs by the player they represent
      *
      * @param other the ButtonConfig that should be compared to
-     * @return the value 0 if this == other; a value less than 0 if this < other;
-     * and a value greater than 0 if this > other
+     * @return {@literal the value 0 if this == other; a value less than 0 if this < other;
+     * and a value greater than 0 if this > other}
      */
     @Override
     public int compareTo(ButtonConfig other) {

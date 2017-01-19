@@ -67,6 +67,7 @@ public class SteeringWheel implements NetworkDataSink, AccelerationPhaseDetectio
 
     /**
      * Get the button config this steering wheel uses
+     * @return current {@link ButtonConfig}
      */
     ButtonConfig getButtonConfig() {
         return mButtonConfig;
@@ -75,9 +76,9 @@ public class SteeringWheel implements NetworkDataSink, AccelerationPhaseDetectio
     /**
      * onData is responsible for the controller input.
      * SensorData send here is either gyroscope or accelerometer
-     * <br/>
+     * <br>
      * The gyroscope steers the player and is responsible for left right movement in the menu
-     * <br/>
+     * <br>
      * the accelerometer is responsible for throwing items and up, down movement in the menu
      *
      * @param data            contains sensor data

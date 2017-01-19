@@ -98,6 +98,7 @@ public class GraphingServer extends AbstractServer {
      * Start a new graphing user interface
      *
      * @param args ignored
+     * @throws IOException if the device connection fails
      */
     public static void main(String[] args) throws IOException {
         GraphPanel graphPanel = new GraphPanel();
@@ -155,7 +156,7 @@ public class GraphingServer extends AbstractServer {
     /**
      * Called whenever a button is clicked
      *
-     * @param buttonClick  event object specifying details like button id
+     * @param buttonClick   event object specifying details like button id
      * @param networkDevice the network device that sent the button click
      */
     @Override
@@ -185,6 +186,7 @@ public class GraphingServer extends AbstractServer {
 
     /**
      * called when a Client is successfully connected
+     *
      * @param connectedClient the client that connected successfully
      */
     @Override

@@ -75,7 +75,7 @@ public class MarbleLabyrinthControl implements NetworkDataSink, ResetListener {
     /**
      * Reset robot to a position that should make the marble labyrinth game easily playable
      *
-     * @param origin
+     * @param origin the device that sent the reset command
      */
     @Override
     public void onResetPosition(NetworkDevice origin) {

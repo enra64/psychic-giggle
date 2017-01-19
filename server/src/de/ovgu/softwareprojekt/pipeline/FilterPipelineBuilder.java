@@ -44,7 +44,7 @@ public class FilterPipelineBuilder {
      *
      * @param sink  the sink to be added
      * @param index where to put the
-     * @throws IndexOutOfBoundsException - if the index is out of range (index < 0 || index > size())
+     * @throws IndexOutOfBoundsException - if the index is out of range {@literal (index < 0 || index > size())}
      */
     public void append(AbstractFilter sink, int index) throws IndexOutOfBoundsException {
         mPipelineElements.add(index, sink);

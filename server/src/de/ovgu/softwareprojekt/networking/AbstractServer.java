@@ -22,7 +22,7 @@ import java.net.UnknownHostException;
  * 2) A CommandConnection to be able to reliable communicate about important stuff, like enabling sensors
  * 3) A DataConnection to rapidly transmit sensor data
  */
-@SuppressWarnings({"unused", "WeakerAccess"})
+@SuppressWarnings({"unused", "WeakerAccess", "SameParameterValue"})
 public abstract class AbstractServer implements OnCommandListener, ClientListener, ExceptionListener, ButtonListener, ResetListener {
     /**
      * AbstractServer handling responding to discovery broadcasts
@@ -58,7 +58,8 @@ public abstract class AbstractServer implements OnCommandListener, ClientListene
     /**
      * Create a new server. It will be offline (not using any sockets) until {@link #start()} is called.
      *
-     * @param serverName if not null, this name will be used. otherwise, the devices hostname is used
+     * @param serverName    if not null, this name will be used. otherwise, the devices hostname is used
+     * @param discoveryPort the port that should be listened on for new devices
      */
     @SuppressWarnings("WeakerAccess")
     public AbstractServer(@Nullable String serverName, int discoveryPort) {
@@ -132,6 +133,8 @@ public abstract class AbstractServer implements OnCommandListener, ClientListene
 
     /**
      * Tries to get a server name via the host name; not very reliable, but also not very important.
+     *
+     * @return the host name of this device, or, if it is not known, "unknown hostname"
      */
     private String getHostName() {
         try {
@@ -202,6 +205,8 @@ public abstract class AbstractServer implements OnCommandListener, ClientListene
     /**
      * Initialising the discovery server makes it possible for the client ot find use. The command- and data connection
      * need to be initialised, because they provide important information
+     *
+     * @throws IOException if no new {@link ClientConnection} could be initialized
      */
     private void advertiseServer() throws IOException {
         // initialise the command and data connections
@@ -260,6 +265,7 @@ public abstract class AbstractServer implements OnCommandListener, ClientListene
      * Unregister a data sink from all sensors
      *
      * @param dataSink which data sink to remove
+     * @throws IOException if a client could not be notified of a no longer required sensor
      */
     public void unregisterDataSink(NetworkDataSink dataSink) throws IOException {
         // unregister dataSink from all sensors it is registered to
@@ -270,6 +276,8 @@ public abstract class AbstractServer implements OnCommandListener, ClientListene
      * Unregister a data sink from all sensors
      *
      * @param dataSink which data sink to remove
+     * @param sensor   the sensor for which the data sink was registered
+     * @throws IOException if a client could not be notified of a no longer required sensor
      */
     public void unregisterDataSink(NetworkDataSink dataSink, SensorType sensor) throws IOException {
         // unregister dataSink from all sensors it is registered to
@@ -281,11 +289,17 @@ public abstract class AbstractServer implements OnCommandListener, ClientListene
      *
      * @param name text to be displayed on the button
      * @param id   id of the button. ids below zero are reserved.
+     * @throws IOException if a client could not be notified of newly required button
      */
     protected void addButton(String name, int id) throws IOException {
         mClientHandlerFactory.addButton(name, id);
     }
 
+    /**
+     * Remove all buttons added to the app using eithr {@link #addButton(String, int)} or {@link #setButtonLayout(String)}.
+     *
+     * @throws IOException if a client could not be notified of a no longer required button
+     */
     public void clearButtons() throws IOException {
         mClientHandlerFactory.clearButtons();
     }
@@ -294,6 +308,7 @@ public abstract class AbstractServer implements OnCommandListener, ClientListene
      * Remove a button from the clients
      *
      * @param id id of the button
+     * @throws IOException if a client could not be notified of a no longer required button
      */
     public void removeButton(int id) throws IOException {
         mClientHandlerFactory.removeButton(id);
@@ -304,6 +319,7 @@ public abstract class AbstractServer implements OnCommandListener, ClientListene
      *
      * @param xml valid android XML layout using only linear layout and button
      *            if string is null ButtonMap will be used
+     * @throws IOException if a client could not be notified of the new button layout
      */
     public void setButtonLayout(@Nullable String xml) throws IOException {
         mClientHandlerFactory.setButtonLayout(xml);
@@ -314,6 +330,7 @@ public abstract class AbstractServer implements OnCommandListener, ClientListene
      *
      * @param sensor the sensor to change
      * @param speed  the speed to use for sensor
+     * @throws IOException if a client could not be notified of the changed sensor speed
      */
     public void setSensorSpeed(SensorType sensor, SetSensorSpeed.SensorSpeed speed) throws IOException {
         mClientHandlerFactory.setSensorSpeed(sensor, speed);
@@ -337,7 +354,7 @@ public abstract class AbstractServer implements OnCommandListener, ClientListene
      * @param content       - content of the notification
      * @param isOnGoing     - if true, notification is not removable by user
      * @param deviceAddress - address of the device that shall display the notification
-     * @throws IOException
+     * @throws IOException if a client could not be notified of the notification that should be displayed
      */
     protected void displayNotification(int id, String title, String content, boolean isOnGoing, InetAddress deviceAddress) throws IOException {
         mClientHandlerFactory.getClientHandler(deviceAddress).displayNotification(id, title, content, isOnGoing);

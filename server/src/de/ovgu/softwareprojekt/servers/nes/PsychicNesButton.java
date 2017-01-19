@@ -33,6 +33,7 @@ enum PsychicNesButton {
 
     /**
      * Map the enum to the integer used in the app
+     * @return the button code as given in the nes button layout file
      */
     public int psychicId() {
         return psychicButtonId;

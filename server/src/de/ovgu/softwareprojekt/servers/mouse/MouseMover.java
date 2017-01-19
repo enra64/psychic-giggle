@@ -61,6 +61,7 @@ public class MouseMover implements NetworkDataSink {
     /**
      * Press and release the right/left mouse button according to the button event
      *
+     * @param buttonID  the button id as given in {@link de.ovgu.softwareprojekt.networking.Server#addButton(String, int)}
      * @param isClicked true if the user pressed, false if the user released the button
      */
     void click(int buttonID, boolean isClicked) {
@@ -80,7 +81,9 @@ public class MouseMover implements NetworkDataSink {
     /**
      * moves Mouse according to rawData
      *
-     * @param sensorData the sensor data containing the x-,y-,z-Axis of gyroscope
+     * @param origin          the network device that sent this data
+     * @param sensorData      the sensor data containing the x-,y-,z-Axis of gyroscope
+     * @param userSensitivity the sensitivity the user chose for the sensorData.sensorType
      */
     @Override
     public void onData(NetworkDevice origin, SensorData sensorData, float userSensitivity) {

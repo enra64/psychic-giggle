@@ -43,9 +43,10 @@ class DataScalingHandler implements NetworkDataSink {
     }
 
     /**
-     * This changes the range a certain sensor will be in.
+     * This changes the target range of a sensor.
      *
      * @param targetRange maximum and -minimum of the resulting range for this sensor
+     * @param sensor      the sensor of which the target range should be modified
      */
     void setOutputRange(SensorType sensor, float targetRange) {
         // get the normalization filter configured for this sensor
@@ -58,6 +59,7 @@ class DataScalingHandler implements NetworkDataSink {
     /**
      * This changes the range a certain sensors data will be expected to be in
      *
+     * @param sensor      the sensor of which the source range should be modified
      * @param sourceRange maximum and -minimum of the incoming range for this sensor
      */
     void setSourceRange(SensorType sensor, float sourceRange) {

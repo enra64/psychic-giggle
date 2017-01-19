@@ -41,6 +41,9 @@ public class RingBuffer<E> {
 
     /**
      * Get an item. Index 0 will always retrieve the newest item, while index (size - 1) will retrieve the oldest item.
+     *
+     * @param index the age index of the item; index 0 is the newest item, index (size - 1) is the oldest item.
+     * @return the value stored at the given age index
      */
     public E get(int index) {
         int timedIndex = mIndex - 1 + index;

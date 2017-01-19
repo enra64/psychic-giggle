@@ -72,6 +72,8 @@ public class GraphPanel extends JPanel {
 
     /**
      * Set what data throughput rate is displayed
+     *
+     * @param throughput the throughput to be displayed.
      */
     void setThroughput(float throughput) {
         mThroughput = throughput;
@@ -151,6 +153,7 @@ public class GraphPanel extends JPanel {
 
     /**
      * Minimum value contained in all lines
+     * @return minimum value contained in all lines
      */
     private float getMinValue() {
         float min = Float.MAX_VALUE;
@@ -161,6 +164,7 @@ public class GraphPanel extends JPanel {
 
     /**
      * Maximum value contained in all lines
+     * @return maximum value contained in all lines
      */
     private float getMaxValue() {
         float max = -Float.MAX_VALUE;

@@ -74,7 +74,7 @@ public class NormalizationFilter extends AbstractFilter {
 
     /**
      * Set the third {@link NetworkDataSink#onData(NetworkDevice, SensorData, float)} parameter for any incoming data.
-     * @param customValue
+     * @param customValue the userSensitivity that will be set for each {@link #onData(NetworkDevice, SensorData, float)}
      */
     public void setCustomSensitivity(float customValue) {
         mCustomSensitivity = customValue;

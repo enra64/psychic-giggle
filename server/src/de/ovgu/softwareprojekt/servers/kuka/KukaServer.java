@@ -34,7 +34,7 @@ public class KukaServer extends AbstractServer {
     /**
      * Button ids for selecting different joints. Only needed for joint control mode
      *
-     * NOTE: if you change theses ids, you're gonna have a bad time {@link JointControl#onButtonClick(ButtonClick, NetworkDevice)}
+     * NOTE: if you change theses ids, you're gonna have a bad time. see {@link JointControl#onButtonClick(ButtonClick, NetworkDevice)}
      */
     private static final int
             JOINT1_BUTTON = 1,
@@ -67,8 +67,8 @@ public class KukaServer extends AbstractServer {
     private ResetListener mCurrentControl;
 
     /**
-     *
-     * @throws IOException
+     * Create a new {@link KukaServer}
+     * @throws IOException if communication with a device fails
      */
     public KukaServer() throws IOException {
         super(null);
@@ -92,6 +92,8 @@ public class KukaServer extends AbstractServer {
 
     /**
      * Reset robot position. Appropriate target state is determined by current control class.
+     *
+     * @param origin the device that sent the data
      */
     @Override
     public void onResetPosition(NetworkDevice origin) {

@@ -166,7 +166,7 @@ public class AccelerationPhaseDetection implements NetworkDataSink {
     /**
      * String representation of the AccelerationPhaseDetection object useful for debugging state errors
      *
-     * @return
+     * @return string representation
      */
     @Override
     public String toString() {

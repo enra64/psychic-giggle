@@ -25,7 +25,7 @@ class DataMapper implements NetworkDataSink {
      */
     private ClientConnectionManager mConnectionHandler;
 
-    void setConnectionHandler(ClientConnectionManager connectionHandler){
+    void setConnectionHandler(ClientConnectionManager connectionHandler) {
         mConnectionHandler = connectionHandler;
     }
 
@@ -62,7 +62,7 @@ class DataMapper implements NetworkDataSink {
         removeIf(filter -> client.equals(filter.mOrigin), null);
     }
 
-    void unregisterDataSink(NetworkDataSink dataSink){
+    void unregisterDataSink(NetworkDataSink dataSink) {
         // remove all instances of the given data sink
         removeIf(filter -> dataSink.equals(filter.mSink), null);
     }
@@ -73,25 +73,35 @@ class DataMapper implements NetworkDataSink {
     }
 
     /**
-     * Remove all SinkOriginFilters where the given lambda rings true
+     * Remove all SinkOriginFilters where the given lambda returns true
+     *
+     * @param sensor    a {@link SensorType} if only sinks registered for that type should be removed, or null, if all sinks
+     *                  where the predicate returns true should be removed
      * @param predicate returns true for all SinkOriginFilters that should be removed
      */
-    private void removeIf(Predicate<SinkOriginFilter> predicate, SensorType sensor){
+    private void removeIf(Predicate<SinkOriginFilter> predicate, SensorType sensor) {
         // remove all instances of the given network device
         Iterator<Map.Entry<SensorType, HashSet<SinkOriginFilter>>> sensorIterator = mDataSinks.entrySet().iterator();
         while (sensorIterator.hasNext()) {
             Map.Entry<SensorType, HashSet<SinkOriginFilter>> pair = sensorIterator.next();
 
             // remove all forwarding entries that used this client
-            if(sensor == null || sensor == pair.getKey())
+            if (sensor == null || sensor == pair.getKey())
                 pair.getValue().removeIf(predicate);
 
             // remove the sensor -> hashSet mapping if there are no longer any sinks registered for the sensor
-            if(pair.getValue().size() == 0)
+            if (pair.getValue().size() == 0)
                 sensorIterator.remove();
         }
     }
 
+    /**
+     * onData is called whenever new data is to be processed. here, we forward the data to
+     *
+     * @param origin          the network device which sent the data
+     * @param data            the sensor data
+     * @param userSensitivity the sensitivity the user requested in his app settings
+     */
     @Override
     public void onData(NetworkDevice origin, SensorData data, float userSensitivity) {
         HashSet<SinkOriginFilter> registeredSinks = mDataSinks.get(data.sensorType);
@@ -100,6 +110,9 @@ class DataMapper implements NetworkDataSink {
             sink.onData(origin, data, userSensitivity);
     }
 
+    /**
+     * called when the sink is no longer used and should no longer require resources. no commands required here
+     */
     @Override
     public void close() {
     }
@@ -107,8 +120,9 @@ class DataMapper implements NetworkDataSink {
 
     /**
      * This is a small NetworkDataSink that only forwards data from one origin if the
-     * {@link #SinkOriginFilter(NetworkDataSink, NetworkDevice)} constructor is used, or all data if the
-     * NetworkDevice parameter is null.
+     * {@link SinkOriginFilter#SinkOriginFilter(NetworkDataSink, NetworkDevice)} constructor is used, or all data if the
+     * NetworkDevice parameter is null. It allows us to register data sinks for data coming only from a
+     * specified {@link SensorType} and {@link NetworkDevice}.
      */
     private class SinkOriginFilter implements NetworkDataSink {
         /**
@@ -123,10 +137,11 @@ class DataMapper implements NetworkDataSink {
 
         /**
          * Create a new SinkOriginFilter that will only forward data stemming from origin
-         * @param sink where to put data
+         *
+         * @param sink   where to put data
          * @param origin what origin device should be forwarded
          */
-        SinkOriginFilter(NetworkDataSink sink, NetworkDevice origin) {
+        SinkOriginFilter(NetworkDataSink sink, @Nullable NetworkDevice origin) {
             mSink = sink;
             mOrigin = origin;
         }

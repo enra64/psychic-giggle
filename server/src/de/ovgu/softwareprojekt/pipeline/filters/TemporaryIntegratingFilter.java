@@ -23,8 +23,10 @@ public class TemporaryIntegratingFilter extends AbstractFilter {
 
     /**
      * Create a new {@link TemporaryIntegratingFilter}
-     * @param sink either a valid network data sink, or null. if null, {@link #setDataSink(NetworkDataSink)}
-     *             must be called prior to starting operations.
+     *
+     * @param sink   either a valid network data sink, or null. if null, {@link #setDataSink(NetworkDataSink)}
+     *               must be called prior to starting operations.
+     * @param length the length after which sensor data will be ignored
      */
     public TemporaryIntegratingFilter(@Nullable NetworkDataSink sink, int length) {
         super(sink);
@@ -33,6 +35,7 @@ public class TemporaryIntegratingFilter extends AbstractFilter {
 
     /**
      * Add current Values to the AXES_SUM and save them in the pipeline
+     *
      * @param data current values
      */
     @Override
@@ -41,7 +44,7 @@ public class TemporaryIntegratingFilter extends AbstractFilter {
         System.arraycopy(data.data, 0, mValueStorage[mIndex++], 0, data.data.length);
 
         // wraparound
-        if(mIndex >= mValueStorage.length)
+        if (mIndex >= mValueStorage.length)
             mIndex = 0;
 
         // write over data with sum
@@ -52,22 +55,23 @@ public class TemporaryIntegratingFilter extends AbstractFilter {
 
     /**
      * Sum all values (for each element of the triple) and store that in the parameter array
+     *
      * @param target the destination for the values
      */
-    private void sum(float[] target){
+    private void sum(float[] target) {
         Arrays.fill(target, 0);
 
-        for(float[] valueSet : mValueStorage)
-            for(int i = 0; i < target.length; i++)
+        for (float[] valueSet : mValueStorage)
+            for (int i = 0; i < target.length; i++)
                 target[i] += valueSet[i];
     }
 
     /**
      * This method sets all axis sums back to 0 in order to set a new initial position for the smart phone
      */
-    public void resetFilter(){
-        for(int i = 0; i < mValueStorage.length; i++)
-            for(int j = 0; j < mValueStorage[i].length; j++)
+    public void resetFilter() {
+        for (int i = 0; i < mValueStorage.length; i++)
+            for (int j = 0; j < mValueStorage[i].length; j++)
                 mValueStorage[i][j] = 0;
     }
 

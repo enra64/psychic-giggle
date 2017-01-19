@@ -29,7 +29,7 @@ public class ThresholdingFilter extends AbstractFilter {
      * @param dataSink         either a valid network data sink, or null. if null, {@link #setDataSink(NetworkDataSink)}
      *                         must be called prior to starting operations.
      * @param minimumAmplitude the minimum amplitude the values on <code>axis</code> must have for the data not to be zeroed
-     * @param axis             the axis which must reach <code>minimumAmplitude</code>, x->0, y->1, z->2
+     * @param axis             the axis which must reach <code>minimumAmplitude</code>, {@literal x->0, y->1, z->2}
      */
     public ThresholdingFilter(@Nullable NetworkDataSink dataSink, float minimumAmplitude, int axis) {
         super(dataSink);

@@ -23,7 +23,7 @@ public class Server extends AbstractServer {
      * Create a new server. It will be offline (not using any sockets) until {@link #start()} is called.
      *
      * @param serverName    if not null, this name will be used. otherwise, the devices hostname is used
-     * @param discoveryPort
+     * @param discoveryPort the port that should be listened on to discover devices
      */
     public Server(@Nullable String serverName, int discoveryPort) {
         super(serverName, discoveryPort);
