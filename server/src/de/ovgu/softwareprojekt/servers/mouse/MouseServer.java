@@ -56,11 +56,15 @@ public class MouseServer extends Server {
         addButton("right click", RIGHT_MOUSE_BUTTON);
     }
 
+    /**
+     * Handle exceptions by printing them and then closing down
+     */
     @Override
-    public void onException(Object o, Exception e, String s) {
+    public void onException(Object origin, Exception e, String info) {
+        System.out.println("Exception in " + origin.getClass() + "with additional information:\n" + info);
+        System.out.flush();
         e.printStackTrace();
-        System.out.println("Exception in " + o.getClass() + "with additional information:\n" + s);
-        System.exit(0);
+        System.exit(1);
     }
 
     /**
@@ -71,9 +75,7 @@ public class MouseServer extends Server {
      */
     @Override
     public void onButtonClick(ButtonClick click, NetworkDevice origin) {
-        mMouseMover.click(click.mID, true);
-        if (!click.isHold)
-            mMouseMover.click(click.mID, false);
+        mMouseMover.click(click.mID, click.isHold);
     }
 
     /**
@@ -98,16 +100,30 @@ public class MouseServer extends Server {
         System.out.println(disconnectedClient.name + " disconnected");
     }
 
+    /**
+     * called when a Client is successfully connected
+     *
+     * @param timeoutClient the client that connected successfully
+     */
     @Override
     public void onClientTimeout(NetworkDevice timeoutClient) {
         System.out.println(timeoutClient.name + " had a timeout");
     }
 
+    /**
+     * called when a Client is successfully connected
+     *
+     * @param connectedClient the client that connected successfully
+     */
     @Override
     public void onClientAccepted(NetworkDevice connectedClient) {
-
     }
 
+    /**
+     * Called when the user presses the reset position button
+     *
+     * @param origin which device pressed the button
+     */
     @Override
     public void onResetPosition(NetworkDevice origin) {
         mMouseMover.resetPosToCenter();

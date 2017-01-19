@@ -5,37 +5,69 @@ import de.ovgu.softwareprojekt.SensorData;
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
 
 /**
- * Created by arne on 18.01.17.
+ * This pipeline splitter forwards incoming data to one of two data sinks.
  */
+@SuppressWarnings("WeakerAccess")
 public class Switch implements NetworkDataSink {
+    /**
+     * True if the data should be forwarded to {@link #mFirstSink}, false if it should be forwarded
+     * to {@link #mSecondSink}.
+     */
     private boolean mForwardToFirstSink;
 
+    /**
+     * Possible target destination for incoming data. Chosen using {@link #mForwardToFirstSink}
+     */
     private NetworkDataSink mFirstSink, mSecondSink;
 
-    public Switch(NetworkDataSink first, NetworkDataSink secondSink, boolean startWithFirst){
-        mFirstSink = first;
+    /**
+     * Create a new pipeline switch
+     * @param firstSink the sink that will get data if {@link #routeToFirst()} is called
+     * @param secondSink the sink that will get data if {@link #routeToSecond()} is called
+     * @param startWithFirst true if the switch should send all data to firstSink until otherwise requested
+     */
+    public Switch(NetworkDataSink firstSink, NetworkDataSink secondSink, boolean startWithFirst){
+        mFirstSink = firstSink;
         mSecondSink = secondSink;
         mForwardToFirstSink = startWithFirst;
     }
 
+    /**
+     * Change the data sink that is regarded to as first
+     * @param firstSink new first sink
+     */
     public void setFirst(NetworkDataSink firstSink) {
         mFirstSink = firstSink;
     }
 
+    /**
+     * Change the data sink that is regarded to as second
+     * @param secondSink new first sink
+     */
     public void setSecond(NetworkDataSink secondSink) {
         mSecondSink = secondSink;
     }
 
+    /**
+     * Change routing destination
+     * @param routeToFirst true if first sink should get data
+     */
     public void routeToFirst(boolean routeToFirst){
         mForwardToFirstSink = routeToFirst;
     }
 
+    /**
+     * Change routing destination to first sink
+     */
     public void routeToFirst() {
-        mForwardToFirstSink = true;
+        routeToFirst(true);
     }
 
+    /**
+     * Change routing destination to second sink
+     */
     public void routeToSecond() {
-        mForwardToFirstSink = false;
+        routeToFirst(false);
     }
 
     /**

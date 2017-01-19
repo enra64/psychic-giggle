@@ -3,7 +3,7 @@ package de.ovgu.softwareprojekt.util;
 import java.util.ArrayList;
 
 /**
- * This is a ring buffer implementation. It is, however, severely limited in its capabilities.
+ * This is a ring buffer implementation. It is severely limited in its capabilities.
  * <p>
  * Supported operations include:<br>
  * * {@link #add(Object)}: overwrite the oldest element<br>
@@ -27,12 +27,6 @@ public class RingBuffer<E> {
     private int mSize = 0;
 
     /**
-     * Construct a new {@link RingBuffer} with a capacity of 64.
-     */
-    public RingBuffer() {
-        this(64, null);
-    }
-    /**
      * Construct a new {@link RingBuffer} with the specified capacity
      *
      * @param size     final size of this container
@@ -51,7 +45,7 @@ public class RingBuffer<E> {
     public E get(int index) {
         int timedIndex = mIndex - 1 + index;
 
-        if(timedIndex < 0)
+        if (timedIndex < 0)
             timedIndex += mBuffer.size();
         else
             timedIndex %= mBuffer.size();
@@ -70,7 +64,7 @@ public class RingBuffer<E> {
         if (mSize < mBuffer.size())
             mSize++;
 
-        if(mIndex == mBuffer.size()){
+        if (mIndex == mBuffer.size()) {
             System.out.println("index = size");
             return mBuffer.get(mBuffer.size());
         }
@@ -87,11 +81,12 @@ public class RingBuffer<E> {
         return tmp;
     }
 
+    /**
+     * Get the number of elements in the ring buffer that were set by the user
+     *
+     * @return number of elements in the ring buffer that were set by the user
+     */
     public int size() {
         return mSize;
-    }
-
-    public int getCapacity() {
-        return mBuffer.size();
     }
 }

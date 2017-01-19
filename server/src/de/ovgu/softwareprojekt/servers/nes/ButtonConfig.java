@@ -4,14 +4,13 @@ import java.awt.event.KeyEvent;
 import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.Properties;
 
 /**
  * POJO for mapping psychic button ids to java robot keycodes
  */
 class ButtonConfig implements Comparable<ButtonConfig> {
-
-
     /**
      * This maps from psychic button ids (keys) to java button ids (values).
      */
@@ -31,22 +30,40 @@ class ButtonConfig implements Comparable<ButtonConfig> {
      */
     ButtonConfig(Properties buttonProperties, int player) throws InvalidButtonException {
         playerID = player;
-        mMapping.put(PsychicNesButton.A_BUTTON.psychicId(), getKeyEvent(buttonProperties.getProperty("BUTTON_A_" + player)));
-        mMapping.put(PsychicNesButton.B_BUTTON.psychicId(), getKeyEvent(buttonProperties.getProperty("BUTTON_B_" + player)));
-        mMapping.put(PsychicNesButton.X_BUTTON.psychicId(), getKeyEvent(buttonProperties.getProperty("BUTTON_X_" + player)));
-        mMapping.put(PsychicNesButton.Y_BUTTON.psychicId(), getKeyEvent(buttonProperties.getProperty("BUTTON_Y_" + player)));
-        mMapping.put(PsychicNesButton.SELECT_BUTTON.psychicId(), getKeyEvent(buttonProperties.getProperty("BUTTON_SELECT_" + player)));
-        mMapping.put(PsychicNesButton.START_BUTTON.psychicId(), getKeyEvent(buttonProperties.getProperty("BUTTON_START_" + player)));
-        mMapping.put(PsychicNesButton.R_BUTTON.psychicId(), getKeyEvent(buttonProperties.getProperty("BUTTON_R_" + player)));
-        mMapping.put(PsychicNesButton.L_BUTTON.psychicId(), getKeyEvent(buttonProperties.getProperty("BUTTON_L_" + player)));
-        mMapping.put(PsychicNesButton.LEFT_BUTTON.psychicId(), getKeyEvent(buttonProperties.getProperty("BUTTON_LEFT_" + player)));
-        mMapping.put(PsychicNesButton.UP_BUTTON.psychicId(), getKeyEvent(buttonProperties.getProperty("BUTTON_UP_" + player)));
-        mMapping.put(PsychicNesButton.RIGHT_BUTTON.psychicId(), getKeyEvent(buttonProperties.getProperty("BUTTON_RIGHT_" + player)));
-        mMapping.put(PsychicNesButton.DOWN_BUTTON.psychicId(), getKeyEvent(buttonProperties.getProperty("BUTTON_DOWN_" + player)));
+        addButton(buttonProperties, PsychicNesButton.A_BUTTON, player);
+        addButton(buttonProperties, PsychicNesButton.B_BUTTON, player);
+        addButton(buttonProperties, PsychicNesButton.X_BUTTON, player);
+        addButton(buttonProperties, PsychicNesButton.Y_BUTTON, player);
+        addButton(buttonProperties, PsychicNesButton.SELECT_BUTTON, player);
+        addButton(buttonProperties, PsychicNesButton.START_BUTTON, player);
+        addButton(buttonProperties, PsychicNesButton.R_BUTTON, player);
+        addButton(buttonProperties, PsychicNesButton.L_BUTTON, player);
+        addButton(buttonProperties, PsychicNesButton.LEFT_BUTTON, player);
+        addButton(buttonProperties, PsychicNesButton.UP_BUTTON, player);
+        addButton(buttonProperties, PsychicNesButton.RIGHT_BUTTON, player);
+        addButton(buttonProperties, PsychicNesButton.DOWN_BUTTON, player);
+    }
+
+    /**
+     * Add a mapping for a button to mMapping
+     *
+     * @param buttonProperties the properties object storing the button mapping
+     * @param button           the button that should be added
+     * @param player           which player the button is for
+     * @throws InvalidButtonException if a button could not be parsed
+     */
+    private void addButton(Properties buttonProperties, PsychicNesButton button, int player) throws InvalidButtonException {
+        // get psychic button id and java button id
+        int psychicButtonId = button.psychicId();
+        int javaButtonId = getKeyEvent(buttonProperties.getProperty(button.name() + "_" + player));
+
+        // add to mapping
+        mMapping.put(psychicButtonId, javaButtonId);
     }
 
     /**
      * Convert a VK_<KEY> string to a KeyEvent.VK_<KEY> integer
+     *
      * @param keyEvent a string representation of the key psychicButtonId
      * @return an integer representation of the key psychicButtonId
      * @throws InvalidButtonException if the string could not be converted into a KeyEvent integer
@@ -61,13 +78,14 @@ class ButtonConfig implements Comparable<ButtonConfig> {
     }
 
     /**
+     * Get the ID used for the player device this button mapping is assigned to
      *
-     * @return the ID used for the player device
+     * @return the ID used for the player device this button mapping is assigned to
      */
-    public int getPlayerID()
-    {
+    int getPlayerID() {
         return playerID;
     }
+
     /**
      * Get a collection of all java keys this ButtonConfig maps to
      */
@@ -95,15 +113,15 @@ class ButtonConfig implements Comparable<ButtonConfig> {
         return mMapping.get(psychicButtonId);
     }
 
+    /**
+     * Compare ButtonConfigs by the player they represent
+     *
+     * @param other the ButtonConfig that should be compared to
+     * @return the value 0 if this == other; a value less than 0 if this < other;
+     * and a value greater than 0 if this > other
+     */
     @Override
-    public int compareTo(ButtonConfig o) {
-        if(this.playerID < o.getPlayerID())
-            return -1;
-
-        else if(this.playerID == o.getPlayerID())
-                return 0;
-
-        else
-            return 1;
+    public int compareTo(ButtonConfig other) {
+        return Integer.compare(playerID, other.getPlayerID());
     }
 }

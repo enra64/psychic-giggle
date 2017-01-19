@@ -5,8 +5,9 @@ import de.ovgu.softwareprojekt.SensorData;
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
 
 /**
- * This class may be used to detect sudden movements in the z-axis of linear acceleration of a device.
- * The movement is expected to return to the original position.
+ * This class may be used to detect forth-and-back movements in the z-axis of
+ * linear acceleration of a device. The movement is expected to return to the original position.
+ * Users may subscribe to the detected movements using an {@link AccelerationListener}.
  */
 public class AccelerationPhaseDetection implements NetworkDataSink {
     /**
@@ -35,7 +36,7 @@ public class AccelerationPhaseDetection implements NetworkDataSink {
 
     /**
      * This counter is used for aborting phase waits, avoiding bad recognition of the next
-     * event due to bad phase state.
+     * event due to delays in finishing the current events
      */
     private int mTimeoutCounter = 0;
 
@@ -55,7 +56,7 @@ public class AccelerationPhaseDetection implements NetworkDataSink {
     private boolean mDownCycle = false;
 
     /**
-     * State variables determining the current state of an up movement. True if the phase is currently live.
+     * State variables determining the current state of a movement. True if the phase is currently live.
      */
     private boolean mPhase2 = false, mPhase3 = false;
 
@@ -65,6 +66,8 @@ public class AccelerationPhaseDetection implements NetworkDataSink {
     private AccelerationListener mListener;
 
     /**
+     * Called whenever new data arrives from a device
+     *
      * @param networkDevice   where the data stems from
      * @param sensorData      the sensor data
      * @param userSensitivity currently ignored to simplify detection
@@ -160,6 +163,11 @@ public class AccelerationPhaseDetection implements NetworkDataSink {
         }
     }
 
+    /**
+     * String representation of the AccelerationPhaseDetection object useful for debugging state errors
+     *
+     * @return
+     */
     @Override
     public String toString() {
         return "AccelerationPhaseDetection{" +

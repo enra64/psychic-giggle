@@ -8,7 +8,9 @@ import de.ovgu.softwareprojekt.servers.nes.NesServer;
 import java.awt.*;
 import java.io.IOException;
 
-
+/**
+ * Main class for switching between the different example uses for the framework.
+ */
 public class Main {
     public static void main(String[] args) throws IOException, AWTException {
         switch(args.length > 0 ? args[0] : ""){

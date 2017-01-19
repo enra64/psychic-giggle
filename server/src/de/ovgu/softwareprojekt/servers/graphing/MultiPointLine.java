@@ -45,9 +45,9 @@ class MultiPointLine {
     /**
      * Create a new line in the specified color.
      *
-     * @param lineColor the color to use for the line
+     * @param lineColor  the color to use for the line
      * @param sensorType the sensor type displayed, only for external purposes
-     * @param axis the axis of the sensor, only for external purposes
+     * @param axis       the axis of the sensor, only for external purposes
      */
     MultiPointLine(Color lineColor, SensorType sensorType, int axis) {
         mLineColor = lineColor;

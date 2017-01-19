@@ -10,20 +10,14 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 /**
- * This code is taken almost unchanged from a github gist.
- *
- * @author Rodrigo
+ * The base of this code is the following github gist:
+ * https://gist.github.com/roooodcastro/6325153. It was modified to support multiple
+ * independent lines.
  */
-@SuppressWarnings("unused")
 public class GraphPanel extends JPanel {
     /**
-     * The set of available colors.
+     * A preset of 8 clearly distinguishable colors.
      */
     private static final Color[] mLineColors = new Color[]{
             new Color(255, 0, 0),
@@ -46,6 +40,9 @@ public class GraphPanel extends JPanel {
      */
     private static final int PADDING = 25, LABEL_PADDING = 40;
 
+    /**
+     * How large the buffer should be, and thus how many data points are in one full line
+     */
     static final int BUFFER_SIZE = 512;
 
     /**
@@ -76,10 +73,15 @@ public class GraphPanel extends JPanel {
     /**
      * Set what data throughput rate is displayed
      */
-    void setThroughput(float throughput){
+    void setThroughput(float throughput) {
         mThroughput = throughput;
     }
 
+    /**
+     * Called whenever the graph needs to be redrawn
+     *
+     * @param g the graphics object to be used for drawing
+     */
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -173,6 +175,7 @@ public class GraphPanel extends JPanel {
      * @param sensor     the line to be removed
      * @param sensorAxis the axis the line is for
      */
+    @SuppressWarnings("unused")
     void removeLine(SensorType sensor, int sensorAxis) {
         // remove all matching lines
         mLines.removeIf(line -> line.getSensorType() == sensor && line.getAxis() == sensorAxis);
@@ -181,8 +184,9 @@ public class GraphPanel extends JPanel {
     /**
      * Get a data sink. This new data sink corresponds to a new line in the graph, which will display the data received
      * by this data sink.
+     *
      * @param sensor requested sensor type
-     * @param axis requested sensor axis
+     * @param axis   requested sensor axis
      * @return a data sink usable for pushing data into the graph
      */
     NetworkDataSink getDataSink(SensorType sensor, final int axis) {

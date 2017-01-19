@@ -9,7 +9,8 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 /**
- * This {@link AbstractFilter} subclass forwards incoming data without changes, but measures how often it receives data.
+ * This {@link AbstractFilter} subclass forwards incoming data without changes,
+ * but measures how often it receives data.
  */
 public class ThroughputMeasurer extends AbstractFilter {
     /**
@@ -27,6 +28,12 @@ public class ThroughputMeasurer extends AbstractFilter {
      */
     private RingBuffer<Integer> mDataThroughputStorage;
 
+    /**
+     * Forward data unchanged, only counting the events
+     * @param origin the device that sent the data
+     * @param data the data that was sent
+     * @param userSensitivity the sensitivity the user set for this sensor type
+     */
     @Override
     public void onData(NetworkDevice origin, SensorData data, float userSensitivity) {
         mThroughputCounter++;
@@ -54,7 +61,6 @@ public class ThroughputMeasurer extends AbstractFilter {
      */
     @Override
     public void close() {
-        super.close();
         mThroughputTimer.cancel();
     }
 

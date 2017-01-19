@@ -52,6 +52,9 @@ public class SensorSplitter implements NetworkDataSink {
             mNetworkDataSinkMap.get(data.sensorType).onData(origin, data, userSensitivity);
     }
 
+    /**
+     * Not needed for this splitter
+     */
     @Override
     public void close() {
     }

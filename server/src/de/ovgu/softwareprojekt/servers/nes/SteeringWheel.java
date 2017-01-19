@@ -12,10 +12,9 @@ import static de.ovgu.softwareprojekt.servers.nes.PsychicNesButton.*;
 
 /**
  * Created by Ulrich on 12.12.2016
- * This class is responsible for steering the player in simple racing games
+ * This class is responsible for steering the player in simple NES racing games
  */
 public class SteeringWheel implements NetworkDataSink, AccelerationPhaseDetection.AccelerationListener {
-
     /**
      * is responsible for emulating hardware input
      */
@@ -35,10 +34,14 @@ public class SteeringWheel implements NetworkDataSink, AccelerationPhaseDetectio
     /**
      * Constant which describes the maximum sensitivty value
      */
+    @SuppressWarnings("FieldCanBeLocal")
     private final int MAX_SENSITIVITY = 100;
 
     /**
-     * @throws AWTException is thrown when low level input is prohibit by system
+     * Create a new SteeringWheel instance.
+     *
+     * @param config the button config this steering wheel should use
+     * @throws AWTException is thrown when low level input is prohibited by system
      */
     SteeringWheel(ButtonConfig config) throws AWTException {
         mSteeringBot = new Robot(); //emulates peripheral device input
@@ -85,13 +88,11 @@ public class SteeringWheel implements NetworkDataSink, AccelerationPhaseDetectio
     @Override
     public void onData(NetworkDevice origin, SensorData data, float userSensitivity) {
         //Check if player steers to the left or right by tilted distance
-
         if (data.sensorType == SensorType.Gravity) {
             if (data.data[YAXIS] < (-MAX_SENSITIVITY + userSensitivity))
                 mSteeringBot.keyPress(mButtonConfig.mapInput(LEFT_BUTTON));
             else if (data.data[YAXIS] > (MAX_SENSITIVITY - userSensitivity))
                 mSteeringBot.keyPress(mButtonConfig.mapInput(RIGHT_BUTTON));
-
             else {
                 mSteeringBot.keyRelease(mButtonConfig.mapInput(LEFT_BUTTON));
                 mSteeringBot.keyRelease(mButtonConfig.mapInput(RIGHT_BUTTON));
@@ -101,20 +102,19 @@ public class SteeringWheel implements NetworkDataSink, AccelerationPhaseDetectio
 
 
     /**
-     * Needs to be implemented due to interface but serves no purpose here
+     * Release all keys currently pressed
      */
     @Override
     public void close() {
+        releaseAllKeys();
     }
 
+    /**
+     * Handle up movements detected by our AccelerationPhaseDetection by triggering a
+     * down+a key press sequence
+     */
     @Override
     public void onUpMovement() {
-        //WARNING: ONLY WORKS WHEN USING PROPERLY CONFIGURED COMPUTER
-        try {
-            Runtime.getRuntime().exec("notify-send --expire-time=50 up");
-        } catch (IOException ignored) {
-        }
-
         mSteeringBot.keyPress(mButtonConfig.mapInput(DOWN_BUTTON));
         mSteeringBot.delay(5);
         mSteeringBot.keyPress(mButtonConfig.mapInput(A_BUTTON));
@@ -123,14 +123,12 @@ public class SteeringWheel implements NetworkDataSink, AccelerationPhaseDetectio
         mSteeringBot.keyRelease(mButtonConfig.mapInput(DOWN_BUTTON));
     }
 
+    /**
+     * Handle down movements detected by our AccelerationPhaseDetection by triggering a
+     * up+a key press sequence
+     */
     @Override
     public void onDownMovement() {
-        //WARNING: ONLY WORKS WHEN USING PROPERLY CONFIGURED COMPUTER (i3, notify-send)
-        try {
-            Runtime.getRuntime().exec("notify-send --expire-time=50 down");
-        } catch (IOException ignored) {
-        }
-
         mSteeringBot.keyPress(mButtonConfig.mapInput(UP_BUTTON));
         mSteeringBot.delay(5);
         mSteeringBot.keyPress(mButtonConfig.mapInput(A_BUTTON));
@@ -139,8 +137,10 @@ public class SteeringWheel implements NetworkDataSink, AccelerationPhaseDetectio
         mSteeringBot.keyRelease(mButtonConfig.mapInput(UP_BUTTON));
     }
 
+    /**
+     * Release all keys this steering wheel is mapped to
+     */
     void releaseAllKeys() {
-        for (Integer key : mButtonConfig.getJavaButtons())
-            mSteeringBot.keyRelease(key);
+        mButtonConfig.getJavaButtons().forEach(keyCode -> mSteeringBot.keyRelease(keyCode));
     }
 }

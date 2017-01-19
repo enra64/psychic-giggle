@@ -5,23 +5,18 @@ import de.ovgu.softwareprojekt.NetworkDataSink;
 import de.ovgu.softwareprojekt.SensorType;
 import de.ovgu.softwareprojekt.control.commands.ButtonClick;
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
-import de.ovgu.softwareprojekt.networking.ClientConnection;
 import de.ovgu.softwareprojekt.networking.Server;
 import de.ovgu.softwareprojekt.pipeline.FilterPipelineBuilder;
 import de.ovgu.softwareprojekt.pipeline.filters.AveragingFilter;
 import de.ovgu.softwareprojekt.pipeline.splitters.ClientSplitter;
+import de.ovgu.softwareprojekt.util.FileUtils;
 
 import java.awt.*;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.PriorityQueue;
 import java.util.Properties;
-import java.util.Stack;
 
 /**
  * This server is designed to create NES controller input from gravity and linear acceleration data
@@ -45,13 +40,14 @@ public class NesServer extends Server {
      * Queue is automatically sorted by playerID stored in ButtonConfig
      */
     private PriorityQueue<ButtonConfig> mButtonConfigs = new PriorityQueue<>();
+
     /**
-     * This client splitter makes sure that all linear acceleration data is only sent to the correct pipeline
+     * This client splitter makes sure that linear acceleration data is only sent to the correct pipeline
      */
     private ClientSplitter mLinearAccelerationSplitter = new ClientSplitter();
 
     /**
-     * This client splitter makes sure that all gravity data is only sent to the correct pipeline
+     * This client splitter makes sure that gravity data is only sent to the correct pipeline
      */
     private ClientSplitter mGravitySplitter = new ClientSplitter();
 
@@ -70,9 +66,10 @@ public class NesServer extends Server {
         // load button mappings: which player presses what when
         loadButtonMappings();
 
-        // display the nes button layout
-        super.setButtonLayout(readFile("../nesLayout.txt", "utf-8"));
+        // display the nes button layout on all connected devices
+        super.setButtonLayout(FileUtils.readFile("../nesLayout.txt", "utf-8"));
 
+        // register our data splitters for sensor data
         registerDataSink(mGravitySplitter, SensorType.Gravity);
         registerDataSink(mLinearAccelerationSplitter, SensorType.LinearAcceleration);
     }
@@ -97,7 +94,6 @@ public class NesServer extends Server {
                 System.out.println("Player " + player + ": Keycode " + e.getMessage());
             }
         }
-
     }
 
     /**
@@ -126,10 +122,10 @@ public class NesServer extends Server {
      */
     @Override
     public void onException(Object origin, Exception exception, String info) {
-        System.out.println("onException:\n" + info);
-        System.out.println("in " + origin.getClass());
+        System.out.println("NesServer experienced exception in " + origin.getClass() + ", info: " + info);
+        System.out.flush();
         exception.printStackTrace();
-        System.exit(0);
+        System.exit(1);
     }
 
     /**
@@ -158,9 +154,11 @@ public class NesServer extends Server {
 
             // add the steering wheel to the list of network devices
             mSteeringWheels.put(newClient, wheel);
-        } catch (AWTException | IOException e) {
-            e.printStackTrace();
-            // yeah this shouldnt happen
+        } catch (AWTException e) {
+            System.out.println("Your device does not support java virtual input, which is required.");
+            return false;
+        } catch (IOException e) {
+            onException(this, e, "Could not accept client");
         }
 
         return true;
@@ -189,7 +187,7 @@ public class NesServer extends Server {
      * @param removeClient the client to be removed
      */
     private void removeClient(NetworkDevice removeClient) {
-        SteeringWheel wheel = mSteeringWheels.get(removeClient);        
+        SteeringWheel wheel = mSteeringWheels.get(removeClient);
         if (wheel != null) {
             // put back the button config that was used by the removed client
             mButtonConfigs.add(wheel.getButtonConfig());
@@ -216,44 +214,45 @@ public class NesServer extends Server {
     public void close() {
         super.close();
 
-        for (SteeringWheel sw : mSteeringWheels.values()) {
-            sw.releaseAllKeys();
-            sw.close();
-        }
+        // close all steering wheels
+        mSteeringWheels.forEach((networkDevice, wheel) -> wheel.close());
+        mAccPhaseDetectors.forEach((networkDevice, apd) -> apd.close());
     }
 
+    /**
+     * Reset position is not implemented
+     *
+     * @param origin which device pressed the button
+     */
     @Override
     public void onResetPosition(NetworkDevice origin) {
     }
 
+    /**
+     * Forward button clicks to the steering wheel handling the device that sent the click
+     *
+     * @param click  event object specifying details like button id
+     * @param origin the network device that sent the button click
+     */
     @Override
     public void onButtonClick(ButtonClick click, NetworkDevice origin) {
         mSteeringWheels.get(origin).controllerInput(click.mID, click.isHold);
     }
 
     /**
-     * Read all contents of a file into a string
+     * Called when a client has finished connecting
      *
-     * @param path     file location
-     * @param encoding expected encoding
-     * @return a string representing the file content
-     * @throws IOException if the file could not be found or read
+     * @param connectedClient the client that connected successfully
      */
-    @SuppressWarnings("SameParameterValue")
-    private static String readFile(String path, String encoding) throws IOException {
-        byte[] encoded = Files.readAllBytes(Paths.get(path));
-        return new String(encoded, encoding);
-    }
-
     @Override
     public void onClientAccepted(NetworkDevice connectedClient) {
-        //Get playerID and add 1, because IDs start with zero
-        int playerID = mSteeringWheels.get(connectedClient).getButtonConfig().getPlayerID()+1;
+        // Get playerID and add 1, because IDs start with zero
+        int playerID = mSteeringWheels.get(connectedClient).getButtonConfig().getPlayerID() + 1;
 
         try {
             displayNotification(0, "Player " + playerID, "You are connected as player " + playerID, true, connectedClient.getInetAddress());
         } catch (IOException e) {
-            e.printStackTrace();
+            onException(this, e, "Could not display notification for player " + playerID);
         }
     }
 }
