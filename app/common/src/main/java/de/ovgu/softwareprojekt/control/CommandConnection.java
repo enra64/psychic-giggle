@@ -242,9 +242,8 @@ public class CommandConnection {
 
                     // call listener with new command
                     mListener.onCommand(connection.getInetAddress(), (AbstractCommand) oinput.readObject());
-                } catch (SocketException e) {
-                    CommandConnection.this.mExceptionListener.onException(CommandConnection.this, e, "Probable cause is calling close() while" +
-                            "in accept loop. If that is the case, this exception can be safely ignored");
+                } catch (SocketException ignored) {
+                    // this exception is thrown if #close() is called before #start(), but it is not relevant.
                 } catch (ClassNotFoundException | IOException e) {
                     CommandConnection.this.mExceptionListener.onException(CommandConnection.this, e, "Could not listen for commands");
                 }
