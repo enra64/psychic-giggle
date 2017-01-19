@@ -9,7 +9,7 @@ import de.ovgu.softwareprojekt.discovery.NetworkDevice;
 @SuppressWarnings("unused")
 public class AbsoluteFilter extends AbstractFilter {
     /**
-     * Replace any negative values with its absolute value.
+     * Replace any negative values with their absolute value.
      */
     @Override
     public void onData(NetworkDevice networkDevice, SensorData sensorData, float userSensitivity) {

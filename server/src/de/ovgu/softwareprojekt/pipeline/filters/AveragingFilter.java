@@ -18,16 +18,6 @@ public class AveragingFilter extends AbstractFilter {
     private RingBuffer<float[]> mBuffer;
 
     /**
-     * A filter that uses the Average
-     * movement in order to create a smooth movement
-     *
-     * @param avgSampSize how many values should be used to calculate the average
-     * @param dataSink    either a valid network data sink, or null. if null, {@link #setDataSink(NetworkDataSink)}
-     *                    must be called prior to starting operations.
-     */
-
-
-    /**
      * Create a new average movement filter without a configured data sink.
      * {@link #setDataSink(NetworkDataSink)} must be called before operations may begin
      *
@@ -67,11 +57,9 @@ public class AveragingFilter extends AbstractFilter {
         Arrays.fill(rawData, 0);
 
         // sum all values in mBuffer
-        for (int i = 0; i < mBuffer.size(); i++) {
-            rawData[XAXIS] += mBuffer.get(i)[XAXIS];
-            rawData[YAXIS] += mBuffer.get(i)[YAXIS];
-            rawData[ZAXIS] += mBuffer.get(i)[ZAXIS];
-        }
+        for (int bufferIndex = 0; bufferIndex < mBuffer.size(); bufferIndex++)
+            for (int dataIndex = 0; dataIndex < rawData.length; dataIndex++)
+                rawData[dataIndex] += mBuffer.get(bufferIndex)[dataIndex];
 
         // average the values by dividing by their count
         for (int i = 0; i < rawData.length; i++)

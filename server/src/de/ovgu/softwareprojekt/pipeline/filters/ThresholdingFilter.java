@@ -5,7 +5,6 @@ import de.ovgu.softwareprojekt.NetworkDataSink;
 import de.ovgu.softwareprojekt.SensorData;
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
 
-import java.security.InvalidParameterException;
 import java.util.Arrays;
 
 import static java.lang.Math.abs;
@@ -35,20 +34,7 @@ public class ThresholdingFilter extends AbstractFilter {
     public ThresholdingFilter(@Nullable NetworkDataSink dataSink, float minimumAmplitude, int axis) {
         super(dataSink);
         mMinimumAmplitude = minimumAmplitude;
-
-        switch (axis) {
-            case 0:
-                mAxis = XAXIS;
-                break;
-            case 1:
-                mAxis = YAXIS;
-                break;
-            case 2:
-                mAxis = ZAXIS;
-                break;
-            default:
-                throw new InvalidParameterException("Unknown axis parameter");
-        }
+        mAxis = axis;
     }
 
     /**

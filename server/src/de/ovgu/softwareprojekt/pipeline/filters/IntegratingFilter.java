@@ -33,13 +33,13 @@ public class IntegratingFilter extends AbstractFilter {
      */
     @Override
     public void onData(NetworkDevice origin, SensorData data, float userSensitivity) {
-        mSumOfRotationX += data.data[XAXIS];
-        mSumOfRotationY += data.data[YAXIS];
-        mSumOfRotationZ += data.data[ZAXIS];
+        mSumOfRotationX += data.data[0];
+        mSumOfRotationY += data.data[1];
+        mSumOfRotationZ += data.data[2];
 
-        data.data[XAXIS] = mSumOfRotationX;
-        data.data[YAXIS] = mSumOfRotationY;
-        data.data[ZAXIS] = mSumOfRotationZ;
+        data.data[0] = mSumOfRotationX;
+        data.data[1] = mSumOfRotationY;
+        data.data[2] = mSumOfRotationZ;
 
         mDataSink.onData(origin, data, userSensitivity);
     }
@@ -52,5 +52,4 @@ public class IntegratingFilter extends AbstractFilter {
         mSumOfRotationY = 0;
         mSumOfRotationZ = 0;
     }
-
 }

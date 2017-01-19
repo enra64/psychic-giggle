@@ -5,6 +5,9 @@ import de.ovgu.softwareprojekt.NetworkDataSink;
 import de.ovgu.softwareprojekt.SensorData;
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
 
+import java.lang.reflect.Array;
+import java.util.Arrays;
+
 /**
  * Created by Ulrich on 29.11.2016.
  * <p>
@@ -64,9 +67,9 @@ public class NormalizationFilter extends AbstractFilter {
      */
     private void normalize(float[] sensorData) {
         float projectionFactor = mTargetRange / mSourceRange;
-        sensorData[XAXIS] *= projectionFactor;
-        sensorData[YAXIS] *= projectionFactor;
-        sensorData[ZAXIS] *= projectionFactor;
+
+        for(int i = 0; i < sensorData.length; i++)
+            sensorData[i] *= projectionFactor;
     }
 
     /**

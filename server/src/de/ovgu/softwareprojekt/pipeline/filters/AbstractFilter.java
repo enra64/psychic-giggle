@@ -13,9 +13,6 @@ import java.io.IOException;
  * provides the DataSink and axes
  */
 public abstract class AbstractFilter implements NetworkDataSink, NetworkDataSource {
-    // constants are the standard ids from android sensors/sensor data
-    protected final int XAXIS = 0, YAXIS = 1, ZAXIS =2;
-
     /**
      * The data sink all data processed by this filter will be dumped into
      */
