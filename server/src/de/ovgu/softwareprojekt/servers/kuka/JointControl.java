@@ -33,7 +33,7 @@ public class JointControl implements NetworkDataSink, ButtonListener, ResetListe
      * <p>
      * NOTE: if you change theses ids, you're gonna have a bad time. see {@link #onButtonClick(ButtonClick, NetworkDevice)}
      */
-    static final int BASE_PAIR_BUTTON = 1, CENTER_PAIR_BUTTON = 2, TOOL_PAIR_BUTTON = 3;
+    static final int BASE_PAIR_BUTTON = 3, CENTER_PAIR_BUTTON = 2, TOOL_PAIR_BUTTON = 1;
 
     /**
      * Create a new JointControl instance
