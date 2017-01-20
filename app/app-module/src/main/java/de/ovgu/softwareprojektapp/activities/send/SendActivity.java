@@ -22,6 +22,7 @@ import java.net.ConnectException;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -32,6 +33,7 @@ import de.ovgu.softwareprojekt.control.commands.AbstractCommand;
 import de.ovgu.softwareprojekt.control.commands.ConnectionRequestResponse;
 import de.ovgu.softwareprojekt.control.commands.ChangeSensorSensitivity;
 import de.ovgu.softwareprojekt.control.commands.ResetToCenter;
+import de.ovgu.softwareprojekt.control.commands.SensorDescription;
 import de.ovgu.softwareprojekt.control.commands.SensorRangeNotification;
 import de.ovgu.softwareprojekt.control.commands.DisplayNotification;
 import de.ovgu.softwareprojekt.control.commands.SetSensorCommand;
@@ -110,7 +112,7 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
     /**
      * saves descriptions for the used sensors
      */
-    private EnumMap<SensorType, String> sensorDescriptions;
+    private HashMap<SensorType, String> sensorDescriptions = new HashMap<SensorType, String>();
 
 
     @Override
@@ -390,7 +392,7 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
             //put sensor descriptions in an EnumMap for each SensorType
             case SensorDescription:
                 SensorDescription setSensorDescription = (SensorDescription) command;
-                sensorDescriptions.put(setSensorDescription.type, setSensorDescription.description);
+                sensorDescriptions.put(setSensorDescription.usedSensor, setSensorDescription.sensorDescription);
                 break;
             // ignore unhandled commands
             default:

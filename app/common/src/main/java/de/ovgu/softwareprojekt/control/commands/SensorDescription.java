@@ -15,11 +15,11 @@ public class SensorDescription extends AbstractCommand {
     /**
      * The {@link SensorType} that is regarded
      */
-    private SensorType usedSensor;
+    public SensorType usedSensor;
     /**
      * The information about the used SensorType
      */
-    private  String sensorDescription;
+    public  String sensorDescription;
 
     /**
      * Create a new {@link SensorDescription} command

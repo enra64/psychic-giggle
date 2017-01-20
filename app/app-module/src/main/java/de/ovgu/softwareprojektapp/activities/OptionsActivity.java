@@ -21,6 +21,7 @@ import java.net.InetAddress;
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.HashMap;
 
 import de.ovgu.softwareprojekt.SensorType;
 import de.ovgu.softwareprojekt.control.CommandConnection;
@@ -148,9 +149,11 @@ public class OptionsActivity extends AppCompatActivity implements SeekBar.OnSeek
      * Create options dynamically based on the number of sensortypes
      */
     private void createSensorOptions() {
-
+        //array of active sensors
         boolean[] sensors = getIntent().getBooleanArrayExtra(EXTRA_ACTIVE_SENSORS);
-        EnumMap<SensorType, String> descriptions = getIntent().getBundleExtra(EXTRA_SENSOR_DESCRIPTIONS);
+        //map of descriptions for each active sensor
+        HashMap<SensorType, String> descriptionsHash = (HashMap<SensorType, String>) getIntent().getSerializableExtra(EXTRA_SENSOR_DESCRIPTIONS);
+
 
         for (int i = 0; i < mNumberOfSensors; i++) {
             //only create seekbar and text if the server needs these sensors or
@@ -159,7 +162,15 @@ public class OptionsActivity extends AppCompatActivity implements SeekBar.OnSeek
                 // Create a header for the seekbar
                 TextView text = new TextView(OptionsActivity.this);
                 text.setText(SensorType.values()[i].toString());
+                text.setTextSize(18f);
                 text.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+
+                // create description for sensors
+                TextView description = new TextView(OptionsActivity.this);
+                description.setText(descriptionsHash.get(SensorType.values()[i]));
+                description.setTextSize(14f);
+                description.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+
 
                 // create the seekbar
                 SeekBar seek = new SeekBar(OptionsActivity.this);
@@ -169,8 +180,10 @@ public class OptionsActivity extends AppCompatActivity implements SeekBar.OnSeek
 
                 mSeekBars.add(seek);
                 mTextViews.add(text);
+                mTextViews.add(description);
 
                 mSensorOptions.addView(text);
+                mSensorOptions.addView(description);
                 mSensorOptions.addView(seek);
             }
         }
