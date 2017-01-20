@@ -201,6 +201,8 @@ public class KukaServer extends Server {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+
+                System.out.println("Switched to " + (mIsInMarbleMode ? "marble mode" : "joint mode"));
                 break;
             default:
                 // forward all other ids to the joint control, as the marble labyrinth has no further buttons

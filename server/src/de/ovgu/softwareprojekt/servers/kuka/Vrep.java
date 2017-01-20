@@ -34,9 +34,9 @@ public class Vrep implements LbrIiiiiiiwa {
     private int mClientId;
 
     /**
-     * A mapping from {@link LbrJoint}s to their keys in V-REP
+     * A mapping from {@link Joint}s to their keys in V-REP
      */
-    private EnumMap<LbrJoint, Integer> mJointMap = new EnumMap<>(LbrJoint.class);
+    private EnumMap<Joint, Integer> mJointMap = new EnumMap<>(Joint.class);
 
     /**
      * Create a new V-REP control instance
@@ -64,7 +64,7 @@ public class Vrep implements LbrIiiiiiiwa {
 
         // get all joints
         for(int i = 1; i <= 7; i++)
-            mJointMap.put(LbrJoint.values()[i - 1], getSimulationObject("LBR_iiwa_7_R800_joint" + i));
+            mJointMap.put(Joint.values()[i - 1], getSimulationObject("LBR_iiwa_7_R800_joint" + i));
 
         // start the simulation in blocking mode to wait until it started
         mVrep.simxStartSimulation(mClientId, simx_opmode_blocking);
@@ -97,7 +97,7 @@ public class Vrep implements LbrIiiiiiiwa {
      * @param degree how much.
      */
     @Override
-    public void rotateJoint(LbrJoint joint, float degree) {
+    public void rotateJoint(Joint joint, float degree) {
         // because this is oneshot mode, the return code is basically useless
         // parameters are in radian
         mVrep.simxSetJointPosition(mClientId, mJointMap.get(joint), (float) (degree * Math.PI / 180), simx_opmode_oneshot);
@@ -110,7 +110,7 @@ public class Vrep implements LbrIiiiiiiwa {
      * @param degree where to
      */
     @Override
-    public void rotateJointTarget(LbrJoint joint, float degree) {
+    public void rotateJointTarget(Joint joint, float degree) {
         // because this is oneshot mode, the return code is basically useless
         // parameters are in radian
         mVrep.simxSetJointTargetPosition(mClientId, mJointMap.get(joint), (float) (degree * Math.PI / 180), simx_opmode_oneshot);
@@ -122,7 +122,7 @@ public class Vrep implements LbrIiiiiiiwa {
      * @param velocity how fast
      */
     @Override
-    public void setJointVelocity(LbrJoint joint, float velocity) {
+    public void setJointVelocity(Joint joint, float velocity) {
         // because this is oneshot mode, the return code is basically useless
         mVrep.simxSetJointTargetVelocity(mClientId, mJointMap.get(joint), velocity, simx_opmode_oneshot);
     }

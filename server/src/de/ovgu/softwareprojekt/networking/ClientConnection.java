@@ -254,7 +254,7 @@ public class ClientConnection implements OnCommandListener, NetworkDataSink, Con
      */
     private void initialiseCommandConnection() throws IOException {
         // begin a new command connection, set this as callback
-        mCommandConnection = new CommandConnection(this);
+        mCommandConnection = new CommandConnection(this, mExceptionListener);
 
         // begin listening for commands
         mCommandConnection.start();

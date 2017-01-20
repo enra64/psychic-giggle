@@ -24,7 +24,7 @@ public class JointControl implements NetworkDataSink, ButtonListener, ResetListe
     /**
      * The joint that is currently controlled by movement
      */
-    private LbrJoint mCurrentJoint = LbrJoint.BaseRotator;
+    private Joint mCurrentJoint = Joint.BaseRotator;
 
     /**
      * Create a new JointControl instance
@@ -73,7 +73,7 @@ public class JointControl implements NetworkDataSink, ButtonListener, ResetListe
         // ignore button release events
         if (click.isHold) {
             // change controlled joint
-            mCurrentJoint = LbrJoint.values()[click.mID - 1];
+            mCurrentJoint = Joint.values()[click.mID - 1];
             System.out.println("Using " + mCurrentJoint.name());
         }
     }
@@ -84,6 +84,7 @@ public class JointControl implements NetworkDataSink, ButtonListener, ResetListe
      */
     @Override
     public void onResetPosition(NetworkDevice origin) {
-        mControlInterface.rotateJointTarget(mCurrentJoint, 0);
+        for(Joint joint : Joint.values())
+            mControlInterface.rotateJointTarget(joint, 0);
     }
 }

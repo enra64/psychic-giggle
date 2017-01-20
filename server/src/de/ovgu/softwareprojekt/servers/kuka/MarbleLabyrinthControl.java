@@ -5,7 +5,7 @@ import de.ovgu.softwareprojekt.SensorData;
 import de.ovgu.softwareprojekt.callback_interfaces.ResetListener;
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
 
-import static de.ovgu.softwareprojekt.servers.kuka.LbrJoint.*;
+import static de.ovgu.softwareprojekt.servers.kuka.Joint.*;
 
 /**
  * This class may be used for controlling the robot in a marble-labyrinth friendly way. Only the two topmost joints are
@@ -20,9 +20,9 @@ public class MarbleLabyrinthControl implements NetworkDataSink, ResetListener {
     /**
      * The joints we use for expressing the pitch and roll angles
      */
-    private final static LbrJoint
-            mRobotPitchJoint = LbrJoint.ToolTilter,
-            mRobotRollJoint = LbrJoint.ThirdRotator;
+    private final static Joint
+            mRobotPitchJoint = Joint.ToolTilter,
+            mRobotRollJoint = Joint.ThirdRotator;
 
     /**
      * The maxima of our pitch and roll joints
