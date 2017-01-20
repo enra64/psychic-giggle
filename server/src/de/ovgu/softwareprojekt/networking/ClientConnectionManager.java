@@ -433,6 +433,13 @@ class ClientConnectionManager implements ClientListener, UnexpectedClientListene
         mClientListener.onClientAccepted(connectedClient);
     }
 
+    //TODO: DESCRIPTION
+    public void sendSensorDescription(SensorType type, String description) throws IOException {
+        synchronized (mClientConnections) {
+            for(ClientConnection con : mClientConnections)
+            con.sendSensorDescription(type, description);
+    }
+
     /**
      * Return the number of currently added and not disconnected clients.
      *

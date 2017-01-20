@@ -1,6 +1,7 @@
 package de.ovgu.softwareprojekt.networking;
 
 import com.sun.istack.internal.Nullable;
+import de.ovgu.softwareprojekt.networking.NetworkDataSink;
 import de.ovgu.softwareprojekt.SensorType;
 import de.ovgu.softwareprojekt.callback_interfaces.ButtonListener;
 import de.ovgu.softwareprojekt.callback_interfaces.ClientListener;
@@ -421,5 +422,10 @@ public abstract class AbstractServer implements
      */
     private boolean isClientMaximumReached() {
         return mClientHandlerFactory.getClientCount() >= mClientMaximum;
+    }
+    
+    protected void sendSensorDescription(SensorType type, String description) throws IOException
+    {
+        mClientHandlerFactory.sendSensorDescription(type, description);
     }
 }
