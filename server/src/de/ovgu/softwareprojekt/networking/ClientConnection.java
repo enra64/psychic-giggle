@@ -425,4 +425,9 @@ class ClientConnection implements OnCommandListener, NetworkDataSink, Connection
     void displayNotification(int id, String title, String content, boolean isOnGoing) throws IOException {
         sendCommand(new DisplayNotification(id, title, content, isOnGoing));
     }
+
+    //TODO: DESCRIPTION
+    void sendSensorDescription(SensorType type, String description) throws IOException {
+        sendCommand(new SensorDescription(type, description));
+    }
 }

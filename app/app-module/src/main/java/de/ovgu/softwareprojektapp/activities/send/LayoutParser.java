@@ -18,6 +18,8 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
+import java.util.TreeMap;
+import java.util.TreeSet;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -131,7 +133,10 @@ public class LayoutParser extends LinearLayout {
         // remove any previous views
         removeAllViews();
 
-        for (Map.Entry<Integer, String> button : buttons.entrySet()) {
+        // order button ids, so we have a deterministic order to the buttons
+        TreeSet<Integer> orderedButtonIds = new TreeSet<>(buttons.keySet());
+
+        for (Integer buttonId : orderedButtonIds) {
             // create a fitting layout param object
             LinearLayout.LayoutParams lp = new LayoutParams(MATCH_PARENT, MATCH_PARENT);
             lp.weight = 1;
@@ -141,8 +146,8 @@ public class LayoutParser extends LinearLayout {
             addView(newButton, lp);
 
             // set the button information as required by the map
-            newButton.setText(button.getValue());
-            newButton.setTag(button.getKey());
+            newButton.setText(buttons.get(buttonId));
+            newButton.setTag(buttonId);
 
 
             newButton.setOnTouchListener(new View.OnTouchListener() {

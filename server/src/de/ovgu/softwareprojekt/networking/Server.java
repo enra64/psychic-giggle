@@ -13,6 +13,7 @@ import de.ovgu.softwareprojekt.misc.ExceptionListener;
  * AbstractServer. The server will accept all clients, unless {@link #acceptClient(NetworkDevice)} is overridden or a
  * {@link ClientListener} is set using {@link #setClientListener(ClientListener)}.
  */
+@SuppressWarnings("WeakerAccess")
 public class Server extends AbstractServer {
     private ClientListener mClientListener;
     private ExceptionListener mExceptionListener;

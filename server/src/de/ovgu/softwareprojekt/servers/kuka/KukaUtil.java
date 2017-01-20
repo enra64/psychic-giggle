@@ -25,7 +25,7 @@ class KukaUtil {
      * @param joint the joint of which the range should be returned
      * @return the maximum range of the joint. the robot can move half of it in positive and negative direction.
      */
-    static float getRange(LbrJoint joint) {
+    static float getRange(Joint joint) {
         switch (joint) {
             case BaseRotator:
                 return 340;

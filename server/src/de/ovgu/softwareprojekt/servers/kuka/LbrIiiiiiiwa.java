@@ -15,14 +15,14 @@ public interface LbrIiiiiiiwa {
      * @param joint  which joint
      * @param degree how much.
      */
-    void rotateJoint(LbrJoint joint, float degree);
+    void rotateJoint(Joint joint, float degree);
 
     /**
      * Set the velocity of a joint
      * @param joint which joint
      * @param velocity how fast
      */
-    void setJointVelocity(LbrJoint joint, float velocity);
+    void setJointVelocity(Joint joint, float velocity);
 
     /**
      * Rotate a joint to a position.
@@ -30,7 +30,7 @@ public interface LbrIiiiiiiwa {
      * @param joint  which joint
      * @param degree where to
      */
-    void rotateJointTarget(LbrJoint joint, float degree);
+    void rotateJointTarget(Joint joint, float degree);
 
     /**
      * Finalize operations. The other interface methods, except for start(), need not be callable after calling stop().

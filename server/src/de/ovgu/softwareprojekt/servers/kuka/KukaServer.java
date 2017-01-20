@@ -189,6 +189,8 @@ public class KukaServer extends AbstractServer {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+
+                System.out.println("Switched to " + (mIsInMarbleMode ? "marble mode" : "joint mode"));
                 break;
             default:
                 // forward all other buttons to both controls.

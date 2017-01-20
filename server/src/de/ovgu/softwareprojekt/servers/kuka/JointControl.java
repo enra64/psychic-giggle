@@ -24,16 +24,16 @@ public class JointControl implements NetworkDataSink, ButtonListener, ResetListe
     /**
      * The joint that is currently controlled by movement
      */
-    private LbrJoint
-            mCurrentRotator = LbrJoint.BaseRotator,
-            mCurrentTilter = LbrJoint.BaseTilter;
+    private Joint
+            mCurrentRotator = Joint.BaseRotator,
+            mCurrentTilter = Joint.BaseTilter;
 
     /**
      * Button ids for selecting different joints. Only needed for joint control mode
      * <p>
      * NOTE: if you change theses ids, you're gonna have a bad time. see {@link #onButtonClick(ButtonClick, NetworkDevice)}
      */
-    static final int BASE_PAIR_BUTTON = 1, CENTER_PAIR_BUTTON = 2, TOOL_PAIR_BUTTON = 3;
+    static final int BASE_PAIR_BUTTON = 3, CENTER_PAIR_BUTTON = 2, TOOL_PAIR_BUTTON = 1;
 
     /**
      * Create a new JointControl instance
@@ -87,16 +87,16 @@ public class JointControl implements NetworkDataSink, ButtonListener, ResetListe
         // update the currently used actor pair
         switch (click.mID) {
             case BASE_PAIR_BUTTON:
-                mCurrentRotator = LbrJoint.BaseRotator;
-                mCurrentTilter = LbrJoint.BaseTilter;
+                mCurrentRotator = Joint.BaseRotator;
+                mCurrentTilter = Joint.BaseTilter;
                 break;
             case CENTER_PAIR_BUTTON:
-                mCurrentRotator = LbrJoint.SecondRotator;
-                mCurrentTilter = LbrJoint.SecondTilter;
+                mCurrentRotator = Joint.SecondRotator;
+                mCurrentTilter = Joint.SecondTilter;
                 break;
             case TOOL_PAIR_BUTTON:
-                mCurrentRotator = LbrJoint.ToolArmRotator;
-                mCurrentTilter = LbrJoint.ToolTilter;
+                mCurrentRotator = Joint.ToolArmRotator;
+                mCurrentTilter = Joint.ToolTilter;
                 break;
         }
     }

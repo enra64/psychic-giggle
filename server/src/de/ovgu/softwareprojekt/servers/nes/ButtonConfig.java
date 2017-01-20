@@ -55,7 +55,8 @@ class ButtonConfig implements Comparable<ButtonConfig> {
     private void addButton(Properties buttonProperties, PsychicNesButton button, int player) throws InvalidButtonException {
         // get psychic button id and java button id
         int psychicButtonId = button.psychicId();
-        int javaButtonId = getKeyEvent(buttonProperties.getProperty(button.name() + "_" + player));
+        String javaButtonName = "BUTTON_" + button.name().substring(0, button.name().length() - 7) + "_" + player;
+        int javaButtonId = getKeyEvent(buttonProperties.getProperty(javaButtonName));
 
         // add to mapping
         mMapping.put(psychicButtonId, javaButtonId);

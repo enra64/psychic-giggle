@@ -241,6 +241,10 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
         // set result of activity
         setResult(result);
 
+        // close connection dialog if it was still open
+        if(mConnectionProgressDialog != null)
+            mConnectionProgressDialog.cancel();
+
         // stop generating sensor data
         mSensorHandler.closeAll();
 
