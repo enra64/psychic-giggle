@@ -29,6 +29,11 @@ import java.util.*;
 @SuppressWarnings("WeakerAccess")
 class ClientConnectionManager implements ClientListener, UnexpectedClientListener {
     /**
+     * This interface must be called if a client is lost to allow the {@link AbstractServer} to react
+     */
+    private final ClientLossListener mClientLossListener;
+
+    /**
      * Name of the server as displayed to discovery clients
      */
     private String mServerName;
@@ -98,12 +103,14 @@ class ClientConnectionManager implements ClientListener, UnexpectedClientListene
             ExceptionListener exceptionListener,
             OnCommandListener commandListener,
             ClientListener clientListener,
-            NetworkDataSink dataSink) {
+            NetworkDataSink dataSink,
+            ClientLossListener clientLossListener) {
         mServerName = serverName;
         mExceptionListener = exceptionListener;
         mCommandListener = commandListener;
         mClientListener = clientListener;
         mDataSink = dataSink;
+        mClientLossListener = clientLossListener;
     }
 
     /**
@@ -372,6 +379,9 @@ class ClientConnectionManager implements ClientListener, UnexpectedClientListene
 
         // forward the disconnect
         mClientListener.onClientDisconnected(disconnectedClient);
+
+        // notify client loss listener
+        mClientLossListener.onClientLoss();
     }
 
     /**
@@ -388,6 +398,9 @@ class ClientConnectionManager implements ClientListener, UnexpectedClientListene
 
         // forward the timeout
         mClientListener.onClientTimeout(timeoutClient);
+
+        // notify loss listener
+        mClientLossListener.onClientLoss();
     }
 
     /**
@@ -418,5 +431,14 @@ class ClientConnectionManager implements ClientListener, UnexpectedClientListene
     @Override
     public void onClientAccepted(NetworkDevice connectedClient) {
         mClientListener.onClientAccepted(connectedClient);
+    }
+
+    /**
+     * Return the number of currently added and not disconnected clients.
+     *
+     * @return number of currently added and not disconnected clients.
+     */
+    int getClientCount() {
+        return mClientConnections.size();
     }
 }
