@@ -119,8 +119,7 @@ public class LayoutParser extends LinearLayout {
         }
 
         // extra check to avoid adding this to this. needed to use this function for the recursion from the start
-        if(linlay != this)
-            addView(linlay);
+        if(linlay != this) addView(linlay);
     }
 
     /**

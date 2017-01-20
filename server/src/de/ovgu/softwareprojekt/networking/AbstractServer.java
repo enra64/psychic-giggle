@@ -23,7 +23,13 @@ import java.net.UnknownHostException;
  * 3) A DataConnection to rapidly transmit sensor data
  */
 @SuppressWarnings({"unused", "WeakerAccess", "SameParameterValue"})
-public abstract class AbstractServer implements OnCommandListener, ClientListener, ExceptionListener, ButtonListener, ResetListener {
+public abstract class AbstractServer implements
+        OnCommandListener,
+        ClientListener,
+        ExceptionListener,
+        ButtonListener,
+        ResetListener,
+        ClientLossListener {
     /**
      * AbstractServer handling responding to discovery broadcasts
      */
@@ -56,6 +62,11 @@ public abstract class AbstractServer implements OnCommandListener, ClientListene
     private DataMapper mDataMapper = new DataMapper();
 
     /**
+     * The maximum number of clients allowed on the server
+     */
+    private int mClientMaximum = Integer.MAX_VALUE;
+
+    /**
      * Create a new server. It will be offline (not using any sockets) until {@link #start()} is called.
      *
      * @param serverName    if not null, this name will be used. otherwise, the devices hostname is used
@@ -72,7 +83,8 @@ public abstract class AbstractServer implements OnCommandListener, ClientListene
                 this,
                 this,
                 this,
-                mDataMapper);
+                mDataMapper,
+                this);
 
         mDataMapper.setConnectionHandler(mClientHandlerFactory);
         // SIGTERM -> close all clients, stop discovery server
@@ -163,7 +175,8 @@ public abstract class AbstractServer implements OnCommandListener, ClientListene
                 // update the request source address
                 request.self.address = origin.getHostAddress();
 
-                boolean acceptClient = acceptClient(request.self);
+                // accept the client if the client maximum has not been reached and the subclass allows it
+                boolean acceptClient = !isClientMaximumReached() && acceptClient(request.self);
 
                 // reply to the client, either accepting or denying his request
                 try {
@@ -171,7 +184,6 @@ public abstract class AbstractServer implements OnCommandListener, ClientListene
                 } catch (UnknownHostException e) {
                     onException(this, e, "Could not parse address of incoming connection request. This is bad.");
                 }
-
 
                 if (acceptClient) {
                     try {
@@ -203,6 +215,19 @@ public abstract class AbstractServer implements OnCommandListener, ClientListene
     }
 
     /**
+     * Called when the client manager detects a client loss.
+     * We use it to re-check whether we need to advertise the server again
+     */
+    @Override
+    public final void onClientLoss() {
+        try {
+            advertiseServer();
+        } catch (IOException e) {
+            onException(this, e, "Could not advertise server");
+        }
+    }
+
+    /**
      * Initialising the discovery server makes it possible for the client ot find use. The command- and data connection
      * need to be initialised, because they provide important information
      *
@@ -215,6 +240,10 @@ public abstract class AbstractServer implements OnCommandListener, ClientListene
         // stop old instances
         if (mDiscoveryServer != null)
             mDiscoveryServer.close();
+
+        // do not advertise the server if the client maximum has been reached
+        if (isClientMaximumReached())
+            return;
 
         // the DiscoveryServer makes it possible for the client to find us, but it needs to know the command and
         // data ports, which is why we had to initialise those connections first
@@ -360,6 +389,41 @@ public abstract class AbstractServer implements OnCommandListener, ClientListene
         mClientHandlerFactory.getClientHandler(deviceAddress).displayNotification(id, title, content, isOnGoing);
     }
 
+    /**
+     * Set the maximum number of clients that may be accepted.
+     * If this number is reached, the server will no longer advertise the server.
+     *
+     * @param maximum maximum number of clients
+     */
+    public void setClientMaximum(int maximum) {
+        mClientMaximum = maximum;
+    }
+
+    /**
+     * Return the current client maximum
+     *
+     * @return current maximum client count
+     */
+    public int getClientMaximum() {
+        return mClientMaximum;
+    }
+
+    /**
+     * Removes the restriction on client numbers
+     */
+    public void removeClientMaximum() {
+        mClientMaximum = Integer.MAX_VALUE;
+    }
+
+    /**
+     * Check for the maximum number of clients
+     *
+     * @return true if no further clients may connect
+     */
+    private boolean isClientMaximumReached() {
+        return mClientHandlerFactory.getClientCount() >= mClientMaximum;
+    }
+    
     protected void sendSensorDescription(SensorType type, String description) throws IOException
     {
         mClientHandlerFactory.sendSensorDescription(type, description);

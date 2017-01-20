@@ -56,6 +56,9 @@ public class MouseServer extends AbstractServer {
         // add left- and right click buttons
         addButton("left click", LEFT_MOUSE_BUTTON);
         addButton("right click", RIGHT_MOUSE_BUTTON);
+
+        // set a maximum client count
+        setClientMaximum(1);
     }
 
     /**
