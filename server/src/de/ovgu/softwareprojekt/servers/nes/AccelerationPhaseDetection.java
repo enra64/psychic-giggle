@@ -1,6 +1,6 @@
 package de.ovgu.softwareprojekt.servers.nes;
 
-import de.ovgu.softwareprojekt.NetworkDataSink;
+import de.ovgu.softwareprojekt.networking.NetworkDataSink;
 import de.ovgu.softwareprojekt.SensorData;
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
 
@@ -166,7 +166,7 @@ public class AccelerationPhaseDetection implements NetworkDataSink {
     /**
      * String representation of the AccelerationPhaseDetection object useful for debugging state errors
      *
-     * @return
+     * @return string representation
      */
     @Override
     public String toString() {

@@ -12,14 +12,14 @@ import java.util.TimerTask;
 /**
  * This class handles checking the connection age. It schedules itself. <b>You may not schedule
  * this class by yourself, call {@link #start()}.</b>
- * <p>It may be used in active mode with the constructor
+ * <p>It can be used in active mode with the constructor
  * {@link ConnectionWatch#ConnectionWatch(NetworkDevice, TimeoutListener, CommandConnection, ExceptionListener)},
  * where connection checks will be sent and {@link #onCheckEvent()} must be called when the remote
  * responds.</p>
- * <p>It may also be used in passive mode with the constructor
+ * <p>It can also be used in passive mode with the constructor
  * {@link ConnectionWatch#ConnectionWatch(NetworkDevice, TimeoutListener, ExceptionListener)}.
  * No network requests will be sent, but {@link #onCheckEvent()} must be called when a connection
- * check is requested.</p>
+ * check is requested and has been answered.</p>
  */
 public class ConnectionWatch extends TimerTask {
     /**
@@ -143,7 +143,7 @@ public class ConnectionWatch extends TimerTask {
         // avoid immediate timeout through a zero (eg last response was 1970) here
         mLastCheckEventTimestamp = System.currentTimeMillis() + 900;
         mLastRequestTimestamp = mLastCheckEventTimestamp;
-        // in one second, begin requesting a "still-alive" beep from the clients once per second
+        // in ~one second, begin requesting a "still-alive" beep from the clients once per second
         mConnectionCheckTimer.scheduleAtFixedRate(this, 900, 500);
 
         mIsStarted = true;
@@ -151,53 +151,83 @@ public class ConnectionWatch extends TimerTask {
 
     /**
      * Set the remote this connectionwatch should watch
+     *
      * @param remote the target of the connection this watch watches
      */
-    public void setRemote(NetworkDevice remote){
+    public void setRemote(NetworkDevice remote) {
         mRemote = remote;
 
         // set informative thread name
         Thread.currentThread().setName("ConnectionWatch for " + mSelf);
     }
 
+    /**
+     * This runs a single iteration of the active mode:<br>
+     * Check whether the client answered within {@link #MAXIMUM_CLIENT_RESPONSE_DELAY}ms</li>
+     * <ul>
+     * <li>if it did, send next {@link ConnectionAliveCheck}</li>
+     * <li>if not, notify {@link #mTimeoutListener}</li>
+     * </ul>
+     */
+    private void activeModeIteration() {
+        try {
+            // check whether the maximum delay has been breached
+            if ((mLastCheckEventTimestamp - mLastRequestTimestamp) > MAXIMUM_CLIENT_RESPONSE_DELAY)
+                mTimeoutListener.onTimeout(mLastCheckEventTimestamp - mLastRequestTimestamp);
+            // connection still alive
+            else if (mOutConnection.isRunningAndConfigured()) {
+                // send next connection check
+                mOutConnection.sendCommand(new ConnectionAliveCheck(mSelf));
+
+                // debugging statement
+                if (mRemote.name.contains("C")) System.out.println(mRemote + " request event: " + mLastRequestTimestamp + ", diff: " + (mLastCheckEventTimestamp - mLastRequestTimestamp));
+
+                // update the request timestamp
+                mLastRequestTimestamp = System.currentTimeMillis();
+            }
+            // DEBUG statement
+            //System.out.println((mRemote != null ? mRemote : "unset remote") + " took " + (mLastCheckEventTimestamp - mLastRequestTimestamp) + "ms to answer");
+        } catch (ConnectException e) {
+            // DEBUG statement
+            if (mRemote.name.contains("C")) System.out.println("exception 1");
+            // as this exception is thrown when the remote does not answer, a timeout is signalled
+            // instead of calling the exception listener
+            mTimeoutListener.onTimeout(mLastCheckEventTimestamp - mLastRequestTimestamp);
+        } catch (IOException e) {
+            // DEBUG statement
+            if (mRemote.name.contains("C")) System.out.println("IOException in ConnectionWatch");
+            // notify exception listener of exception
+            mExceptionListener.onException(ConnectionWatch.this, e, "CONNECTION_WATCH_CHECK_FAILED: Could not check connection; probably offline.");
+        }
+    }
+
+    /**
+     * This runs the passive mode check, that is it checks whether the last check event occurred less
+     * than {@link #MAXIMUM_CLIENT_RESPONSE_DELAY} ms in the past.
+     */
+    private void passiveModeCheck() {
+        long delay = System.currentTimeMillis() - mLastCheckEventTimestamp;
+
+        // true if the system has timed out
+        if (delay > MAXIMUM_CLIENT_RESPONSE_DELAY) {
+            // notify listener and user
+            mTimeoutListener.onTimeout(mLastCheckEventTimestamp - mLastRequestTimestamp);
+            System.out.println(mSelf + " TEST disconnected");
+        }
+        // system did not time out
+        else
+            System.out.println("con check ok: " + mSelf.name + ": " + delay);
+    }
+
+    /**
+     * This is periodically called since we scheduled ourselves as a {@link TimerTask} in {@link #start()}
+     */
     @Override
     public void run() {
-        if (mIsActiveMode) {
-            try {
-                // check whether the maximum delay has been breached
-                if ((mLastCheckEventTimestamp - mLastRequestTimestamp) > MAXIMUM_CLIENT_RESPONSE_DELAY) {
-                    if(mRemote.name.contains("C"))
-                        System.out.println("timeout");
-                    mTimeoutListener.onTimeout(mLastCheckEventTimestamp - mLastRequestTimestamp);
-                }
-                else if (mOutConnection.isRunningAndConfigured()) {
-                    mOutConnection.sendCommand(new ConnectionAliveCheck(mSelf));
-
-                    if(mRemote.name.contains("C"))
-                        System.out.println(mRemote + " request event: " + mLastRequestTimestamp + ", diff: " + (mLastCheckEventTimestamp - mLastRequestTimestamp));
-
-                    // update the timestamp
-                    mLastRequestTimestamp = System.currentTimeMillis();
-
-                }
-                //System.out.println((mRemote != null ? mRemote : "unset remote") + " took " + (mLastCheckEventTimestamp - mLastRequestTimestamp) + "ms to answer");
-            } catch (ConnectException e) {
-                if(mRemote.name.contains("C"))
-                    System.out.println("exception 1");
-                mTimeoutListener.onTimeout(mLastCheckEventTimestamp - mLastRequestTimestamp);
-            } catch (IOException e) {
-                if(mRemote.name.contains("C"))
-                    System.out.println("exception 2");
-                mExceptionListener.onException(ConnectionWatch.this, e, "CONNECTION_WATCH_CHECK_FAILED: Could not check connection; probably offline.");
-            }
-        } else {
-            long delay = System.currentTimeMillis() - mLastCheckEventTimestamp;
-            if (delay > MAXIMUM_CLIENT_RESPONSE_DELAY) {
-                System.out.println(mSelf + " TEST disconnected");
-                mTimeoutListener.onTimeout(mLastCheckEventTimestamp - mLastRequestTimestamp);
-            } else
-                System.out.println("con check ok: " + mSelf.name + ": " + delay);
-        }
+        if (mIsActiveMode)
+            activeModeIteration();
+        else
+            passiveModeCheck();
     }
 
     /**
@@ -217,6 +247,7 @@ public class ConnectionWatch extends TimerTask {
 
     /**
      * Get the running state of this connection watch
+     *
      * @return true if the watch is running (eg its timer has been scheduled)
      */
     public boolean started() {

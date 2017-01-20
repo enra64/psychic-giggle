@@ -1,13 +1,13 @@
 package de.ovgu.softwareprojekt.servers.graphing;
 
-import de.ovgu.softwareprojekt.NetworkDataSink;
+import de.ovgu.softwareprojekt.networking.NetworkDataSink;
 import de.ovgu.softwareprojekt.SensorType;
 import de.ovgu.softwareprojekt.control.commands.ButtonClick;
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
 import de.ovgu.softwareprojekt.pipeline.FilterPipelineBuilder;
 import de.ovgu.softwareprojekt.pipeline.ThroughputMeasurer;
 import de.ovgu.softwareprojekt.pipeline.filters.*;
-import de.ovgu.softwareprojekt.networking.Server;
+import de.ovgu.softwareprojekt.networking.AbstractServer;
 
 import javax.swing.*;
 import java.awt.event.WindowAdapter;
@@ -19,7 +19,7 @@ import java.util.Timer;
 /**
  * A server for live graphing of sensor data
  */
-public class GraphingServer extends Server {
+public class GraphingServer extends AbstractServer {
 
     /**
      * Create a new GraphingServer.
@@ -98,6 +98,7 @@ public class GraphingServer extends Server {
      * Start a new graphing user interface
      *
      * @param args ignored
+     * @throws IOException if the device connection fails
      */
     public static void main(String[] args) throws IOException {
         GraphPanel graphPanel = new GraphPanel();
@@ -155,7 +156,7 @@ public class GraphingServer extends Server {
     /**
      * Called whenever a button is clicked
      *
-     * @param buttonClick  event object specifying details like button id
+     * @param buttonClick   event object specifying details like button id
      * @param networkDevice the network device that sent the button click
      */
     @Override
@@ -185,6 +186,7 @@ public class GraphingServer extends Server {
 
     /**
      * called when a Client is successfully connected
+     *
      * @param connectedClient the client that connected successfully
      */
     @Override

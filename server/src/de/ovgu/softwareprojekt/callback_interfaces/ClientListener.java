@@ -3,7 +3,14 @@ package de.ovgu.softwareprojekt.callback_interfaces;
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
 
 /**
- * Implement to be notified of new or disconnected clients
+ * Implement to be notified of client events:
+ * <p>
+ * <ul>
+ * <li>{@link #acceptClient(NetworkDevice)} for checking whether you want to accept a new client</li>
+ * <li>{@link #onClientAccepted(NetworkDevice)} called when a client has successfully connected</li>
+ * <li>{@link #onClientDisconnected(NetworkDevice)} when a client leaves, or lost connection</li>
+ * <li>{@link #onClientTimeout(NetworkDevice)} when a client no longer responds</li>
+ * </ul>
  */
 public interface ClientListener {
     /**
@@ -30,6 +37,7 @@ public interface ClientListener {
 
     /**
      * called when a Client is successfully connected
+     *
      * @param connectedClient the client that connected successfully
      */
     void onClientAccepted(NetworkDevice connectedClient);

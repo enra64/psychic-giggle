@@ -1,11 +1,10 @@
 package de.ovgu.softwareprojekt.networking;
 
 import com.sun.istack.internal.NotNull;
-import de.ovgu.softwareprojekt.NetworkDataSink;
+import de.ovgu.softwareprojekt.networking.NetworkDataSink;
 import de.ovgu.softwareprojekt.SensorData;
 import de.ovgu.softwareprojekt.SensorType;
 import de.ovgu.softwareprojekt.callback_interfaces.ClientListener;
-import de.ovgu.softwareprojekt.callback_interfaces.UnexpectedClientListener;
 import de.ovgu.softwareprojekt.control.CommandConnection;
 import de.ovgu.softwareprojekt.control.ConnectionWatch;
 import de.ovgu.softwareprojekt.control.OnCommandListener;
@@ -27,7 +26,7 @@ import java.util.*;
  * When a {@link EndConnection} command is received, all ports are closed, and the command is forwarded; no other
  * command can be sent to the client after that.
  */
-public class ClientConnection implements OnCommandListener, NetworkDataSink, ConnectionWatch.TimeoutListener {
+class ClientConnection implements OnCommandListener, NetworkDataSink, ConnectionWatch.TimeoutListener {
     /**
      * This listener is to be called when we get commands from an unknown client
      */
@@ -96,6 +95,8 @@ public class ClientConnection implements OnCommandListener, NetworkDataSink, Con
      * @param exceptionListener Who to notify about unhandleable exceptions
      * @param commandListener   Who to notify about commands
      * @param dataSink          Where to put data
+     * @param clientListener who to notify of client events
+     * @param unexpectedClientListener Who to notify if commands arrive from a foreign client
      * @throws IOException when the listening process could not be started
      */
     ClientConnection(
@@ -150,6 +151,8 @@ public class ClientConnection implements OnCommandListener, NetworkDataSink, Con
 
     /**
      * Retrieve the client this connection handler is bound to
+     *
+     * @return a fully configured {@link NetworkDevice} representing the client.
      */
     @NotNull
     NetworkDevice getClient() {
@@ -251,6 +254,8 @@ public class ClientConnection implements OnCommandListener, NetworkDataSink, Con
 
     /**
      * Instantiate the command connection (with this as listener) and start listening for command packets
+     *
+     * @throws IOException if no free port could be found, or the command connection could not be started
      */
     private void initialiseCommandConnection() throws IOException {
         // begin a new command connection, set this as callback
@@ -262,6 +267,8 @@ public class ClientConnection implements OnCommandListener, NetworkDataSink, Con
 
     /**
      * Instantiate the data connection (with this as listener) and start listening for data packets
+     *
+     * @throws SocketException if no free data port could be found
      */
     private void initialiseDataConnection() throws SocketException {
         // begin a new data connection
@@ -278,6 +285,7 @@ public class ClientConnection implements OnCommandListener, NetworkDataSink, Con
      * Notify the client of all required buttons
      * will overwrite any settings made by {@link #updateButtons(String)}
      *
+     * @param buttonList a mapping of required (psychic button id {@literal ->} button text) buttons
      * @throws IOException if the command could not be sent
      */
     void updateButtons(Map<Integer, String> buttonList) throws IOException {
@@ -299,6 +307,7 @@ public class ClientConnection implements OnCommandListener, NetworkDataSink, Con
     /**
      * Notify the client of all required sensors
      *
+     * @param requiredSensors a set of sensors that the client must activate
      * @throws IOException if the command could not be sent
      */
     void updateSensors(Set<SensorType> requiredSensors) throws IOException {
@@ -407,11 +416,11 @@ public class ClientConnection implements OnCommandListener, NetworkDataSink, Con
     /**
      * this method sends a notification to the device which is then displayed
      *
-     * @param id        - NotificationID: should start at 0 and increases with each new notification while device is connected
-     * @param title     - title of the notification
-     * @param content   - content of the notification
-     * @param isOnGoing - if true, notification is not removable by user
-     * @throws IOException
+     * @param id        NotificationID: should start at 0 and increase with each new notification while device is connected
+     * @param title     title of the notification
+     * @param content   content of the notification
+     * @param isOnGoing if true, notification is not removable by user
+     * @throws IOException if the command could not be sent
      */
     void displayNotification(int id, String title, String content, boolean isOnGoing) throws IOException {
         sendCommand(new DisplayNotification(id, title, content, isOnGoing));

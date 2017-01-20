@@ -35,7 +35,7 @@ class KukaUtil {
                 return 340;
             case SecondTilter:
                 return 240;
-            case ThirdRotator:
+            case ToolArmRotator:
                 return 340;
             case ToolTilter:
                 return 240;

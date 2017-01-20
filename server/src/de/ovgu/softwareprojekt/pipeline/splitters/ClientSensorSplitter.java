@@ -1,6 +1,6 @@
 package de.ovgu.softwareprojekt.pipeline.splitters;
 
-import de.ovgu.softwareprojekt.NetworkDataSink;
+import de.ovgu.softwareprojekt.networking.NetworkDataSink;
 import de.ovgu.softwareprojekt.SensorType;
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
 
@@ -9,7 +9,14 @@ import de.ovgu.softwareprojekt.discovery.NetworkDevice;
  * registered to be notified only of specified sensor type events from specified network devices
  */
 public class ClientSensorSplitter {
+    /**
+     * The {@link ClientSplitter} used to split data by {@link NetworkDevice}
+     */
     private ClientSplitter mClientSplitter = new ClientSplitter();
+
+    /**
+     * The {@link SensorSplitter} used to split data by {@link SensorType}
+     */
     private SensorSplitter mSensorSplitter = new SensorSplitter();
 
     /**

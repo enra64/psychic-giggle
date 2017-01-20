@@ -1,6 +1,6 @@
 package de.ovgu.softwareprojekt.networking;
 
-import de.ovgu.softwareprojekt.NetworkDataSink;
+import de.ovgu.softwareprojekt.networking.NetworkDataSink;
 import de.ovgu.softwareprojekt.SensorData;
 import de.ovgu.softwareprojekt.SensorType;
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
@@ -12,7 +12,7 @@ import java.util.EnumMap;
  * This class handles scaling all the data, because we may have to apply a different scaling factor to
  * all the incoming data
  */
-public class DataScalingHandler implements NetworkDataSink {
+class DataScalingHandler implements NetworkDataSink {
     /**
      * Contains the scaling filters that have to be applied for each sensors
      */
@@ -43,9 +43,10 @@ public class DataScalingHandler implements NetworkDataSink {
     }
 
     /**
-     * This changes the range a certain sensor will be in.
+     * This changes the target range of a sensor.
      *
      * @param targetRange maximum and -minimum of the resulting range for this sensor
+     * @param sensor      the sensor of which the target range should be modified
      */
     void setOutputRange(SensorType sensor, float targetRange) {
         // get the normalization filter configured for this sensor
@@ -58,6 +59,7 @@ public class DataScalingHandler implements NetworkDataSink {
     /**
      * This changes the range a certain sensors data will be expected to be in
      *
+     * @param sensor      the sensor of which the source range should be modified
      * @param sourceRange maximum and -minimum of the incoming range for this sensor
      */
     void setSourceRange(SensorType sensor, float sourceRange) {

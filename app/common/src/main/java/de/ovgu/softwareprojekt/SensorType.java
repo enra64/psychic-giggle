@@ -1,7 +1,7 @@
 package de.ovgu.softwareprojekt;
 
 /**
- * This enum lists all known sensor types
+ * All sensor types known to the framework.
  *
  */
 // WARNING: THE SENSOR CLASS NAME (FOR ANDROID)  MUST MATCH THE ENUM VALUE _EXACTLY_!

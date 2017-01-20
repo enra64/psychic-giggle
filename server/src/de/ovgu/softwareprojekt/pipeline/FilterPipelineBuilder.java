@@ -1,8 +1,8 @@
 package de.ovgu.softwareprojekt.pipeline;
 
 import com.sun.istack.internal.Nullable;
-import de.ovgu.softwareprojekt.NetworkDataSink;
-import de.ovgu.softwareprojekt.NetworkDataSource;
+import de.ovgu.softwareprojekt.networking.NetworkDataSink;
+import de.ovgu.softwareprojekt.networking.NetworkDataSource;
 import de.ovgu.softwareprojekt.pipeline.filters.AbstractFilter;
 
 import java.util.LinkedList;
@@ -44,7 +44,7 @@ public class FilterPipelineBuilder {
      *
      * @param sink  the sink to be added
      * @param index where to put the
-     * @throws IndexOutOfBoundsException - if the index is out of range (index < 0 || index > size())
+     * @throws IndexOutOfBoundsException - if the index is out of range {@literal (index < 0 || index > size())}
      */
     public void append(AbstractFilter sink, int index) throws IndexOutOfBoundsException {
         mPipelineElements.add(index, sink);

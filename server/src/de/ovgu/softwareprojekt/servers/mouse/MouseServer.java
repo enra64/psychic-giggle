@@ -1,12 +1,12 @@
 package de.ovgu.softwareprojekt.servers.mouse;
 
 import com.sun.istack.internal.Nullable;
-import de.ovgu.softwareprojekt.NetworkDataSink;
+import de.ovgu.softwareprojekt.networking.NetworkDataSink;
 import de.ovgu.softwareprojekt.SensorType;
 import de.ovgu.softwareprojekt.control.commands.ButtonClick;
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
+import de.ovgu.softwareprojekt.networking.AbstractServer;
 import de.ovgu.softwareprojekt.pipeline.filters.DifferenceThresholdFilter;
-import de.ovgu.softwareprojekt.networking.Server;
 import de.ovgu.softwareprojekt.pipeline.filters.AveragingFilter;
 import de.ovgu.softwareprojekt.pipeline.filters.UserSensitivityMultiplicator;
 
@@ -14,10 +14,10 @@ import java.awt.*;
 import java.io.IOException;
 
 /**
- * The MouseServer class is an exemplary extension of Server that enables
+ * The MouseServer class is an exemplary extension of AbstractServer that enables
  * the user to move the mouse using his phone
  */
-public class MouseServer extends Server {
+public class MouseServer extends AbstractServer {
     /**
      * Constant identifying left mouse button in app
      */
@@ -37,6 +37,8 @@ public class MouseServer extends Server {
      * Create a new server. It will be offline (not using any sockets) until {@link #start()} is called.
      *
      * @param serverName if not null, this name will be used. otherwise, the devices hostname is used
+     * @throws IOException  if an issue with the phone communication arose
+     * @throws AWTException if your device does not support javas {@link Robot} input
      */
     public MouseServer(@Nullable String serverName) throws IOException, AWTException {
         super(serverName);

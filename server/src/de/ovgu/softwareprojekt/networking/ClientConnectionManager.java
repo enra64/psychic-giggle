@@ -1,10 +1,10 @@
 package de.ovgu.softwareprojekt.networking;
 
 import com.sun.istack.internal.Nullable;
-import de.ovgu.softwareprojekt.NetworkDataSink;
+import de.ovgu.softwareprojekt.networking.NetworkDataSink;
+import de.ovgu.softwareprojekt.networking.NetworkDataSink;
 import de.ovgu.softwareprojekt.SensorType;
 import de.ovgu.softwareprojekt.callback_interfaces.ClientListener;
-import de.ovgu.softwareprojekt.callback_interfaces.UnexpectedClientListener;
 import de.ovgu.softwareprojekt.control.OnCommandListener;
 import de.ovgu.softwareprojekt.control.commands.AbstractCommand;
 import de.ovgu.softwareprojekt.control.commands.CommandType;
@@ -111,6 +111,8 @@ class ClientConnectionManager implements ClientListener, UnexpectedClientListene
     /**
      * Creates a new correctly initialized unbound handler
      *
+     * @return an unbound handler that must be added using {@link #addHandler(ClientConnection)} to make it part of the
+     * clients managed by this {@link ClientConnectionManager}
      * @throws IOException if the handler could not be initialized
      */
     ClientConnection getUnboundHandler() throws IOException {
@@ -178,6 +180,7 @@ class ClientConnectionManager implements ClientListener, UnexpectedClientListene
      *
      * @param name text to be displayed on the button
      * @param id   id of the button. ids below zero are reserved.
+     * @throws IOException if the required command could not be sent to all clients
      */
     void addButton(String name, int id) throws IOException {
         // reserve id's below zero
@@ -197,6 +200,7 @@ class ClientConnectionManager implements ClientListener, UnexpectedClientListene
      * clears XMLLayout
      *
      * @param id id of the button
+     * @throws IOException if the required command could not be sent to all clients
      */
     void removeButton(int id) throws IOException {
         // remove the button from local storage
@@ -213,6 +217,7 @@ class ClientConnectionManager implements ClientListener, UnexpectedClientListene
      *
      * @param xml valid android XML layout using only linear layout and button
      *            if string is null ButtonMap will be used
+     * @throws IOException if the required command could not be sent to all clients
      */
     void setButtonLayout(@Nullable String xml) throws IOException {
         this.mButtonXML = xml;
@@ -224,7 +229,7 @@ class ClientConnectionManager implements ClientListener, UnexpectedClientListene
      * Remove all buttons added. Clears both buttons added using {@link #addButton(String, int)} and layouts created using
      * {@link #setButtonLayout(String)}.
      *
-     * @throws IOException if the update could not be sent to all devices
+     * @throws IOException if the required command could not be sent to all clients
      */
     public void clearButtons() throws IOException {
         mButtonList.clear();
@@ -237,7 +242,7 @@ class ClientConnectionManager implements ClientListener, UnexpectedClientListene
      *
      * @param sensor the sensor to change
      * @param speed  the speed to use for sensor
-     * @throws IOException if the update could not be sent to all devices
+     * @throws IOException if the required command could not be sent to all clients
      */
     void setSensorSpeed(SensorType sensor, SetSensorSpeed.SensorSpeed speed) throws IOException {
         // change the speed for sensor x
@@ -333,7 +338,8 @@ class ClientConnectionManager implements ClientListener, UnexpectedClientListene
     /**
      * Force each client to update his required sensors
      *
-     * @throws IOException if the command could not be sent
+     * @param requiredSensors a set of sensors that each client must enable
+     * @throws IOException if the required command could not be sent to all clients
      */
     synchronized void updateSensors(Set<SensorType> requiredSensors) throws IOException {
         mRequiredSensors = requiredSensors;

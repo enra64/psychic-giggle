@@ -1,6 +1,6 @@
 package de.ovgu.softwareprojekt.servers.kuka;
 
-import de.ovgu.softwareprojekt.NetworkDataSink;
+import de.ovgu.softwareprojekt.networking.NetworkDataSink;
 import de.ovgu.softwareprojekt.SensorData;
 import de.ovgu.softwareprojekt.callback_interfaces.ResetListener;
 import de.ovgu.softwareprojekt.control.commands.ButtonClick;
@@ -19,12 +19,21 @@ public class JointControl implements NetworkDataSink, ButtonListener, ResetListe
     /**
      * The mobile phone axes
      */
-    private final static int PITCH_AXIS = 1;
+    private final static int PITCH_AXIS = 1, ROLL_AXIS = 0;
 
     /**
      * The joint that is currently controlled by movement
      */
-    private Joint mCurrentJoint = Joint.BaseRotator;
+    private Joint
+            mCurrentRotator = Joint.BaseRotator,
+            mCurrentTilter = Joint.BaseTilter;
+
+    /**
+     * Button ids for selecting different joints. Only needed for joint control mode
+     * <p>
+     * NOTE: if you change theses ids, you're gonna have a bad time. see {@link #onButtonClick(ButtonClick, NetworkDevice)}
+     */
+    static final int BASE_PAIR_BUTTON = 1, CENTER_PAIR_BUTTON = 2, TOOL_PAIR_BUTTON = 3;
 
     /**
      * Create a new JointControl instance
@@ -44,15 +53,15 @@ public class JointControl implements NetworkDataSink, ButtonListener, ResetListe
      */
     @Override
     public void onData(NetworkDevice origin, SensorData data, float userSensitivity) {
-        float currentMaximum = KukaUtil.getRange(mCurrentJoint);
+        float tilterMaxRange = KukaUtil.getRange(mCurrentTilter);
+        float rotatorMaxRange = KukaUtil.getRange(mCurrentRotator);
 
         //float rollValue = clampToJointRange(data.data[ROLL_AXIS] * userSensitivity * .03f, mRobotRollMaximum);
-        float pitchValue = KukaUtil.clampToJointRange(data.data[PITCH_AXIS] * userSensitivity * .08f, currentMaximum);
+        float tilterValue = KukaUtil.clampToJointRange(data.data[PITCH_AXIS] * userSensitivity * .08f, tilterMaxRange);
+        float rotatorValue = KukaUtil.clampToJointRange(data.data[ROLL_AXIS] * userSensitivity * .08f, rotatorMaxRange);
 
-        //System.out.println("Roll target: " + rollValue + ", pitch target: " + pitchValue);
-
-        //mControlInterface.rotateJointTarget(mRobotRollJoint, rollValue);
-        mControlInterface.rotateJointTarget(mCurrentJoint, pitchValue);
+        mControlInterface.rotateJointTarget(mCurrentTilter, tilterValue);
+        mControlInterface.rotateJointTarget(mCurrentRotator, rotatorValue);
     }
 
     /**
@@ -71,20 +80,35 @@ public class JointControl implements NetworkDataSink, ButtonListener, ResetListe
     @Override
     public void onButtonClick(ButtonClick click, NetworkDevice origin) {
         // ignore button release events
-        if (click.isHold) {
-            // change controlled joint
-            mCurrentJoint = Joint.values()[click.mID - 1];
-            System.out.println("Using " + mCurrentJoint.name());
+        if (!click.isHold) return;
+
+        // WARNING: because of the KukaServer#onButtonClick implementation, robot state must not be changed in onButtonClick!
+
+        // update the currently used actor pair
+        switch (click.mID) {
+            case BASE_PAIR_BUTTON:
+                mCurrentRotator = Joint.BaseRotator;
+                mCurrentTilter = Joint.BaseTilter;
+                break;
+            case CENTER_PAIR_BUTTON:
+                mCurrentRotator = Joint.SecondRotator;
+                mCurrentTilter = Joint.SecondTilter;
+                break;
+            case TOOL_PAIR_BUTTON:
+                mCurrentRotator = Joint.ToolArmRotator;
+                mCurrentTilter = Joint.ToolTilter;
+                break;
         }
     }
 
     /**
      * Called when the user presses the reset button on the app
+     *
      * @param origin which device pressed the button. may be null!
      */
     @Override
     public void onResetPosition(NetworkDevice origin) {
-        for(Joint joint : Joint.values())
-            mControlInterface.rotateJointTarget(joint, 0);
+        mControlInterface.rotateJointTarget(mCurrentRotator, 0);
+        mControlInterface.rotateJointTarget(mCurrentTilter, 0);
     }
 }

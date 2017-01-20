@@ -1,7 +1,7 @@
 package de.ovgu.softwareprojekt.pipeline.filters;
 
 import com.sun.istack.internal.Nullable;
-import de.ovgu.softwareprojekt.NetworkDataSink;
+import de.ovgu.softwareprojekt.networking.NetworkDataSink;
 import de.ovgu.softwareprojekt.SensorData;
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
 
@@ -74,7 +74,7 @@ public class NormalizationFilter extends AbstractFilter {
 
     /**
      * Set the third {@link NetworkDataSink#onData(NetworkDevice, SensorData, float)} parameter for any incoming data.
-     * @param customValue
+     * @param customValue the userSensitivity that will be set for each {@link #onData(NetworkDevice, SensorData, float)}
      */
     public void setCustomSensitivity(float customValue) {
         mCustomSensitivity = customValue;

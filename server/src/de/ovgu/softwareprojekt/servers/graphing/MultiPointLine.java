@@ -57,6 +57,8 @@ class MultiPointLine {
 
     /**
      * Get the sensor this line displays
+     *
+     * @return the {@link SensorType} this line displays
      */
     SensorType getSensorType() {
         return mSensorType;
@@ -64,6 +66,8 @@ class MultiPointLine {
 
     /**
      * Get the axis this line displays
+     *
+     * @return the data index (of {@link de.ovgu.softwareprojekt.SensorData#data} that is being displayed
      */
     int getAxis() {
         return mAxis;
@@ -90,6 +94,8 @@ class MultiPointLine {
 
     /**
      * Retrieve the minimum value contained in this line
+     *
+     * @return the minimum value in the data of this line
      */
     float getMinimum() {
         return mMinValue;
@@ -97,6 +103,8 @@ class MultiPointLine {
 
     /**
      * Retrieve the maximum value contained in this line
+     *
+     * @return the maximum value in the data of this line
      */
     float getMaximum() {
         return mMaxValue;
@@ -104,6 +112,8 @@ class MultiPointLine {
 
     /**
      * Recalculate the minimum value contained in this line
+     *
+     * @return the minimum value in the data of this line
      */
     private float calcMinValue() {
         float minValue = Float.MAX_VALUE;
@@ -114,6 +124,8 @@ class MultiPointLine {
 
     /**
      * Recalculate the maximum value contained in this line
+     *
+     * @return the maximum value in the data of this line
      */
     private float calcMaxValue() {
         float minValue = -Float.MAX_VALUE;

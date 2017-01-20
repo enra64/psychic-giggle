@@ -8,7 +8,7 @@ public enum Joint {
     BaseTilter,
     SecondRotator,
     SecondTilter,
-    ThirdRotator,
+    ToolArmRotator,
     ToolTilter,
     ToolRotator
 }

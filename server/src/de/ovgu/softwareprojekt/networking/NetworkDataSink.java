@@ -1,11 +1,14 @@
-package de.ovgu.softwareprojekt;
+package de.ovgu.softwareprojekt.networking;
 
+import de.ovgu.softwareprojekt.SensorData;
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
 
 /**
- * Interface for sensor data sinks, with an added origin parameter do differentiate between data
- * sources, and a userSensitivity parameter to inform of the sensitivity selected by the user for the
- * sensor.
+ * This interface is used when you want to define a data splitter, or an end piece of the data pipeline that consumes the
+ * incoming data. It may also be implemented in combination with {@link NetworkDataSource}, like in {@link de.ovgu.softwareprojekt.pipeline.filters.AbstractFilter},
+ * to create a class that does not use but modify the data.
+ * <p>
+ * On the app side, the origin and the sensor sensitivity of data are not relevant, so {@link de.ovgu.softwareprojekt.DataSink} is used there.
  */
 @SuppressWarnings("WeakerAccess")
 public interface NetworkDataSink {

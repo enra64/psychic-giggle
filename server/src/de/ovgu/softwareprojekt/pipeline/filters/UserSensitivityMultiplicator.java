@@ -1,6 +1,6 @@
 package de.ovgu.softwareprojekt.pipeline.filters;
 
-import de.ovgu.softwareprojekt.NetworkDataSink;
+import de.ovgu.softwareprojekt.networking.NetworkDataSink;
 import de.ovgu.softwareprojekt.SensorData;
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
 
@@ -10,20 +10,26 @@ import de.ovgu.softwareprojekt.discovery.NetworkDevice;
 public class UserSensitivityMultiplicator extends AbstractFilter {
     /**
      * Apply the user sensitivity as a factor
+     *
+     * @param sink the sink that should receive the multiplied data.
      */
-    public UserSensitivityMultiplicator(NetworkDataSink sink){
+    public UserSensitivityMultiplicator(NetworkDataSink sink) {
         super(sink);
     }
 
     /**
      * Apply the user sensitivity as a factor
+     *
+     * @param origin          the network device which sent the data
+     * @param sensorData      the sensor data
+     * @param userSensitivity the sensitivity the user requested in his app settings
      */
     @Override
-    public void onData(NetworkDevice networkDevice, SensorData sensorData, float v) {
-        for(int i = 0; i < sensorData.data.length; i++)
-            sensorData.data[i] *= v;
+    public void onData(NetworkDevice origin, SensorData sensorData, float userSensitivity) {
+        for (int i = 0; i < sensorData.data.length; i++)
+            sensorData.data[i] *= userSensitivity;
 
         // forward data
-        mDataSink.onData(networkDevice, sensorData, 1);
+        mDataSink.onData(origin, sensorData, 1);
     }
 }

@@ -34,6 +34,7 @@ class DiscoveryServer extends DiscoveryThread {
      * @param localDataPort      this port will be announced to any potential remote in the discovery phase. The correct
      *                           parameter can be most easily retrieved via {@link UdpDataConnection#getLocalPort()}.
      * @param selfName           how to announce this server to any remotes
+     * @param exceptionListener  the listener for exceptions that could not be handled internally
      */
     DiscoveryServer(ExceptionListener exceptionListener, int localDiscoveryPort, int localCommandPort, int localDataPort, String selfName) {
         super(selfName, localCommandPort, localDataPort);

@@ -2,8 +2,8 @@ package de.ovgu.softwareprojekt.pipeline.filters;
 
 import com.sun.istack.internal.Nullable;
 import de.ovgu.softwareprojekt.DataSink;
-import de.ovgu.softwareprojekt.NetworkDataSink;
-import de.ovgu.softwareprojekt.NetworkDataSource;
+import de.ovgu.softwareprojekt.networking.NetworkDataSink;
+import de.ovgu.softwareprojekt.networking.NetworkDataSource;
 
 import java.io.IOException;
 

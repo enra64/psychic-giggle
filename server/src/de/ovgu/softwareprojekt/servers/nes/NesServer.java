@@ -1,11 +1,11 @@
 package de.ovgu.softwareprojekt.servers.nes;
 
 import com.sun.istack.internal.Nullable;
-import de.ovgu.softwareprojekt.NetworkDataSink;
+import de.ovgu.softwareprojekt.networking.NetworkDataSink;
 import de.ovgu.softwareprojekt.SensorType;
 import de.ovgu.softwareprojekt.control.commands.ButtonClick;
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
-import de.ovgu.softwareprojekt.networking.Server;
+import de.ovgu.softwareprojekt.networking.AbstractServer;
 import de.ovgu.softwareprojekt.pipeline.FilterPipelineBuilder;
 import de.ovgu.softwareprojekt.pipeline.filters.AveragingFilter;
 import de.ovgu.softwareprojekt.pipeline.splitters.ClientSplitter;
@@ -21,7 +21,7 @@ import java.util.Properties;
 /**
  * This server is designed to create NES controller input from gravity and linear acceleration data
  */
-public class NesServer extends Server {
+public class NesServer extends AbstractServer {
     /**
      * This variable stores our steering wheels, mapped from network devices so we
      * can easily access the correct one.
@@ -55,6 +55,8 @@ public class NesServer extends Server {
      * Create a new server. It will be offline (not using any sockets) until {@link #start()} is called.
      *
      * @param serverName if not null, this name will be used. otherwise, the devices hostname is used
+     * @throws IOException  if an issue with the phone communication arose
+     * @throws AWTException if your device does not support javas {@link Robot} input
      */
     public NesServer(@Nullable String serverName) throws IOException, AWTException {
         super(serverName);
@@ -101,6 +103,7 @@ public class NesServer extends Server {
      * detection system can correctly recognize up/down events
      *
      * @param wheel the SteeringWheel getting the up/down events
+     * @return a NetworkDataSink representing the beginning of the {@link AccelerationPhaseDetection} pipeline
      * @throws IOException if the data sink could not be registered
      */
     private NetworkDataSink getAccelerationPhaseDetection(SteeringWheel wheel) throws IOException {

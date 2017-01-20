@@ -1,6 +1,6 @@
 package de.ovgu.softwareprojekt.pipeline.splitters;
 
-import de.ovgu.softwareprojekt.NetworkDataSink;
+import de.ovgu.softwareprojekt.networking.NetworkDataSink;
 import de.ovgu.softwareprojekt.SensorData;
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
 
@@ -20,23 +20,33 @@ public class PipelineDuplication implements NetworkDataSink {
 
     /**
      * Add a data sink. It will get any and all SensorData objects received by this PipelineDuplication element
+     *
+     * @param sink the data sink that should from now on also receive any data received by this {@link PipelineDuplication} instance
      */
-    public void addDataSink(NetworkDataSink sink){
+    public void addDataSink(NetworkDataSink sink) {
         mDataSinks.add(sink);
     }
 
     /**
      * Remove a data sink from this PipelineDuplication element. It will no longer receive data from here
+     *
      * @param sink data sink that should no longer receive data
      */
-    public void removeDataSink(NetworkDataSink sink){
+    public void removeDataSink(NetworkDataSink sink) {
         mDataSinks.remove(sink);
     }
 
+    /**
+     * onData is called whenever new data is to be processed
+     *
+     * @param origin          the network device which sent the data
+     * @param sensorData            the sensor data
+     * @param userSensitivity the sensitivity the user requested in his app settings
+     */
     @Override
-    public void onData(NetworkDevice networkDevice, SensorData sensorData, float userSensitivity) {
+    public void onData(NetworkDevice origin, SensorData sensorData, float userSensitivity) {
         // copy the data for each further recipient
-        mDataSinks.forEach(sink -> sink.onData(networkDevice, sensorData.clone(), userSensitivity));
+        mDataSinks.forEach(sink -> sink.onData(origin, sensorData.clone(), userSensitivity));
     }
 
     /**
@@ -44,7 +54,7 @@ public class PipelineDuplication implements NetworkDataSink {
      */
     @Override
     public void close() {
-        for(NetworkDataSink sink : mDataSinks)
+        for (NetworkDataSink sink : mDataSinks)
             sink.close();
     }
 }

@@ -9,8 +9,8 @@ import java.io.ObjectOutputStream;
 import java.net.*;
 
 /**
- * This abstract class serves as a skeleton for implementing both the discovery server implementation as well as the discovery
- * client implementation.
+ * This abstract class serves as a skeleton for implementing both the discovery server implementation
+ * as well as the discovery client implementation.
  */
 @SuppressWarnings("WeakerAccess")
 public abstract class DiscoveryThread extends Thread {
@@ -59,11 +59,8 @@ public abstract class DiscoveryThread extends Thread {
     /**
      * This function must be overridden to complete the DiscoveryThread. You probably want to do something like
      * <pre>
-     *     {@code
-     *     while(started()){
-     *         listen();
-     *     }
-     *     }
+     *     {@code while(started())
+     *          listen(); }
      * </pre>
      */
     @Override
@@ -104,7 +101,8 @@ public abstract class DiscoveryThread extends Thread {
 
     /**
      * Check whether this threads {@link #start()} has already been called. If it returns true,
-     * start() may not be called on this instance!
+     * start() must not be called on this instance, since threads cannot be restarted.
+     * @return true if this thread has already been started
      */
     public boolean hasRun() {
         return mHasRun;
@@ -156,9 +154,9 @@ public abstract class DiscoveryThread extends Thread {
     }
 
     /**
-     * Socket currently configured to be used by the discovery system
+     * Get the socket currently configured to be used by the discovery system
      *
-     * @return the socket
+     * @return socket currently used by the discovery system
      */
     protected DatagramSocket getSocket() {
         return mSocket;
@@ -168,7 +166,7 @@ public abstract class DiscoveryThread extends Thread {
      * Set the socket to be used by this {@link DiscoveryThread}
      *
      * @param socket new socket configuration
-     * @throws SocketException if some of the internal configuration failed
+     * @throws SocketException if some of the configuration failed
      */
     protected void setSocket(DatagramSocket socket) throws SocketException {
         // socket must be broadcasting

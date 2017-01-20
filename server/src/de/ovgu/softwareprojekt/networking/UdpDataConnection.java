@@ -17,7 +17,7 @@ import java.net.SocketException;
  */
 class UdpDataConnection extends Thread implements NetworkDataSource {
     /**
-     * Incoming sensor data will be forwareded here
+     * Incoming sensor data will be forwarded here
      */
     private NetworkDataSink mDataSink;
 
@@ -42,9 +42,11 @@ class UdpDataConnection extends Thread implements NetworkDataSource {
     private NetworkDevice mClient;
 
 
-
     /**
      * Create a new UdpDataConnection that will start listening after {@link #start()} is called.
+     *
+     * @param exceptionListener the {@link ExceptionListener} called when a (possibly threaded) exception occurs
+     * @throws SocketException if no free port could be found
      */
     UdpDataConnection(ExceptionListener exceptionListener) throws SocketException {
         super("UdpDataConnection: unbound");
@@ -52,7 +54,11 @@ class UdpDataConnection extends Thread implements NetworkDataSource {
         mExceptionListener = exceptionListener;
     }
 
-    void setClient(NetworkDevice client){
+    /**
+     * Set the client that sends data to this {@link UdpDataConnection}
+     * @param client the client that should send its data here
+     */
+    void setClient(NetworkDevice client) {
         mClient = client;
 
         // update thread name
@@ -61,6 +67,7 @@ class UdpDataConnection extends Thread implements NetworkDataSource {
 
     /**
      * Find a free port to listen on
+     *
      * @return a currently (!) free port
      * @throws SocketException when an error occurs during the search
      */
@@ -73,15 +80,17 @@ class UdpDataConnection extends Thread implements NetworkDataSource {
 
     /**
      * Returns the port this UdpDataConnection is listening on
+     *
+     * @return the port this {@link UdpDataConnection} listens on
      */
-    public int getLocalPort(){
+    int getLocalPort() {
         return mLocalPort;
     }
 
     @Override
     public void run() {
         // this is a "try with resources": it automatically closes the socket, whatever happens
-        try(DatagramSocket serverSocket = new DatagramSocket(mLocalPort)) {
+        try (DatagramSocket serverSocket = new DatagramSocket(mLocalPort)) {
             // storage for udp data
             byte[] appData = new byte[1024];
 
@@ -100,7 +109,7 @@ class UdpDataConnection extends Thread implements NetworkDataSource {
 
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
-        } catch (NullPointerException e){
+        } catch (NullPointerException e) {
             mExceptionListener.onException(
                     UdpDataConnection.this,
                     e,
