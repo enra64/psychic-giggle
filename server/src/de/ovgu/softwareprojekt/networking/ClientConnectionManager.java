@@ -1,8 +1,6 @@
 package de.ovgu.softwareprojekt.networking;
 
 import com.sun.istack.internal.Nullable;
-import de.ovgu.softwareprojekt.networking.NetworkDataSink;
-import de.ovgu.softwareprojekt.networking.NetworkDataSink;
 import de.ovgu.softwareprojekt.SensorType;
 import de.ovgu.softwareprojekt.callback_interfaces.ClientListener;
 import de.ovgu.softwareprojekt.control.OnCommandListener;
@@ -53,7 +51,7 @@ class ClientConnectionManager implements ClientListener, UnexpectedClientListene
     /**
      * list of buttons that should be displayed on all clients
      */
-    private Map<Integer, String> mButtonList = new HashMap<>();
+    private Map<Integer, String> mButtonMap = new HashMap<>();
 
     /**
      * This is the list of all currently bound clients.
@@ -187,7 +185,7 @@ class ClientConnectionManager implements ClientListener, UnexpectedClientListene
         assert (id >= 0);
 
         // add the new button to local storage
-        mButtonList.put(id, name);
+        mButtonMap.put(id, name);
         //in Case ButtonMap is used after ButtonXML -> ButtonXML has to be set null again
         mButtonXML = null;
 
@@ -204,7 +202,7 @@ class ClientConnectionManager implements ClientListener, UnexpectedClientListene
      */
     void removeButton(int id) throws IOException {
         // remove the button from local storage
-        mButtonList.remove(id);
+        mButtonMap.remove(id);
         //in Case ButtonMap is used after ButtonXML -> ButtonXML has to be set null again
         mButtonXML = null;
 
@@ -232,7 +230,7 @@ class ClientConnectionManager implements ClientListener, UnexpectedClientListene
      * @throws IOException if the required command could not be sent to all clients
      */
     public void clearButtons() throws IOException {
-        mButtonList.clear();
+        mButtonMap.clear();
         mButtonXML = null;
         updateButtons();
     }
@@ -307,7 +305,7 @@ class ClientConnectionManager implements ClientListener, UnexpectedClientListene
     /**
      * Force each client to update his buttons
      * chooses between {@link ClientConnection#updateButtons(String)} and {@link ClientConnection#updateButtons(Map)}
-     * if {@link #mButtonXML} is given, it is preferred over [{@link #mButtonList}
+     * if {@link #mButtonXML} is given, it is preferred over [{@link #mButtonMap}
      *
      * @throws IOException if the update command could not be sent to a client
      */
@@ -316,8 +314,8 @@ class ClientConnectionManager implements ClientListener, UnexpectedClientListene
             for (ClientConnection client : mClientConnections) {
                 if (mButtonXML != null) {
                     client.updateButtons(mButtonXML);
-                } else if (mButtonList != null) {
-                    client.updateButtons(mButtonList);
+                } else if (mButtonMap != null) {
+                    client.updateButtons(mButtonMap);
                 }
             }
         }
