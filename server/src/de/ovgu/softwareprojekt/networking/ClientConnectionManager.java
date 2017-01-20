@@ -421,4 +421,12 @@ class ClientConnectionManager implements ClientListener, UnexpectedClientListene
     public void onClientAccepted(NetworkDevice connectedClient) {
         mClientListener.onClientAccepted(connectedClient);
     }
+
+    //TODO: DESCRIPTION
+    public void sendSensorDescription(SensorType type, String description) throws IOException {
+        synchronized (mClientConnections) {
+            for(ClientConnection con : mClientConnections)
+            con.sendSensorDescription(type, description);
+        }
+    }
 }

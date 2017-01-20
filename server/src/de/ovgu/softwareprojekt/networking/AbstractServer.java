@@ -359,4 +359,9 @@ public abstract class AbstractServer implements OnCommandListener, ClientListene
     protected void displayNotification(int id, String title, String content, boolean isOnGoing, InetAddress deviceAddress) throws IOException {
         mClientHandlerFactory.getClientHandler(deviceAddress).displayNotification(id, title, content, isOnGoing);
     }
+
+    protected void sendSensorDescription(SensorType type, String description) throws IOException
+    {
+        mClientHandlerFactory.sendSensorDescription(type, description);
+    }
 }

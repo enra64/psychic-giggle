@@ -254,8 +254,16 @@ public class NesServer extends AbstractServer {
 
         try {
             displayNotification(0, "Player " + playerID, "You are connected as player " + playerID, true, connectedClient.getInetAddress());
+
+            //TODO: Better strings
+            sendSensorDescription(SensorType.LinearAcceleration, "Wurfempfindlichkeit");
+            sendSensorDescription(SensorType.Gravity, "Lenkverhalten");
+
+
         } catch (IOException e) {
             onException(this, e, "Could not display notification for player " + playerID);
         }
+
+
     }
 }
