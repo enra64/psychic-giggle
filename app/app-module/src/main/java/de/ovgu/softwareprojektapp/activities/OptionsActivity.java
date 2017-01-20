@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
+import java.util.EnumMap;
 
 import de.ovgu.softwareprojekt.SensorType;
 import de.ovgu.softwareprojekt.control.CommandConnection;
@@ -42,7 +43,8 @@ public class OptionsActivity extends AppCompatActivity implements SeekBar.OnSeek
     static final String
             EXTRA_SERVER_ADDRESS = "Address",
             EXTRA_SERVER_PORT_COMMAND = "CommandPort",
-            EXTRA_ACTIVE_SENSORS = "ActiveSensor";
+            EXTRA_ACTIVE_SENSORS = "ActiveSensor",
+            EXTRA_SENSOR_DESCRIPTIONS = "SensorDescription";
 
     /**
      * the linear layout containing all options
@@ -148,6 +150,7 @@ public class OptionsActivity extends AppCompatActivity implements SeekBar.OnSeek
     private void createSensorOptions() {
 
         boolean[] sensors = getIntent().getBooleanArrayExtra(EXTRA_ACTIVE_SENSORS);
+        EnumMap<SensorType, String> descriptions = getIntent().getBundleExtra(EXTRA_SENSOR_DESCRIPTIONS);
 
         for (int i = 0; i < mNumberOfSensors; i++) {
             //only create seekbar and text if the server needs these sensors or

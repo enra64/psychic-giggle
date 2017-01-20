@@ -21,6 +21,7 @@ import android.widget.CompoundButton;
 import java.net.ConnectException;
 import java.net.InetAddress;
 import java.net.SocketException;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -58,7 +59,8 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
             EXTRA_SERVER_PORT_COMMAND = "CommandPort",
             EXTRA_SERVER_PORT_DATA = "DataPort",
             EXTRA_SELF_NAME = "SelfName",
-            EXTRA_ACTIVE_SENSORS = "ActiveSensor";
+            EXTRA_ACTIVE_SENSORS = "ActiveSensor",
+            EXTRA_SENSOR_DESCRIPTIONS = "SensorDescription";
 
     /**
      * result codes for the activity
@@ -104,6 +106,11 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
      * handle the shown Notifications
      */
     private NotificationManager mNotificationManager;
+
+    /**
+     * saves descriptions for the used sensors
+     */
+    private EnumMap<SensorType, String> sensorDescriptions;
 
 
     @Override
@@ -376,6 +383,11 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
                     mBuilder.setVibrate(new long[0]);
                 mNotificationManager.notify(notification.id, mBuilder.build());
                 break;
+            //put sensor descriptions in an EnumMap for each SensorType
+            case SensorDescription:
+                SensorDescription setSensorDescription = (SensorDescription) command;
+                sensorDescriptions.put(setSensorDescription.type, setSensorDescription.description);
+                break;
             // ignore unhandled commands
             default:
                 break;
@@ -460,6 +472,7 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
         intent.putExtra(EXTRA_SERVER_PORT_COMMAND, in.getInt(EXTRA_SERVER_PORT_COMMAND));
         intent.putExtra(EXTRA_SERVER_ADDRESS, in.getString(EXTRA_SERVER_ADDRESS));
         intent.putExtra(EXTRA_ACTIVE_SENSORS, activeSensors);
+        intent.putExtra(EXTRA_SENSOR_DESCRIPTIONS, sensorDescriptions);
         SendActivity.this.startActivity(intent);
     }
 }
