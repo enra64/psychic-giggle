@@ -180,7 +180,7 @@ public class OptionsActivity extends AppCompatActivity implements SeekBar.OnSeek
                 mSensorOptions.addView(seek);
 
                 // create description for sensor only if sensor is in use
-                if(descriptionsHash != null || descriptionsHash.containsKey(SensorType.values()[i])) {
+                if(descriptionsHash != null && descriptionsHash.containsKey(SensorType.values()[i])) {
                     TextView description = new TextView(OptionsActivity.this);
                     description.setText(descriptionsHash.get(SensorType.values()[i]));
                     description.setTextSize(14f);
