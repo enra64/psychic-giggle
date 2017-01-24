@@ -107,7 +107,6 @@ public class UdpConnection implements DataSink {
                 DatagramPacket sendPacket = new DatagramPacket(data, data.length, mHost, mPort);
                 mSocket.send(sendPacket);
             } catch (IOException e) {
-                //TODO: somehow avoid sending millions of exceptions when the socket has been closed
                 mExceptionListener.onException(UdpConnection.this, e, "UdpConnection: could not send SensorData object");
                 return false;
             }
