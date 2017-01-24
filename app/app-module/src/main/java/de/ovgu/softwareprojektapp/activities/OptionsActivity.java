@@ -159,18 +159,6 @@ public class OptionsActivity extends AppCompatActivity implements SeekBar.OnSeek
             //only create seekbar and text if the server needs these sensors or
             //when there is no server connection
             if(sensors == null || sensors[i]){
-                // Create a header for the seekbar
-                TextView text = new TextView(OptionsActivity.this);
-                text.setText(SensorType.values()[i].toString());
-                text.setTextSize(18f);
-                text.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
-
-                // create description for sensors
-                TextView description = new TextView(OptionsActivity.this);
-                description.setText(descriptionsHash.get(SensorType.values()[i]));
-                description.setTextSize(14f);
-                description.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
-
 
                 // create the seekbar
                 SeekBar seek = new SeekBar(OptionsActivity.this);
@@ -178,13 +166,29 @@ public class OptionsActivity extends AppCompatActivity implements SeekBar.OnSeek
                 seek.setTag(SensorType.values()[i]);
                 seek.setOnSeekBarChangeListener(this);
 
+                // Create a header for the seekbar
+                TextView text = new TextView(OptionsActivity.this);
+                text.setText(SensorType.values()[i].toString());
+                text.setTextSize(18f);
+                text.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+
+
                 mSeekBars.add(seek);
                 mTextViews.add(text);
-                mTextViews.add(description);
 
                 mSensorOptions.addView(text);
-                mSensorOptions.addView(description);
                 mSensorOptions.addView(seek);
+
+                // create description for sensor only if sensor is in use
+                if(descriptionsHash != null && descriptionsHash.containsKey(SensorType.values()[i])) {
+                    TextView description = new TextView(OptionsActivity.this);
+                    description.setText(descriptionsHash.get(SensorType.values()[i]));
+                    description.setTextSize(14f);
+                    description.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+                    mTextViews.add(description);
+                    mSensorOptions.addView(description);
+                }
+
             }
         }
     }
