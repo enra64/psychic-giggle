@@ -3,6 +3,7 @@ package de.ovgu.softwareprojekt.servers;
 import de.ovgu.softwareprojekt.SensorData;
 import de.ovgu.softwareprojekt.SensorType;
 import de.ovgu.softwareprojekt.callback_interfaces.ButtonListener;
+import de.ovgu.softwareprojekt.callback_interfaces.ClientListener;
 import de.ovgu.softwareprojekt.control.commands.ButtonClick;
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
 import de.ovgu.softwareprojekt.networking.AbstractServer;
@@ -15,13 +16,14 @@ import java.util.Arrays;
 /**
  * Created by arne on 1/24/17.
  */
-public class ExampleServer implements NetworkDataSink, ButtonListener {
+public class ExampleServer implements NetworkDataSink, ButtonListener, ClientListener {
     public ExampleServer() throws IOException {
         Server server = new Server();
         server.registerDataSink(this, SensorType.LinearAcceleration);
         server.start();
 
         server.setButtonListener(this);
+        server.setClientListener(this);
     }
 
     /**
@@ -41,7 +43,6 @@ public class ExampleServer implements NetworkDataSink, ButtonListener {
      */
     @Override
     public void close() {
-
     }
 
     /**
@@ -55,6 +56,43 @@ public class ExampleServer implements NetworkDataSink, ButtonListener {
      */
     @Override
     public void onButtonClick(ButtonClick click, NetworkDevice origin) {
+    }
 
+    /**
+     * Check whether a new client should be accepted
+     *
+     * @param newClient the new clients identification
+     * @return true if the client should be accepted, false otherwise
+     */
+    @Override
+    public boolean acceptClient(NetworkDevice newClient) {
+        return false;
+    }
+
+    /**
+     * Called when a client sent a disconnect signal or has disconnected
+     *
+     * @param disconnectedClient the lost client
+     */
+    @Override
+    public void onClientDisconnected(NetworkDevice disconnectedClient) {
+    }
+
+    /**
+     * Called when a client hasn't responded in a while
+     *
+     * @param timeoutClient the client that did not respond
+     */
+    @Override
+    public void onClientTimeout(NetworkDevice timeoutClient) {
+    }
+
+    /**
+     * Called when a Client has successfully been connected
+     *
+     * @param connectedClient the client that connected successfully
+     */
+    @Override
+    public void onClientAccepted(NetworkDevice connectedClient) {
     }
 }

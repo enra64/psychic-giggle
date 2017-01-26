@@ -169,7 +169,7 @@ public class KukaServer extends AbstractServer {
     @Override
     public void onButtonClick(ButtonClick click, NetworkDevice origin) {
         // handle buttons
-        switch (click.mID) {
+        switch (click.getId()) {
             case MODE_BUTTON:
                 // toggle mode
                 mIsInMarbleMode = !mIsInMarbleMode;
