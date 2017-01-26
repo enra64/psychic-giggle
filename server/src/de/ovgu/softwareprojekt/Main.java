@@ -1,6 +1,6 @@
 package de.ovgu.softwareprojekt;
 
-import de.ovgu.softwareprojekt.gui.ServerSelectionWindow;
+import de.ovgu.softwareprojekt.servers.gui.ServerSelectionWindow;
 import de.ovgu.softwareprojekt.servers.kuka.KukaServer;
 import de.ovgu.softwareprojekt.servers.mouse.MouseServer;
 import de.ovgu.softwareprojekt.servers.nes.NesServer;
