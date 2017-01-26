@@ -274,7 +274,7 @@ public abstract class AbstractServer implements
      * @param requestedSensor which sensors events are relevant
      * @throws IOException if a client could not be notified of the sensor change
      */
-    protected void registerDataSink(NetworkDataSink dataSink, SensorType requestedSensor) throws IOException {
+    public void registerDataSink(NetworkDataSink dataSink, SensorType requestedSensor) throws IOException {
         mDataMapper.registerDataSink(requestedSensor, dataSink);
     }
 
@@ -320,7 +320,7 @@ public abstract class AbstractServer implements
      * @param id   id of the button. ids below zero are reserved.
      * @throws IOException if a client could not be notified of newly required button
      */
-    protected void addButton(String name, int id) throws IOException {
+    public void addButton(String name, int id) throws IOException {
         mClientHandlerFactory.addButton(name, id);
     }
 

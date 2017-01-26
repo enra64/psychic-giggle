@@ -441,8 +441,9 @@ class ClientConnectionManager implements ClientListener, UnexpectedClientListene
      */
     public void sendSensorDescription(SensorType type, String description) throws IOException {
         synchronized (mClientConnections) {
-            for(ClientConnection con : mClientConnections)
-            con.sendSensorDescription(type, description);
+            for (ClientConnection con : mClientConnections)
+                con.sendSensorDescription(type, description);
+        }
     }
 
     /**

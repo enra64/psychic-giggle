@@ -52,7 +52,7 @@ public class ConnectionWatch extends TimerTask {
     /**
      * If the time between connection check requests exceeds this time, the connection is deemed dead.
      */
-    private static final long MAXIMUM_CLIENT_RESPONSE_DELAY = 2500;// please do not increase this value without talking to me -Arne
+    private static final long MAXIMUM_CLIENT_RESPONSE_DELAY = 10000;// please do not increase this value without talking to me -Arne
 
     /**
      * This is the first of two timestamps used to keep check of the delay between sending the request
@@ -180,7 +180,7 @@ public class ConnectionWatch extends TimerTask {
                 mOutConnection.sendCommand(new ConnectionAliveCheck(mSelf));
 
                 // debugging statement
-                if (mRemote.name.contains("C")) System.out.println(mRemote + " request event: " + mLastRequestTimestamp + ", diff: " + (mLastCheckEventTimestamp - mLastRequestTimestamp));
+                if (Math.abs((mLastCheckEventTimestamp - mLastRequestTimestamp)) > 1000) System.out.println(mRemote + " request event: " + mLastRequestTimestamp + ", diff: " + (mLastCheckEventTimestamp - mLastRequestTimestamp));
 
                 // update the request timestamp
                 mLastRequestTimestamp = System.currentTimeMillis();
