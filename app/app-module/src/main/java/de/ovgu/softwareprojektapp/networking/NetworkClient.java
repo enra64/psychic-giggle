@@ -179,7 +179,6 @@ public class NetworkClient implements DataSink, ExceptionListener, OnCommandList
      */
     @Override
     public void close() {
-        Log.i("spapp", "closing network client on " + mSelf);
         mConnectionWatch.close();
         mOutboundDataConnection.close();
         mCommandConnection.close();
@@ -271,7 +270,6 @@ public class NetworkClient implements DataSink, ExceptionListener, OnCommandList
                         NetworkClient.this,
                         e,
                         "NetworkClient: exception when trying to send a " + commands[0].getClass());
-                System.out.println("NetworkClient: exception when trying to send a " + commands[0].getClass());
             }
             return null;
         }
