@@ -133,32 +133,32 @@ Um die verschiedenen Client events zu handeln, muss ein ```ClientListener``` ges
 Die maximale Anzahl von Clients ist theoretisch nicht beschränkt. Ein nutzerdefiniertes Maximum kann mithilfe von ```setClientMaximum(int)``` gesetzt werden, mit ```getClientMaximum()``` abgefragt werden und mit ```removeClientMaximum()``` entfernt werden.
 
 ## ```acceptClient(NetworkDevice)```
-```acceptClient(NetworkDevice)``` wird immer dann aufgerufen, wenn ein neuer Client versucht sich mit dem Server zu verbinden. Die
+wird immer dann aufgerufen, wenn ein neuer Client versucht sich mit dem Server zu verbinden. Die
 Addresse des Clients und sein Name sind mit ```newClient.getInetAddress()``` und ```newClient.name``` verfügbar.
 Wenn ```acceptClient(NetworkDevice)``` ```true``` zurückgibt, wird der Client angenommen; gibt es ```false``` zurück, wird der Client
 abgelehnt.
 
 ## ```onClientDisconnected(NetworkDevice)```
-```onClientDisconnected``` wird aufgerufen, wenn ein Client die Verbindung beendet hat oder nicht mehr erreichbar ist.
+wird aufgerufen, wenn ein Client die Verbindung beendet hat oder nicht mehr erreichbar ist.
 Der Client ist zum Zeitpunkt des Aufrufs nicht mehr über den Server verfügbar.
 
 ## ```onClientTimeout(NetworkDevice)```
-```onClientTimeout``` wird aufgerufen, wenn ein Client eine zeitlang nicht mehr reagiert. Der Client ist zum Zeitpunkt
+wird aufgerufen, wenn ein Client eine zeitlang nicht mehr reagiert. Der Client ist zum Zeitpunkt
 des Aufrufs nicht mehr über den Server verfügbar.
 
 ## ```onClientAccepted(NetworkDevice)```
-```onClientAccepted(NetworkDevice)``` wird aufgerufen wenn  die Kommunikation zwischen Server und dem neuen Client funktioniert. Diese Funktion wird nur dann aufgerufen, wenn ```acceptClient(NetworkDevice)``` ```true``` für das entsprechende ```NetworkDevice``` zurückgegeben hat.
+wird aufgerufen wenn  die Kommunikation zwischen Server und dem neuen Client funktioniert. Diese Funktion wird nur dann aufgerufen, wenn ```acceptClient(NetworkDevice)``` ```true``` für das entsprechende ```NetworkDevice``` zurückgegeben hat.
 
 # Exceptionhandling
 ```Java
-public class ExampleServer implements NetworkDataSink, ButtonListener, ClientListener, ExceptionListener {
+public class ExampleServer implements ExceptionListener {
     public ExampleServer() throws IOException {
         Server server = new Server();
         server.start();
 
         server.setExceptionListener(this);
     }
-    @Override
+
     public void onException(Object origin, Exception exception, String info) {
     }
 }
@@ -176,7 +176,6 @@ public class ExampleServer implements ResetListener {
         server.setResetListener(this);
     }
 
-    @Override
     public void onResetPosition(NetworkDevice origin) {
     }
 }
@@ -185,6 +184,7 @@ Wenn ein Client den "Reset"-Button auf seinem Handy benutzt, wird die ```onReset
 
 # Entfernen einer ```NetworkDataSink```
 Wenn eine ```NetworkDataSink``` nicht mehr benötigt wird, zum Beispiel weil der entsprechende Client getrennt wurde, kann sie mit ```unregisterDataSink(NetworkDataSink)``` von allen Sensoren abgemeldet werden, und mit  ```unregisterDataSink(NetworkDataSink, SensorType)``` von bestimmten Sensoren abgemeldet werden. Danach erhält die ```NetworkDataSink``` keine Daten mehr vom Server.
+
 # License
 
 Copyright (c) 2017 by the contributers. All rights reserved.
