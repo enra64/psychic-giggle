@@ -122,6 +122,11 @@ public class MouseServer extends AbstractServer {
      */
     @Override
     public void onClientAccepted(NetworkDevice connectedClient) {
+        try {
+            sendSensorDescription(SensorType.Gyroscope, "Cursorgeschwindigkeit");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     /**

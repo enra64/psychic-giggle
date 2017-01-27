@@ -154,3 +154,7 @@ public class ExampleServer implements ResetListener {
 }
 ```
 Wenn ein Client den "Reset"-Button auf seinem Handy benutzt, wird die ```onResetPosition(NetworkDevice)``` aufgerufen. Dann sollte der derzeitige Status des Handys zurückgesetzt werden, bei der Beispielimplementation ```MouseServer``` wird zum Beispiel die derzeitige Position des Handys als neuer Nullpunkt gewertet.
+
+# License
+
+Copyright (c) 2017 by the contributers. All rights reserved.
