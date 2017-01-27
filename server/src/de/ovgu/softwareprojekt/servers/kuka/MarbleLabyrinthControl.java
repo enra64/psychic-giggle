@@ -116,12 +116,12 @@ public class MarbleLabyrinthControl implements NetworkDataSink, ResetListener, B
     @Override
     public void onButtonClick(ButtonClick click, NetworkDevice origin) {
         // ignore release events
-        if(!click.isHold)
+        if(!click.isPressed())
             return;
 
         // WARNING: because of the KukaServer#onButtonClick implementation, robot state must not be changed in onButtonClick!
 
-        switch (click.mID) {
+        switch (click.getId()) {
             case FLIP_ROTATOR_BUTTON:
                 mRotatorIsFlipped = !mRotatorIsFlipped;
                 break;

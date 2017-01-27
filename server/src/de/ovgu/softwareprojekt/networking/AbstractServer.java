@@ -1,7 +1,6 @@
 package de.ovgu.softwareprojekt.networking;
 
 import com.sun.istack.internal.Nullable;
-import de.ovgu.softwareprojekt.networking.NetworkDataSink;
 import de.ovgu.softwareprojekt.SensorType;
 import de.ovgu.softwareprojekt.callback_interfaces.ButtonListener;
 import de.ovgu.softwareprojekt.callback_interfaces.ClientListener;
@@ -37,7 +36,7 @@ public abstract class AbstractServer implements
 
     /**
      * This is the latest unbound client connection, which makes it also the currently advertised connection. When bound,
-     * this instance will be moved to {@link #mClientHandlerFactory}, and a new instance will be set instead
+     * this instance will be moved to {@link #mClientManager}, and a new instance will be set instead
      */
     private ClientConnection mCurrentUnboundClientConnection;
 
@@ -49,7 +48,7 @@ public abstract class AbstractServer implements
     /**
      * This class is used for keeping the sensor-, button and speed requirements synchronous
      */
-    private final ClientConnectionManager mClientHandlerFactory;
+    private final ClientConnectionManager mClientManager;
 
     /**
      * name of this server
@@ -78,7 +77,7 @@ public abstract class AbstractServer implements
         mServerName = serverName != null ? serverName : getHostName();
         mDiscoveryPort = discoveryPort;
 
-        mClientHandlerFactory = new ClientConnectionManager(
+        mClientManager = new ClientConnectionManager(
                 mServerName,
                 this,
                 this,
@@ -86,10 +85,11 @@ public abstract class AbstractServer implements
                 mDataMapper,
                 this);
 
-        mDataMapper.setConnectionHandler(mClientHandlerFactory);
+        mDataMapper.setConnectionHandler(mClientManager);
+
         // SIGTERM -> close all clients, stop discovery server
-        Runtime.getRuntime().addShutdownHook(new Thread(this::close));
-        System.out.println("AbstractServer started, shutdown runtime hook online");
+        //Runtime.getRuntime().addShutdownHook(new Thread(this::close));
+        //System.out.println("AbstractServer started, shutdown runtime hook online");
     }
 
     /**
@@ -136,7 +136,7 @@ public abstract class AbstractServer implements
      */
     public void close() {
         System.out.println("Closing down");
-        mClientHandlerFactory.closeAll();
+        mClientManager.closeAll();
         mCurrentUnboundClientConnection.close();
         System.out.println("All ClientConnections closed");
         mDiscoveryServer.close();
@@ -164,7 +164,7 @@ public abstract class AbstractServer implements
      */
     @Override
     public void onCommand(InetAddress origin, AbstractCommand command) {
-        ClientConnection fromClient = mClientHandlerFactory.getClientHandler(origin);
+        ClientConnection fromClient = mClientManager.getClientHandler(origin);
 
         // decide what to do with the packet
         switch (command.getCommandType()) {
@@ -189,7 +189,7 @@ public abstract class AbstractServer implements
                     try {
                         // add unbound connection to list of bound connections.
                         // it will be automatically configured
-                        mClientHandlerFactory.addHandler(mCurrentUnboundClientConnection);
+                        mClientManager.addHandler(mCurrentUnboundClientConnection);
 
                         // begin advertising the next client connection
                         advertiseServer();
@@ -197,7 +197,7 @@ public abstract class AbstractServer implements
                         onException(this, e, "Could not start listening for new client. Bad.");
                     }
 
-                    onClientAccepted(mClientHandlerFactory.getClientHandler(origin).getClient());
+                    onClientAccepted(mClientManager.getClientHandler(origin).getClient());
                 }
                 break;
             case ButtonClick:
@@ -235,7 +235,7 @@ public abstract class AbstractServer implements
      */
     private void advertiseServer() throws IOException {
         // initialise the command and data connections
-        mCurrentUnboundClientConnection = mClientHandlerFactory.getUnboundHandler();
+        mCurrentUnboundClientConnection = mClientManager.getUnboundHandler();
 
         // stop old instances
         if (mDiscoveryServer != null)
@@ -264,7 +264,7 @@ public abstract class AbstractServer implements
      */
     public boolean disconnectClient(NetworkDevice client) {
         mDataMapper.onClientRemoved(client);
-        return mClientHandlerFactory.close(client);
+        return mClientManager.close(client);
     }
 
     /**
@@ -274,7 +274,7 @@ public abstract class AbstractServer implements
      * @param requestedSensor which sensors events are relevant
      * @throws IOException if a client could not be notified of the sensor change
      */
-    protected void registerDataSink(NetworkDataSink dataSink, SensorType requestedSensor) throws IOException {
+    public void registerDataSink(NetworkDataSink dataSink, SensorType requestedSensor) throws IOException {
         mDataMapper.registerDataSink(requestedSensor, dataSink);
     }
 
@@ -320,8 +320,8 @@ public abstract class AbstractServer implements
      * @param id   id of the button. ids below zero are reserved.
      * @throws IOException if a client could not be notified of newly required button
      */
-    protected void addButton(String name, int id) throws IOException {
-        mClientHandlerFactory.addButton(name, id);
+    public void addButton(String name, int id) throws IOException {
+        mClientManager.addButton(name, id);
     }
 
     /**
@@ -330,7 +330,7 @@ public abstract class AbstractServer implements
      * @throws IOException if a client could not be notified of a no longer required button
      */
     public void clearButtons() throws IOException {
-        mClientHandlerFactory.clearButtons();
+        mClientManager.clearButtons();
     }
 
     /**
@@ -340,7 +340,7 @@ public abstract class AbstractServer implements
      * @throws IOException if a client could not be notified of a no longer required button
      */
     public void removeButton(int id) throws IOException {
-        mClientHandlerFactory.removeButton(id);
+        mClientManager.removeButton(id);
     }
 
     /**
@@ -351,7 +351,7 @@ public abstract class AbstractServer implements
      * @throws IOException if a client could not be notified of the new button layout
      */
     public void setButtonLayout(@Nullable String xml) throws IOException {
-        mClientHandlerFactory.setButtonLayout(xml);
+        mClientManager.setButtonLayout(xml);
     }
 
     /**
@@ -362,7 +362,7 @@ public abstract class AbstractServer implements
      * @throws IOException if a client could not be notified of the changed sensor speed
      */
     public void setSensorSpeed(SensorType sensor, SetSensorSpeed.SensorSpeed speed) throws IOException {
-        mClientHandlerFactory.setSensorSpeed(sensor, speed);
+        mClientManager.setSensorSpeed(sensor, speed);
     }
 
     /**
@@ -372,7 +372,7 @@ public abstract class AbstractServer implements
      * @param outputRange the resulting maximum and negative minimum of the sensor output range. Default is -100 to 100.
      */
     protected void setSensorOutputRange(SensorType sensor, @SuppressWarnings("SameParameterValue") float outputRange) {
-        mClientHandlerFactory.setSensorOutputRange(sensor, outputRange);
+        mClientManager.setSensorOutputRange(sensor, outputRange);
     }
 
     /**
@@ -386,7 +386,7 @@ public abstract class AbstractServer implements
      * @throws IOException if a client could not be notified of the notification that should be displayed
      */
     protected void displayNotification(int id, String title, String content, boolean isOnGoing, InetAddress deviceAddress) throws IOException {
-        mClientHandlerFactory.getClientHandler(deviceAddress).displayNotification(id, title, content, isOnGoing);
+        mClientManager.getClientHandler(deviceAddress).displayNotification(id, title, content, isOnGoing);
     }
 
     /**
@@ -421,11 +421,11 @@ public abstract class AbstractServer implements
      * @return true if no further clients may connect
      */
     private boolean isClientMaximumReached() {
-        return mClientHandlerFactory.getClientCount() >= mClientMaximum;
+        return mClientManager.getClientCount() >= mClientMaximum;
     }
     
     protected void sendSensorDescription(SensorType type, String description) throws IOException
     {
-        mClientHandlerFactory.sendSensorDescription(type, description);
+        mClientManager.sendSensorDescription(type, description);
     }
 }

@@ -239,7 +239,7 @@ public class NesServer extends AbstractServer {
      */
     @Override
     public void onButtonClick(ButtonClick click, NetworkDevice origin) {
-        mSteeringWheels.get(origin).controllerInput(click.mID, click.isHold);
+        mSteeringWheels.get(origin).controllerInput(click.getId(), click.isPressed());
     }
 
     /**

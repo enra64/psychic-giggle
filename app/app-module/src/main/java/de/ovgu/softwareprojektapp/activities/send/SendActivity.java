@@ -9,8 +9,8 @@ import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.app.NotificationCompat;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -100,11 +100,6 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
     private Timer mConnectionResponseTimeoutTimer;
 
     /**
-     * mBuilder to show deviceID in Notification
-     */
-    private android.support.v4.app.NotificationCompat.Builder mBuilder;
-
-    /**
      * handle the shown Notifications
      */
     private NotificationManager mNotificationManager;
@@ -145,8 +140,11 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
         // immediately try to connect to the server
         initiateConnection();
 
-        //set NetworkClient in LayoutParser
+        // set NetworkClient in LayoutParser
         mRuntimeButtonLayout.setNetworkClient(mNetworkClient);
+
+        // set Notificationmanager in order to handle the notifications
+        mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
     }
 
     /**
@@ -373,13 +371,9 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
                 mSensorHandler.setSensorSpeed(setSpeedCommand.affectedSensor, setSpeedCommand.sensorSpeed);
                 break;
             case DisplayNotification:
-
-                //set Notificationmanager in order to handle the notifications
-                mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-
                 //display message
                 DisplayNotification notification = (DisplayNotification) command;
-                mBuilder = new NotificationCompat.Builder(this)
+                NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this)
                         .setSmallIcon(R.drawable.ic_stat_name)
                         .setContentTitle(notification.title)
                         .setContentText(notification.content)

@@ -80,7 +80,7 @@ public class MouseServer extends AbstractServer {
      */
     @Override
     public void onButtonClick(ButtonClick click, NetworkDevice origin) {
-        mMouseMover.click(click.mID, click.isHold);
+        mMouseMover.click(click.getId(), click.isPressed());
     }
 
     /**

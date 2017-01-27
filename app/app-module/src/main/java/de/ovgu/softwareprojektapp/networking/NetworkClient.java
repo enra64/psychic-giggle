@@ -214,9 +214,6 @@ public class NetworkClient implements DataSink, ExceptionListener, OnCommandList
      */
     @Override
     public void onCommand(InetAddress origin, AbstractCommand command) {
-        // notify the connection watch of a server contact
-        mConnectionWatch.onCheckEvent();
-
         switch (command.getCommandType()){
             case RemapPorts:
                 RemapPorts cmd = (RemapPorts) command;
@@ -226,6 +223,10 @@ public class NetworkClient implements DataSink, ExceptionListener, OnCommandList
                 break;
             // completely handle connection checks
             case ConnectionAliveCheck:
+                // notify the connection watch of a server contact
+                mConnectionWatch.onCheckEvent();
+
+                // answer request
                 ConnectionAliveCheck response = (ConnectionAliveCheck) command;
                 response.answerer = getSelf();
                 sendCommand(response);

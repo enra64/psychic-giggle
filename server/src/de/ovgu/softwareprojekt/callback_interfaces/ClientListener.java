@@ -22,21 +22,21 @@ public interface ClientListener {
     boolean acceptClient(NetworkDevice newClient);
 
     /**
-     * Called when a client sent a disconnect signal
+     * Called when a client sent a disconnect signal or has disconnected
      *
      * @param disconnectedClient the lost client
      */
     void onClientDisconnected(NetworkDevice disconnectedClient);
 
     /**
-     * Called when a client hasn't responded to connection check requests within 500ms
+     * Called when a client hasn't responded in a while
      *
      * @param timeoutClient the client that did not respond
      */
     void onClientTimeout(NetworkDevice timeoutClient);
 
     /**
-     * called when a Client is successfully connected
+     * Called when a Client has successfully been connected
      *
      * @param connectedClient the client that connected successfully
      */
