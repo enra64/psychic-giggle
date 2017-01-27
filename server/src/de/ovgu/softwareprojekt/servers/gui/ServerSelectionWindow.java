@@ -16,14 +16,10 @@ import java.io.PrintStream;
 
 public class ServerSelectionWindow {
 
-<<<<<<< HEAD
     private JTextArea consoleText;
 
-    public ServerSelectionWindow()
-    {
-=======
     public ServerSelectionWindow() {
->>>>>>> 00a7277f7efb0a2610a58a7087504fca138420cc
+
         //Create window
         JFrame window = new JFrame();
         window.setSize(800, 600);
@@ -49,7 +45,6 @@ public class ServerSelectionWindow {
         masterPanel.add(btnPanel);
         masterPanel.add(scroll);
 
-        System.out.println("Test shit");
         //finally add masterpanel and make window visible for user
         window.add(masterPanel);
         window.setVisible(true);
