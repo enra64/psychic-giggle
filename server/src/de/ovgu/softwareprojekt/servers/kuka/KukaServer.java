@@ -138,6 +138,11 @@ public class KukaServer extends AbstractServer {
     @Override
     public void onClientAccepted(NetworkDevice connectedClient) {
         System.out.println("Accepted client " + connectedClient);
+        try {
+            sendSensorDescription(SensorType.Gravity, "Bewegungsempfindlichkeit");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     /**

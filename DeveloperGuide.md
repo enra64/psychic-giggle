@@ -69,7 +69,7 @@ public class ExampleServer implements ButtonListener {
 
 ```
 
-Im Konstruktor muss ein ButtonListener gesetzt werden. Daraufhin können Buttons mit ```addButton(String, int)``` hinzugefügt werden. Der ```String``` ist der Text den der Button anzeigt, der ```int``` is die ID, die beim Drücken des Buttons an den Server gesendet wird. Buttons werden auf allen verbundenen Clients angezeigt. Buttoninputs können dann in der ```onButtonClick``` verarbeitet werden. Mithilfe von ```buttonClick.getId()``` kann der Button identifiziert werden, und ```buttonClick.isPressed()``` ist ```true``` wenn der Button gedrückt wurde.
+Im Konstruktor muss ein ButtonListener gesetzt werden. Daraufhin können Buttons mit ```addButton(String, int)``` hinzugefügt werden. Der ```String``` ist der Text den der Button anzeigt, der ```int``` ist die ID, die beim Drücken des Buttons an den Server gesendet wird. Buttons werden auf allen verbundenen Clients angezeigt. Buttoninputs können dann in der ```onButtonClick``` verarbeitet werden. Mithilfe von ```buttonClick.getId()``` kann der Button identifiziert werden, und ```buttonClick.isPressed()``` ist ```true``` wenn der Button gedrückt wurde.
 
 Zum Entfernen einzelner Buttons kann ```removeButtons(int)``` verwendet werden
 
@@ -98,6 +98,9 @@ Für ```Button``` werden die folgenden Attribute unterstützt:
 Für ```LinearLayout``` werden die folgenden Attribute unterstützt:
 * ```android:layout_weight=""``` wird direkt für das Layout gesetzt. Genaue Informationen sind in der [Android-Dokumentation](https://developer.android.com/guide/topics/ui/layout/linear.html#Weight) zu finden.
 * ```android:orientation=""``` wird direkt für das Layout gesetzt. Genaue Informationen sind in der [Android-Dokumentation](https://developer.android.com/reference/android/widget/LinearLayout.html#attr_android:orientation) zu finden.
+
+Bei Verwendung von ```setButtonLayout(String)``` werden alle durch ```addButton(String, int)``` hinzugefügten Buttons entfernt und bei
+Verwendung von ```addButton(String, int)``` wird das durch ```setButtonLayout``` erstellte Layout entfernt.
 
 Um alle Buttons zu entfernen kann ```clearButtons()``` aufgerufen werden.
 
@@ -182,3 +185,6 @@ Wenn ein Client den "Reset"-Button auf seinem Handy benutzt, wird die ```onReset
 
 # Entfernen einer ```NetworkDataSink```
 Wenn eine ```NetworkDataSink``` nicht mehr benötigt wird, zum Beispiel weil der entsprechende Client getrennt wurde, kann sie mit ```unregisterDataSink(NetworkDataSink)``` von allen Sensoren abgemeldet werden, und mit  ```unregisterDataSink(NetworkDataSink, SensorType)``` von bestimmten Sensoren abgemeldet werden. Danach erhält die ```NetworkDataSink``` keine Daten mehr vom Server.
+# License
+
+Copyright (c) 2017 by the contributers. All rights reserved.
