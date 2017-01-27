@@ -4,7 +4,7 @@
 ist ein Framework zur Nutzung von Android-Sensoren auf PCs zur einfachen und schnellen Verwendung von Sensordaten auf dem Computer.
 
 
-# Verwendung:
+# Grundlegende Verwendung:
 Zur Erstellung minimaler Funktionalität wird folgender Code benötigt:
 
 ```Java
@@ -24,9 +24,31 @@ public class ExampleServer implements NetworkDataSink {
 ```
 
 Im Konstruktor wurde ein Server erstellt und ```this``` wurde als NetworkDataSink für den LinearAcceleration-Sensor registriert.
-Die ankommenden Daten können in ```onData``` verarbeitet werden. Hierzu muss auf ```sensorData.data``` zugegriffen werden, ein ```float[]```, das die Sensordaten enthält.
+Nachdem der Server mit ```start()``` gestartet wurde, können die ankommenden Daten in ```onData``` verarbeitet werden. Hierzu muss auf ```sensorData.data``` zugegriffen werden, ein ```float[]```, das die Sensordaten enthält.
 In der ```close()``` sollten alle verwendeten Ressourcen freigegeben werden.
 
+## ```NetworkDevice```
+Das ```NetworkDevice``` wird vielfach verwendet um Clients und Server zu identifizieren. Mit ```getInetAddress()``` kann die aktuelle IP-Adresse als ```InetAddress``` abgefragt werden, unter ```getName()``` ist der Name des ```NetworkDevice``` verfügbar.
+
+# Sensoren
+Die derzeitig unterstützten Sensoren sind:
+* Accelerometer
+* GameRotationVector
+* Gravity
+* Gyroscope
+* LinearAcceleration
+* Magnetometer
+* Orientation
+* RotationVector
+All diese Sensoren sind im ```SensorType```-Enum verbunden.
+
+Sensordaten können mithilfe von ```setSensorOutputRange(SensorType, float)``` für den spezifizierten Sensor normalisiert werden. Der ```float```-Wert ist dabei der maximale Ausschlag sowohl in positiver als auch in negativer Richtung.
+
+Die Update-Frequenz der Android-Sensoren kann mithilfe von ```setSensorSpeed()``` gesetzt werden, unterstützt sind die folgenden Werte:
+* [SENSOR_DELAY_FASTEST](https://developer.android.com/reference/android/hardware/SensorManager.html#SENSOR_DELAY_FASTEST)
+* [SENSOR_DELAY_GAME](https://developer.android.com/reference/android/hardware/SensorManager.html#SENSOR_DELAY_GAME)
+* [SENSOR_DELAY_NORMAL](https://developer.android.com/reference/android/hardware/SensorManager.html#SENSOR_DELAY_NORMAL)
+* [SENSOR_DELAY_UI](https://developer.android.com/reference/android/hardware/SensorManager.html#SENSOR_DELAY_UI)
 
 # Verwendung von Buttons
 ```Java
@@ -47,9 +69,11 @@ public class ExampleServer implements ButtonListener {
 
 ```
 
-Im Konstruktor muss ein ButtonListener gesetzt werden. Daraufhin können Buttons mit ```addButton(String, int)``` hinzugefügt werden. Der ```String``` ist der Text den der Button anzeigt, der ```int``` is die ID, die beim drücken des Buttons an den Server gesendet wird. Buttoninputs können dann in der ```onButtonClick``` verarbeitet werden. Mithilfe von ```buttonClick.getId()``` kann der Button identifiziert werden, und ```buttonClick.isPressed()``` ist ```true``` wenn der Button gedrückt wurde.
+Im Konstruktor muss ein ButtonListener gesetzt werden. Daraufhin können Buttons mit ```addButton(String, int)``` hinzugefügt werden. Der ```String``` ist der Text den der Button anzeigt, der ```int``` ist die ID, die beim Drücken des Buttons an den Server gesendet wird. Buttons werden auf allen verbundenen Clients angezeigt. Buttoninputs können dann in der ```onButtonClick``` verarbeitet werden. Mithilfe von ```buttonClick.getId()``` kann der Button identifiziert werden, und ```buttonClick.isPressed()``` ist ```true``` wenn der Button gedrückt wurde.
 
-Eine Alternative ist die Verwendung von ```setButtonLayout(String)```. Hierbei kann eine eigene Android XML Layout Datei als ```String``` übergeben werden. Es werden nur ```LinearLayout```- und ```Button```-Objekte unterstützt.
+Zum Entfernen einzelner Buttons kann ```removeButtons(int)``` verwendet werden
+
+Eine Alternative ist die Verwendung von ```setButtonLayout(String)```. Hierbei kann eine eigene Android XML Layout Datei als ```String``` übergeben werden. Es werden nur ```LinearLayout```- und ```Button```-Objekte unterstützt. Bei Verwendung von ```setButtonLayout(String)``` werden alle durch ```addButton(String, int)``` hinzugefügten Buttons entfernt und bei Verwendung von ```addButton(String, int)``` wird das durch ```setButtonLayout``` erstellte Layout entfernt.
 
 Ein Beispiel für einen unterstützten XML-String ist das folgende Snippet:
 ```xml
@@ -105,7 +129,8 @@ public class ExampleServer implements ClientListener {
 ```
 Um die verschiedenen Client events zu handeln, muss ein ```ClientListener``` gesetzt werden, der die Events empfängt.
 
-Das ```NetworkDevice``` Object wird vielfach verwendet. Besonders interessante sind ```networkDevice.getInetAddress()``` und ```networkDevice.name```.
+## Maximale Anzahl Clients
+Die maximale Anzahl von Clients ist theoretisch nicht beschränkt. Ein nutzerdefiniertes Maximum kann mithilfe von ```setClientMaximum(int)``` gesetzt werden, mit ```getClientMaximum()``` abgefragt werden und mit ```removeClientMaximum()``` entfernt werden.
 
 ## ```acceptClient(NetworkDevice)```
 ```acceptClient(NetworkDevice)``` wird immer dann aufgerufen, wenn ein neuer Client versucht sich mit dem Server zu verbinden. Die
@@ -120,6 +145,9 @@ Der Client ist zum Zeitpunkt des Aufrufs nicht mehr über den Server verfügbar.
 ## ```onClientTimeout(NetworkDevice)```
 ```onClientTimeout``` wird aufgerufen, wenn ein Client eine zeitlang nicht mehr reagiert. Der Client ist zum Zeitpunkt
 des Aufrufs nicht mehr über den Server verfügbar.
+
+## ```onClientAccepted(NetworkDevice)```
+```onClientAccepted(NetworkDevice)``` wird aufgerufen wenn  die Kommunikation zwischen Server und dem neuen Client funktioniert. Diese Funktion wird nur dann aufgerufen, wenn ```acceptClient(NetworkDevice)``` ```true``` für das entsprechende ```NetworkDevice``` zurückgegeben hat.
 
 # Exceptionhandling
 ```Java
@@ -155,6 +183,8 @@ public class ExampleServer implements ResetListener {
 ```
 Wenn ein Client den "Reset"-Button auf seinem Handy benutzt, wird die ```onResetPosition(NetworkDevice)``` aufgerufen. Dann sollte der derzeitige Status des Handys zurückgesetzt werden, bei der Beispielimplementation ```MouseServer``` wird zum Beispiel die derzeitige Position des Handys als neuer Nullpunkt gewertet.
 
+# Entfernen einer ```NetworkDataSink```
+Wenn eine ```NetworkDataSink``` nicht mehr benötigt wird, zum Beispiel weil der entsprechende Client getrennt wurde, kann sie mit ```unregisterDataSink(NetworkDataSink)``` von allen Sensoren abgemeldet werden, und mit  ```unregisterDataSink(NetworkDataSink, SensorType)``` von bestimmten Sensoren abgemeldet werden. Danach erhält die ```NetworkDataSink``` keine Daten mehr vom Server.
 # License
 
 Copyright (c) 2017 by the contributers. All rights reserved.

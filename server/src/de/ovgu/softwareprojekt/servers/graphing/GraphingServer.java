@@ -52,6 +52,7 @@ public class GraphingServer extends AbstractServer {
         // normalize output
         setSensorOutputRange(SensorType.Gyroscope, 100);
 
+
         // register the throughput measuring stream
         NetworkDataSink accelerationCurrentLine = graphPanel.getDataSink(SensorType.Gyroscope, 0);
         FilterPipelineBuilder pipelineBuilder = new FilterPipelineBuilder();
@@ -59,11 +60,14 @@ public class GraphingServer extends AbstractServer {
         pipelineBuilder.append(new IntegratingFilter(null));
         registerDataSink(pipelineBuilder.build(accelerationCurrentLine), SensorType.Gyroscope);
 
-        // register the two other axes
+        // register Y-Axis
         NetworkDataSink accelerationCurrentLine1 = graphPanel.getDataSink(SensorType.Gyroscope, 1);
-        NetworkDataSink accelerationCurrentLine2 = graphPanel.getDataSink(SensorType.Gyroscope, 2);
         registerDataSink(accelerationCurrentLine1, SensorType.Gyroscope);
+
+        //register Z-Axis
+        NetworkDataSink accelerationCurrentLine2 = graphPanel.getDataSink(SensorType.Gyroscope, 2);
         registerDataSink(accelerationCurrentLine2, SensorType.Gyroscope);
+
     }
 
     /**
