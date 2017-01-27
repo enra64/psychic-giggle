@@ -121,6 +121,9 @@ Der Client ist zum Zeitpunkt des Aufrufs nicht mehr über den Server verfügbar.
 ```onClientTimeout``` wird aufgerufen, wenn ein Client eine zeitlang nicht mehr reagiert. Der Client ist zum Zeitpunkt
 des Aufrufs nicht mehr über den Server verfügbar.
 
+## ```onClientAccepted(NetworkDevice)```
+```onClientAccepted(NetworkDevice)``` wird aufgerufen wenn  die Kommunikation zwischen Server und dem neuen Client funktioniert. Diese Funktion wird nur dann aufgerufen, wenn ```acceptClient(NetworkDevice)``` ```true``` zurückgegeben hat.
+
 # Exceptionhandling
 ```Java
 public class ExampleServer implements NetworkDataSink, ButtonListener, ClientListener, ExceptionListener {
