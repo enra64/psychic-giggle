@@ -158,7 +158,7 @@ class ClientConnectionManager implements ClientListener, UnexpectedClientListene
      */
     void closeAll() {
         synchronized (mClientConnections) {
-            mClientConnections.forEach(ClientConnection::close);
+            mClientConnections.forEach(connection -> close(connection.getClient()));
         }
     }
 
