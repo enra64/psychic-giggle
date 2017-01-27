@@ -54,7 +54,19 @@ public class ButtonPanel extends JPanel implements ActionListener {
         closePan.add(new JLabel(" "));
 
         closeBtn = new JButton("Close Servers");
-        closeBtn.addActionListener(this);
+
+        //This button should only close if a server is already running
+        closeBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if(e.getSource() == closeBtn && isRunning) {
+                    server.close();
+                    console.append("\nServer closed");
+                    isRunning = false;
+                }
+                console.setCaretPosition(console.getDocument().getLength());
+            }
+        });
 
         closePan.add(closeBtn);
 
@@ -94,15 +106,7 @@ public class ButtonPanel extends JPanel implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
             try {
-                //TODO: Shit code alert ... closeButton should only close if server is running but setting isRunning is fucked up
-                if(e.getSource() == closeBtn && isRunning)
-                {
-                    server.close();
-                    console.append("\nServer closed");
-                    isRunning = false;
-                }
-
-                else if(isRunning)
+                if(isRunning)
                 {
                     server.close();
                     console.append("\nServer closed");
@@ -113,27 +117,24 @@ public class ButtonPanel extends JPanel implements ActionListener {
                 if(e.getSource() == startMouseBtn) {
                     server = new MouseServer(null);
                     console.append("\nMouseServer started");
-                    isRunning = true;
+
                 }
                 else if(e.getSource() == startNesBtn) {
                     server = new NesServer(null);
                     console.append("\nNesServer started");
-                    isRunning = true;
                 }
                 else if(e.getSource() == startKukaBtn) {
                     server = new KukaServer();
                     console.append("\nKukaServer started");
-                    isRunning = true;
                 }
 
-                // doesn't look nice that same if-statement is needed ...
-                if(isRunning)
-                    server.start();
-
+                isRunning = true;
+                server.start();
                 //scrolls down automatically if the textarea border is reached
                 console.setCaretPosition(console.getDocument().getLength());
             } catch (IOException | AWTException exc) {
-                exc.printStackTrace();
+                String error = exc.getMessage();
+                console.append("\n"+ error);
             }
     }
 }
