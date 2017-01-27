@@ -80,12 +80,12 @@ public class JointControl implements NetworkDataSink, ButtonListener, ResetListe
     @Override
     public void onButtonClick(ButtonClick click, NetworkDevice origin) {
         // ignore button release events
-        if (!click.isHold) return;
+        if (!click.isPressed()) return;
 
         // WARNING: because of the KukaServer#onButtonClick implementation, robot state must not be changed in onButtonClick!
 
         // update the currently used actor pair
-        switch (click.mID) {
+        switch (click.getId()) {
             case BASE_PAIR_BUTTON:
                 mCurrentRotator = Joint.BaseRotator;
                 mCurrentTilter = Joint.BaseTilter;
