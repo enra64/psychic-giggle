@@ -403,14 +403,14 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
             mConnectionProgressDialog.dismiss();
 
         // this exception is thrown when we send commands, but the server has closed its command port
-        if (exception instanceof ConnectException && exception.getMessage().contains("ECONNREFUSED"))
+        if (exception instanceof ConnectException && (exception.getMessage().contains("ECONNREFUSED") || exception.getMessage().contains("Connection refused")))
             closeActivity(RESULT_SERVER_NOT_LISTENING_ON_PORT);
         else if (exception instanceof ConnectException && exception.getMessage().contains("ETIMEDOUT"))
             closeActivity(RESULT_SERVER_CONNECTION_TIMED_OUT);
         else if (exception instanceof ConnectException && exception.getMessage().contains("Socket is closed"))
             closeActivity(RESULT_SERVER_NOT_LISTENING_ON_PORT);
         else if (exception instanceof SocketException && info.contains("could not send SensorData object"))
-            Log.e("spapp", "could not send data");
+            closeActivity(RESULT_SERVER_NOT_LISTENING_ON_PORT);
         else {
             Log.w("spapp", "UNHANDLED EXCEPTION SENDACTIVITY:");
             exception.printStackTrace();

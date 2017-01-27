@@ -179,23 +179,14 @@ public class ConnectionWatch extends TimerTask {
                 // send next connection check
                 mOutConnection.sendCommand(new ConnectionAliveCheck(mSelf));
 
-                // debugging statement
-                if (Math.abs((mLastCheckEventTimestamp - mLastRequestTimestamp)) > 1000) System.out.println(mRemote + " request event: " + mLastRequestTimestamp + ", diff: " + (mLastCheckEventTimestamp - mLastRequestTimestamp));
-
                 // update the request timestamp
                 mLastRequestTimestamp = System.currentTimeMillis();
             }
-            // DEBUG statement
-            //System.out.println((mRemote != null ? mRemote : "unset remote") + " took " + (mLastCheckEventTimestamp - mLastRequestTimestamp) + "ms to answer");
         } catch (ConnectException e) {
-            // DEBUG statement
-            if (mRemote.name.contains("C")) System.out.println("exception 1");
             // as this exception is thrown when the remote does not answer, a timeout is signalled
             // instead of calling the exception listener
             mTimeoutListener.onTimeout(mLastCheckEventTimestamp - mLastRequestTimestamp);
         } catch (IOException e) {
-            // DEBUG statement
-            if (mRemote.name.contains("C")) System.out.println("IOException in ConnectionWatch");
             // notify exception listener of exception
             mExceptionListener.onException(ConnectionWatch.this, e, "CONNECTION_WATCH_CHECK_FAILED: Could not check connection; probably offline.");
         }
@@ -212,11 +203,7 @@ public class ConnectionWatch extends TimerTask {
         if (delay > MAXIMUM_CLIENT_RESPONSE_DELAY) {
             // notify listener and user
             mTimeoutListener.onTimeout(mLastCheckEventTimestamp - mLastRequestTimestamp);
-            System.out.println(mSelf + " TEST disconnected");
         }
-        // system did not time out
-        else
-            System.out.println("con check ok: " + mSelf.name + ": " + delay);
     }
 
     /**
