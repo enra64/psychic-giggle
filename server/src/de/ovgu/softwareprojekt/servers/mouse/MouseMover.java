@@ -90,8 +90,8 @@ public class MouseMover implements NetworkDataSink {
         PointerInfo pi = MouseInfo.getPointerInfo();
         Point mousePos = pi.getLocation();
 
-        int xAxis = (int) sensorData.data[Z_AXIS];   //Up down movement on screen is achieved my rotating phone by z-axis
-        int yAxis = (int) sensorData.data[X_AXIS];
+        int xAxis = Math.round(sensorData.data[Z_AXIS]); //Up down movement on screen is achieved my rotating phone by z-axis
+        int yAxis = Math.round(sensorData.data[X_AXIS]);
 
         mMoveBot.mouseMove(mousePos.x - xAxis, mousePos.y - yAxis);
     }
