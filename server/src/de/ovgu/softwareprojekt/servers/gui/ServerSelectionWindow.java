@@ -10,15 +10,14 @@ import java.awt.GridLayout;
 
 /**
  * Created by Ulrich on 26.01.2017.
- *
+ * <p>
  * This class creates a simple window that displays buttons, which call their respective server
  * and a simple information output area
  */
 
 public class ServerSelectionWindow {
 
-    public ServerSelectionWindow()
-    {
+    public ServerSelectionWindow() {
         //Create window
         JFrame window = new JFrame();
         window.setSize(800, 600);
@@ -51,9 +50,8 @@ public class ServerSelectionWindow {
     /**
      * Start the main frame
      */
-    public static void start()
-    {
-        javax.swing.SwingUtilities.invokeLater(new Runnable(){
+    public static void start() {
+        javax.swing.SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
                 new ServerSelectionWindow();
