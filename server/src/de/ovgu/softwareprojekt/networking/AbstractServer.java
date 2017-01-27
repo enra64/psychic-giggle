@@ -370,7 +370,7 @@ public abstract class AbstractServer implements
      * @param sensor      affected sensor
      * @param outputRange the resulting maximum and negative minimum of the sensor output range. Default is -100 to 100.
      */
-    protected void setSensorOutputRange(SensorType sensor, @SuppressWarnings("SameParameterValue") float outputRange) {
+    public void setSensorOutputRange(SensorType sensor, float outputRange) {
         mClientManager.setSensorOutputRange(sensor, outputRange);
     }
 

@@ -50,6 +50,14 @@ public class NetworkDevice implements Serializable {
         this.address = address;
     }
 
+    /**
+     * Get the name as given by the NetworkDevice
+     * @return the name as given by the NetworkDevice
+     */
+    public String getName() {
+        return name;
+    }
+
     /**j
      * Create a new NetworkDevice which will announce itself as "name" who may be contacted using commandPort and dataPort
      * @param name human readable name
