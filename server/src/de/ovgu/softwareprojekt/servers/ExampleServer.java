@@ -4,8 +4,10 @@ import de.ovgu.softwareprojekt.SensorData;
 import de.ovgu.softwareprojekt.SensorType;
 import de.ovgu.softwareprojekt.callback_interfaces.ButtonListener;
 import de.ovgu.softwareprojekt.callback_interfaces.ClientListener;
+import de.ovgu.softwareprojekt.callback_interfaces.ResetListener;
 import de.ovgu.softwareprojekt.control.commands.ButtonClick;
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
+import de.ovgu.softwareprojekt.misc.ExceptionListener;
 import de.ovgu.softwareprojekt.networking.AbstractServer;
 import de.ovgu.softwareprojekt.networking.NetworkDataSink;
 import de.ovgu.softwareprojekt.networking.Server;
@@ -16,7 +18,7 @@ import java.util.Arrays;
 /**
  * Created by arne on 1/24/17.
  */
-public class ExampleServer implements NetworkDataSink, ButtonListener, ClientListener {
+public class ExampleServer implements NetworkDataSink, ButtonListener, ClientListener, ExceptionListener, ResetListener {
     public ExampleServer() throws IOException {
         Server server = new Server();
         server.registerDataSink(this, SensorType.LinearAcceleration);
@@ -24,6 +26,17 @@ public class ExampleServer implements NetworkDataSink, ButtonListener, ClientLis
 
         server.setButtonListener(this);
         server.setClientListener(this);
+        server.setExceptionListener(this);
+        server.setResetListener(this);
+    }
+
+    /**
+     * Called when the user presses the reset position button
+     *
+     * @param origin which device pressed the button
+     */
+    @Override
+    public void onResetPosition(NetworkDevice origin) {
     }
 
     /**
@@ -94,5 +107,16 @@ public class ExampleServer implements NetworkDataSink, ButtonListener, ClientLis
      */
     @Override
     public void onClientAccepted(NetworkDevice connectedClient) {
+    }
+
+    /**
+     * Called when an exception cannot be gracefully handled.
+     *
+     * @param origin    the instance (or, if it is a hidden instance, the known parent) that produced the exception
+     * @param exception the exception that was thrown
+     * @param info      additional information to help identify the problem
+     */
+    @Override
+    public void onException(Object origin, Exception exception, String info) {
     }
 }

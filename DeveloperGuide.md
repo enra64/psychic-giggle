@@ -75,18 +75,6 @@ Für ```LinearLayout``` werden die folgenden Attribute unterstützt:
 * ```android:layout_weight=""``` wird direkt für das Layout gesetzt. Genaue Informationen sind in der [Android-Dokumentation](https://developer.android.com/guide/topics/ui/layout/linear.html#Weight) zu finden.
 * ```android:orientation=""``` wird direkt für das Layout gesetzt. Genaue Informationen sind in der [Android-Dokumentation](https://developer.android.com/reference/android/widget/LinearLayout.html#attr_android:orientation) zu finden.
 
-prob no metrics calc
-"what is a good question" for questionaire probably not, but maybe "what should you consider"
-"some stuff like " main ir system component
-evaluate ir system
-calc some ranking
-precision, recall
-divided in blocks a 3-5 assignments with points given
-no calculator
-index-structures: beneftis, drawbacks
-should be able to do all calcs from the exercises
-no multiple choice questions
-
 Bei Verwendung von ```setButtonLayout(String)``` werden alle durch ```addButton(String, int)``` hinzugefügten Buttons entfernt und bei
 Verwendung von ```addButton(String, int)``` wird das durch ```setButtonLayout``` erstellte Layout entfernt.
 
@@ -133,6 +121,36 @@ Der Client ist zum Zeitpunkt des Aufrufs nicht mehr über den Server verfügbar.
 ```onClientTimeout``` wird aufgerufen, wenn ein Client eine zeitlang nicht mehr reagiert. Der Client ist zum Zeitpunkt
 des Aufrufs nicht mehr über den Server verfügbar.
 
-#Exceptionhandling
+# Exceptionhandling
+```Java
+public class ExampleServer implements NetworkDataSink, ButtonListener, ClientListener, ExceptionListener {
+    public ExampleServer() throws IOException {
+        Server server = new Server();
+        server.start();
 
-#Resetevents
+        server.setExceptionListener(this);
+    }
+    @Override
+    public void onException(Object origin, Exception exception, String info) {
+    }
+}
+```
+Um alle Exceptions die in verschiedenen Threads auftreten aufzufangen muss ein ```ExceptionListener``` registriert werden.
+```onException(Object, Exception, String)``` wird dann aufgerufen, falls eine Exception auftritt, die nicht intern gehandelt werden kann. Der ```origin```
+
+# Resetevents
+```Java
+public class ExampleServer implements ResetListener {
+    public ExampleServer() throws IOException {
+        Server server = new Server();
+        server.start();
+
+        server.setResetListener(this);
+    }
+
+    @Override
+    public void onResetPosition(NetworkDevice origin) {
+    }
+}
+```
+Wenn ein Client den "Reset"-Button auf seinem Handy benutzt, wird die ```onResetPosition(NetworkDevice)``` aufgerufen. Dann sollte der derzeitige Status des Handys zurückgesetzt werden, bei der Beispielimplementation ```MouseServer``` wird zum Beispiel die derzeitige Position des Handys als neuer Nullpunkt gewertet.
