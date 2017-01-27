@@ -29,7 +29,7 @@ public class ServerSelectionWindow {
         JPanel masterPanel = new JPanel(new GridLayout(2, 1));
 
         //This text area displays all information regarding the server usage
-        consoleText = new JTextArea(" Hello, this is a simple information output");
+        consoleText = new JTextArea(" Hello, this is a simple information output\n");
         consoleText.setEditable(false);
 
         redirectSystemStreams();
@@ -57,7 +57,7 @@ public class ServerSelectionWindow {
     private void updateTextArea(final String text) {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                consoleText.append("\n"+ text);
+                consoleText.append(text);
             }
         });
     }
