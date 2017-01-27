@@ -19,7 +19,7 @@ import java.io.IOException;
 
 /**
  * Created by Ulrich on 26.01.2017.
- *
+ * <p>
  * This panel creates buttons which call their respective servers or closes them before opening another
  */
 public class ButtonPanel extends JPanel implements ActionListener {
@@ -29,12 +29,11 @@ public class ButtonPanel extends JPanel implements ActionListener {
     private JTextArea console;
     private boolean isRunning;
 
-    public ButtonPanel(JTextArea textArea)
-    {
+    public ButtonPanel(JTextArea textArea) {
         console = textArea;
 
         //Set Layout and create panels
-        this.setLayout(new GridLayout(3,1));
+        this.setLayout(new GridLayout(3, 1));
 
         //Order decides the position
         this.add(createServerButtons());
@@ -44,10 +43,10 @@ public class ButtonPanel extends JPanel implements ActionListener {
 
     /**
      * This Panel holds a button which closes the server connection
+     *
      * @return the Panel responsible for displaying the close Button
      */
-    private JPanel createCloseButton()
-    {
+    private JPanel createCloseButton() {
         JPanel closePan = new JPanel(new GridLayout(1, 3));
 
         //Setup layout and create close button
@@ -59,7 +58,7 @@ public class ButtonPanel extends JPanel implements ActionListener {
         closeBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if(e.getSource() == closeBtn && isRunning) {
+                if (e.getSource() == closeBtn && isRunning) {
                     server.close();
                     console.append("\nServer closed");
                     isRunning = false;
@@ -77,10 +76,10 @@ public class ButtonPanel extends JPanel implements ActionListener {
 
     /**
      * This Panel holds the 3 server start buttons
+     *
      * @return the Panel responsible for displaying the close Button
      */
-    private JPanel createServerButtons()
-    {
+    private JPanel createServerButtons() {
         JPanel serverButtonPan = new JPanel(new GridLayout(1, 5));
 
         //Create buttons and setup layout
@@ -105,36 +104,32 @@ public class ButtonPanel extends JPanel implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-            try {
-                if(isRunning)
-                {
-                    server.close();
-                    console.append("\nServer closed");
-                    isRunning = false;
-                }
-
-                //Check for the specific button input
-                if(e.getSource() == startMouseBtn) {
-                    server = new MouseServer(null);
-                    console.append("\nMouseServer started");
-
-                }
-                else if(e.getSource() == startNesBtn) {
-                    server = new NesServer(null);
-                    console.append("\nNesServer started");
-                }
-                else if(e.getSource() == startKukaBtn) {
-                    server = new KukaServer();
-                    console.append("\nKukaServer started");
-                }
-
-                isRunning = true;
-                server.start();
-                //scrolls down automatically if the textarea border is reached
-                console.setCaretPosition(console.getDocument().getLength());
-            } catch (IOException | AWTException exc) {
-                String error = exc.getMessage();
-                console.append("\n"+ error);
+        try {
+            if (isRunning) {
+                server.close();
+                console.append("\nServer closed");
+                isRunning = false;
             }
+
+            //Check for the specific button input
+            if (e.getSource() == startMouseBtn) {
+                server = new MouseServer(null);
+                console.append("\nMouseServer started");
+            } else if (e.getSource() == startNesBtn) {
+                server = new NesServer(null);
+                console.append("\nNesServer started");
+            } else if (e.getSource() == startKukaBtn) {
+                server = new KukaServer();
+                console.append("\nKukaServer started");
+            }
+
+            isRunning = true;
+            server.start();
+            //scrolls down automatically if the textarea border is reached
+            console.setCaretPosition(console.getDocument().getLength());
+        } catch (IOException | AWTException exc) {
+            String error = exc.getMessage();
+            console.append("\n" + error);
+        }
     }
 }
