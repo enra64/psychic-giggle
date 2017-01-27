@@ -1,11 +1,10 @@
 package de.ovgu.softwareprojekt.servers.gui;
 
-import javax.swing.JFrame;
-import javax.swing.JTextArea;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.ScrollPaneConstants;
+import javax.swing.*;
 import java.awt.GridLayout;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintStream;
 
 
 /**
@@ -17,7 +16,10 @@ import java.awt.GridLayout;
 
 public class ServerSelectionWindow {
 
+    private JTextArea consoleText;
+
     public ServerSelectionWindow() {
+
         //Create window
         JFrame window = new JFrame();
         window.setSize(800, 600);
@@ -26,10 +28,11 @@ public class ServerSelectionWindow {
         //masterPanel holds two sub panels for layout reasons
         JPanel masterPanel = new JPanel(new GridLayout(2, 1));
 
-        //TODO: channel the standard output stream through this textarea
         //This text area displays all information regarding the server usage
-        JTextArea consoleText = new JTextArea(" Hello, this is a simple information output");
+        consoleText = new JTextArea(" Hello, this is a simple information output");
         consoleText.setEditable(false);
+
+        redirectSystemStreams();
 
         // This panel is responsible for the button display and their usages
         ButtonPanel btnPanel = new ButtonPanel(consoleText);
@@ -45,6 +48,43 @@ public class ServerSelectionWindow {
         //finally add masterpanel and make window visible for user
         window.add(masterPanel);
         window.setVisible(true);
+    }
+
+    /**
+     * This method displays text received in an Outputstream in the consoleText JTextarea of the GUI
+     * @param text
+     */
+    private void updateTextArea(final String text) {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                consoleText.append("\n"+ text);
+            }
+        });
+    }
+
+    /**
+     * This method redirects all System.out and System.err messages through a JTextArea
+     */
+    private void redirectSystemStreams() {
+        OutputStream out = new OutputStream() {
+            @Override
+            public void write(int b) throws IOException {
+                updateTextArea(String.valueOf((char) b));
+            }
+
+            @Override
+            public void write(byte[] b, int off, int len) throws IOException {
+                updateTextArea(new String(b, off, len));
+            }
+
+            @Override
+            public void write(byte[] b) throws IOException {
+                write(b, 0, b.length);
+            }
+        };
+
+        System.setOut(new PrintStream(out, true));
+        System.setErr(new PrintStream(out, true));
     }
 
     /**

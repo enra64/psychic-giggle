@@ -86,10 +86,9 @@ public abstract class AbstractServer implements
                 this);
 
         mDataMapper.setConnectionHandler(mClientManager);
-
         // SIGTERM -> close all clients, stop discovery server
-        //Runtime.getRuntime().addShutdownHook(new Thread(this::close));
-        //System.out.println("AbstractServer started, shutdown runtime hook online");
+        Runtime.getRuntime().addShutdownHook(new Thread(this::close));
+        System.out.println("AbstractServer started, shutdown runtime hook online");
     }
 
     /**
