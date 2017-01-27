@@ -68,7 +68,38 @@ Bei Verwendung von setButtonLayout werden alle durch addButton hinzugefügten Bu
 
 
 #Verwaltung von Clients
+```Java
+public class ExampleServer implements NetworkDataSink, ClientListener {
+	public ExampleServer() throws IOException {
+		Server server = new Server();
+		server.registerDataSink(this, SensorType.LinearAcceleration);
+		server.start();
 
+		server.setClientListener(this);
+		
+	}
+
+	public boolean acceptClient(NetworkDevice newClient) {
+        return false;
+    	}
+
+        public void onClientDisconnected(NetworkDevice disconnectedClient) {
+
+        }
+
+    	public void onClientTimeout(NetworkDevice timeoutClient) {
+
+    	}
+
+    	public void onClientAccepted(NetworkDevice connectedClient) {
+
+    	}
+}
+
+```
+
+Im Konstruktor muss ein ClientListener gesetzt werden. Daraufhin sind die obigen Methoden zu implementieren. 
+Hierbei ist anzumerken, dass acceptClient true zurückgeben muss um einen Clienten erfolgreich zu akzeptieren.
 
 #Exceptionhandling
 
