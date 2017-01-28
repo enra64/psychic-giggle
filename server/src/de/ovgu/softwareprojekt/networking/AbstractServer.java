@@ -381,12 +381,11 @@ public abstract class AbstractServer implements
      * @param id            - NotificationID: should start at 0 and increases with each new notification while device is connected
      * @param title         - title of the notification
      * @param content       - content of the notification
-     * @param isOnGoing     - if true, notification is not removable by user
      * @param deviceAddress - address of the device that shall display the notification
      * @throws IOException if a client could not be notified of the notification that should be displayed
      */
-    protected void displayNotification(int id, String title, String content, boolean isOnGoing, InetAddress deviceAddress) throws IOException {
-        mClientManager.getClientHandler(deviceAddress).displayNotification(id, title, content, isOnGoing);
+    protected void displayNotification(int id, String title, String content, InetAddress deviceAddress) throws IOException {
+        mClientManager.getClientHandler(deviceAddress).displayNotification(id, title, content);
     }
 
     /**

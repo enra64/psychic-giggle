@@ -419,11 +419,10 @@ class ClientConnection implements OnCommandListener, NetworkDataSink, Connection
      * @param id        NotificationID: should start at 0 and increase with each new notification while device is connected
      * @param title     title of the notification
      * @param content   content of the notification
-     * @param isOnGoing if true, notification is not removable by user
      * @throws IOException if the command could not be sent
      */
-    void displayNotification(int id, String title, String content, boolean isOnGoing) throws IOException {
-        sendCommand(new DisplayNotification(id, title, content, isOnGoing));
+    void displayNotification(int id, String title, String content) throws IOException {
+        sendCommand(new DisplayNotification(id, title, content));
     }
 
     /**
