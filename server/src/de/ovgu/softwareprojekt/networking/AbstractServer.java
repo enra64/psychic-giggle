@@ -13,6 +13,7 @@ import de.ovgu.softwareprojekt.misc.ExceptionListener;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.HashMap;
 
 /**
  * This class encapsulates the whole server system:
@@ -366,13 +367,24 @@ public abstract class AbstractServer implements
     }
 
     /**
-     * Change the output range of a sensor
+     * Retrieve the sensor range of a sensor on a specified device
      *
-     * @param sensor      affected sensor
-     * @param outputRange the resulting maximum and negative minimum of the sensor output range. Default is -100 to 100.
+     * @param sensor the range of this sensor will be returned
+     * @param device the sensor on this device will be returned
+     * @return the sensors maximum range as reported by <a href="https://developer.android.com/reference/android/hardware/Sensor.html#getMaximumRange()">android</a>
      */
-    public void setSensorOutputRange(SensorType sensor, float outputRange) {
-        mClientManager.setSensorOutputRange(sensor, outputRange);
+    public float getSensorMaximumRange(SensorType sensor, NetworkDevice device) {
+        return mClientManager.getSensorMaximumRange(device, sensor);
+    }
+
+    /**
+     * Retrieve the sensor range of a sensor on all connected devices
+     *
+     * @param sensor the sensor of which the maximum <a href="https://developer.android.com/reference/android/hardware/Sensor.html#getMaximumRange()">range</a> is required
+     * @return a mapping from NetworkDevice to the float range
+     */
+    public HashMap<NetworkDevice, Float> getSensorMaximumRange(SensorType sensor) {
+        return mClientManager.getSensorMaximumRange(sensor);
     }
 
     /**
@@ -422,9 +434,8 @@ public abstract class AbstractServer implements
     private boolean isClientMaximumReached() {
         return mClientManager.getClientCount() >= mClientMaximum;
     }
-    
-    protected void sendSensorDescription(SensorType type, String description) throws IOException
-    {
+
+    protected void sendSensorDescription(SensorType type, String description) throws IOException {
         mClientManager.sendSensorDescription(type, description);
     }
 }

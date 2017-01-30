@@ -20,7 +20,6 @@ import java.util.*;
  * <p>
  * Configuration functions include:
  * <ul>
- * <li>{@link #setSensorOutputRange(SensorType, float)}</li>
  * <li>{@link #addButton(String, int)}</li>
  * <li>{@link #setButtonLayout(String)}</li>
  * <li>{@link #setSensorSpeed(SensorType, SetSensorSpeed.SensorSpeed)}</li>
@@ -47,11 +46,6 @@ class ClientConnectionManager implements ClientListener, UnexpectedClientListene
      * Store requested speeds for all data sinks
      */
     private EnumMap<SensorType, SetSensorSpeed.SensorSpeed> mSensorSpeeds = new EnumMap<>(SensorType.class);
-
-    /**
-     * store requested output ranges for all sensors
-     */
-    private EnumMap<SensorType, Float> mSensorOutputRanges = new EnumMap<>(SensorType.class);
 
     /**
      * list of buttons that should be displayed on all clients
@@ -121,19 +115,13 @@ class ClientConnectionManager implements ClientListener, UnexpectedClientListene
      * @throws IOException if the handler could not be initialized
      */
     ClientConnection getUnboundHandler() throws IOException {
-        ClientConnection newHandler = new ClientConnection(
+        return new ClientConnection(
                 mServerName,
                 mExceptionListener,
                 mCommandListener,
                 this,
                 mDataSink,
                 this);
-
-        // set the requested output ranges
-        for (Map.Entry<SensorType, Float> sensor : mSensorOutputRanges.entrySet())
-            newHandler.setOutputRange(sensor.getKey(), sensor.getValue());
-
-        return newHandler;
     }
 
     /**
@@ -255,19 +243,6 @@ class ClientConnectionManager implements ClientListener, UnexpectedClientListene
 
         // update on all clients
         updateSensorSpeeds();
-    }
-
-    /**
-     * Change the output range of a sensor
-     *
-     * @param sensor      affected sensor
-     * @param outputRange the resulting maximum and negative minimum of the sensor output range. Default is -100 to 100.
-     */
-    public void setSensorOutputRange(SensorType sensor, float outputRange) {
-        synchronized (mClientConnections) {
-            mClientConnections.forEach(con -> con.setOutputRange(sensor, outputRange));
-        }
-        mSensorOutputRanges.put(sensor, outputRange);
     }
 
     /**
@@ -435,15 +410,40 @@ class ClientConnectionManager implements ClientListener, UnexpectedClientListene
 
     /**
      * sends a description for the sensortype
-     * @param type affected sensor
+     *
+     * @param type        affected sensor
      * @param description description for the affected sensor
-     * @throws IOException
+     * @throws IOException if the sensor description could not be sent
      */
     public void sendSensorDescription(SensorType type, String description) throws IOException {
         synchronized (mClientConnections) {
             for (ClientConnection con : mClientConnections)
                 con.sendSensorDescription(type, description);
         }
+    }
+
+    /**
+     * Retrieve the sensor range of a sensor on a device
+     *
+     * @param client the device with the sensor
+     * @param sensor the sensor
+     * @return the range of the sensor, see <a href="https://developer.android.com/reference/android/hardware/Sensor.html#getMaximumRange()">android docs</a>
+     */
+    float getSensorMaximumRange(NetworkDevice client, SensorType sensor) {
+        return getClientHandler(client).getSensorMaximumRange(sensor);
+    }
+
+    /**
+     * Retrieve the sensor range of a sensor on all connected devices
+     *
+     * @param sensor the sensor of which the maximum <a href="https://developer.android.com/reference/android/hardware/Sensor.html#getMaximumRange()">range</a> is required
+     * @return a mapping from NetworkDevice to the float range
+     */
+    HashMap<NetworkDevice, Float> getSensorMaximumRange(SensorType sensor) {
+        HashMap<NetworkDevice, Float> rangeMapping = new HashMap<>();
+        for (ClientConnection clientConnection : mClientConnections)
+            rangeMapping.put(clientConnection.getClient(), clientConnection.getSensorMaximumRange(sensor));
+        return rangeMapping;
     }
 
     /**
