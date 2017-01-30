@@ -8,7 +8,7 @@ import de.ovgu.softwareprojekt.discovery.NetworkDevice;
 import de.ovgu.softwareprojekt.networking.AbstractServer;
 import de.ovgu.softwareprojekt.pipeline.filters.DifferenceThresholdFilter;
 import de.ovgu.softwareprojekt.pipeline.filters.AveragingFilter;
-import de.ovgu.softwareprojekt.pipeline.filters.NormalizationFilter;
+import de.ovgu.softwareprojekt.pipeline.filters.ScalingFilter;
 import de.ovgu.softwareprojekt.pipeline.filters.UserSensitivityMultiplicator;
 
 import java.awt.*;
@@ -48,7 +48,7 @@ public class MouseServer extends AbstractServer {
         mMouseMover = new MouseMover();
 
         // this is how we currently define a filter pipeline:
-        NetworkDataSink pipeline = new NormalizationFilter(20, 5, new UserSensitivityMultiplicator(new AveragingFilter(3,
+        NetworkDataSink pipeline = new ScalingFilter(20, 5, new UserSensitivityMultiplicator(new AveragingFilter(3,
                 new DifferenceThresholdFilter(mMouseMover, .1f))));
 
         // register our mouse mover to receive gyroscope data

@@ -53,7 +53,7 @@ public class GraphingServer extends AbstractServer {
         NetworkDataSink accelerationCurrentLine = graphPanel.getDataSink(SensorType.Light, 0);
         FilterPipelineBuilder pipelineBuilder = new FilterPipelineBuilder();
         pipelineBuilder.append(throughputMeasurer);
-        //pipelineBuilder.append(new NormalizationFilter(1000f, 10f, new AveragingFilter(5)));
+        //pipelineBuilder.append(new ScalingFilter(1000f, 10f, new AveragingFilter(5)));
         registerDataSink(pipelineBuilder.build(accelerationCurrentLine), SensorType.Light);
 
         /**

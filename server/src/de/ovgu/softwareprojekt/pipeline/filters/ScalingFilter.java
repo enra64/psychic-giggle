@@ -5,9 +5,6 @@ import de.ovgu.softwareprojekt.networking.NetworkDataSink;
 import de.ovgu.softwareprojekt.SensorData;
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
 
-import java.lang.reflect.Array;
-import java.util.Arrays;
-
 /**
  * Created by Ulrich on 29.11.2016.
  * <p>
@@ -16,7 +13,7 @@ import java.util.Arrays;
  * A custom sensitivity may be set; it will replace the default value of 1. The filter ignores its third
  * {@link #onData(NetworkDevice, SensorData, float)} parameter in any case.
  */
-public class NormalizationFilter extends AbstractFilter {
+public class ScalingFilter extends AbstractFilter {
     /**
      * The range (maximum value, and inverted minimum value) the data should be projected to
      */
@@ -34,7 +31,7 @@ public class NormalizationFilter extends AbstractFilter {
      * @param dataSink either a valid network data sink, or null. if null, {@link #setDataSink(NetworkDataSink)}
      *                 must be called prior to starting operations.
      */
-    public NormalizationFilter(@Nullable NetworkDataSink dataSink) {
+    public ScalingFilter(@Nullable NetworkDataSink dataSink) {
         this(100f, 100f, dataSink);
     }
 
@@ -46,7 +43,7 @@ public class NormalizationFilter extends AbstractFilter {
      * @param sourceRange       range of the data coming into the normalization filter
      * @param targetRange       range the data should be projected to
      */
-    public NormalizationFilter(float targetRange, float sourceRange,@Nullable NetworkDataSink sink) {
+    public ScalingFilter(float targetRange, float sourceRange, @Nullable NetworkDataSink sink) {
         super(sink);
 
         mTargetRange = targetRange;

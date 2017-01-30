@@ -48,14 +48,14 @@ public class MarbleLabyrinthControl implements NetworkDataSink, ResetListener, B
     /**
      * The control interface for the robot
      */
-    private final LbrIiiiiiiwa mControlInterface;
+    private final LbrIiwa mControlInterface;
 
     /**
      * Create a new marble labyrinth control class.
      *
      * @param control the control interface for the robot
      */
-    MarbleLabyrinthControl(LbrIiiiiiiwa control) {
+    MarbleLabyrinthControl(LbrIiwa control) {
         mControlInterface = control;
         onResetPosition(null);
     }

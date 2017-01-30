@@ -10,9 +10,9 @@ import static coppelia.remoteApi.simx_opmode_oneshot;
 import static coppelia.remoteApi.simx_return_ok;
 
 /**
- * An implementation of the {@link LbrIiiiiiiwa} interface for controlling a kuka lbr iiwa robot in V-REP
+ * An implementation of the {@link LbrIiwa} interface for controlling a kuka lbr iiwa robot in V-REP
  */
-public class Vrep implements LbrIiiiiiiwa {
+public class Vrep implements LbrIiwa {
     /**
      * Address of the simulation environment
      */
@@ -128,7 +128,7 @@ public class Vrep implements LbrIiiiiiiwa {
     }
 
     /**
-     * Finalize operations. The other {@link LbrIiiiiiiwa} methods, except for start(), need not be callable after calling stop().
+     * Finalize operations. The other {@link LbrIiwa} methods, except for start(), need not be callable after calling stop().
      */
     @Override
     public void stop() {
