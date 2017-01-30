@@ -8,6 +8,7 @@ import de.ovgu.softwareprojekt.discovery.NetworkDevice;
 import de.ovgu.softwareprojekt.networking.AbstractServer;
 import de.ovgu.softwareprojekt.pipeline.FilterPipelineBuilder;
 import de.ovgu.softwareprojekt.pipeline.filters.AveragingFilter;
+import de.ovgu.softwareprojekt.pipeline.filters.ScalingFilter;
 import de.ovgu.softwareprojekt.pipeline.splitters.ClientSplitter;
 import de.ovgu.softwareprojekt.util.FileUtils;
 
@@ -67,8 +68,7 @@ public class NesServer extends AbstractServer {
         super(serverName);
 
         // normalize both utilized sensors
-        setSensorOutputRange(SensorType.LinearAcceleration, 1000);
-        setSensorOutputRange(SensorType.Gravity, 333);
+        NetworkDataSink gravityPipeline = new ScalingFilter(333f, 10f, mGravitySplitter);
 
         // load button mappings: which player presses what when
         loadButtonMappings();
@@ -77,7 +77,7 @@ public class NesServer extends AbstractServer {
         super.setButtonLayout(FileUtils.readFile("../nesLayout.xml", "utf-8"));
 
         // register our data splitters for sensor data
-        registerDataSink(mGravitySplitter, SensorType.Gravity);
+        registerDataSink(gravityPipeline, SensorType.Gravity);
         registerDataSink(mLinearAccelerationSplitter, SensorType.LinearAcceleration);
     }
 
@@ -117,7 +117,7 @@ public class NesServer extends AbstractServer {
 
         // create a filter pipeline ending in the acceleration phase detection system
         FilterPipelineBuilder pipelineBuilder = new FilterPipelineBuilder();
-        pipelineBuilder.append(new AveragingFilter(5));
+        pipelineBuilder.append(new ScalingFilter(1000f, 40f,new AveragingFilter(5)));
         return pipelineBuilder.build(phaseDetection);
     }
 

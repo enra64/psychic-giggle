@@ -14,7 +14,7 @@ public class JointControl implements NetworkDataSink, ButtonListener, ResetListe
     /**
      * The robot control interface used for communications
      */
-    private final LbrIiiiiiiwa mControlInterface;
+    private final LbrIiwa mControlInterface;
 
     /**
      * The mobile phone axes
@@ -40,7 +40,7 @@ public class JointControl implements NetworkDataSink, ButtonListener, ResetListe
      *
      * @param robotInterface the control interface to be used for movement etc.
      */
-    JointControl(LbrIiiiiiiwa robotInterface) {
+    JointControl(LbrIiwa robotInterface) {
         mControlInterface = robotInterface;
     }
 
@@ -57,8 +57,8 @@ public class JointControl implements NetworkDataSink, ButtonListener, ResetListe
         float rotatorMaxRange = KukaUtil.getRange(mCurrentRotator);
 
         //float rollValue = clampToJointRange(data.data[ROLL_AXIS] * userSensitivity * .03f, mRobotRollMaximum);
-        float tilterValue = KukaUtil.clampToJointRange(data.data[PITCH_AXIS] * userSensitivity * .08f, tilterMaxRange);
-        float rotatorValue = KukaUtil.clampToJointRange(data.data[ROLL_AXIS] * userSensitivity * .08f, rotatorMaxRange);
+        float tilterValue = KukaUtil.clampToJointRange(data.data[PITCH_AXIS] * userSensitivity * .2f, tilterMaxRange);
+        float rotatorValue = KukaUtil.clampToJointRange(data.data[ROLL_AXIS] * userSensitivity * .2f, rotatorMaxRange);
 
         mControlInterface.rotateJointTarget(mCurrentTilter, tilterValue);
         mControlInterface.rotateJointTarget(mCurrentRotator, rotatorValue);

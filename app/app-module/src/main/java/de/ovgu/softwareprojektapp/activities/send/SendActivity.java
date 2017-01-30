@@ -15,13 +15,13 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 
 import java.net.ConnectException;
 import java.net.InetAddress;
 import java.net.SocketException;
-import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Timer;
@@ -145,6 +145,9 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
 
         // set Notificationmanager in order to handle the notifications
         mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+
+        // keep the screen on
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     }
 
     /**

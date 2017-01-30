@@ -3,7 +3,7 @@ package de.ovgu.softwareprojekt.servers.kuka;
 /**
  * This interface makes the kuka and the vrep marble labyrinth implementation interchangeable.
  */
-public interface LbrIiiiiiiwa {
+public interface LbrIiwa {
     /**
      * Initialises the control method. All other interface methods should be safely callable after calling start()
      */

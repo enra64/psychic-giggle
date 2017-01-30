@@ -12,26 +12,26 @@ import de.ovgu.softwareprojekt.control.commands.SetSensorSpeed;
 import de.ovgu.softwareprojektapp.sensors.AbstractSensor;
 
 /**
- * {@link DataSource} feeding Magnetometer data
+ * {@link DataSource} feeding {@link Sensor#TYPE_GYROSCOPE_UNCALIBRATED} data
  */
-public class Magnetometer extends AbstractSensor {
+public class GyroscopeUncalibrated extends AbstractSensor {
     /**
-     * Create an accelerometer; does not start anything yet, use {@link #start()} or {@link #setRunning(boolean)}
+     * Create an{@link GyroscopeUncalibrated} sensor; does not start anything yet, use {@link #start()} or {@link #setRunning(boolean)}
      * to start receiving events
      *
-     * @param context    android system context needed for sensors
+     * @param context android system context needed for sensors
      */
-    public Magnetometer(Context context) {
-        super(context, Sensor.TYPE_MAGNETIC_FIELD, SensorType.Magnetometer);
+    public GyroscopeUncalibrated(Context context) {
+        super(context, Sensor.TYPE_GYROSCOPE_UNCALIBRATED, SensorType.GyroscopeUncalibrated);
     }
 
     /**
-     * Static sensor speed definition for all Magnetometer instances. defaults to sensor_delay_game.
+     * Static sensor speed definition for all{@link GyroscopeUncalibrated} instances. defaults to sensor_delay_game.
      */
     private static SetSensorSpeed.SensorSpeed mSensorSpeed = SetSensorSpeed.SensorSpeed.SENSOR_DELAY_GAME;
 
     /**
-     * update the sensor speed for all Magnetometer instances
+     * update the sensor speed for all{@link GyroscopeUncalibrated} instances
      *
      * @param targetSpeed the speed the sensor should run at after this call
      * @throws IOException if the sensor could not be restarted
@@ -51,7 +51,7 @@ public class Magnetometer extends AbstractSensor {
     }
 
     /**
-     * Get the sensor speed currently set for all Magnetometer instances
+     * Get the sensor speed currently set for all {@link GyroscopeUncalibrated} instances
      */
     @Override
     public SetSensorSpeed.SensorSpeed getSensorSpeed() {

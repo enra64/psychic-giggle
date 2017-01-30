@@ -60,7 +60,7 @@ public class ButtonPanel extends JPanel implements ActionListener {
             public void actionPerformed(ActionEvent e) {
                 if (e.getSource() == closeBtn && isRunning) {
                     server.close();
-                    console.append("Server closed\n");
+                    System.out.println("Server closed");
                     isRunning = false;
                 }
                 console.setCaretPosition(console.getDocument().getLength());
@@ -107,20 +107,20 @@ public class ButtonPanel extends JPanel implements ActionListener {
         try {
             if (isRunning) {
                 server.close();
-                console.append("\nServer closed");
+                System.out.println("Server closed");
                 isRunning = false;
             }
 
             //Check for the specific button input
             if (e.getSource() == startMouseBtn) {
                 server = new MouseServer(null);
-                console.append("MouseServer started\n");
+                System.out.println("MouseServer started");
             } else if (e.getSource() == startNesBtn) {
                 server = new NesServer(null);
-                console.append("\nNesServer started\n");
+                System.out.println("NesServer started");
             } else if (e.getSource() == startKukaBtn) {
                 server = new KukaServer();
-                console.append("\nKukaServer started\n");
+                System.out.println("KukaServer started");
             }
 
             isRunning = true;

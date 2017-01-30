@@ -6,6 +6,7 @@ import de.ovgu.softwareprojekt.control.commands.ButtonClick;
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
 import de.ovgu.softwareprojekt.networking.AbstractServer;
 import de.ovgu.softwareprojekt.pipeline.filters.AveragingFilter;
+import de.ovgu.softwareprojekt.pipeline.filters.ScalingFilter;
 import de.ovgu.softwareprojekt.pipeline.splitters.Switch;
 
 import java.io.IOException;
@@ -19,7 +20,7 @@ public class KukaServer extends AbstractServer {
     /**
      * The control interface for the robot
      */
-    private LbrIiiiiiiwa mRobotInterface;
+    private LbrIiwa mRobotInterface;
 
     /**
      * If true, only the ToolTilter and the ToolArmRotator joints will be used, so as to enable playing a marble labyrinth
@@ -70,10 +71,13 @@ public class KukaServer extends AbstractServer {
         mJointControl = new JointControl(mRobotInterface);
 
         // create a new data switch
-        mModeDataSwitch = new Switch(new AveragingFilter(3, mMarbleLabyrinthControl), mJointControl, true);
+        mModeDataSwitch = new Switch(
+                new ScalingFilter(100f, 10f,
+                        new AveragingFilter(3, mMarbleLabyrinthControl)), mJointControl, true);
 
         registerDataSink(mModeDataSwitch, SensorType.Gravity);
-        setSensorOutputRange(SensorType.Gravity, 100);
+
+        mCurrentControl.onResetPosition(null);
     }
 
     /**
