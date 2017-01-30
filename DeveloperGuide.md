@@ -28,7 +28,7 @@ Nachdem der Server mit ```start()``` gestartet wurde, können die ankommenden Da
 In der ```close()``` sollten alle verwendeten Ressourcen freigegeben werden.
 
 ## ```NetworkDevice```
-Das ```NetworkDevice``` wird vielfach verwendet um Clients und Server zu identifizieren. Mit ```getInetAddress()``` kann die aktuelle IP-Adresse als ```InetAddress``` abgefragt werden, unter ```getName()``` ist der Name des ```NetworkDevice``` verfügbar.
+Das ```NetworkDevice``` wird vielfach verwendet um Clients und Server zu identifizieren. Mit ```getInetAddress()``` kann die aktuelle IP-Adresse als ```InetAddress``` abgefragt werden, unter ```getName()``` ist der Name des ```NetworkDevice``` verfügbar. Wenn ```NetworkDevice.equals(NetworkDevice)``` ```true``` zurückgibt, dann handelt es sich um einen Client an der selben Adresse.
 
 # Sensoren
 Die derzeitig unterstützten Sensoren sind:
@@ -40,6 +40,7 @@ Die derzeitig unterstützten Sensoren sind:
 * Magnetometer
 * Orientation
 * RotationVector
+
 All diese Sensoren sind im ```SensorType```-Enum verbunden.
 
 Sensordaten können mithilfe von ```setSensorOutputRange(SensorType, float)``` für den spezifizierten Sensor normalisiert werden. Der ```float```-Wert ist dabei der maximale Ausschlag sowohl in positiver als auch in negativer Richtung.
