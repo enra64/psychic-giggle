@@ -74,7 +74,7 @@ public class NesServer extends AbstractServer {
         loadButtonMappings();
 
         // display the nes button layout on all connected devices
-        super.setButtonLayout(FileUtils.readFile("../nesLayout.txt", "utf-8"));
+        super.setButtonLayout(FileUtils.readFile("../nesLayout.xml", "utf-8"));
 
         // register our data splitters for sensor data
         registerDataSink(mGravitySplitter, SensorType.Gravity);
