@@ -14,7 +14,7 @@ import de.ovgu.softwareprojektapp.sensors.AbstractSensor;
 /**
  * {@link DataSource} feeding {@link Sensor#TYPE_RELATIVE_HUMIDITY} data
  */
-class RelativeHumidity extends AbstractSensor {
+public class RelativeHumidity extends AbstractSensor {
     /**
      * Create an{@link RelativeHumidity} sensor; does not start anything yet, use {@link #start()} or {@link #setRunning(boolean)}
      * to start receiving events

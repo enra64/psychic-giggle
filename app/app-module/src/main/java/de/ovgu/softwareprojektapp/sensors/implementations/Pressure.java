@@ -14,7 +14,7 @@ import de.ovgu.softwareprojektapp.sensors.AbstractSensor;
 /**
  * {@link DataSource} feeding {@link Sensor#TYPE_PRESSURE} data
  */
-class Pressure extends AbstractSensor {
+public class Pressure extends AbstractSensor {
     /**
      * Create an{@link Pressure} sensor; does not start anything yet, use {@link #start()} or {@link #setRunning(boolean)}
      * to start receiving events

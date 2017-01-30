@@ -14,7 +14,7 @@ import de.ovgu.softwareprojektapp.sensors.AbstractSensor;
 /**
  * {@link DataSource} feeding {@link Sensor#TYPE_GYROSCOPE_UNCALIBRATED} data
  */
-class GyroscopeUncalibrated extends AbstractSensor {
+public class GyroscopeUncalibrated extends AbstractSensor {
     /**
      * Create an{@link GyroscopeUncalibrated} sensor; does not start anything yet, use {@link #start()} or {@link #setRunning(boolean)}
      * to start receiving events

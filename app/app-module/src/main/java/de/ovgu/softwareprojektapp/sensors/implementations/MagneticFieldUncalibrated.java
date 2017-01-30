@@ -14,7 +14,7 @@ import de.ovgu.softwareprojektapp.sensors.AbstractSensor;
 /**
  * {@link DataSource} feeding {@link Sensor#TYPE_MAGNETIC_FIELD_UNCALIBRATED} data
  */
-class MagneticFieldUncalibrated extends AbstractSensor {
+public class MagneticFieldUncalibrated extends AbstractSensor {
     /**
      * Create an{@link MagneticFieldUncalibrated} sensor; does not start anything yet, use {@link #start()} or {@link #setRunning(boolean)}
      * to start receiving events

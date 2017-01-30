@@ -14,7 +14,7 @@ import de.ovgu.softwareprojektapp.sensors.AbstractSensor;
 /**
  * {@link DataSource} feeding {@link Sensor#TYPE_LIGHT} data
  */
-class Light extends AbstractSensor {
+public class Light extends AbstractSensor {
     /**
      * Create an{@link Light} sensor; does not start anything yet, use {@link #start()} or {@link #setRunning(boolean)}
      * to start receiving events
