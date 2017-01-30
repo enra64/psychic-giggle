@@ -50,20 +50,22 @@ public class GraphingServer extends AbstractServer {
      */
     private void registerGyroTestbed(final GraphPanel graphPanel, ThroughputMeasurer throughputMeasurer) throws IOException {
         // register the throughput measuring stream
-        NetworkDataSink accelerationCurrentLine = graphPanel.getDataSink(SensorType.Gyroscope, 0);
+        NetworkDataSink accelerationCurrentLine = graphPanel.getDataSink(SensorType.LinearAcceleration, 0);
         FilterPipelineBuilder pipelineBuilder = new FilterPipelineBuilder();
         pipelineBuilder.append(throughputMeasurer);
-        pipelineBuilder.append(new IntegratingFilter(null));
-        registerDataSink(pipelineBuilder.build(accelerationCurrentLine), SensorType.Gyroscope);
+        pipelineBuilder.append(new NormalizationFilter(1000f, 10f, new AveragingFilter(5)));
+        registerDataSink(pipelineBuilder.build(accelerationCurrentLine), SensorType.LinearAcceleration);
 
+        /**
         // register Y-Axis
-        NetworkDataSink accelerationCurrentLine1 = graphPanel.getDataSink(SensorType.Gyroscope, 1);
-        registerDataSink(accelerationCurrentLine1, SensorType.Gyroscope);
+        NetworkDataSink accelerationCurrentLine1 = graphPanel.getDataSink(SensorType.LinearAcceleration, 1);
+        registerDataSink(pipelineBuilder.build(accelerationCurrentLine1), SensorType.LinearAcceleration);
 
         //register Z-Axis
-        NetworkDataSink accelerationCurrentLine2 = graphPanel.getDataSink(SensorType.Gyroscope, 2);
-        registerDataSink(accelerationCurrentLine2, SensorType.Gyroscope);
+        NetworkDataSink accelerationCurrentLine2 = graphPanel.getDataSink(SensorType.LinearAcceleration, 2);
+        registerDataSink(pipelineBuilder.build(accelerationCurrentLine2), SensorType.LinearAcceleration);
 
+         */
     }
 
     /**

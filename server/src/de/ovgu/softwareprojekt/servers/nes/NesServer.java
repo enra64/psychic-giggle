@@ -117,7 +117,7 @@ public class NesServer extends AbstractServer {
 
         // create a filter pipeline ending in the acceleration phase detection system
         FilterPipelineBuilder pipelineBuilder = new FilterPipelineBuilder();
-        pipelineBuilder.append(new NormalizationFilter(1000f, 10f,new AveragingFilter(5)));
+        pipelineBuilder.append(new NormalizationFilter(1000f, 40f,new AveragingFilter(5)));
         return pipelineBuilder.build(phaseDetection);
     }
 
