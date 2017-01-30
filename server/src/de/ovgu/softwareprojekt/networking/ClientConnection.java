@@ -1,7 +1,6 @@
 package de.ovgu.softwareprojekt.networking;
 
 import com.sun.istack.internal.NotNull;
-import de.ovgu.softwareprojekt.networking.NetworkDataSink;
 import de.ovgu.softwareprojekt.SensorData;
 import de.ovgu.softwareprojekt.SensorType;
 import de.ovgu.softwareprojekt.callback_interfaces.ClientListener;
@@ -360,11 +359,11 @@ class ClientConnection implements OnCommandListener, NetworkDataSink, Connection
             case ChangeSensorSensitivity:
                 // update the sensitivity for the given sensor
                 ChangeSensorSensitivity sensorChangeCommand = (ChangeSensorSensitivity) command;
-                mDataScalingHandler.setSensorSensitivity(sensorChangeCommand.sensorType, sensorChangeCommand.sensitivity);
+                mDataScalingHandler.setSensorUserSensitivity(sensorChangeCommand.sensorType, sensorChangeCommand.sensitivity);
                 break;
             case SensorRangeNotification:
                 SensorRangeNotification notification = (SensorRangeNotification) command;
-                mDataScalingHandler.setSourceRange(notification.type, notification.range);
+                mDataScalingHandler.setSensorRange(notification.type, notification.range);
                 break;
             case ConnectionAliveCheck:
                 mConnectionWatch.onCheckEvent();
@@ -380,13 +379,13 @@ class ClientConnection implements OnCommandListener, NetworkDataSink, Connection
     }
 
     /**
-     * Change the output range for a certain sensor
+     * Retrieve the sensor range for the requested sensor for this DataScalingHandler
      *
-     * @param sensor      the sensor whose data will be affected
-     * @param outputRange the maximum and negative minimum of the resulting output range
+     * @param sensor the requested sensor
+     * @return the sensor range as reported by android for the sensor
      */
-    void setOutputRange(SensorType sensor, float outputRange) {
-        mDataScalingHandler.setOutputRange(sensor, outputRange);
+    float getSensorMaximumRange(SensorType sensor) {
+        return mDataScalingHandler.getSensorRange(sensor);
     }
 
     /**
@@ -429,7 +428,7 @@ class ClientConnection implements OnCommandListener, NetworkDataSink, Connection
      * sends a description for the sensortype
      * @param type affected sensor
      * @param description description for the affected sensor
-     * @throws IOException
+     * @throws IOException if the sensor description could not be sent
      */
     void sendSensorDescription(SensorType type, String description) throws IOException {
         sendCommand(new SensorDescription(type, description));

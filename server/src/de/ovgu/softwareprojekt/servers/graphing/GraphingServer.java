@@ -49,10 +49,6 @@ public class GraphingServer extends AbstractServer {
      * @throws IOException if the testbed couldnt be brought online
      */
     private void registerGyroTestbed(final GraphPanel graphPanel, ThroughputMeasurer throughputMeasurer) throws IOException {
-        // normalize output
-        setSensorOutputRange(SensorType.Gyroscope, 100);
-
-
         // register the throughput measuring stream
         NetworkDataSink accelerationCurrentLine = graphPanel.getDataSink(SensorType.Gyroscope, 0);
         FilterPipelineBuilder pipelineBuilder = new FilterPipelineBuilder();

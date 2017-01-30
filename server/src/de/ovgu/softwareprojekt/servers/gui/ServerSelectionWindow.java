@@ -32,6 +32,7 @@ public class ServerSelectionWindow {
         consoleText = new JTextArea(" Hello, this is a simple information output\n");
         consoleText.setEditable(false);
 
+        //Direct Outputstream through consoleText
         redirectSystemStreams();
 
         // This panel is responsible for the button display and their usages

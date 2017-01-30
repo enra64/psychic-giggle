@@ -48,7 +48,7 @@ public class MouseServer extends AbstractServer {
         mMouseMover = new MouseMover();
 
         // this is how we currently define a filter pipeline:
-        NetworkDataSink pipeline = new NormalizationFilter(100, 5, new UserSensitivityMultiplicator(new AveragingFilter(3,
+        NetworkDataSink pipeline = new NormalizationFilter(20, 5, new UserSensitivityMultiplicator(new AveragingFilter(3,
                 new DifferenceThresholdFilter(mMouseMover, .1f))));
 
         // register our mouse mover to receive gyroscope data

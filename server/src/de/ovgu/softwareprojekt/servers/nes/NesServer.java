@@ -68,9 +68,6 @@ public class NesServer extends AbstractServer {
         super(serverName);
 
         // normalize both utilized sensors
-        //setSensorOutputRange(SensorType.LinearAcceleration, 1000);
-        //setSensorOutputRange(SensorType.Gravity, 333);
-
         NetworkDataSink gravityPipeline = new NormalizationFilter(333f, 10f, mGravitySplitter);
 
         // load button mappings: which player presses what when
@@ -120,7 +117,7 @@ public class NesServer extends AbstractServer {
 
         // create a filter pipeline ending in the acceleration phase detection system
         FilterPipelineBuilder pipelineBuilder = new FilterPipelineBuilder();
-        pipelineBuilder.append(new NormalizationFilter(1000f, 100f,new AveragingFilter(5)));
+        pipelineBuilder.append(new NormalizationFilter(1000f, 10f,new AveragingFilter(5)));
         return pipelineBuilder.build(phaseDetection);
     }
 
