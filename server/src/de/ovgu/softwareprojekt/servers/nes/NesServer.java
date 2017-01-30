@@ -52,6 +52,11 @@ public class NesServer extends AbstractServer {
     private ClientSplitter mGravitySplitter = new ClientSplitter();
 
     /**
+     * This value represents an id number which is used by the Android NotificationManager to identify notifications
+     */
+    private final int PLAYER_NUM_NOTIFICATION_ID = 0;
+
+    /**
      * Create a new server. It will be offline (not using any sockets) until {@link #start()} is called.
      *
      * @param serverName if not null, this name will be used. otherwise, the devices hostname is used
@@ -253,7 +258,7 @@ public class NesServer extends AbstractServer {
         int playerID = mSteeringWheels.get(connectedClient).getButtonConfig().getPlayerID() + 1;
 
         try {
-            displayNotification(0, "Player " + playerID, "You are connected as player " + playerID, true, connectedClient.getInetAddress());
+            displayNotification(PLAYER_NUM_NOTIFICATION_ID, "Player " + playerID, "You are connected as player " + playerID, connectedClient.getInetAddress());
 
             sendSensorDescription(SensorType.LinearAcceleration, "Itemwurfempfindlichkeit");
             sendSensorDescription(SensorType.Gravity, "Lenkverhalten");
