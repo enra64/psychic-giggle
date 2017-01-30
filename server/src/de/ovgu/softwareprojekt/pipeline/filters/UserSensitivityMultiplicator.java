@@ -16,10 +16,6 @@ public class UserSensitivityMultiplicator extends AbstractFilter {
     public UserSensitivityMultiplicator(NetworkDataSink sink) {
         super(sink);
     }
-
-    public int negCounter = 0;
-    public int posCounter = 0;
-
     /**
      * Apply the user sensitivity as a factor
      *

@@ -16,7 +16,7 @@ class DataScalingHandler implements NetworkDataSink {
     /**
      * Contains the scaling filters that have to be applied for each sensors
      */
-    private EnumMap<SensorType, NormalizationFilter> mScalingFilters = new EnumMap<>(SensorType.class);
+    private EnumMap<SensorType, Float> mScalingFilters = new EnumMap<>(SensorType.class);
 
     /**
      * Create a new data scaling handler, which will multiply all incoming data with 40.
@@ -25,7 +25,7 @@ class DataScalingHandler implements NetworkDataSink {
      */
     DataScalingHandler(NetworkDataSink outgoingDataSink) {
         for (SensorType sensorType : SensorType.values())
-            mScalingFilters.put(sensorType, new NormalizationFilter(outgoingDataSink, 50f, 10, 10));
+            mScalingFilters.put(sensorType, 10f);
     }
 
     /**
@@ -35,26 +35,11 @@ class DataScalingHandler implements NetworkDataSink {
      * @param sensitivity sensitivity factor. applied before normalization
      */
     void setSensorSensitivity(SensorType sensorType, float sensitivity) {
-        // get the normalization filter configured for this sensor
-        NormalizationFilter sensorTypeFilter = mScalingFilters.get(sensorType);
 
         // update the sensitivity for this sensor type
-        sensorTypeFilter.setCustomSensitivity(sensitivity);
+        mScalingFilters.put(sensorType, sensitivity);
     }
 
-    /**
-     * This changes the target range of a sensor.
-     *
-     * @param targetRange maximum and -minimum of the resulting range for this sensor
-     * @param sensor      the sensor of which the target range should be modified
-     */
-    void setOutputRange(SensorType sensor, float targetRange) {
-        // get the normalization filter configured for this sensor
-        NormalizationFilter sensorTypeFilter = mScalingFilters.get(sensor);
-
-        // change the target range
-        sensorTypeFilter.setTargetRange(targetRange);
-    }
 
     /**
      * This changes the range a certain sensors data will be expected to be in
@@ -63,11 +48,6 @@ class DataScalingHandler implements NetworkDataSink {
      * @param sourceRange maximum and -minimum of the incoming range for this sensor
      */
     void setSourceRange(SensorType sensor, float sourceRange) {
-        // get the normalization filter configured for this sensor
-        NormalizationFilter sensorTypeFilter = mScalingFilters.get(sensor);
-
-        // change the target range
-        sensorTypeFilter.setSourceRange(sourceRange);
     }
 
     /**
@@ -75,12 +55,7 @@ class DataScalingHandler implements NetworkDataSink {
      */
     @Override
     public void onData(NetworkDevice origin, SensorData sensorData, float userSensitivity) {
-        // get the normalization filter configured for this sensor
-        NormalizationFilter sensorTypeFilter = mScalingFilters.get(sensorData.sensorType);
-
-        // let it handle the sensordata; the scaled result will be pushed into the outgoing data sink
-        // the user sensitivity parameter is ignored by NormalizationFilters!
-        sensorTypeFilter.onData(origin, sensorData, userSensitivity);
+ 
     }
 
     @Override

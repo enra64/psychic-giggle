@@ -8,6 +8,7 @@ import de.ovgu.softwareprojekt.discovery.NetworkDevice;
 import de.ovgu.softwareprojekt.networking.AbstractServer;
 import de.ovgu.softwareprojekt.pipeline.filters.DifferenceThresholdFilter;
 import de.ovgu.softwareprojekt.pipeline.filters.AveragingFilter;
+import de.ovgu.softwareprojekt.pipeline.filters.NormalizationFilter;
 import de.ovgu.softwareprojekt.pipeline.filters.UserSensitivityMultiplicator;
 
 import java.awt.*;
@@ -47,11 +48,11 @@ public class MouseServer extends AbstractServer {
         mMouseMover = new MouseMover();
 
         // this is how we currently define a filter pipeline:
-        NetworkDataSink pipeline = new UserSensitivityMultiplicator(new AveragingFilter(3, new DifferenceThresholdFilter(mMouseMover, .1f)));
+        NetworkDataSink pipeline = new NormalizationFilter(100, 5, new UserSensitivityMultiplicator(new AveragingFilter(3,
+                new DifferenceThresholdFilter(mMouseMover, .1f))));
 
         // register our mouse mover to receive gyroscope data
         registerDataSink(pipeline, SensorType.Gyroscope);
-        setSensorOutputRange(SensorType.Gyroscope, 100);
 
         // add left- and right click buttons
         addButton("left click", LEFT_MOUSE_BUTTON);
