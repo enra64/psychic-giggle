@@ -13,6 +13,7 @@ import de.ovgu.softwareprojekt.misc.ExceptionListener;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.util.*;
+import java.util.function.Consumer;
 
 /**
  * The client connection manager handles the expected client state (sensor speeds, button config etc),
@@ -148,7 +149,7 @@ class ClientConnectionManager implements ClientListener, UnexpectedClientListene
         synchronized (mClientConnections) {
             Iterator<ClientConnection> it = mClientConnections.iterator();
 
-            while(it.hasNext()){
+            while (it.hasNext()) {
                 ClientConnection connection = it.next();
                 connection.closeAndSignalClient();
                 it.remove();
@@ -319,6 +320,19 @@ class ClientConnectionManager implements ClientListener, UnexpectedClientListene
             for (ClientConnection client : mClientConnections)
                 client.updateSpeeds(mSensorSpeeds.entrySet());
         }
+    }
+
+    /**
+     * Send a notification to all known devices
+     *
+     * @param id      notification id. must be unique on all devices
+     * @param title   the notification title
+     * @param content the notification content
+     * @throws IOException if a device could not be requested to display the notification
+     */
+    public void displayNotification(int id, String title, String content) throws IOException {
+        for (ClientConnection connection : mClientConnections)
+            connection.displayNotification(id, title, content);
     }
 
     /**

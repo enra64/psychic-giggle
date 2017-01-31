@@ -1,3 +1,6 @@
+#TODO
+packagenamen ändern!
+
 # Developer Guide
 
 ## Working Title: psychic giggle
@@ -198,10 +201,8 @@ Wenn ein Client den "Reset"-Button auf seinem Handy benutzt, wird die ```onReset
 Wenn eine ```NetworkDataSink``` nicht mehr benötigt wird, zum Beispiel weil der entsprechende Client getrennt wurde, kann sie mit ```unregisterDataSink(NetworkDataSink)``` von allen Sensoren abgemeldet werden, und mit  ```unregisterDataSink(NetworkDataSink, SensorType)``` von bestimmten Sensoren abgemeldet werden. Danach erhält die ```NetworkDataSink``` keine Daten mehr vom Server.
 
 # Daten-Pipeline
+![Pipeline](pipeline.png)
 Psychic-Giggle ist darauf ausgerichtet, dass die Sensordaten mithilfe einer Pipeline benutzt werden. Diese Pipeline beginnt auf dem Handy mit dem Sensor, und endet in einer ```NetworkDataSink``` auf dem Server, die die Daten verwendet. Bis dahin können die SensorDaten durch Klassen, die ```NetworkDataSink``` und ```NetworkDataSource``` implementieren, verändert werden.
-
-## Pipeline-Builder
-Eine einfache Methode um eine
 
 ## Daten-Filter
 Datenfilter sind Unterklassen von ```AbstractFilter``` oder Klassen die ```NetworkDataSink``` und ```NetworkDataSource``` implementieren. In diesen Klassen können die Daten verändert werden, zum Beispiel um einen Tiefpassfilter umzusetzen. 
@@ -240,6 +241,38 @@ Vorhandenen Implementierungen:
 * ```SensorSplitter```: Nur Daten, für deren Sensor eine ```NetworkDataSink``` registriert wurde, werden an diese weitergeleitet.
 * ```PipelineDuplication```: Alle Daten werden dupliziert und an alle registrierten ```NetworkDataSink```s weitergeleitet.
 * ```Switch```: Die Daten werden an eine von zwei ```NetworkDataSink```s weitergeleitet 
+
+## Pipeline-Builder
+Mit einer ```FilterPipelineBuilder```-Instanz lassen sich Filterpipelines einfach erstellen. 
+
+### Elemente hinzufügen
+Es gibt drei Methoden um ein neues Element in die Pipeline einzubauen: ```prepend(AbstractFilter)```, um ein Element an den Anfang zu setzen; ```append(AbstractFilter)```, um ein Element ans Ende der Pipeline zu setzen, und ```append(AbstractFilter, int)``` um ein Filterelement in eine beliebige Position der Pipeline zu setzen. 
+
+### Elemente entfernen
+Pipelineelemente können mit ```remove(int)``` oder ```remove(AbstractFilter)``` wieder entfernt werden.
+
+### Pipeline abschließen
+Die Pipeline kann mit ```build()``` abgeschlossen werden; dann ist der letzte ```AbstractFilter``` der ans Ende platziert wurde das letze Element in der Pipeline, und die Funktion gibt den Anfang der Pipeline zurück. Mithilfe von ```build(NetworkDataSink)``` kann das letzte Element auch nur eine DatenSenke sein, nützlich zum Beispiel wenn das letzte Pipelineelement die Daten nicht weiterleiten muss.
+
+# Notification anzeigen
+Das Framework erlaubt es, Notifications mit beliebigem Titel und Text anzeigen zu lassen. 
+```Java
+displayNotification(int, String, String, NetworkDevice)
+displayNotification(int, String, String)
+```
+Der erste Parameter ist die ID der Notification. Pro Gerät muss diese pro Notification einmalig sein. Der erste ```String```-Parameter ist der Titel der Notification, der zweite ist der Text der Notification. 
+
+Mit dem letzten Parameter lässt sich das ```NetworkDevice``` festlegen, auf dem die Notification angezeigt wird. Wird der Parameter ausgelassen, wird die Notification auf allen Geräten angezeigt; die ID darf sich mit keiner anderen überschneiden.
+
+# Netzwerkverbindung
+## Server-Discovery
+Das Psychic-Framework nutzt UDP-Broadcasts der Clients bzw. der App, auf die der Server mit seiner Adresse antwortet. Der Port, auf dem der Server die Broadcasts erwartet, muss in der App eingegeben werden, falls nicht der Standardport ```8888``` verwendet wird.
+
+## Datenverbindung
+Der Server wartet für jeden Client auf einem eigenen Port auf Daten, die via UDP gesendet werden. Dieser Port wird vom Server gewählt und in der Discovery-Phase dem Client mitgeteilt; es ist ein zufälliger freier Port. 
+
+## Kontrollverbindung
+Der Server und die App warten jeweils auf zufällig gewählten freien Port; diese werden in der Discovery-Phase ausgetauscht. Die Kontrollverbindung läuft über TCP; für jede neue Kontrollnachricht (```AbstractCommand```) wird eine neue Verbindung aufgebaut.
 
 # License
 Copyright (c) 2017 by the contributors. All rights reserved.
