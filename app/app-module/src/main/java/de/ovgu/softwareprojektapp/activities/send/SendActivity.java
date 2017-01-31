@@ -66,6 +66,7 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
 
     /**
      * result codes for the activity
+     * result codes for the activity
      */
     public static final int
             RESULT_SERVER_REFUSED = -1,
@@ -457,7 +458,7 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
      *
      * @param view ignored
      */
-    public void repositionMouseCursor(@Nullable View view) {
+    public void onReset(@Nullable View view) {
         mNetworkClient.sendCommand(new ResetToCenter());
     }
 
