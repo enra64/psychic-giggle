@@ -1,5 +1,8 @@
-#TODO
+# TODO
 packagenamen ändern!
+übersetzungen möglich machen
+bilder hinzufügen
+* description
 
 # Developer Guide
 
@@ -254,7 +257,10 @@ Pipelineelemente können mit ```remove(int)``` oder ```remove(AbstractFilter)```
 ### Pipeline abschließen
 Die Pipeline kann mit ```build()``` abgeschlossen werden; dann ist der letzte ```AbstractFilter``` der ans Ende platziert wurde das letze Element in der Pipeline, und die Funktion gibt den Anfang der Pipeline zurück. Mithilfe von ```build(NetworkDataSink)``` kann das letzte Element auch nur eine DatenSenke sein, nützlich zum Beispiel wenn das letzte Pipelineelement die Daten nicht weiterleiten muss.
 
-# Notification anzeigen
+# Sensor-Beschreibungen
+Es ist mit ```sendSensorDescription(SensorType, String)``` möglich, erweiterte Beschriftungen für die Nutzung der Sensoren anzeigen zu lassen, um dem Nutzer die Zuordnung von Sensor zu Funktion zu vereinfachen. 
+
+# Notifications anzeigen
 Das Framework erlaubt es, Notifications mit beliebigem Titel und Text anzeigen zu lassen. 
 ```Java
 displayNotification(int, String, String, NetworkDevice)

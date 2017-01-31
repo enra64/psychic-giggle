@@ -267,7 +267,5 @@ public class NesServer extends AbstractServer {
         } catch (IOException e) {
             onException(this, e, "Could not display notification for player " + playerID);
         }
-
-
     }
 }

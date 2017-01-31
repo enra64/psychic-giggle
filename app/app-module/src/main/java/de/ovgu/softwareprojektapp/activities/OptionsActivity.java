@@ -30,6 +30,7 @@ import de.ovgu.softwareprojekt.misc.ExceptionListener;
 import de.ovgu.softwareprojektapp.R;
 import de.ovgu.softwareprojektapp.UiUtil;
 import de.ovgu.softwareprojektapp.networking.AsyncSendCommand;
+import de.ovgu.softwareprojektapp.sensors.SensorUtil;
 
 /**
  * This activity is for setting options. You may give {@link #EXTRA_SERVER_ADDRESS} and
@@ -148,27 +149,28 @@ public class OptionsActivity extends AppCompatActivity implements SeekBar.OnSeek
     /**
      * Create options dynamically based on the number of sensortypes
      */
+    @SuppressWarnings("unchecked")
     private void createSensorOptions() {
-        //array of active sensors
-        boolean[] sensors = getIntent().getBooleanArrayExtra(EXTRA_ACTIVE_SENSORS);
+        //map of active sensors
+        EnumMap<SensorType, Boolean> sensorActivationMap = (EnumMap<SensorType, Boolean>) getIntent().getSerializableExtra(EXTRA_ACTIVE_SENSORS);
+
         //map of descriptions for each active sensor
         HashMap<SensorType, String> descriptionsHash = (HashMap<SensorType, String>) getIntent().getSerializableExtra(EXTRA_SENSOR_DESCRIPTIONS);
 
-
-        for (int i = 0; i < mNumberOfSensors; i++) {
+        for(SensorType sensor : SensorType.values()){
             //only create seekbar and text if the server needs these sensors or
             //when there is no server connection
-            if(sensors == null || sensors[i]){
+            if(sensorActivationMap == null || sensorActivationMap.get(sensor)){
 
                 // create the seekbar
                 SeekBar seek = new SeekBar(OptionsActivity.this);
                 seek.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
-                seek.setTag(SensorType.values()[i]);
+                seek.setTag(sensor);
                 seek.setOnSeekBarChangeListener(this);
 
                 // Create a header for the seekbar
                 TextView text = new TextView(OptionsActivity.this);
-                text.setText(SensorType.values()[i].toString());
+                text.setText(SensorUtil.getSensorName(this, sensor));
                 text.setTextSize(18f);
                 text.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
 
@@ -179,16 +181,15 @@ public class OptionsActivity extends AppCompatActivity implements SeekBar.OnSeek
                 mSensorOptions.addView(text);
                 mSensorOptions.addView(seek);
 
-                // create description for sensor only if sensor is in use
-                if(descriptionsHash != null && descriptionsHash.containsKey(SensorType.values()[i])) {
+                // add description if possible
+                if(descriptionsHash != null && descriptionsHash.containsKey(sensor)) {
                     TextView description = new TextView(OptionsActivity.this);
-                    description.setText(descriptionsHash.get(SensorType.values()[i]));
+                    description.setText(descriptionsHash.get(sensor));
                     description.setTextSize(14f);
                     description.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
                     mTextViews.add(description);
                     mSensorOptions.addView(description);
                 }
-
             }
         }
     }
