@@ -262,10 +262,8 @@ public class NesServer extends AbstractServer {
             displayNotification(PLAYER_NUM_NOTIFICATION_ID, "Player " + playerID, "You are connected as player " + playerID, connectedClient.getInetAddress());
 
             //Sensor descriptions
-            sendSensorDescription(SensorType.LinearAcceleration, "Itemwurfempfindlichkeit");
-
-            sendSensorDescription(SensorType.Gravity, "Lenkverhalten");
             sendSensorDescription(SensorType.Gravity, "Je höher die Empfindlichkeit, desto weiter muss das Gerät für eine Lenkaktion gedreht werden.");
+            sendSensorDescription(SensorType.LinearAcceleration, "Je höher die Empfindlichkeit, desto schwächer kann die Auslösegeschwindigkeit sein ");
 
 
             //hide ResetButton because NES Server doesn´t support ResetButton
