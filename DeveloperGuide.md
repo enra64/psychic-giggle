@@ -198,10 +198,8 @@ Wenn ein Client den "Reset"-Button auf seinem Handy benutzt, wird die ```onReset
 Wenn eine ```NetworkDataSink``` nicht mehr benötigt wird, zum Beispiel weil der entsprechende Client getrennt wurde, kann sie mit ```unregisterDataSink(NetworkDataSink)``` von allen Sensoren abgemeldet werden, und mit  ```unregisterDataSink(NetworkDataSink, SensorType)``` von bestimmten Sensoren abgemeldet werden. Danach erhält die ```NetworkDataSink``` keine Daten mehr vom Server.
 
 # Daten-Pipeline
+![Pipeline](pipeline.png)
 Psychic-Giggle ist darauf ausgerichtet, dass die Sensordaten mithilfe einer Pipeline benutzt werden. Diese Pipeline beginnt auf dem Handy mit dem Sensor, und endet in einer ```NetworkDataSink``` auf dem Server, die die Daten verwendet. Bis dahin können die SensorDaten durch Klassen, die ```NetworkDataSink``` und ```NetworkDataSource``` implementieren, verändert werden.
-
-## Pipeline-Builder
-Eine einfache Methode um eine
 
 ## Daten-Filter
 Datenfilter sind Unterklassen von ```AbstractFilter``` oder Klassen die ```NetworkDataSink``` und ```NetworkDataSource``` implementieren. In diesen Klassen können die Daten verändert werden, zum Beispiel um einen Tiefpassfilter umzusetzen. 
@@ -240,6 +238,18 @@ Vorhandenen Implementierungen:
 * ```SensorSplitter```: Nur Daten, für deren Sensor eine ```NetworkDataSink``` registriert wurde, werden an diese weitergeleitet.
 * ```PipelineDuplication```: Alle Daten werden dupliziert und an alle registrierten ```NetworkDataSink```s weitergeleitet.
 * ```Switch```: Die Daten werden an eine von zwei ```NetworkDataSink```s weitergeleitet 
+
+## Pipeline-Builder
+Mit einer ```FilterPipelineBuilder```-Instanz lassen sich Filterpipelines einfach erstellen. 
+
+### Elemente hinzufügen
+Es gibt drei Methoden um ein neues Element in die Pipeline einzubauen: ```prepend(AbstractFilter)```, um ein Element an den Anfang zu setzen; ```append(AbstractFilter)```, um ein Element ans Ende der Pipeline zu setzen, und ```append(AbstractFilter, int)``` um ein Filterelement in eine beliebige Position der Pipeline zu setzen. 
+
+### Elemente entfernen
+Pipelineelemente können mit ```remove(int)``` oder ```remove(AbstractFilter)``` wieder entfernt werden.
+
+### Pipeline abschließen
+Die Pipeline kann mit ```build()``` abgeschlossen werden; dann ist der letzte ```AbstractFilter``` der ans Ende platziert wurde das letze Element in der Pipeline, und die Funktion gibt den Anfang der Pipeline zurück. Mithilfe von ```build(NetworkDataSink)``` kann das letzte Element auch nur eine DatenSenke sein, nützlich zum Beispiel wenn das letzte Pipelineelement die Daten nicht weiterleiten muss.
 
 # License
 Copyright (c) 2017 by the contributors. All rights reserved.
