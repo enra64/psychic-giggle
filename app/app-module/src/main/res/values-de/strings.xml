@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">SoftwareprojektApp</string>
+    <string name="app_name">PsychicSensors</string>
     <string name="disconnect">Trennen</string>
     <string name="send_activity_connection_success">Verbindung erfolgreich!</string>
     <string name="reposition">Reset</string>
@@ -15,7 +15,7 @@
     <string name="ports_below_1024_denied">Ports unter 1024 sind reserviert</string>
     <string name="sensor_accelerometer">Beschleunigungssensor</string>
     <string name="sensor_ambient_temperature">Umgebungstemperatur</string>
-    <string name="sensor_game_rotation_vector">GameRotationVector</string>
+    <string name="sensor_game_rotation_vector">Spiel-Rotationsvektor</string>
     <string name="sensor_gravity">Schwerkraftsensor</string>
     <string name="sensor_gyroscope">Gyroskop</string>
     <string name="sensor_gyroscope_uncalibrated">Unkalibriertes Gyroskop</string>

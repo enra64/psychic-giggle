@@ -50,11 +50,11 @@ public class GraphingServer extends AbstractServer {
      */
     private void registerGyroTestbed(final GraphPanel graphPanel, ThroughputMeasurer throughputMeasurer) throws IOException {
         // register the throughput measuring stream
-        NetworkDataSink accelerationCurrentLine = graphPanel.getDataSink(SensorType.Light, 0);
+        NetworkDataSink accelerationCurrentLine = graphPanel.getDataSink(SensorType.GyroscopeUncalibrated, 0);
         FilterPipelineBuilder pipelineBuilder = new FilterPipelineBuilder();
         pipelineBuilder.append(throughputMeasurer);
         //pipelineBuilder.append(new ScalingFilter(1000f, 10f, new AveragingFilter(5)));
-        registerDataSink(pipelineBuilder.build(accelerationCurrentLine), SensorType.Light);
+        registerDataSink(pipelineBuilder.build(accelerationCurrentLine), SensorType.GyroscopeUncalibrated);
 
         /**
         // register Y-Axis

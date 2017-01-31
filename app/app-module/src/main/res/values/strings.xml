@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">SoftwareprojektApp</string>
+    <string name="app_name">PsychicSensors</string>
     <string name="send_activity_connection_success">Connection successful</string>
     <string name="disconnect">Disconnect</string>
     <string name="hold_sonsors">Hold sensors</string>
