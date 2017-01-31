@@ -251,5 +251,15 @@ Pipelineelemente können mit ```remove(int)``` oder ```remove(AbstractFilter)```
 ### Pipeline abschließen
 Die Pipeline kann mit ```build()``` abgeschlossen werden; dann ist der letzte ```AbstractFilter``` der ans Ende platziert wurde das letze Element in der Pipeline, und die Funktion gibt den Anfang der Pipeline zurück. Mithilfe von ```build(NetworkDataSink)``` kann das letzte Element auch nur eine DatenSenke sein, nützlich zum Beispiel wenn das letzte Pipelineelement die Daten nicht weiterleiten muss.
 
+# Netzwerkverbindung
+## Server-Discovery
+Das Psychic-Framework nutzt UDP-Broadcasts der Clients bzw. der App, auf die der Server mit seiner Adresse antwortet. Der Port, auf dem der Server die Broadcasts erwartet, muss in der App eingegeben werden, falls nicht der Standardport ```8888``` verwendet wird.
+
+## Datenverbindung
+Der Server wartet für jeden Client auf einem eigenen Port auf Daten, die via UDP gesendet werden. Dieser Port wird vom Server gewählt und in der Discovery-Phase dem Client mitgeteilt; es ist ein zufälliger freier Port. 
+
+## Kontrollverbindung
+Der Server und die App warten jeweils auf zufällig gewählten freien Port; diese werden in der Discovery-Phase ausgetauscht. Die Kontrollverbindung läuft über TCP; für jede neue Kontrollnachricht (```AbstractCommand```) wird eine neue Verbindung aufgebaut.
+
 # License
 Copyright (c) 2017 by the contributors. All rights reserved.
