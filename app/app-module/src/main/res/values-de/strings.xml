@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">SoftwareprojektApp</string>
+    <string name="app_name">PsychicSensors</string>
     <string name="disconnect">Trennen</string>
     <string name="send_activity_connection_success">Verbindung erfolgreich!</string>
     <string name="reposition">Reset</string>
@@ -10,4 +10,22 @@
     <string name="start_discovery">Server suchen</string>
     <string name="stop_discovery">Suche beenden</string>
     <string name="changes_only_stored_locally">Änderungen werden nur lokal gespeichert.</string>
+    <string name="non_number_denied">Nur Zahlen sind erlaubt</string>
+    <string name="ports_above_65535_denied">\"Die größtmögliche Portnummer ist 65535\"</string>
+    <string name="ports_below_1024_denied">Ports unter 1024 sind reserviert</string>
+    <string name="sensor_accelerometer">Beschleunigungssensor</string>
+    <string name="sensor_ambient_temperature">Umgebungstemperatur</string>
+    <string name="sensor_game_rotation_vector">Spiel-Rotationsvektor</string>
+    <string name="sensor_gravity">Schwerkraftsensor</string>
+    <string name="sensor_gyroscope">Gyroskop</string>
+    <string name="sensor_gyroscope_uncalibrated">Unkalibriertes Gyroskop</string>
+    <string name="sensor_light">Lichtsensor</string>
+    <string name="sensor_linear_acceleration">Linearbeschleunigungssensor</string>
+    <string name="sensor_magnetic_field">Magnetfeldsensor</string>
+    <string name="sensor_magnetic_field_uncalibrated">Unkalibrierter Magnetfeldsensor</string>
+    <string name="sensor_orientation">Orientierungsvektor</string>
+    <string name="sensor_pressure">Drucksensor</string>
+    <string name="sensor_proximity">Näherungssensor</string>
+    <string name="sensor_relative_humidity">Relative Luftfeuchtigkeit</string>
+    <string name="sensor_rotation_vector">Rotationsvektor</string>
 </resources>

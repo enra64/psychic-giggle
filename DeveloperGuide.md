@@ -1,10 +1,56 @@
-#TODO
+# TODO
 packagenamen ändern!
+übersetzungen möglich machen
+bilder hinzufügen
+JavaDoc einbauen
+* description
 
 # Developer Guide
 
 ## Working Title: psychic giggle
 Psychic Giggle ist ein Framework zur Nutzung von Android-Sensoren auf PCs zur einfachen und schnellen Verwendung von Sensordaten auf dem Computer.
+
+# Inhaltsverzeichnis
+* [Developer Guide](#developer-guide)
+  * [Working Title: psychic giggle](#working-title:-psychic-giggle)
+* [Inhaltsverzeichnis](#inhaltsverzeichnis)
+* [JavaDoc](#javadoc)
+* [Grundlegende Verwendung:](#grundlegende-verwendung:)
+  * [```NetworkDevice```](#```networkdevice```)
+* [Sensoren](#sensoren)
+  * [Maximalwerte](#maximalwerte)
+  * [Update-Frequenz](#update-frequenz)
+* [Verwendung von Buttons](#verwendung-von-buttons)
+    * [Layouts laden](#layouts-laden)
+      * [Einschränkungen für die Layout-Dateien](#einschränkungen-für-die-layout-dateien)
+  * [Verwaltung von Clients](#verwaltung-von-clients)
+    * [Maximale Anzahl Clients](#maximale-anzahl-clients)
+  * [```acceptClient(NetworkDevice)```](#```acceptclient(networkdevice)```)
+  * [```onClientDisconnected(NetworkDevice)```](#```onclientdisconnected(networkdevice)```)
+  * [```onClientTimeout(NetworkDevice)```](#```onclienttimeout(networkdevice)```)
+  * [```onClientAccepted(NetworkDevice)```](#```onclientaccepted(networkdevice)```)
+  * [Exceptionhandling](#exceptionhandling)
+  * [Resetevents](#resetevents)
+  * [Entfernen einer ```NetworkDataSink```](#entfernen-einer-```networkdatasink```)
+* [Daten-Pipeline](#daten-pipeline)
+  * [Daten-Filter](#daten-filter)
+    * [Beispiel](#beispiel)
+    * [Vorhandene ```AbstractFilter```-Implementationen](#vorhandene-```abstractfilter```-implementationen)
+  * [Daten-Splitter](#daten-splitter)
+  * [Pipeline-Builder](#pipeline-builder)
+    * [Elemente hinzufügen](#elemente-hinzufügen)
+    * [Elemente entfernen](#elemente-entfernen)
+    * [Pipeline abschließen](#pipeline-abschließen)
+* [Sensor-Beschreibungen](#sensor-beschreibungen)
+* [Notifications anzeigen](#notifications-anzeigen)
+* [Netzwerkverbindung](#netzwerkverbindung)
+  * [Server-Discovery](#server-discovery)
+  * [Datenverbindung](#datenverbindung)
+  * [Kontrollverbindung](#kontrollverbindung)
+* [License](#license)
+
+# JavaDoc
+Eine komplette JavaDoc ist verfügbar unter TODO
 
 # Grundlegende Verwendung:
 Zur Erstellung minimaler Funktionalität wird folgender Code benötigt:
@@ -32,7 +78,7 @@ In der ```close()``` sollten alle verwendeten Ressourcen freigegeben werden.
 ## ```NetworkDevice```
 Das ```NetworkDevice``` wird vielfach verwendet um Clients und Server zu identifizieren. Mit ```getInetAddress()``` kann die aktuelle IP-Adresse als ```InetAddress``` abgefragt werden, unter ```getName()``` ist der Name des ```NetworkDevice``` verfügbar. Wenn ```NetworkDevice.equals(NetworkDevice)``` ```true``` zurückgibt, dann handelt es sich um einen Client an der selben Adresse.
 
-## Sensoren
+# Sensoren
 Die unterstützten Sensoren sind:
 * Accelerometer
 * AmbientTemperature
@@ -52,19 +98,19 @@ Die unterstützten Sensoren sind:
 
 Diese Liste ist synonym mit dem ```SensorType```-Enum. Enthalten sind alle Sensoren, deren [reporting mode](https://source.android.com/devices/sensors/report-modes.html) ```continuous``` oder ```on-change``` ist und die bis spätestens API-Level 19 unterstützt wurden. 
 
-### Maximalwerte
+## Maximalwerte
 Die Maximalwerte der Sensoren können mithilfe von ```getSensorMaximumRange(SensorType)``` für alle verbundenen Geräte oder mit ```getSensorMaximumRange(SensorType, NetworkDevice)``` für ein spezielles Gerät abgefragt werden.
 
 Siehe auch die [Android-Dokumentation](https://developer.android.com/reference/android/hardware/Sensor.html#getMaximumRange()) zum Thema.
 
-### Update-Frequenz
+## Update-Frequenz
 Die Update-Frequenz der Android-Sensoren kann mithilfe von ```setSensorSpeed()``` gesetzt werden, unterstützt sind die folgenden Werte:
 * [SENSOR_DELAY_FASTEST](https://developer.android.com/reference/android/hardware/SensorManager.html#SENSOR_DELAY_FASTEST)
 * [SENSOR_DELAY_GAME](https://developer.android.com/reference/android/hardware/SensorManager.html#SENSOR_DELAY_GAME)
 * [SENSOR_DELAY_NORMAL](https://developer.android.com/reference/android/hardware/SensorManager.html#SENSOR_DELAY_NORMAL)
 * [SENSOR_DELAY_UI](https://developer.android.com/reference/android/hardware/SensorManager.html#SENSOR_DELAY_UI)
 
-## Verwendung von Buttons
+# Verwendung von Buttons
 ```Java
 public class ExampleServer implements ButtonListener {
 	public ExampleServer() throws IOException {
@@ -87,10 +133,10 @@ Im Konstruktor muss ein ButtonListener gesetzt werden. Daraufhin können Buttons
 
 Zum Entfernen einzelner Buttons kann ```removeButtons(int)``` verwendet werden
 
-### Layouts laden
+## Layouts laden
 Eine Alternative ist die Verwendung von ```setButtonLayout(String)```. Hierbei kann eine eigene Android XML Layout Datei als ```String``` übergeben werden.  Bei Verwendung von ```setButtonLayout(String)``` werden alle durch ```addButton(String, int)``` hinzugefügten Buttons entfernt und bei Verwendung von ```addButton(String, int)``` wird das durch ```setButtonLayout``` erstellte Layout entfernt.
 
-#### Einschränkungen für die Layout-Dateien
+### Einschränkungen für die Layout-Dateien
 Es werden nur ```LinearLayout```- und ```Button```-Objekte unterstützt. Ein Beispiel für einen unterstützten XML-String ist das folgende Snippet:
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
@@ -120,7 +166,7 @@ Verwendung von ```addButton(String, int)``` wird das durch ```setButtonLayout```
 
 Um alle Buttons zu entfernen kann ```clearButtons()``` aufgerufen werden.
 
-## Verwaltung von Clients
+# Verwaltung von Clients
 ```Java
 public class ExampleServer implements ClientListener {
 	public ExampleServer() throws IOException {
@@ -145,7 +191,7 @@ public class ExampleServer implements ClientListener {
 ```
 Um die verschiedenen Client events zu handeln, muss ein ```ClientListener``` gesetzt werden, der die Events empfängt.
 
-### Maximale Anzahl Clients
+## Maximale Anzahl Clients
 Die maximale Anzahl von Clients ist theoretisch nicht beschränkt. Ein nutzerdefiniertes Maximum kann mithilfe von ```setClientMaximum(int)``` gesetzt werden, mit ```getClientMaximum()``` abgefragt werden und mit ```removeClientMaximum()``` entfernt werden.
 
 ## ```acceptClient(NetworkDevice)```
@@ -165,7 +211,7 @@ des Aufrufs nicht mehr über den Server verfügbar.
 ## ```onClientAccepted(NetworkDevice)```
 wird aufgerufen wenn  die Kommunikation zwischen Server und dem neuen Client funktioniert. Diese Funktion wird nur dann aufgerufen, wenn ```acceptClient(NetworkDevice)``` ```true``` für das entsprechende ```NetworkDevice``` zurückgegeben hat.
 
-## Exceptionhandling
+# Exceptionhandling
 ```Java
 public class ExampleServer implements ExceptionListener {
     public ExampleServer() throws IOException {
@@ -181,7 +227,7 @@ public class ExampleServer implements ExceptionListener {
 ```
 Um alle Exceptions die in verschiedenen Threads auftreten aufzufangen muss ein ```ExceptionListener``` registriert werden. ```onException(Object, Exception, String)``` wird dann aufgerufen, falls eine Exception auftritt, die nicht intern behandelt werden kann. Der ```origin```-Parameter gibt das Ursprungsobjekt (oder ein übergeordnetes, falls das Ursprungsobjekt dem Nutzer nicht bekannt ist) an, der ```exception```-Parameter gibt die Exception on, und der ```info```-Parameter enthält weitere Informationen zu der Exception und ihrem Grund.
 
-## Resetevents
+# Resetevents
 ```Java
 public class ExampleServer implements ResetListener {
     public ExampleServer() throws IOException {
@@ -197,7 +243,7 @@ public class ExampleServer implements ResetListener {
 ```
 Wenn ein Client den "Reset"-Button auf seinem Handy benutzt, wird die ```onResetPosition(NetworkDevice)``` aufgerufen. Dann sollte der derzeitige Status des Handys zurückgesetzt werden, bei der Beispielimplementation ```MouseServer``` wird der Mauszeiger in die Mitte des Bildschirms gesetzt.
 
-## Entfernen einer ```NetworkDataSink```
+# Entfernen einer ```NetworkDataSink```
 Wenn eine ```NetworkDataSink``` nicht mehr benötigt wird, zum Beispiel weil der entsprechende Client getrennt wurde, kann sie mit ```unregisterDataSink(NetworkDataSink)``` von allen Sensoren abgemeldet werden, und mit  ```unregisterDataSink(NetworkDataSink, SensorType)``` von bestimmten Sensoren abgemeldet werden. Danach erhält die ```NetworkDataSink``` keine Daten mehr vom Server.
 
 # Daten-Pipeline
@@ -254,7 +300,10 @@ Pipelineelemente können mit ```remove(int)``` oder ```remove(AbstractFilter)```
 ### Pipeline abschließen
 Die Pipeline kann mit ```build()``` abgeschlossen werden; dann ist der letzte ```AbstractFilter``` der ans Ende platziert wurde das letze Element in der Pipeline, und die Funktion gibt den Anfang der Pipeline zurück. Mithilfe von ```build(NetworkDataSink)``` kann das letzte Element auch nur eine DatenSenke sein, nützlich zum Beispiel wenn das letzte Pipelineelement die Daten nicht weiterleiten muss.
 
-# Notification anzeigen
+# Sensor-Beschreibungen
+Es ist mit ```sendSensorDescription(SensorType, String)``` möglich, erweiterte Beschriftungen für die Nutzung der Sensoren anzeigen zu lassen, um dem Nutzer die Zuordnung von Sensor zu Funktion zu vereinfachen. 
+
+# Notifications anzeigen
 Das Framework erlaubt es, Notifications mit beliebigem Titel und Text anzeigen zu lassen. 
 ```Java
 displayNotification(int, String, String, NetworkDevice)

@@ -131,10 +131,13 @@ public class SensorHandler {
     }
 
     /**
-     * returns a EnumMap with all sensors
+     * Get the registration/activation state of a sensor
+     *
+     * @param sensor the sensor
+     * @return true if the sensor is currently required
      */
-    public EnumMap<SensorType, AbstractSensor> getSensors() {
-        return mSensors;
+    public boolean isRegistered(SensorType sensor) {
+        return mSensors.get(sensor).isRegistered();
     }
 
     /**
