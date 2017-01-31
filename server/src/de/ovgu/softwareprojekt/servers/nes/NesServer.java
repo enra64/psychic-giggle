@@ -259,7 +259,7 @@ public class NesServer extends AbstractServer {
 
         try {
             //tells player which id they have
-            displayNotification(PLAYER_NUM_NOTIFICATION_ID, "Player " + playerID, "You are connected as player " + playerID, connectedClient.getInetAddress());
+            displayNotification(PLAYER_NUM_NOTIFICATION_ID, "Player " + playerID, "You are connected as player " + playerID, connectedClient);
 
             //Sensor descriptions
             sendSensorDescription(SensorType.Gravity, "Je höher die Empfindlichkeit, desto weiter muss das Gerät für eine Lenkaktion gedreht werden.");

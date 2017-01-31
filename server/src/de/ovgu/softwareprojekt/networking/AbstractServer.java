@@ -393,11 +393,11 @@ public abstract class AbstractServer implements
      * @param id            - NotificationID: should start at 0 and increases with each new notification while device is connected
      * @param title         - title of the notification
      * @param content       - content of the notification
-     * @param deviceAddress - address of the device that shall display the notification
+     * @param device        -  device that shall display the notification
      * @throws IOException if a client could not be notified of the notification that should be displayed
      */
-    public void displayNotification(int id, String title, String content, InetAddress deviceAddress) throws IOException {
-        mClientManager.getClientHandler(deviceAddress).displayNotification(id, title, content);
+    public void displayNotification(int id, String title, String content, NetworkDevice device) throws IOException {
+        mClientManager.getClientHandler(device).displayNotification(id, title, content);
     }
 
     /**
@@ -456,6 +456,13 @@ public abstract class AbstractServer implements
         return mClientManager.getClientCount() >= mClientMaximum;
     }
 
+    /**
+     * sends a description for the sensortype
+     *
+     * @param type        affected sensor
+     * @param description description for the affected sensor
+     * @throws IOException if the sensor description could not be sent
+     */
     public void sendSensorDescription(SensorType type, String description) throws IOException {
         mClientManager.sendSensorDescription(type, description);
     }
