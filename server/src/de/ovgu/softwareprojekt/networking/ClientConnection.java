@@ -433,4 +433,13 @@ class ClientConnection implements OnCommandListener, NetworkDataSink, Connection
     void sendSensorDescription(SensorType type, String description) throws IOException {
         sendCommand(new SensorDescription(type, description));
     }
+
+    /**
+     * Hides Reset Button if not in use
+     * @param isHidden
+     * @throws IOException is thrown if command could not be sent
+     */
+    void hideResetButton(boolean isHidden)throws IOException{
+        sendCommand(new HideReset(isHidden));
+    }
 }

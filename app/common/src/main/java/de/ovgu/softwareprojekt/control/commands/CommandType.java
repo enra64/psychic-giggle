@@ -18,6 +18,7 @@ public enum CommandType {
     SetSensorSpeed,
     DisplayNotification,
     RemapPorts,
-    SensorDescription
+    SensorDescription,
+    HideReset
 
 }

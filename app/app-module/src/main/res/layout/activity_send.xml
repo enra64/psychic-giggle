@@ -32,7 +32,7 @@
             android:text="@string/reposition"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/repositionMouseCursor"
+            android:id="@+id/onReset"
             android:onClick="onReset"
             android:layout_weight="2" />
 

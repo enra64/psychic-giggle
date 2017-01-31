@@ -33,6 +33,7 @@ import de.ovgu.softwareprojekt.control.OnCommandListener;
 import de.ovgu.softwareprojekt.control.commands.AbstractCommand;
 import de.ovgu.softwareprojekt.control.commands.ConnectionRequestResponse;
 import de.ovgu.softwareprojekt.control.commands.ChangeSensorSensitivity;
+import de.ovgu.softwareprojekt.control.commands.HideReset;
 import de.ovgu.softwareprojekt.control.commands.ResetToCenter;
 import de.ovgu.softwareprojekt.control.commands.SensorDescription;
 import de.ovgu.softwareprojekt.control.commands.SensorRangeNotification;
@@ -393,10 +394,29 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
                 SensorDescription setSensorDescription = (SensorDescription) command;
                 sensorDescriptions.put(setSensorDescription.usedSensor, setSensorDescription.sensorDescription);
                 break;
+            case HideReset:
+                HideReset showReset = (HideReset) command;
+                setResetButtonVisibility(showReset.isHidden());
+
+                break;
             // ignore unhandled commands
             default:
                 break;
         }
+    }
+
+    /**
+     * Sets the visibility of Reset Button
+     * @param isHidden
+     */
+    void setResetButtonVisibility(final boolean isHidden) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                View button = findViewById(R.id.onReset);
+                button.setVisibility(isHidden ? View.GONE : View.VISIBLE);
+            }
+        });
     }
 
     @Override
