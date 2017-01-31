@@ -1,3 +1,6 @@
+#TODO
+packagenamen ändern!
+
 # Developer Guide
 
 ## Working Title: psychic giggle
@@ -250,6 +253,16 @@ Pipelineelemente können mit ```remove(int)``` oder ```remove(AbstractFilter)```
 
 ### Pipeline abschließen
 Die Pipeline kann mit ```build()``` abgeschlossen werden; dann ist der letzte ```AbstractFilter``` der ans Ende platziert wurde das letze Element in der Pipeline, und die Funktion gibt den Anfang der Pipeline zurück. Mithilfe von ```build(NetworkDataSink)``` kann das letzte Element auch nur eine DatenSenke sein, nützlich zum Beispiel wenn das letzte Pipelineelement die Daten nicht weiterleiten muss.
+
+# Notification anzeigen
+Das Framework erlaubt es, Notifications mit beliebigem Titel und Text anzeigen zu lassen. 
+```Java
+displayNotification(int, String, String, NetworkDevice)
+displayNotification(int, String, String)
+```
+Der erste Parameter ist die ID der Notification. Pro Gerät muss diese pro Notification einmalig sein. Der erste ```String```-Parameter ist der Titel der Notification, der zweite ist der Text der Notification. 
+
+Mit dem letzten Parameter lässt sich das ```NetworkDevice``` festlegen, auf dem die Notification angezeigt wird. Wird der Parameter ausgelassen, wird die Notification auf allen Geräten angezeigt; die ID darf sich mit keiner anderen überschneiden.
 
 # Netzwerkverbindung
 ## Server-Discovery

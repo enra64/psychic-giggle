@@ -401,6 +401,18 @@ public abstract class AbstractServer implements
     }
 
     /**
+     * Send a notification to all known devices
+     *
+     * @param id      notification id. must be unique on all devices
+     * @param title   the notification title
+     * @param content the notification content
+     * @throws IOException if a device could not be requested to display the notification
+     */
+    public void displayNotification(int id, String title, String content) throws IOException {
+        mClientManager.displayNotification(id, title, content);
+    }
+
+    /**
      * Set the maximum number of clients that may be accepted.
      * If this number is reached, the server will no longer advertise the server.
      *
