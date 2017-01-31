@@ -429,6 +429,18 @@ class ClientConnectionManager implements ClientListener, UnexpectedClientListene
     }
 
     /**
+     * Hides Reset Button if not in use
+     * @param isHidden
+     * @throws IOException is thrown if command could not be sent
+     */
+    public void hideResetButton(boolean isHidden) throws IOException{
+        synchronized (mClientConnections) {
+            for (ClientConnection con : mClientConnections)
+                con.hideResetButton(isHidden);
+        }
+    }
+
+    /**
      * Retrieve the sensor range of a sensor on a device
      *
      * @param client the device with the sensor

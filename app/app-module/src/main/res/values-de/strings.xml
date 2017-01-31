@@ -3,7 +3,7 @@
     <string name="app_name">SoftwareprojektApp</string>
     <string name="disconnect">Trennen</string>
     <string name="send_activity_connection_success">Verbindung erfolgreich!</string>
-    <string name="reposition">Zentrieren</string>
+    <string name="reposition">Reset</string>
     <string name="hold_sonsors">Sensoren blockieren</string>
     <string name="settings">Einstellungen</string>
     <string name="client_name">Gerätename</string>

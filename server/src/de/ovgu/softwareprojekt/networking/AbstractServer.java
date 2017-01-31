@@ -396,7 +396,7 @@ public abstract class AbstractServer implements
      * @param deviceAddress - address of the device that shall display the notification
      * @throws IOException if a client could not be notified of the notification that should be displayed
      */
-    protected void displayNotification(int id, String title, String content, InetAddress deviceAddress) throws IOException {
+    public void displayNotification(int id, String title, String content, InetAddress deviceAddress) throws IOException {
         mClientManager.getClientHandler(deviceAddress).displayNotification(id, title, content);
     }
 
@@ -427,6 +427,15 @@ public abstract class AbstractServer implements
     }
 
     /**
+     * Hides Reset Button if not in use
+     * @param isHidden
+     * @throws IOException is thrown if command could not be sent
+     */
+    public void hideResetButton(boolean isHidden)throws IOException {
+        mClientManager.hideResetButton(isHidden);
+    }
+
+    /**
      * Check for the maximum number of clients
      *
      * @return true if no further clients may connect
@@ -435,7 +444,7 @@ public abstract class AbstractServer implements
         return mClientManager.getClientCount() >= mClientMaximum;
     }
 
-    protected void sendSensorDescription(SensorType type, String description) throws IOException {
+    public void sendSensorDescription(SensorType type, String description) throws IOException {
         mClientManager.sendSensorDescription(type, description);
     }
 }

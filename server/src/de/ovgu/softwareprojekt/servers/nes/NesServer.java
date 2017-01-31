@@ -258,10 +258,13 @@ public class NesServer extends AbstractServer {
         int playerID = mSteeringWheels.get(connectedClient).getButtonConfig().getPlayerID() + 1;
 
         try {
+            //tells player which id they have
             displayNotification(PLAYER_NUM_NOTIFICATION_ID, "Player " + playerID, "You are connected as player " + playerID, connectedClient.getInetAddress());
-
+            //Sensor descriptions
             sendSensorDescription(SensorType.LinearAcceleration, "Itemwurfempfindlichkeit");
             sendSensorDescription(SensorType.Gravity, "Lenkverhalten");
+            //hide ResetButton because NES Server doesn´t support ResetButton
+            hideResetButton(true);
 
 
         } catch (IOException e) {
