@@ -41,7 +41,7 @@ public class IntegratingFilter extends AbstractFilter {
         data.data[1] = mSumOfRotationY;
         data.data[2] = mSumOfRotationZ;
 
-        mDataSink.onData(origin, data, userSensitivity);
+        forwardData(origin, data, userSensitivity);
     }
 
     /**

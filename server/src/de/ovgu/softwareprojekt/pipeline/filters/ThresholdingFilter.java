@@ -50,6 +50,6 @@ public class ThresholdingFilter extends AbstractFilter {
         if (abs(sensorData.data[mAxis]) < mMinimumAmplitude)
             Arrays.fill(sensorData.data, 0);
         // notify attached sink of new data
-        mDataSink.onData(origin, sensorData, userSensitivity);
+        forwardData(origin, sensorData, userSensitivity);
     }
 }

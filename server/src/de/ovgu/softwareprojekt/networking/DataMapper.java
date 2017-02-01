@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.function.Predicate;
 
 /**
- * This class is designed to forward data to NetworkDataSinks.
+ * This class is designed to forwardData data to NetworkDataSinks.
  * <p>
  * It supports mapping them from (SensorType, NetworkDevice) tuples or from SensorType to NetworkDataSink.
  */
@@ -96,7 +96,7 @@ class DataMapper implements NetworkDataSink {
     }
 
     /**
-     * onData is called whenever new data is to be processed. here, we forward the data to
+     * onData is called whenever new data is to be processed. here, we forwardData the data to
      *
      * @param origin          the network device which sent the data
      * @param data            the sensor data
@@ -136,7 +136,7 @@ class DataMapper implements NetworkDataSink {
         private final NetworkDevice mOrigin;
 
         /**
-         * Create a new SinkOriginFilter that will only forward data stemming from origin
+         * Create a new SinkOriginFilter that will only forwardData data stemming from origin
          *
          * @param sink   where to put data
          * @param origin what origin device should be forwarded
@@ -148,7 +148,7 @@ class DataMapper implements NetworkDataSink {
 
         @Override
         public void onData(NetworkDevice networkDevice, SensorData sensorData, float v) {
-            // only forward the data if all-forward is enabled (origin null) or the data is from the correct device
+            // only forwardData the data if all-forwardData is enabled (origin null) or the data is from the correct device
             if (mOrigin == null || mOrigin == networkDevice)
                 mSink.onData(networkDevice, sensorData, v);
         }

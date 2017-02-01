@@ -2,6 +2,8 @@ package de.ovgu.softwareprojekt.pipeline.filters;
 
 import com.sun.istack.internal.Nullable;
 import de.ovgu.softwareprojekt.DataSink;
+import de.ovgu.softwareprojekt.SensorData;
+import de.ovgu.softwareprojekt.discovery.NetworkDevice;
 import de.ovgu.softwareprojekt.networking.NetworkDataSink;
 import de.ovgu.softwareprojekt.networking.NetworkDataSource;
 
@@ -16,10 +18,11 @@ public abstract class AbstractFilter implements NetworkDataSink, NetworkDataSour
     /**
      * The data sink all data processed by this filter will be dumped into
      */
-    protected NetworkDataSink mDataSink;
+    private NetworkDataSink mDataSink;
 
     /**
      * Create a new {@link AbstractFilter}.
+     *
      * @param sink either a valid network data sink, or null. if null, {@link #setDataSink(NetworkDataSink)}
      *             must be called prior to starting operations.
      */
@@ -51,6 +54,48 @@ public abstract class AbstractFilter implements NetworkDataSink, NetworkDataSour
      */
     @Override
     public void start() throws IOException {
+    }
+
+    /**
+     * This retrieves the next pipeline element
+     *
+     * @return the {@link NetworkDataSink} that is due to receive the data next
+     */
+    protected NetworkDataSink getNextDataSink() {
+        return mDataSink;
+    }
+
+    /**
+     * This forwards the given data to the next pipeline element. It is a convenience function that calls
+     * {@link NetworkDataSink#onData(NetworkDevice, SensorData, float)} on the next pipeline element.
+     * <p>
+     * Be aware that this function does *nothing* if the next pipeline element is <code>null</code>. It can be set using either
+     * {@link AbstractFilter#AbstractFilter(NetworkDataSink)} or {@link #setDataSink(NetworkDataSink)}.
+     *
+     * @param origin      the network device which sent the data
+     * @param data        the sensor data
+     * @param sensitivity 0-100 inclusive. unless you consciously want to modify the user sensitivity (for example, because
+     *                    you modify the data to mirror the sensitivity setting) this should just forwardData the sensitivity.
+     * @return true if a next pipeline element was found.
+     */
+    protected boolean forwardData(NetworkDevice origin, SensorData data, float sensitivity) {
+        // abort if next element is not set
+        if (!hasNextPipelineElement())
+            return false;
+
+        // forward data
+        mDataSink.onData(origin, data, sensitivity);
+        return true;
+    }
+
+    /**
+     * Whether this filter element has a next pipeline element set using either
+     * {@link AbstractFilter#AbstractFilter(NetworkDataSink)} or {@link #setDataSink(NetworkDataSink)}.
+     *
+     * @return true if the next pipeline element is not <code>null</code>
+     */
+    public boolean hasNextPipelineElement() {
+        return mDataSink != null;
     }
 
     /**

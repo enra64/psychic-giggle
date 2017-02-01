@@ -202,7 +202,7 @@ public class KukaServer extends AbstractServer {
                 System.out.println("Switched to " + (mIsInMarbleMode ? "marble mode" : "joint mode"));
                 break;
             default:
-                // forward all other buttons to both controls.
+                // forwardData all other buttons to both controls.
                 // WARNING: this relies on neither class changing the robot state in a button event!
                 mJointControl.onButtonClick(click, origin);
                 mMarbleLabyrinthControl.onButtonClick(click, origin);

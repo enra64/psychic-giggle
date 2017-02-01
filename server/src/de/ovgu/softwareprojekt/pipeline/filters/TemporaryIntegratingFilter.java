@@ -50,7 +50,7 @@ public class TemporaryIntegratingFilter extends AbstractFilter {
         // write over data with sum
         sum(data.data);
 
-        mDataSink.onData(origin, data, userSensitivity);
+        forwardData(origin, data, userSensitivity);
     }
 
     /**

@@ -20,7 +20,7 @@ public class AbsoluteFilter extends AbstractFilter {
                 // simple negative assignment, no fp multiplication
                 sensorData.data[i] = -sensorData.data[i];
 
-        // forward data
-        mDataSink.onData(networkDevice, sensorData, userSensitivity);
+        // forwardData data
+        forwardData(networkDevice, sensorData, userSensitivity);
     }
 }

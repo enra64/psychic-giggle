@@ -489,18 +489,17 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
     private void goToOptions() {
         Bundle in = getIntent().getExtras();
 
-
-        EnumMap<SensorType, Boolean> sensorActivationMap = new EnumMap<>(SensorType.class);
-
-        for(SensorType sensor : SensorType.values())
-            sensorActivationMap.put(sensor, mSensorHandler.isRegistered(sensor));
-
         Intent intent = new Intent(SendActivity.this, OptionsActivity.class);
         intent.putExtra(EXTRA_SERVER_PORT_COMMAND, in.getInt(EXTRA_SERVER_PORT_COMMAND));
         intent.putExtra(EXTRA_SERVER_ADDRESS, in.getString(EXTRA_SERVER_ADDRESS));
-
-        intent.putExtra(EXTRA_ACTIVE_SENSORS, sensorActivationMap);
         intent.putExtra(EXTRA_SENSOR_DESCRIPTIONS, sensorDescriptions);
+
+        // add sensor activation map
+        HashMap<SensorType, Boolean> sensorActivationMap = new HashMap<>();
+        for(SensorType sensor : SensorType.values())
+            sensorActivationMap.put(sensor, mSensorHandler.isRegistered(sensor));
+        intent.putExtra(EXTRA_ACTIVE_SENSORS, sensorActivationMap);
+
         SendActivity.this.startActivity(intent);
     }
 }

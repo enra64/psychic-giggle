@@ -71,7 +71,7 @@ class DataScalingHandler implements NetworkDataSink {
         // get the user sensitivity configured for this sensor
         float sensorSensitivity = mUserSensitivity.get(sensorData.sensorType);
 
-        // forward the data
+        // forwardData the data
         mOutgoingDataSink.onData(origin, sensorData, sensorSensitivity);
     }
 

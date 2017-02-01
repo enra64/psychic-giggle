@@ -57,7 +57,7 @@ public class DifferenceThresholdFilter extends AbstractFilter {
             System.arraycopy(sensorData.data, 0, mLastValue, 0, mLastValue.length);
         }
         // notify attached sink of new data
-        mDataSink.onData(origin, sensorData, userSensitivity);
+        forwardData(origin, sensorData, userSensitivity);
     }
 
     /**

@@ -16,6 +16,7 @@ public class UserSensitivityMultiplicator extends AbstractFilter {
     public UserSensitivityMultiplicator(NetworkDataSink sink) {
         super(sink);
     }
+
     /**
      * Apply the user sensitivity as a factor
      *
@@ -25,11 +26,10 @@ public class UserSensitivityMultiplicator extends AbstractFilter {
      */
     @Override
     public void onData(NetworkDevice origin, SensorData sensorData, float userSensitivity) {
-        for (int i = 0; i < sensorData.data.length; i++) {
+        for (int i = 0; i < sensorData.data.length; i++)
             sensorData.data[i] *= userSensitivity;
-        }
 
-        // forward data
-        mDataSink.onData(origin, sensorData, 1);
+        // forwardData data
+        forwardData(origin, sensorData, 1);
     }
 }

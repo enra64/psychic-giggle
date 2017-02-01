@@ -96,7 +96,7 @@ public class ScalingFilter extends AbstractFilter {
     @Override
     public void onData(NetworkDevice origin, SensorData sensorData, float userSensitivity) {
         normalize(sensorData.data);
-        mDataSink.onData(origin, sensorData, userSensitivity);
+        forwardData(origin, sensorData, userSensitivity);
     }
 
 

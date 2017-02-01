@@ -372,7 +372,7 @@ class ClientConnectionManager implements ClientListener, UnexpectedClientListene
             mClientConnections.remove(getClientHandler(disconnectedClient));
         }
 
-        // forward the disconnect
+        // forwardData the disconnect
         mClientListener.onClientDisconnected(disconnectedClient);
 
         // notify client loss listener
@@ -391,7 +391,7 @@ class ClientConnectionManager implements ClientListener, UnexpectedClientListene
             mClientConnections.remove(getClientHandler(timeoutClient));
         }
 
-        // forward the timeout
+        // forwardData the timeout
         mClientListener.onClientTimeout(timeoutClient);
 
         // notify loss listener
@@ -419,7 +419,7 @@ class ClientConnectionManager implements ClientListener, UnexpectedClientListene
     }
 
     /**
-     * Called when the ClientConnection confirms connection success. We just forward here
+     * Called when the ClientConnection confirms connection success. We just forwardData here
      *
      * @param connectedClient the client that connected successfully
      */

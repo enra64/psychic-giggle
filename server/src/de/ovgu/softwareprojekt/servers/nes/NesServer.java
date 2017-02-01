@@ -263,7 +263,8 @@ public class NesServer extends AbstractServer {
 
             //Sensor descriptions
             sendSensorDescription(SensorType.Gravity, "Je höher die Empfindlichkeit, desto weiter muss das Gerät für eine Lenkaktion gedreht werden.");
-            sendSensorDescription(SensorType.LinearAcceleration, "Je höher die Empfindlichkeit, desto schwächer kann die Auslösegeschwindigkeit sein ");
+            sendSensorDescription(SensorType.Gravity, "A high sensitivity reduces the amount of rotation you need to do for steering.");
+            sendSensorDescription(SensorType.LinearAcceleration, "Je höher die Empfindlichkeit, desto schwächer kann die Auslösebewegung sein.");
 
 
             //hide ResetButton because NES Server doesn´t support ResetButton

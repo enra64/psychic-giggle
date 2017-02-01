@@ -77,7 +77,7 @@ public class AveragingFilter extends AbstractFilter {
     public void onData(NetworkDevice origin, SensorData sensorData, float userSensitivity) {
         filter(sensorData.data);
 
-        mDataSink.onData(origin, sensorData, userSensitivity);
+        forwardData(origin, sensorData, userSensitivity);
     }
 
 }

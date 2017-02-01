@@ -37,7 +37,7 @@ public class ThroughputMeasurer extends AbstractFilter {
     @Override
     public void onData(NetworkDevice origin, SensorData data, float userSensitivity) {
         mThroughputCounter++;
-        mDataSink.onData(origin, data, userSensitivity);
+        forwardData(origin, data, userSensitivity);
     }
 
     /**

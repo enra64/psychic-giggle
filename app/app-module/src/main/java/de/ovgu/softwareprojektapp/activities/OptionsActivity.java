@@ -152,7 +152,7 @@ public class OptionsActivity extends AppCompatActivity implements SeekBar.OnSeek
     @SuppressWarnings("unchecked")
     private void createSensorOptions() {
         //map of active sensors
-        EnumMap<SensorType, Boolean> sensorActivationMap = (EnumMap<SensorType, Boolean>) getIntent().getSerializableExtra(EXTRA_ACTIVE_SENSORS);
+        HashMap<SensorType, Boolean> sensorActivationMap = (HashMap<SensorType, Boolean>) getIntent().getSerializableExtra(EXTRA_ACTIVE_SENSORS);
 
         //map of descriptions for each active sensor
         HashMap<SensorType, String> descriptionsHash = (HashMap<SensorType, String>) getIntent().getSerializableExtra(EXTRA_SENSOR_DESCRIPTIONS);
