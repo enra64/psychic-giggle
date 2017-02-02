@@ -24,7 +24,7 @@ public class DifferenceThresholdFilter extends AbstractFilter {
     private float[] mLastValue = null;
 
     /**
-     * Create a new minimum amplitude filter.
+     * Create a new {@link DifferenceThresholdFilter}.
      *
      * @param dataSink      either a valid network data sink, or null. if null, {@link #setDataSink(NetworkDataSink)}
      *                      must be called prior to starting operations.
@@ -33,6 +33,16 @@ public class DifferenceThresholdFilter extends AbstractFilter {
     public DifferenceThresholdFilter(@Nullable NetworkDataSink dataSink, float minimumChange) {
         super(dataSink);
         mMinimumChange = minimumChange;
+    }
+
+    /**
+     * Create a new {@link DifferenceThresholdFilter}. A {@link NetworkDataSink} must be set before using the filter,
+     * see {@link #setDataSink(NetworkDataSink)}
+     *
+     * @param minimumChange the minimum of change a new data element must represent to not be replaced with zeroes.
+     */
+    public DifferenceThresholdFilter(float minimumChange) {
+        this(null, minimumChange);
     }
 
     /**

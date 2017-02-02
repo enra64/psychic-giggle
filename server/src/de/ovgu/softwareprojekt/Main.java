@@ -1,5 +1,6 @@
 package de.ovgu.softwareprojekt;
 
+import de.ovgu.softwareprojekt.servers.ExampleServer;
 import de.ovgu.softwareprojekt.servers.gui.ServerSelectionWindow;
 import de.ovgu.softwareprojekt.servers.kuka.KukaServer;
 import de.ovgu.softwareprojekt.servers.mouse.MouseServer;
@@ -26,6 +27,10 @@ public class Main {
             case "nes":
                 new NesServer(null).start();
                 System.out.println("NesServer started");
+                break;
+            case "example":
+                new ExampleServer();
+                System.out.println("ExampleServer started");
                 break;
             default:
                 ServerSelectionWindow.start();

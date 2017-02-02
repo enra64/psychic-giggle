@@ -6,6 +6,7 @@ import de.ovgu.softwareprojekt.SensorType;
 import de.ovgu.softwareprojekt.control.commands.ButtonClick;
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
 import de.ovgu.softwareprojekt.networking.AbstractServer;
+import de.ovgu.softwareprojekt.pipeline.FilterPipelineBuilder;
 import de.ovgu.softwareprojekt.pipeline.filters.DifferenceThresholdFilter;
 import de.ovgu.softwareprojekt.pipeline.filters.AveragingFilter;
 import de.ovgu.softwareprojekt.pipeline.filters.ScalingFilter;
@@ -47,12 +48,15 @@ public class MouseServer extends AbstractServer {
         // create a new mouse mover
         mMouseMover = new MouseMover();
 
-        // this is how we currently define a filter pipeline:
-        NetworkDataSink pipeline = new ScalingFilter(20, 5, new UserSensitivityMultiplicator(new AveragingFilter(3,
-                new DifferenceThresholdFilter(mMouseMover, .1f))));
+        // this is how we define a filter pipeline:
+        FilterPipelineBuilder builder = new FilterPipelineBuilder();
+        builder.append(new ScalingFilter(20, 5));
+        builder.append(new UserSensitivityMultiplicator());
+        builder.append(new AveragingFilter(3));
+        builder.append(new DifferenceThresholdFilter(.1f));
 
         // register our mouse mover to receive gyroscope data
-        registerDataSink(pipeline, SensorType.Gyroscope);
+        registerDataSink(builder.build(mMouseMover), SensorType.Gyroscope);
 
         // add left- and right click buttons
         addButton("left click", LEFT_MOUSE_BUTTON);

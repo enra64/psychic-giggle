@@ -1,5 +1,6 @@
 package de.ovgu.softwareprojekt.pipeline.filters;
 
+import com.sun.istack.internal.Nullable;
 import de.ovgu.softwareprojekt.networking.NetworkDataSink;
 import de.ovgu.softwareprojekt.SensorData;
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
@@ -9,12 +10,21 @@ import de.ovgu.softwareprojekt.discovery.NetworkDevice;
  */
 public class UserSensitivityMultiplicator extends AbstractFilter {
     /**
-     * Apply the user sensitivity as a factor
+     * Apply the user sensitivity as a factor, replacing the sensitivity value with <code>1f</code>.
      *
-     * @param sink the sink that should receive the multiplied data.
+     * @param sink the sink that should receive the multiplied data. if null, a {@link NetworkDataSink} must be set
+     *             before using the filter with {@link #setDataSink(NetworkDataSink)}
      */
-    public UserSensitivityMultiplicator(NetworkDataSink sink) {
+    public UserSensitivityMultiplicator(@Nullable NetworkDataSink sink) {
         super(sink);
+    }
+
+    /**
+     * Apply the user sensitivity as a factor, replacing the sensitivity value with <code>1f</code>.
+     * A {@link NetworkDataSink} must be set before using the filter, see {@link #setDataSink(NetworkDataSink)}
+     */
+    public UserSensitivityMultiplicator() {
+        this(null);
     }
 
     /**

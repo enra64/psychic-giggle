@@ -16,18 +16,53 @@ import java.io.IOException;
 import java.util.Arrays;
 
 /**
- * Created by arne on 1/24/17.
+ * An example server.
  */
 public class ExampleServer implements NetworkDataSink, ButtonListener, ClientListener, ExceptionListener, ResetListener {
     public ExampleServer() throws IOException {
         Server server = new Server();
-        server.registerDataSink(this, SensorType.LinearAcceleration);
         server.start();
 
         server.setButtonListener(this);
         server.setClientListener(this);
         server.setExceptionListener(this);
         server.setResetListener(this);
+
+        server.setButtonLayout("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
+                "<LinearLayout xmlns:android=\"http://schemas.android.com/apk/res/android\"\n" +
+                "    android:orientation=\"vertical\" android:layout_width=\"match_parent\"\n" +
+                "    android:layout_height=\"match_parent\">\n" +
+                "\n" +
+                "    <Button\n" +
+                "        android:text=\"A\"\n" +
+                "        android:layout_width=\"match_parent\"\n" +
+                "        android:layout_height=\"wrap_content\"\n" +
+                "        android:id=\"0\"\n" +
+                "        android:layout_weight=\"2\"/>\n" +
+                "\n" +
+                "    <LinearLayout\n" +
+                "        android:orientation=\"horizontal\"\n" +
+                "        android:layout_width=\"match_parent\"\n" +
+                "        android:layout_height=\"wrap_content\"\n" +
+                "        android:layout_weight=\"2\">\n" +
+                "\n" +
+                "        <Button\n" +
+                "            android:text=\"B\"\n" +
+                "            android:layout_width=\"wrap_content\"\n" +
+                "            android:layout_height=\"match_parent\"\n" +
+                "            android:id=\"1\"\n" +
+                "            android:layout_weight=\"1\" />\n" +
+                "\n" +
+                "        <Button\n" +
+                "            android:text=\"C\"\n" +
+                "            android:layout_width=\"wrap_content\"\n" +
+                "            android:layout_height=\"match_parent\"\n" +
+                "            android:id=\"2\"\n" +
+                "            android:layout_weight=\"1\" />\n" +
+                "    </LinearLayout>\n" +
+                "</LinearLayout>");
+
+        server.registerDataSink(this, SensorType.LinearAcceleration);
     }
 
     /**
@@ -79,7 +114,7 @@ public class ExampleServer implements NetworkDataSink, ButtonListener, ClientLis
      */
     @Override
     public boolean acceptClient(NetworkDevice newClient) {
-        return false;
+        return true;
     }
 
     /**

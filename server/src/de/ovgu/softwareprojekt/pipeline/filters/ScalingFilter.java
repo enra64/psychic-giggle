@@ -6,42 +6,69 @@ import de.ovgu.softwareprojekt.SensorData;
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
 
 /**
- * Created by Ulrich on 29.11.2016.
+ * This class scales sensor values. It maps the sensor data from [<code>-sourceRange</code>, <code>sourceRange</code>] to
+ * [<code>-targetRange</code>, <code>targetRange</code>]. It is useful for converting sensor values into value ranges that
+ * are more easily usable.
  * <p>
- * This class receives the sensorData and normalizes it to an usable value. The source and target ranges
- * may be set using one of the various constructors, or {@link #setSourceRange(float)} and {@link #setTargetRange(float)}.
- * A custom sensitivity may be set; it will replace the default value of 1. The filter ignores its third
- * {@link #onData(NetworkDevice, SensorData, float)} parameter in any case.
+ * Values exceeding the source range will be mapped to the corresponding extremum of the target range.
+ * <p>
+ * The source and target ranges may be set using one of the various constructors, or {@link #setSourceRange(float)}
+ * and {@link #setTargetRange(float)}.
+ * <p>
+ * If the source and target range have not been manually set, no scaling will be executed.
  */
 public class ScalingFilter extends AbstractFilter {
     /**
-     * The range (maximum value, and inverted minimum value) the data should be projected to
+     * The [<code>-targetRange</code>, <code>targetRange</code>] the data should be projected to
      */
     private float mTargetRange;
 
     /**
-     * The range (maximum value and inverted minimum value) the data lies in
+     * The [<code>-sourceRange</code>, <code>sourceRange</code>] the data should be mapped from
      */
     private float mSourceRange;
 
     /**
-     * A filter that normalizes the sensorData into usable input
-     * and uses standard axes and a base sensitivity of 40f
+     * Create a new {@link ScalingFilter}
      *
-     * @param dataSink either a valid network data sink, or null. if null, {@link #setDataSink(NetworkDataSink)}
-     *                 must be called prior to starting operations.
+     * @param dataSink either a valid network data sink, or null. <p>If null, a {@link NetworkDataSink} must be set before
+     *                 using the filter, see {@link #setDataSink(NetworkDataSink)}.
      */
     public ScalingFilter(@Nullable NetworkDataSink dataSink) {
-        this(100f, 100f, dataSink);
+        // map from max_value to max_value, so that no data will can be capped
+        this(Float.MAX_VALUE, Float.MAX_VALUE, dataSink);
+    }
+
+    /**
+     * Create a new {@link ScalingFilter}.
+     * <p>
+     * A {@link NetworkDataSink} must be set before using the filter, see {@link #setDataSink(NetworkDataSink)}, as is
+     * done automatically be {@link de.ovgu.softwareprojekt.pipeline.FilterPipelineBuilder}
+     */
+    public ScalingFilter() {
+        this(null);
+    }
+
+    /**
+     * Create a new {@link ScalingFilter}.
+     * <p>
+     * A {@link NetworkDataSink} must be set before using the filter, see {@link #setDataSink(NetworkDataSink)}, as is
+     * done automatically be {@link de.ovgu.softwareprojekt.pipeline.FilterPipelineBuilder}
+     *
+     * @param sourceRange The [<code>-sourceRange</code>, <code>sourceRange</code>] the data should be mapped from
+     * @param targetRange The [<code>-targetRange</code>, <code>targetRange</code>] the data should be projected to
+     */
+    public ScalingFilter(float targetRange, float sourceRange) {
+        this(targetRange, sourceRange, null);
     }
 
     /**
      * A filter that normalizes the sensorData into usable input
      *
-     * @param sink              either a valid network data sink, or null. if null, {@link #setDataSink(NetworkDataSink)}
-     *                          must be called prior to starting operations.
-     * @param sourceRange       range of the data coming into the normalization filter
-     * @param targetRange       range the data should be projected to
+     * @param sink        either a valid network data sink, or null. if null, {@link #setDataSink(NetworkDataSink)}
+     *                    must be called prior to starting operations.
+     * @param sourceRange The [<code>-sourceRange</code>, <code>sourceRange</code>] the data should be mapped from
+     * @param targetRange The [<code>-targetRange</code>, <code>targetRange</code>] the data should be projected to
      */
     public ScalingFilter(float targetRange, float sourceRange, @Nullable NetworkDataSink sink) {
         super(sink);
@@ -58,12 +85,12 @@ public class ScalingFilter extends AbstractFilter {
     private void normalize(float[] sensorData) {
         float projectionFactor = mTargetRange / mSourceRange;
 
-        for(int i = 0; i < sensorData.length; i++) {
+        for (int i = 0; i < sensorData.length; i++) {
             //Check if user generated values outside of set source range
-            if(sensorData[i] < -mSourceRange)
+            if (sensorData[i] < -mSourceRange)
                 sensorData[i] = -mSourceRange;
 
-            else if(sensorData[i] > mSourceRange)
+            else if (sensorData[i] > mSourceRange)
                 sensorData[i] = mSourceRange;
 
             sensorData[i] *= projectionFactor;
@@ -81,6 +108,7 @@ public class ScalingFilter extends AbstractFilter {
 
     /**
      * Change the resulting target range, as in the projection target range
+     *
      * @param targetRange the magnitude of the minimum and maximum values
      */
     public void setTargetRange(float targetRange) {
@@ -88,18 +116,18 @@ public class ScalingFilter extends AbstractFilter {
     }
 
     /**
-     * Called when the next element should be filtered. Replaces the userSensitivity parameter with the set custom
-     * sensitivity, or the default of 1.
+     * Called when the next element should be filtered.
      *
-     * @param sensorData sensor data to process
+     * @param origin          the network device which sent the data
+     * @param sensorData      the sensor data
+     * @param userSensitivity the sensitivity the user requested in his app settings for the sensor
+     *                        the data is from
      */
     @Override
     public void onData(NetworkDevice origin, SensorData sensorData, float userSensitivity) {
         normalize(sensorData.data);
         forwardData(origin, sensorData, userSensitivity);
     }
-
-
 
 
 }

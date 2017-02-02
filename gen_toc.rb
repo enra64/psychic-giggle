@@ -7,6 +7,6 @@ File.open("DeveloperGuide.md", 'r') do |f|
 
     title = line.gsub("#", "").strip
     href = title.gsub(" ", "-").gsub(":", "").downcase
-    puts "  " * (line.count("#")-1) + "* [#{title}](\##{href})"
+    puts "    " * (line.count("#")-1) + "* [#{title}](\##{href})"
   end
 end

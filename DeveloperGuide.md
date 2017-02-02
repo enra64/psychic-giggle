@@ -5,7 +5,11 @@
 * JavaDoc einbauen
 * onData muss an zwei stellen beschrieben werden: bei der pipeline, und bei der grundlegenden verwendung
 * wo packen wir so allgemeines zeug wie NetworkDataSink, SensorData, NetworkDevice etc hin?
-
+* alle registrierten sinks in splittern schliessen???
+* javadoc ist teilweise horribly out of date. wir müssen zumindest bei dem kram den die potenziell angucken korrigieren!
+* hold sensors erklären
+* haben wir die icons erklärt? also dc, options
+* das bild für das linearlayout ist nicht wie erwartet
 
 # Developer Guide für das Psychic-Framework
 Das Psychic-Framework bezeichnet eine Kombination aus einer App und einem Serverframework mit einem gemeinsamen Kern. Dieses Framework dient der schnellen und einfachen Entwicklung von
@@ -15,39 +19,43 @@ PC-Applikationen, die Sensordaten von Android-Geräten verwenden möchten.
 * [Developer Guide für das Psychic-Framework](#developer-guide-für-das-psychic-framework)
 * [JavaDoc](#javadoc)
 * [Grundlegende Verwendung:](#grundlegende-verwendung)
-  * [NetworkDevice](#networkdevice)
 * [Sensoren](#sensoren)
-  * [Maximalwerte](#maximalwerte)
-  * [Update-Frequenz](#update-frequenz)
+    * [Maximalwerte](#maximalwerte)
+    * [Update-Frequenz](#update-frequenz)
+    * [Beschreibungen anzeigen](#beschreibungen-anzeigen)
 * [Verwendung von Buttons](#verwendung-von-buttons)
-  * [Layouts laden](#layouts-laden)
-    * [Einschränkungen für die Layout-Dateien](#einschränkungen-für-die-layout-dateien)
+    * [Layouts laden](#layouts-laden)
+        * [Einschränkungen für die Layout-Dateien](#einschränkungen-für-die-layout-dateien)
 * [Verwaltung von Clients](#verwaltung-von-clients)
-  * [Maximale Anzahl Clients](#maximale-anzahl-clients)
-  * [Callbacks](#callbacks)
-    * [acceptClient](#acceptclient)
-    * [onClientDisconnected](#onclientdisconnected)
-    * [onClientTimeout](#onclienttimeout)
-    * [onClientAccepted](#onclientaccepted)
+    * [Callbacks](#callbacks)
+        * [acceptClient](#acceptclient)
+        * [onClientDisconnected](#onclientdisconnected)
+        * [onClientTimeout](#onclienttimeout)
+        * [onClientAccepted](#onclientaccepted)
+    * [Repräsentation von Clients: NetworkDevice](#repräsentation-von-clients-networkdevice)
+    * [Maximale Anzahl Clients](#maximale-anzahl-clients)
 * [Exceptionhandling](#exceptionhandling)
 * [Resetevents](#resetevents)
+    * [Reset-Button deaktivieren](#reset-button-deaktivieren)
 * [Entfernen einer NetworkDataSink](#entfernen-einer-networkdatasink)
 * [Daten-Pipeline](#daten-pipeline)
-  * [Filter](#filter)
-    * [onData](#ondata)
-    * [Beispiel](#beispiel)
-    * [Vorhandene Filter](#vorhandene-filter)
-  * [Daten-Splitter](#daten-splitter)
-  * [Pipeline-Builder](#pipeline-builder)
-    * [Elemente hinzufügen](#elemente-hinzufügen)
-    * [Elemente entfernen](#elemente-entfernen)
-    * [Pipeline abschließen](#pipeline-abschließen)
-* [Sensor-Beschreibungen](#sensor-beschreibungen)
+    * [Format der Sensordaten: SensorData](#format-der-sensordaten-sensordata)
+    * [NetworkDataSink](#networkdatasink)
+    * [NetworkDataSource](#networkdatasource)
+    * [Filter](#filter)
+        * [onData](#ondata)
+        * [Beispiel](#beispiel)
+        * [Vorhandene Filter](#vorhandene-filter)
+    * [Daten-Splitter](#daten-splitter)
+    * [Pipeline-Builder](#pipeline-builder)
+        * [Elemente hinzufügen](#elemente-hinzufügen)
+        * [Elemente entfernen](#elemente-entfernen)
+        * [Pipeline abschließen](#pipeline-abschließen)
 * [Notifications anzeigen](#notifications-anzeigen)
 * [Netzwerkverbindung](#netzwerkverbindung)
-  * [Server-Discovery](#server-discovery)
-  * [Datenverbindung](#datenverbindung)
-  * [Kontrollverbindung](#kontrollverbindung)
+    * [Server-Discovery](#server-discovery)
+    * [Datenverbindung](#datenverbindung)
+    * [Kontrollverbindung](#kontrollverbindung)
 * [License](#license)
 
 
@@ -60,93 +68,67 @@ Zur Erstellung minimaler Funktionalität wird folgender Code benötigt:
 
 ```Java
 public class ExampleServer implements NetworkDataSink {
-	public ExampleServer() throws IOException {
-		Server server = new Server();
-		server.registerDataSink(this, SensorType.LinearAcceleration);
-		server.start();
-	}
+    public ExampleServer() throws IOException {
+        Server server = new Server();
+        server.start();
+    }
 
-	public void onData(NetworkDevice origin, SensorData sensorData, float userSensitivity){
-	}
+    public void onData(NetworkDevice origin, SensorData sensorData, float userSensitivity){
+    }
 
-	public void close(){
-	}
+    public void close(){
+    }
 }
 ```
 
-Im Konstruktor wurde ein Server erstellt und ```this``` wurde als NetworkDataSink für den LinearAcceleration-Sensor registriert.
+Im Konstruktor wurde ein Server instanziiert und gestartet. Falls nicht anders beschrieben, beziehen sich alle nachfolgenden Befehle auf eine solche Instanz. 
 
-Nachdem der Server mit ```start()``` gestartet wurde, können die ankommenden Daten in ```onData``` verarbeitet werden. Hierzu muss auf ```sensorData.data``` zugegriffen werden, ein ```float[]```, das die Sensordaten enthält.
-In der ```close()``` sollten alle verwendeten Ressourcen freigegeben werden.
+Es ist auch möglich, von ```AbstractServer``` zu erben, allerdings wird dann erzwungen, dass die Klasse selbst folgende Interfaces implementiert: [```ButtonListener```](#verwendung-von-buttons), [```ClientListener```](#verwaltung-von-clients), [```ResetListener```](#resetevents) und [```ExceptionListener```](#exceptionhandling).
 
+TODO: vielleicht besser, die interfaces separat von den codebeispielen zu erklären? letztlich ist es jetzt irgendwie dazu übergegangen dass einfah übel viel kram erzählt wird, und die erwähnung von abstractserver läuft irgendwie auf die interfaces hinaus. ODER wir reduzieren die codebeispiele auf die callbacks; dann könnte man alle listener hier registrieren
 
-TODO somehow unify this short description of onData and the longer one that follows in the data pipeline description
+Nachdem der Server mit ```start()``` gestartet wurde, können sich Clients verbinden. Wird ein Server mit ```close()``` geschlossen werden alle Clients getrennt. Die Instanz kann nicht wieder verwendet werden, ein weiterer Aufruf von ```start()``` wird eine Exception erzeugen.
 
-# Sensoren
-Folgende Sensoren werden unterstützt:
-* Accelerometer
-* AmbientTemperature
-* GameRotationVector
-* Gravity
-* Gyroscope
-* GyroscopeUncalibrated
-* Light
-* LinearAcceleration
-* MagneticField
-* MagneticFieldUncalibrated
-* Orientation
-* Pressure
-* Proximity
-* RelativeHumidity
-* RotationVector
+## ~~Pizza~~ Daten bestellen
+Das eigentliche Kernthema des Psychic-Frameworks sind ja Sensordaten. Sensordaten werden vom Handy angefordert, indem die ```registerDataSink(NetworkDataSink, SensorType)```-Funktion der ```AbstractServer```-Klasse aufgerufen wird. Die übergebene ```NetworkDataSink``` wird dann die unveränderten Daten von dem durch den ```SensorType```-Parameter angegebenen Sensor erhalten. Falls nur Daten eines einzelnen Clients an eine Datensenke gelangen sollen, steht auch ```registerDataSink(NetworkDataSink, NetworkDevice, SensorData)``` zur Verfügung. Wird diese Funktion genutzt, werden nur Daten vom spezifizierten ```NetworkDevice``` an der übergebenen ```NetworkDataSink``` ankommen.
 
-Diese Liste ist synonym mit dem ```SensorType```-Enum. Enthalten sind alle Sensoren, deren [reporting mode](https://source.android.com/devices/sensors/report-modes.html) ```continuous``` oder ```on-change``` ist und die bis spätestens API-Level 19 unterstützt wurden.
+[Die Verwendung von ```NetworkDataSink``` wird hier beschrieben.](#networkdatasink)
 
-## Maximalwerte
-Die Maximalwerte der Sensoren können mithilfe von ```getSensorMaximumRange(SensorType)``` für alle verbundenen Geräte oder mit ```getSensorMaximumRange(SensorType, NetworkDevice)``` für ein spezielles Gerät abgefragt werden.
-
-<a href="https://developer.android.com/reference/android/hardware/Sensor.html#getMaximumRange()">Siehe auch die Android-Dokumentation hierzu.</a>
-
-## Update-Frequenz
-Die Update-Frequenz der Android-Sensoren kann mithilfe von ```setSensorSpeed()``` gesetzt werden, unterstützt sind die folgenden Werte:
-* [SENSOR_DELAY_FASTEST](https://developer.android.com/reference/android/hardware/SensorManager.html#SENSOR_DELAY_FASTEST)
-* [SENSOR_DELAY_GAME](https://developer.android.com/reference/android/hardware/SensorManager.html#SENSOR_DELAY_GAME)
-* [SENSOR_DELAY_NORMAL](https://developer.android.com/reference/android/hardware/SensorManager.html#SENSOR_DELAY_NORMAL)
-* [SENSOR_DELAY_UI](https://developer.android.com/reference/android/hardware/SensorManager.html#SENSOR_DELAY_UI)
-
-## Beschreibungen anzeigen
-Es ist mit ```sendSensorDescription(SensorType, String)``` möglich, erweiterte Beschriftungen für die Nutzung der Sensoren anzeigen zu lassen, um dem Nutzer die Zuordnung von Sensor zu Funktion zu vereinfachen.
-
-![Beispielhafte Beschreibung](sensor_description.png)
+## Daten abbestellen
+Wenn eine ```NetworkDataSink``` nicht mehr benötigt wird, zum Beispiel weil der entsprechende Client getrennt wurde, kann sie mit ```unregisterDataSink(NetworkDataSink)``` von allen Sensoren abgemeldet werden, und mit  ```unregisterDataSink(NetworkDataSink, SensorType)``` von bestimmten Sensoren abgemeldet werden. Danach erhält die ```NetworkDataSink``` keine Daten mehr vom Server.
 
 # Verwendung von Buttons
 ```Java
 public class ExampleServer implements ButtonListener {
-	public ExampleServer() throws IOException {
-		Server server = new Server();
-		server.start();
+    public ExampleServer() throws IOException {
+        Server server = new Server();
+        server.start();
 
-		server.setButtonListener(this);
-		server.addButton("Erster Button", 0);
-		server.addButton("Zweiter Button", 1);
-		//server.setButtonLayout(xmlFileContent);
-	}
+        server.setButtonListener(this);
+        server.addButton("Erster Button", 0);
+        server.addButton("Zweiter Button", 1);
+        //server.setButtonLayout(xmlFileContent);
+    }
 
-	public void onButtonClick(ButtonClick buttonClick , NetworkDevice origin){
-	}
+    public void onButtonClick(ButtonClick buttonClick , NetworkDevice origin){
+    }
 }
 ```
 
-Im Konstruktor muss ein ButtonListener gesetzt werden. Daraufhin können Buttons mit ```addButton(String, int)``` hinzugefügt werden. Der ```String``` ist der Text den der Button anzeigt, der ```int``` ist die ID, die beim Drücken des Buttons an den Server gesendet wird. Buttons werden auf allen verbundenen Clients angezeigt. Buttoninputs können dann in der ```onButtonClick``` verarbeitet werden. Mithilfe von ```buttonClick.getId()``` kann der Button identifiziert werden, und ```buttonClick.isPressed()``` ist ```true``` wenn der Button gedrückt wurde.
+Im Konstruktor muss ein ```ButtonListener``` gesetzt werden, so dass jeder Knopfdruck einen Aufruf der ```onButtonClick```-Funktion auslöst.
+Mithilfe von ```buttonClick.getId()``` kann der Button identifiziert werden, und ```buttonClick.isPressed()``` ist ```true``` wenn der Button gedrückt wurde, und ```false``` wenn der Button losgelassen wurde.
+Buttons werden immer auf allen verbundenen Clients angezeigt.
 
-Zum Entfernen einzelner Buttons kann ```removeButtons(int)``` verwendet werden
+## Buttons zur Runtime anfordern
+Buttons können mit ```addButton(String, int)``` hinzugefügt werden. Der ```String``` ist der Text den der Button anzeigt, der ```int``` ist die ID, die beim Drücken des Buttons an den Server gesendet wird. Zum Entfernen einzelner Buttons kann ```removeButtons(int)``` verwendet werden. Ein Aufruf von ```setButtonLayout(String)``` wird alle mit ```addButton``` hinzugefügten Knöpfe entfernen.
 
 ## Layouts laden
-Eine Alternative ist die Verwendung von ```setButtonLayout(String)```. Hierbei kann eine eigene Android XML Layout Datei als ```String``` übergeben werden.  Bei Verwendung von ```setButtonLayout(String)``` werden alle durch ```addButton(String, int)``` hinzugefügten Buttons entfernt und bei Verwendung von ```addButton(String, int)``` wird das durch ```setButtonLayout``` erstellte Layout entfernt.
+Eine Alternative ist die Verwendung von ```setButtonLayout(String)```. Hierbei kann eine eigene Android XML Layout Datei als ```String``` übergeben werden.  Bei Verwendung von ```addButton(String, int)``` wird das durch ```setButtonLayout``` erstellte Layout entfernt.
 
 ### Einschränkungen für die Layout-Dateien
 Es werden nur ```LinearLayout```- und ```Button```-Objekte unterstützt. Ein Beispiel für einen unterstützten XML-String ist das folgende Snippet:
-```xml
+
+```Java
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
@@ -157,15 +139,40 @@ Es werden nur ```LinearLayout```- und ```Button```-Objekte unterstützt. Ein Bei
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="0"
-        android:layout_weight="5"/>
+        android:layout_weight="2"/>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="2">
+
+        <Button
+            android:text="B"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:id="1"
+            android:layout_weight="1" />
+
+        <Button
+            android:text="C"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:id="2"
+            android:layout_weight="1" />
+    </LinearLayout>
 </LinearLayout>
 ```
-Für ```Button``` werden die folgenden Attribute unterstützt:
+
+Layout-String, wie er in der App angezeigt wird:
+<p align="center"><img src="button_layout_result.png" width="300px"/></p>
+
+```Button```-Elemente unterstützen ausschließlich die folgenden Attribute:
 * ```android:text=""``` enthält den vom Button dargestellten Text
 * ```android:id=""``` ist die ID die an den Server übertragen wird, und dort mithilfe von ```ButtonClick.getId()``` abgefragt werden kann
 * ```android:layout_weight=""``` wird direkt für den Button gesetzt. Genaue Informationen sind in der [Android-Dokumentation](https://developer.android.com/guide/topics/ui/layout/linear.html#Weight) zu finden.
 
-Für ```LinearLayout``` werden die folgenden Attribute unterstützt:
+```LinearLayout```-Elemente unterstützen ausschließlich die folgenden Attribute:
 * ```android:layout_weight=""``` wird direkt für das Layout gesetzt. Genaue Informationen sind in der [Android-Dokumentation](https://developer.android.com/guide/topics/ui/layout/linear.html#Weight) zu finden.
 * ```android:orientation=""``` wird direkt für das Layout gesetzt. Genaue Informationen sind in der [Android-Dokumentation](https://developer.android.com/reference/android/widget/LinearLayout.html#attr_android:orientation) zu finden.
 
@@ -175,14 +182,16 @@ Verwendung von ```addButton(String, int)``` wird das durch ```setButtonLayout```
 Um alle Buttons zu entfernen kann ```clearButtons()``` aufgerufen werden.
 
 # Verwaltung von Clients
+Um die verschiedenen Client-Events zu handeln, muss ein ```ClientListener``` gesetzt werden, der die Events empfängt.
+
 ```Java
 public class ExampleServer implements ClientListener {
-	public ExampleServer() throws IOException {
-		Server server = new Server();
-		server.start();
+    public ExampleServer() throws IOException {
+        Server server = new Server();
+        server.start();
 
-		server.setClientListener(this);
-	}
+        server.setClientListener(this);
+    }
 
     public boolean acceptClient(NetworkDevice newClient) {
         return false;
@@ -197,18 +206,8 @@ public class ExampleServer implements ClientListener {
     public void onClientAccepted(NetworkDevice connectedClient) {
     }
 ```
-Um die verschiedenen Client events zu handeln, muss ein ```ClientListener``` gesetzt werden, der die Events empfängt.
-
-## Repräsentation von Clients
-Clients werden als ```NetworkDevice``` angegeben. Mit ```getInetAddress()``` kann die aktuelle IP-Adresse als ```InetAddress``` abgefragt werden und unter ```getName()``` ist der Name des ```NetworkDevice``` verfügbar.
-
-Wenn ```NetworkDevice.equals(NetworkDevice)``` ```true``` zurückgibt, dann handelt es sich um einen Client an der selben Adresse.
-
-## Maximale Anzahl Clients
-Die maximale Anzahl von Clients ist theoretisch nicht beschränkt. Ein nutzerdefiniertes Maximum kann mithilfe von ```setClientMaximum(int)``` gesetzt werden, mit ```getClientMaximum()``` abgefragt werden und mit ```removeClientMaximum()``` entfernt werden.
 
 ## Callbacks
-
 ### acceptClient
 ```acceptClient(NetworkDevice)``` wird immer dann aufgerufen, wenn ein neuer Client, nämlich das übergebene ```NetworkDevice```, versucht sich mit dem Server zu verbinden. Die Addresse des Clients und sein Name sind mit ```newClient.getInetAddress()``` und ```newClient.name``` verfügbar.
 Wenn ```acceptClient(NetworkDevice)``` ```true``` zurückgibt, wird der Client angenommen; gibt es ```false``` zurück, wird der Client abgelehnt.
@@ -221,6 +220,16 @@ Wenn ```acceptClient(NetworkDevice)``` ```true``` zurückgibt, wird der Client a
 
 ### onClientAccepted
 ```onClientAccepted(NetworkDevice)``` wird aufgerufen wenn die Kommunikation zwischen Server und dem übergebenen neuen Client funktioniert. Diese Funktion wird nur dann aufgerufen, wenn ```acceptClient(NetworkDevice)``` ```true``` für das entsprechende ```NetworkDevice``` zurückgegeben hat.
+
+
+## Repräsentation von Clients: NetworkDevice
+Clients werden als ```NetworkDevice``` angegeben. Mit ```getInetAddress()``` kann die aktuelle IP-Adresse als ```InetAddress``` abgefragt werden und unter ```getName()``` ist der Name des ```NetworkDevice``` verfügbar.
+
+Wenn ```NetworkDevice.equals(NetworkDevice)``` ```true``` zurückgibt, dann handelt es sich um einen Client an der selben Adresse.
+
+
+## Maximale Anzahl Clients
+Die maximale Anzahl von Clients ist beschränkt auf ```Integer.INT_MAX```. Ein nutzerdefiniertes Maximum kann mithilfe von ```setClientMaximum(int)``` gesetzt werden, mit ```getClientMaximum()``` abgefragt werden und mit ```removeClientMaximum()``` entfernt werden.
 
 # Exceptionhandling
 ```Java
@@ -257,14 +266,9 @@ Wenn ein Client den "Reset"-Button auf seinem Handy benutzt, wird die ```onReset
 ## Reset-Button deaktivieren
 Es wird empfohlen den Reset-Button zu implementieren. Er gewährleistet, dass der Nutzer mit einem einfachen, nie wechselndem Button jederzeit in einen Zustand zurückkehren kann, in dem die Anwendung bedienbar ist. Solche Zustände können zum Beispiel durch nicht korrigierten Gyroskop-Drift entstehen. Es ist jedoch möglich, den Reset-Knopf zu deaktivieren, indem die ```hideResetButton(boolean)```-Funktion des Servers aufgerufen wird.
 
-# Entfernen einer NetworkDataSink
-Wenn eine ```NetworkDataSink``` nicht mehr benötigt wird, zum Beispiel weil der entsprechende Client getrennt wurde, kann sie mit ```unregisterDataSink(NetworkDataSink)``` von allen Sensoren abgemeldet werden, und mit  ```unregisterDataSink(NetworkDataSink, SensorType)``` von bestimmten Sensoren abgemeldet werden. Danach erhält die ```NetworkDataSink``` keine Daten mehr vom Server.
-
 # Daten-Pipeline
 ![Pipeline](pipeline.png)
 Das Psychic-Framework ist darauf ausgerichtet dass Sensordaten mithilfe einer Pipeline benutzt werden die auf dem Handy mit dem Sensor beginnt und auf dem Server mit der Anwendung endet. Bis dahin können die Sensordaten flexibel mithilfe von ```AbstractFilter```, ```NetworkDataSource``` und ```NetworkDataSink``` gefiltert und weitergeleitet werden.
-
-Sensordaten werden vom Handy angefordert, indem die ```registerDataSink(NetworkDataSink, SensorType)```-Funktion der ```AbstractServer```-Klasse aufgerufen wird. Die übergebene ```NetworkDataSink``` wird dann die unveränderten Daten von dem durch den ```SensorType```-Parameter angegebenen Sensor erhalten. Falls nur Daten eines einzelnen Clients an eine Datensenke gelangen sollen, steht auch ```registerDataSink(NetworkDataSink, NetworkDevice, SensorData)``` zur Verfügung. Wird diese Funktion genutzt, werden nur Daten vom spezifizierten ```NetworkDevice``` an der übergebenen ```NetworkDataSink``` ankommen.
 
 ## Format der Sensordaten: SensorData
 Alle Daten werden in ```SensorData```-Objekten transportiert. In ```SensorData```-Objekten sind folgende Informationen enthalten:
@@ -288,6 +292,43 @@ Das ```NetworkDataSource```-Interface muss von Klassen implementiert werden, die
 
 * ```close()```: Die Instanz wird nicht mehr benötigt, und sollte alle Ressourcen schließen.
 * ```setDataSink(NetworkDataSink)```: Alle Daten, die von der ```NetworkDataSource``` erzeugt wurden, müssen an die hier erhaltene ```NetworkDataSink``` geleitet werden.
+
+## Sensoren
+Folgende Sensoren werden unterstützt:
+* Accelerometer
+* AmbientTemperature
+* GameRotationVector
+* Gravity
+* Gyroscope
+* GyroscopeUncalibrated
+* Light
+* LinearAcceleration
+* MagneticField
+* MagneticFieldUncalibrated
+* Orientation
+* Pressure
+* Proximity
+* RelativeHumidity
+* RotationVector
+
+Diese Liste ist synonym mit dem ```SensorType```-Enum. Enthalten sind alle Sensoren, deren [reporting mode](https://source.android.com/devices/sensors/report-modes.html) ```continuous``` oder ```on-change``` ist und die bis spätestens API-Level 19 unterstützt wurden.
+
+### Maximalwerte
+Die Maximalwerte der Sensoren können mithilfe von ```getSensorMaximumRange(SensorType)``` für alle verbundenen Geräte oder mit ```getSensorMaximumRange(SensorType, NetworkDevice)``` für ein spezielles Gerät abgefragt werden.
+
+<a href="https://developer.android.com/reference/android/hardware/Sensor.html#getMaximumRange()">Siehe auch die Android-Dokumentation hierzu.</a>
+
+### Update-Frequenz
+Die Update-Frequenz der Android-Sensoren kann mithilfe von ```setSensorSpeed()``` gesetzt werden, unterstützt sind die folgenden Werte:
+* [SENSOR_DELAY_FASTEST](https://developer.android.com/reference/android/hardware/SensorManager.html#SENSOR_DELAY_FASTEST)
+* [SENSOR_DELAY_GAME](https://developer.android.com/reference/android/hardware/SensorManager.html#SENSOR_DELAY_GAME)
+* [SENSOR_DELAY_NORMAL](https://developer.android.com/reference/android/hardware/SensorManager.html#SENSOR_DELAY_NORMAL)
+* [SENSOR_DELAY_UI](https://developer.android.com/reference/android/hardware/SensorManager.html#SENSOR_DELAY_UI)
+
+### Beschreibungen anzeigen
+Es ist mit ```sendSensorDescription(SensorType, String)``` möglich, erweiterte Beschriftungen für die Nutzung der Sensoren anzeigen zu lassen, um dem Nutzer die Zuordnung von Sensor zu Funktion zu vereinfachen.
+
+![Beispielhafte Beschreibung](sensor_description.png)
 
 ## Filter
 Filter sind Pipelineelemente, die erhaltene Daten bearbeiten und dann weiterleiten, zum Beispiel einen Tiefpassfilter. Um neue Filter zu erstellen sollte ```AbstractFilter``` erweitert werden; alle folgenden Beschreibungen beziehen sich auf diese Klasse.

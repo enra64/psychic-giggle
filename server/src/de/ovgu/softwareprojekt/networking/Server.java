@@ -55,6 +55,7 @@ public class Server extends AbstractServer {
      * be used as the discovery port, and the device hostname will be used as server name.
      */
     public Server() {
+        super();
     }
 
     /**
