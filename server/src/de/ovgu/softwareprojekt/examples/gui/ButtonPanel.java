@@ -1,7 +1,7 @@
 package de.ovgu.softwareprojekt.examples.gui;
 
 
-import de.ovgu.softwareprojekt.networking.AbstractServer;
+import de.ovgu.softwareprojekt.networking.AbstractPsychicServer;
 import de.ovgu.softwareprojekt.examples.kuka.KukaServer;
 import de.ovgu.softwareprojekt.examples.mouse.MouseServer;
 import de.ovgu.softwareprojekt.examples.nes.NesServer;
@@ -24,7 +24,7 @@ import java.io.IOException;
  */
 public class ButtonPanel extends JPanel implements ActionListener {
 
-    private AbstractServer server;
+    private AbstractPsychicServer server;
     private JButton startMouseBtn, startNesBtn, startKukaBtn, closeBtn;
     private JTextArea console;
     private boolean isRunning;
@@ -60,7 +60,7 @@ public class ButtonPanel extends JPanel implements ActionListener {
             public void actionPerformed(ActionEvent e) {
                 if (e.getSource() == closeBtn && isRunning) {
                     server.close();
-                    System.out.println("Server closed");
+                    System.out.println("PsychicServer closed");
                     isRunning = false;
                 }
                 console.setCaretPosition(console.getDocument().getLength());
@@ -107,7 +107,7 @@ public class ButtonPanel extends JPanel implements ActionListener {
         try {
             if (isRunning) {
                 server.close();
-                System.out.println("Server closed");
+                System.out.println("PsychicServer closed");
                 isRunning = false;
             }
 

@@ -4,7 +4,7 @@ import com.sun.istack.internal.Nullable;
 import de.ovgu.softwareprojekt.SensorType;
 import de.ovgu.softwareprojekt.control.commands.ButtonClick;
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
-import de.ovgu.softwareprojekt.networking.AbstractServer;
+import de.ovgu.softwareprojekt.networking.AbstractPsychicServer;
 import de.ovgu.softwareprojekt.pipeline.FilterPipelineBuilder;
 import de.ovgu.softwareprojekt.pipeline.filters.DifferenceThresholdFilter;
 import de.ovgu.softwareprojekt.pipeline.filters.AveragingFilter;
@@ -15,10 +15,10 @@ import java.awt.*;
 import java.io.IOException;
 
 /**
- * The MouseServer class is an exemplary extension of AbstractServer that enables
+ * The MouseServer class is an exemplary extension of AbstractPsychicServer that enables
  * the user to move the mouse using his phone
  */
-public class MouseServer extends AbstractServer {
+public class MouseServer extends AbstractPsychicServer {
     /**
      * Constant identifying left mouse button in app
      */

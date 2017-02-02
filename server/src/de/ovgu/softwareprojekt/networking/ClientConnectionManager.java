@@ -13,7 +13,6 @@ import de.ovgu.softwareprojekt.misc.ExceptionListener;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.util.*;
-import java.util.function.Consumer;
 
 /**
  * The client connection manager handles the expected client state (sensor speeds, button config etc),
@@ -29,7 +28,7 @@ import java.util.function.Consumer;
 @SuppressWarnings("WeakerAccess")
 class ClientConnectionManager implements ClientListener, UnexpectedClientListener {
     /**
-     * This interface must be called if a client is lost to allow the {@link AbstractServer} to react
+     * This interface must be called if a client is lost to allow the {@link AbstractPsychicServer} to react
      */
     private final ClientLossListener mClientLossListener;
 

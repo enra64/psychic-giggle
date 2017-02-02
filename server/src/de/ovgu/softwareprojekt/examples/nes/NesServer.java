@@ -1,11 +1,11 @@
 package de.ovgu.softwareprojekt.examples.nes;
 
 import com.sun.istack.internal.Nullable;
+import de.ovgu.softwareprojekt.networking.AbstractPsychicServer;
 import de.ovgu.softwareprojekt.networking.NetworkDataSink;
 import de.ovgu.softwareprojekt.SensorType;
 import de.ovgu.softwareprojekt.control.commands.ButtonClick;
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
-import de.ovgu.softwareprojekt.networking.AbstractServer;
 import de.ovgu.softwareprojekt.pipeline.FilterPipelineBuilder;
 import de.ovgu.softwareprojekt.pipeline.filters.AveragingFilter;
 import de.ovgu.softwareprojekt.pipeline.filters.ScalingFilter;
@@ -22,7 +22,7 @@ import java.util.Properties;
 /**
  * This server is designed to create NES controller input from gravity and linear acceleration data
  */
-public class NesServer extends AbstractServer {
+public class NesServer extends AbstractPsychicServer {
     /**
      * This variable stores our steering wheels, mapped from network devices so we
      * can easily access the correct one.
@@ -267,7 +267,7 @@ public class NesServer extends AbstractServer {
             sendSensorDescription(SensorType.LinearAcceleration, "Je höher die Empfindlichkeit, desto schwächer kann die Auslösebewegung sein.");
 
 
-            //hide ResetButton because NES Server doesn´t support ResetButton
+            //hide ResetButton because NES PsychicServer doesn´t support ResetButton
             hideResetButton(true);
         } catch (IOException e) {
             onException(this, e, "Could not display notification for player " + playerID);

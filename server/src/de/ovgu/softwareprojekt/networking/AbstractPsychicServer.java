@@ -23,7 +23,7 @@ import java.util.HashMap;
  * 3) A DataConnection to rapidly transmit sensor data
  */
 @SuppressWarnings({"unused", "WeakerAccess", "SameParameterValue"})
-public abstract class AbstractServer implements
+public abstract class AbstractPsychicServer implements
         OnCommandListener,
         ClientListener,
         ExceptionListener,
@@ -31,7 +31,7 @@ public abstract class AbstractServer implements
         ResetListener,
         ClientLossListener {
     /**
-     * AbstractServer handling responding to discovery broadcasts
+     * AbstractPsychicServer handling responding to discovery broadcasts
      */
     private DiscoveryServer mDiscoveryServer;
 
@@ -73,7 +73,7 @@ public abstract class AbstractServer implements
      * @param discoveryPort the port that should be listened on for new devices
      */
     @SuppressWarnings("WeakerAccess")
-    public AbstractServer(@Nullable String serverName, int discoveryPort) {
+    public AbstractPsychicServer(@Nullable String serverName, int discoveryPort) {
         // if the server name was not set, use the host name
         mServerName = serverName != null ? serverName : getHostName();
         mDiscoveryPort = discoveryPort;
@@ -90,7 +90,7 @@ public abstract class AbstractServer implements
 
         // SIGTERM -> close all clients, stop discovery server
         //Runtime.getRuntime().addShutdownHook(new Thread(this::close));
-        //System.out.println("AbstractServer started, shutdown runtime hook online");
+        //System.out.println("AbstractPsychicServer started, shutdown runtime hook online");
     }
 
     /**
@@ -99,7 +99,7 @@ public abstract class AbstractServer implements
      *
      * @param serverName the name this server will be discoverable as
      */
-    public AbstractServer(String serverName) {
+    public AbstractPsychicServer(String serverName) {
         this(serverName, 8888);
     }
 
@@ -109,7 +109,7 @@ public abstract class AbstractServer implements
      *
      * @param discoveryPort the discovery port to use
      */
-    public AbstractServer(int discoveryPort) {
+    public AbstractPsychicServer(int discoveryPort) {
         this(null, discoveryPort);
     }
 
@@ -117,7 +117,7 @@ public abstract class AbstractServer implements
      * Create a new server. It will be offline (not using any sockets) until {@link #start()} is called. Port 8888 will
      * be used as the discovery port, and the device hostname will be used as server name.
      */
-    public AbstractServer() {
+    public AbstractPsychicServer() {
         this(null);
     }
 

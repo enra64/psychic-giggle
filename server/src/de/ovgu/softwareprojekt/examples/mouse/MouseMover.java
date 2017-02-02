@@ -3,6 +3,7 @@ package de.ovgu.softwareprojekt.examples.mouse;
 import de.ovgu.softwareprojekt.networking.NetworkDataSink;
 import de.ovgu.softwareprojekt.SensorData;
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
+import de.ovgu.softwareprojekt.networking.PsychicServer;
 
 import java.awt.*;
 import java.awt.event.InputEvent;
@@ -61,7 +62,7 @@ public class MouseMover implements NetworkDataSink {
     /**
      * Press and release the right/left mouse button according to the button event
      *
-     * @param buttonID  the button id as given in {@link de.ovgu.softwareprojekt.networking.Server#addButton(String, int)}
+     * @param buttonID  the button id as given in {@link PsychicServer#addButton(String, int)}
      * @param isClicked true if the user pressed, false if the user released the button
      */
     void click(int buttonID, boolean isClicked) {

@@ -9,12 +9,12 @@ import de.ovgu.softwareprojekt.discovery.NetworkDevice;
 import de.ovgu.softwareprojekt.misc.ExceptionListener;
 
 /**
- * This subclass of AbstractServer can be used if you only want to know about specific callbacks, or cannot subclass
- * AbstractServer. The server will accept all clients, unless {@link #acceptClient(NetworkDevice)} is overridden or a
+ * This subclass of AbstractPsychicServer can be used if you only want to know about specific callbacks, or cannot subclass
+ * AbstractPsychicServer. The server will accept all clients, unless {@link #acceptClient(NetworkDevice)} is overridden or a
  * {@link ClientListener} is set using {@link #setClientListener(ClientListener)}.
  */
 @SuppressWarnings("WeakerAccess")
-public class Server extends AbstractServer {
+public class PsychicServer extends AbstractPsychicServer {
     private ClientListener mClientListener;
     private ExceptionListener mExceptionListener;
     private ButtonListener mButtonListener;
@@ -26,7 +26,7 @@ public class Server extends AbstractServer {
      * @param serverName    if not null, this name will be used. otherwise, the devices hostname is used
      * @param discoveryPort the port that should be listened on to discover devices
      */
-    public Server(@Nullable String serverName, int discoveryPort) {
+    public PsychicServer(@Nullable String serverName, int discoveryPort) {
         super(serverName, discoveryPort);
     }
 
@@ -36,7 +36,7 @@ public class Server extends AbstractServer {
      *
      * @param serverName the name this server will be discoverable as
      */
-    public Server(String serverName) {
+    public PsychicServer(String serverName) {
         super(serverName);
     }
 
@@ -46,7 +46,7 @@ public class Server extends AbstractServer {
      *
      * @param discoveryPort the discovery port to use
      */
-    public Server(int discoveryPort) {
+    public PsychicServer(int discoveryPort) {
         super(discoveryPort);
     }
 
@@ -54,7 +54,7 @@ public class Server extends AbstractServer {
      * Create a new server. It will be offline (not using any sockets) until {@link #start()} is called. Port 8888 will
      * be used as the discovery port, and the device hostname will be used as server name.
      */
-    public Server() {
+    public PsychicServer() {
         super();
     }
 

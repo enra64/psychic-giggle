@@ -66,59 +66,49 @@ Das Psychic-Framework bezeichnet eine Kombination aus einer App und einem Server
 Eine komplette JavaDoc ist verfügbar unter TODO
 
 # Grundlegende Verwendung:
-Zur Erstellung minimaler Funktionalität wird folgender Code benötigt:
+Es gibt zwei Möglichkeiten einen Server zu implementieren: Entweder wird ```AbstractPsychicServer``` erweitert, oder ein ```PsychicServer``` wird instanziiert.
 
-```Java
-public class ExampleServer implements NetworkDataSink {
-    public ExampleServer() throws IOException {
-        Server server = new Server();
-        server.start();
-    }
+Wenn ```AbstractPsychicServer``` erweitert wurde, müssen folgende Interfaces implementiert werden: 
+* [ButtonListener](#verwendung-von-buttons)
+* [ClientListener](#verwaltung-von-clients)
+* [ResetListener](#resetevents)
+* [ExceptionListener](#exceptionhandling)
 
-    public void onData(NetworkDevice origin, SensorData sensorData, float userSensitivity){
-    }
+Wenn ein ```PsychicServer``` instanziiert wurde, kann gewählt werden welche Interfaces interessant sind; für jedes kann ein Listener mit einer der folgenden Funktionen registriert werden:
+* ```setButtonListener(ButtonListener)```
+* ```setClientListener(ClientListener)```
+* ```setResetListener(ResetListener)```
+* ```setExceptionListener(ExceptionListener)```
 
-    public void close(){
-    }
-}
-```
+Nachdem ein Server mit ```start()``` gestartet wurde, können sich Clients verbinden. Wird ein Server mit ```close()``` geschlossen werden alle Clients getrennt. Die Instanz kann nicht wieder verwendet werden, ein weiterer Aufruf von ```start()``` wird eine Exception erzeugen.
 
-Im Konstruktor wurde ein Server instanziiert und gestartet. Falls nicht anders beschrieben, beziehen sich alle nachfolgenden Befehle auf eine solche Instanz. 
+> Hinweis: Falls nicht anders angegeben, befinden sich alle nachfolgend genannten Funktionen im ```AbstractPsychicServer```, sind also auch im ```PsychicServer``` verfügbar.
 
-Es ist auch möglich, von ```AbstractServer``` zu erben, allerdings wird dann erzwungen, dass die Klasse selbst folgende Interfaces implementiert: [```ButtonListener```](#verwendung-von-buttons), [```ClientListener```](#verwaltung-von-clients), [```ResetListener```](#resetevents) und [```ExceptionListener```](#exceptionhandling).
-
-TODO: vielleicht besser, die interfaces separat von den codebeispielen zu erklären? letztlich ist es jetzt irgendwie dazu übergegangen dass einfah übel viel kram erzählt wird, und die erwähnung von abstractserver läuft irgendwie auf die interfaces hinaus. ODER wir reduzieren die codebeispiele auf die callbacks; dann könnte man alle listener hier registrieren
-
-Nachdem der Server mit ```start()``` gestartet wurde, können sich Clients verbinden. Wird ein Server mit ```close()``` geschlossen werden alle Clients getrennt. Die Instanz kann nicht wieder verwendet werden, ein weiterer Aufruf von ```start()``` wird eine Exception erzeugen.
+Sind die Interfaces implementiert, fehlt noch der eigentlich wichtigste Schritt: Es müssen Daten von den Clients angefragt werden. 
 
 ## ~~Pizza~~ Daten bestellen
-Das eigentliche Kernthema des Psychic-Frameworks sind ja Sensordaten. Sensordaten werden vom Handy angefordert, indem die ```registerDataSink(NetworkDataSink, SensorType)```-Funktion der ```AbstractServer```-Klasse aufgerufen wird. Die übergebene ```NetworkDataSink``` wird dann die unveränderten Daten von dem durch den ```SensorType```-Parameter angegebenen Sensor erhalten. Falls nur Daten eines einzelnen Clients an eine Datensenke gelangen sollen, steht auch ```registerDataSink(NetworkDataSink, NetworkDevice, SensorData)``` zur Verfügung. Wird diese Funktion genutzt, werden nur Daten vom spezifizierten ```NetworkDevice``` an der übergebenen ```NetworkDataSink``` ankommen.
+Das eigentliche Kernthema des Psychic-Frameworks sind ja Sensordaten. Diese werden zuerst immer an eine ```NetworkDataSink``` geleitet, und werden mit der ```registerDataSink(NetworkDataSink, SensorType)```-Funktion angefordert. Die übergebene ```NetworkDataSink``` wird dann die unveränderten Daten von dem durch den ```SensorType```-Parameter angegebenen Sensor erhalten. [Die Verwendung von ```NetworkDataSink``` wird hier genauer beschrieben.](#networkdatasink)
 
-[Die Verwendung von ```NetworkDataSink``` wird hier beschrieben.](#networkdatasink)
+Sollen nur Daten eines einzelnen Clients an eine Datensenke gelangen, steht ```registerDataSink(NetworkDataSink, NetworkDevice, SensorData)``` zur Verfügung. Wird diese Funktion genutzt, werden nur Daten vom spezifizierten ```NetworkDevice``` an der übergebenen ```NetworkDataSink``` ankommen.
+
+Sensordaten lassen sich mit dem Psychic-Framework am besten mithilfe der [Daten-Pipeline](#daten-pipeline) bearbeiten, bis sie der Anwendung genügen.
 
 ## Daten abbestellen
 Wenn eine ```NetworkDataSink``` nicht mehr benötigt wird, zum Beispiel weil der entsprechende Client getrennt wurde, kann sie mit ```unregisterDataSink(NetworkDataSink)``` von allen Sensoren abgemeldet werden, und mit  ```unregisterDataSink(NetworkDataSink, SensorType)``` von bestimmten Sensoren abgemeldet werden. Danach erhält die ```NetworkDataSink``` keine Daten mehr vom Server.
 
 # Verwendung von Buttons
 ```Java
-public class ExampleServer implements ButtonListener {
-    public ExampleServer() throws IOException {
-        Server server = new Server();
-        server.start();
-
-        server.setButtonListener(this);
-        server.addButton("Erster Button", 0);
-        server.addButton("Zweiter Button", 1);
-        //server.setButtonLayout(xmlFileContent);
-    }
-
-    public void onButtonClick(ButtonClick buttonClick , NetworkDevice origin){
-    }
+// aus dem ButtonListener Interface
+void onButtonClick(ButtonClick click, NetworkDevice origin) {
+    if(click.getId() == MY_BUTTON_ID)
+        System.out.println("Button MY_BUTTON is currently held: " + click.isPressed());
 }
 ```
 
-Im Konstruktor muss ein ```ButtonListener``` gesetzt werden, so dass jeder Knopfdruck einen Aufruf der ```onButtonClick```-Funktion auslöst.
-Mithilfe von ```buttonClick.getId()``` kann der Button identifiziert werden, und ```buttonClick.isPressed()``` ist ```true``` wenn der Button gedrückt wurde, und ```false``` wenn der Button losgelassen wurde.
+Um über Knopfdrücke informiert zu werden, muss ein ```ButtonListener``` registriert werden. Der ```Server``` hat dafür die ```setButtonListener(ButtonListener)```-Funktion, Unterklassen des ```AbstractPsychicServer``` müssen das Interface ohnehin implementieren. 
+
+Innerhalb der ```onButtonClick(ButtonClick, NetworkDevice)``` kann der Button mithilfe von ```click.getId()``` identifiziert werden, und ```click.isPressed()``` ist ```true``` wenn der Button gedrückt wurde, und ```false``` wenn der Button losgelassen wurde.
+
 Buttons werden immer auf allen verbundenen Clients angezeigt.
 
 ## Buttons zur Runtime anfordern
@@ -176,29 +166,22 @@ Verwendung von ```addButton(String, int)``` wird das durch ```setButtonLayout```
 Um alle Buttons zu entfernen kann ```clearButtons()``` aufgerufen werden.
 
 # Verwaltung von Clients
-Um die verschiedenen Client-Events zu handeln, muss ein ```ClientListener``` gesetzt werden, der die Events empfängt.
+Um die verschiedenen Client-Events zu handeln, muss ein ```ClientListener``` gesetzt werden, der die Events empfängt. Die Server-Klasse hat dafür den ```setClientListener(ClientListener)```-Befehl.
 
+Beispiel-Implementationen der Funktionen aus dem ```ClientListener```-Interface:
 ```Java
-public class ExampleServer implements ClientListener {
-    public ExampleServer() throws IOException {
-        Server server = new Server();
-        server.start();
-
-        server.setClientListener(this);
-    }
-
-    public boolean acceptClient(NetworkDevice newClient) {
-        return false;
-    }
-
-    public void onClientDisconnected(NetworkDevice disconnectedClient) {
-    }
-
-    public void onClientTimeout(NetworkDevice timeoutClient) {
-    }
-
-    public void onClientAccepted(NetworkDevice connectedClient) {
-    }
+boolean acceptClient(NetworkDevice newClient){
+    return true; // accept any client
+}
+void onClientDisconnected(NetworkDevice disconnectedClient){
+    System.out.println("Oh no! Client " + disconnectedClient.getName() + " has disconnected!")
+}
+void onClientTimeout(NetworkDevice timeoutClient){
+    System.out.println("Oh no! Client " + disconnectedClient.getName() + " had a timeout!")
+}
+void onClientAccepted(NetworkDevice connectedClient){
+    System.out.println("A new client, " + disconnectedClient.getName() + " has connected!")
+}
 ```
 
 ## Callbacks
@@ -226,43 +209,37 @@ Wenn ```NetworkDevice.equals(NetworkDevice)``` ```true``` zurückgibt, dann hand
 Die maximale Anzahl von Clients ist beschränkt auf ```Integer.INT_MAX```. Ein nutzerdefiniertes Maximum kann mithilfe von ```setClientMaximum(int)``` gesetzt werden, mit ```getClientMaximum()``` abgefragt werden und mit ```removeClientMaximum()``` entfernt werden.
 
 # Exceptionhandling
+Um alle Exceptions die in verschiedenen Threads auftreten aufzufangen muss ein ```ExceptionListener``` registriert werden. ```onException(Object, Exception, String)``` wird dann aufgerufen, falls eine Exception auftritt, die nicht intern behandelt werden kann.
+
+Beispiel-Implementation:
 ```Java
-public class ExampleServer implements ExceptionListener {
-    public ExampleServer() throws IOException {
-        Server server = new Server();
-        server.start();
-
-        server.setExceptionListener(this);
-    }
-
     public void onException(Object origin, Exception exception, String info) {
+      // print complete info before the stack trace
+      System.out.println("Exception in " + origin.getClass() + "; Info: " + info)
+      System.out.flush();
+
+      // print the stack trace
+      exception.printStackTrace();
     }
-}
 ```
-Um alle Exceptions die in verschiedenen Threads auftreten aufzufangen muss ein ```ExceptionListener``` registriert werden. ```onException(Object, Exception, String)``` wird dann aufgerufen, falls eine Exception auftritt, die nicht intern behandelt werden kann. Der ```origin```-Parameter gibt das Ursprungsobjekt (oder ein übergeordnetes, falls das Ursprungsobjekt dem Nutzer nicht bekannt ist) an, der ```exception```-Parameter gibt die Exception on, und der ```info```-Parameter enthält weitere Informationen zu der Exception und ihrem Grund.
+Der ```origin```-Parameter gibt das Ursprungsobjekt (oder ein übergeordnetes, falls das Ursprungsobjekt dem Nutzer nicht bekannt ist) an, der ```exception```-Parameter gibt die Exception on, und der ```info```-Parameter enthält weitere Informationen zu der Exception und ihrem Grund.
 
 # Resetevents
+ResetEvents werden durch den von anderen Buttons separaten Reset-Button hervorgerufen. Im ```PsychicServer``` wird das Event wird an den ```ResetListener``` geleitet, der mit ```setResetListener(ResetListener)``` registriert wurde, im ```AbstractPsychicServer``` wird die Implementation erzwungen.
 ```Java
-public class ExampleServer implements ResetListener {
-    public ExampleServer() throws IOException {
-        Server server = new Server();
-        server.start();
-
-        server.setResetListener(this);
-    }
-
-    public void onResetPosition(NetworkDevice origin) {
-    }
+public void onResetPosition(NetworkDevice origin) {
+    // pseudo-code!
+    mouse.centerOnCurrentScreen();
 }
 ```
 Wenn ein Client den "Reset"-Button auf seinem Handy benutzt, wird die ```onResetPosition(NetworkDevice)``` aufgerufen. Dann sollte der derzeitige Status des Handys zurückgesetzt werden, bei der Beispielimplementation ```MouseServer``` wird der Mauszeiger in die Mitte des Bildschirms gesetzt.
 
 ## Reset-Button deaktivieren
-Es wird empfohlen den Reset-Button zu implementieren. Er gewährleistet, dass der Nutzer mit einem einfachen, nie wechselndem Button jederzeit in einen Zustand zurückkehren kann, in dem die Anwendung bedienbar ist. Solche Zustände können zum Beispiel durch nicht korrigierten Gyroskop-Drift entstehen. Es ist jedoch möglich, den Reset-Knopf zu deaktivieren, indem die ```hideResetButton(boolean)```-Funktion des Servers aufgerufen wird.
+Es wird empfohlen den Reset-Button zu implementieren. Er gewährleistet, dass der Nutzer mit einem einfachen, nie wechselndem Button jederzeit in einen Zustand zurückkehren kann, in dem die Anwendung bedienbar ist. Solche Zustände können zum Beispiel durch nicht korrigierten Gyroskop-Drift entstehen. Es ist jedoch möglich, den Reset-Knopf zu deaktivieren, indem die ```hideResetButton(boolean)```-Funktion des Servers aufgerufen wird. Ist der Parameter ```true```, wird der Button versteckt; ist er ```false```, wird der Button angezeigt.
 
 # Daten-Pipeline
 ![Pipeline](pipeline.png)
-Das Psychic-Framework ist darauf ausgerichtet dass Sensordaten mithilfe einer Pipeline benutzt werden die auf dem Handy mit dem Sensor beginnt und auf dem Server mit der Anwendung endet. Bis dahin können die Sensordaten flexibel mithilfe von ```AbstractFilter```, ```NetworkDataSource``` und ```NetworkDataSink``` gefiltert und weitergeleitet werden.
+Das Psychic-Framework ist darauf ausgerichtet, dass Sensordaten mithilfe einer Pipeline benutzt werden die auf dem Handy mit dem Sensor beginnt und auf dem Server mit der Anwendung endet. Bis dahin können die Sensordaten flexibel mithilfe von ```AbstractFilter```, ```NetworkDataSource``` und ```NetworkDataSink``` gefiltert und weitergeleitet werden.
 
 ## Format der Sensordaten: SensorData
 Alle Daten werden in ```SensorData```-Objekten transportiert. In ```SensorData```-Objekten sind folgende Informationen enthalten:
@@ -275,9 +252,9 @@ Alle Daten werden in ```SensorData```-Objekten transportiert. In ```SensorData``
 Das ```NetworkDataSink```-Interface muss implementiert werden, wenn eine Klasse Daten aus der Pipeline erhalten soll. Es beinhaltet zwei Funktionen:
 
 * ```close()```: Die Instanz wird nicht mehr benötigt, und sollte alle Ressourcen schließen.
-* ```onData(NetworkDevice, SensorData, float)```: wird immer dann aufgerufen wenn die Daten die Pipeline bis zu dieser Implementation durchlaufen haben.
-  * Der erste Parameter, meist ```origin``` genannt, spezifiziert das ```NetworkDevice```, also den Client, der diese Daten gesendet hat.
-  * Der zweite Parameter, ```sensorData```, enthält die [Sensordaten](#format-der-sensordaten:-sensordata).
+* ```onData(NetworkDevice, SensorData, float)```: wird immer dann aufgerufen wenn die Daten die Pipeline bis zu dieser Senke durchlaufen haben.
+  * Der erste Parameter, ```origin```, spezifiziert das ```NetworkDevice```, also den Client, der diese Daten gesendet hat.
+  * Der zweite Parameter, ```sensorData```, enthält die [Sensordaten](#format-der-sensordaten-sensordata).
   * Der dritte Parameter, ```userSensitivity```, spezifiziert die Sensitivität die in der App für den Sensor eingestellt wurde. Der Wert liegt standardmäßig bei ```50```, und es gilt ```0 <= userSensitivity <= 100```.
 
 
@@ -359,7 +336,7 @@ class UserSensitivityMultiplicator extends AbstractFilter {
 * ```ScalingFilter```: Skaliert die Werte von ```-sourceRange``` bis ```+sourceRange``` zu ```-targetRange``` bis ```-targetRange```
 * ```TemporaryIntegratingFilter```: Bildet die Summe der letzten ```n``` Werte.
 * ```ThresholdingFilter```: Ersetzt die Werte durch ```0``` wenn die Amplitude nicht groß genug ist
-* ```UserSensitivityMultiplicator```: Multipliziert die Daten mit dem ```userSensitivity```-Faktor und ersetzt diesen durch 1.
+* ```UserSensitivityMultiplicator```: Multipliziert die Daten mit dem ```userSensitivity```-Faktor und ersetzt diesen durch ```1f```.
 
 ## Daten-Splitter
 Splitter sind Klassen, die ```NetworkDataSink``` implementieren, und die erhaltenen Daten an verschiedene ```NetworkDataSink```s weiterleiten.
@@ -383,15 +360,20 @@ Pipelineelemente können mit ```remove(int)``` oder ```remove(AbstractFilter)```
 ### Pipeline abschließen
 Die Pipeline kann mit ```build()``` abgeschlossen werden; dann ist der letzte ```AbstractFilter``` der ans Ende platziert wurde das letze Element in der Pipeline, und die Funktion gibt den Anfang der Pipeline zurück. Mithilfe von ```build(NetworkDataSink)``` kann das letzte Element auch eine ```NetworkDataSink``` sein, nützlich zum Beispiel wenn das letzte Pipelineelement die Daten nicht weiterleiten muss.
 
+## Temporärer Stopp des Datenflusses
+Es ist dem Nutzer möglich, mithilfe der "Hold Sensors"-Checkbox das Senden von SensorDaten zu unterbinden.
+
 # Notifications anzeigen
 Das Framework erlaubt es, Notifications mit beliebigem Titel und Text anzeigen zu lassen.
 ```Java
-displayNotification(int, String, String, NetworkDevice)
-displayNotification(int, String, String)
+displayNotification(int id, String title, String text, NetworkDevice target)
+displayNotification(int id, String title, String text)
 ```
-Der erste Parameter ist die ID der Notification. Pro Gerät muss diese pro Notification einmalig sein. Der erste ```String```-Parameter ist der Titel der Notification, der zweite ist der Text der Notification.
+Die ID aller Notifications darf sich mit keiner anderen überschneiden, die vom derzeitigen Server verwendet wird.
 
-Mit dem letzten Parameter lässt sich das ```NetworkDevice``` festlegen, auf dem die Notification angezeigt wird. Wird der Parameter ausgelassen, wird die Notification auf allen Geräten angezeigt; die ID darf sich mit keiner anderen überschneiden.
+Mit dem letzten Parameter lässt sich das ```NetworkDevice``` festlegen, auf dem die Notification angezeigt wird. Wird der Parameter ausgelassen, wird die Notification auf allen Geräten angezeigt.
+
+![Ergebnis eines displayNotification-Calls](notification.png)
 
 # Netzwerkverbindung
 ## Server-Discovery

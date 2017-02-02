@@ -8,9 +8,9 @@ import de.ovgu.softwareprojekt.callback_interfaces.ResetListener;
 import de.ovgu.softwareprojekt.control.commands.ButtonClick;
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
 import de.ovgu.softwareprojekt.misc.ExceptionListener;
-import de.ovgu.softwareprojekt.networking.AbstractServer;
+import de.ovgu.softwareprojekt.networking.AbstractPsychicServer;
 import de.ovgu.softwareprojekt.networking.NetworkDataSink;
-import de.ovgu.softwareprojekt.networking.Server;
+import de.ovgu.softwareprojekt.networking.PsychicServer;
 
 import java.io.IOException;
 
@@ -19,7 +19,7 @@ import java.io.IOException;
  */
 public class ExampleServer implements NetworkDataSink, ButtonListener, ClientListener, ExceptionListener, ResetListener {
     public ExampleServer() throws IOException {
-        Server server = new Server();
+        PsychicServer server = new PsychicServer();
         server.start();
 
         server.setButtonListener(this);
@@ -86,8 +86,8 @@ public class ExampleServer implements NetworkDataSink, ButtonListener, ClientLis
     /**
      * Called whenever a button requested by the server is clicked.
      * <p>
-     * You may add buttons using {@link AbstractServer#addButton(String, int) addButton(String, id)}
-     * or {@link AbstractServer#setButtonLayout(String) setButtonLayout(String)}
+     * You may add buttons using {@link AbstractPsychicServer#addButton(String, int) addButton(String, id)}
+     * or {@link AbstractPsychicServer#setButtonLayout(String) setButtonLayout(String)}
      *
      * @param click  event object specifying details like button id
      * @param origin the network device that sent the button click
