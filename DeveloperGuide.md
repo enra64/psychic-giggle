@@ -9,7 +9,8 @@
 * javadoc ist teilweise horribly out of date. wir müssen zumindest bei dem kram den die potenziell angucken korrigieren!
 * hold sensors erklären
 * haben wir die icons erklärt? also dc, options
-* das bild für das linearlayout ist nicht wie erwartet
+* evtl statt dem exampleserver einfach das interface nennen?
+* wie soll man das common-package ohne android studio compilen? iwie müssen wir das noch anders lösen.
 
 # Developer Guide für das Psychic-Framework
 Das Psychic-Framework bezeichnet eine Kombination aus einer App und einem Serverframework mit einem gemeinsamen Kern. Dieses Framework dient der schnellen und einfachen Entwicklung von PC-Applikationen, die Sensordaten von Android-Geräten verwenden möchten.
@@ -131,7 +132,8 @@ Es werden nur ```LinearLayout```- und ```Button```-Objekte unterstützt. Ein Bei
 
 ```Java
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout 
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal">
 
     <Button
@@ -393,7 +395,7 @@ Mit dem letzten Parameter lässt sich das ```NetworkDevice``` festlegen, auf dem
 
 # Netzwerkverbindung
 ## Server-Discovery
-Das Psychic-Framework nutzt UDP-Broadcasts der Clients bzw. der App, auf die der Server mit seiner Adresse antwortet. Der Port, auf dem der Server die Broadcasts erwartet, muss in der App eingegeben werden, falls nicht der Standardport ```8888``` verwendet wird.
+Das Psychic-Framework nutzt UDP-Broadcasts der Clients bzw. der App, auf die der Server mit seiner Adresse antwortet. Der Port, auf dem der Server die Broadcasts erwartet, muss in der App eingegeben werden, falls nicht der Standardport ```8888``` verwendet wird. Alle Daten und Commands werden als serialisierte Java-Objekte übertragen.
 
 ## Datenverbindung
 Der Server wartet für jeden Client auf einem eigenen Port auf Daten, die via UDP gesendet werden. Dieser Port wird vom Server gewählt und in der Discovery-Phase dem Client mitgeteilt; es ist ein zufälliger freier Port.

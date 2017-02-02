@@ -1,10 +1,10 @@
 package de.ovgu.softwareprojekt;
 
-import de.ovgu.softwareprojekt.servers.ExampleServer;
-import de.ovgu.softwareprojekt.servers.gui.ServerSelectionWindow;
-import de.ovgu.softwareprojekt.servers.kuka.KukaServer;
-import de.ovgu.softwareprojekt.servers.mouse.MouseServer;
-import de.ovgu.softwareprojekt.servers.nes.NesServer;
+import de.ovgu.softwareprojekt.examples.ExampleServer;
+import de.ovgu.softwareprojekt.examples.gui.ServerSelectionWindow;
+import de.ovgu.softwareprojekt.examples.kuka.KukaServer;
+import de.ovgu.softwareprojekt.examples.mouse.MouseServer;
+import de.ovgu.softwareprojekt.examples.nes.NesServer;
 
 
 import java.awt.*;
