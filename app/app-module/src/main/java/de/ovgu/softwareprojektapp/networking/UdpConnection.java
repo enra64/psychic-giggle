@@ -1,6 +1,7 @@
 package de.ovgu.softwareprojektapp.networking;
 
 import android.os.AsyncTask;
+import android.util.Log;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -8,6 +9,7 @@ import java.io.ObjectOutputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.SocketException;
 import java.nio.channels.DatagramChannel;
 
 import de.ovgu.softwareprojekt.DataSink;
@@ -76,7 +78,7 @@ public class UdpConnection implements DataSink {
         if(!mSocket.isClosed())
             new SensorOut().execute(sensorData);
         else
-            System.out.println("sending data on closed data connection");
+            Log.w("PsychicApp", "You are trying to send data on a closed connection!");
     }
 
     /**

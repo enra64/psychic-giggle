@@ -30,33 +30,24 @@ public class ExampleServer implements NetworkDataSink, ButtonListener, ClientLis
 
         server.setButtonLayout("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
                 "<LinearLayout xmlns:android=\"http://schemas.android.com/apk/res/android\"\n" +
-                "    android:orientation=\"vertical\" android:layout_width=\"match_parent\"\n" +
-                "    android:layout_height=\"match_parent\">\n" +
+                "    android:orientation=\"horizontal\">\n" +
                 "\n" +
                 "    <Button\n" +
                 "        android:text=\"A\"\n" +
-                "        android:layout_width=\"match_parent\"\n" +
-                "        android:layout_height=\"wrap_content\"\n" +
                 "        android:id=\"0\"\n" +
-                "        android:layout_weight=\"2\"/>\n" +
+                "        android:layout_weight=\"3\"/>\n" +
                 "\n" +
                 "    <LinearLayout\n" +
-                "        android:orientation=\"horizontal\"\n" +
-                "        android:layout_width=\"match_parent\"\n" +
-                "        android:layout_height=\"wrap_content\"\n" +
-                "        android:layout_weight=\"2\">\n" +
+                "        android:orientation=\"vertical\"\n" +
+                "        android:layout_weight=\"5\">\n" +
                 "\n" +
                 "        <Button\n" +
                 "            android:text=\"B\"\n" +
-                "            android:layout_width=\"wrap_content\"\n" +
-                "            android:layout_height=\"match_parent\"\n" +
                 "            android:id=\"1\"\n" +
-                "            android:layout_weight=\"1\" />\n" +
+                "            android:layout_weight=\"2\" />\n" +
                 "\n" +
                 "        <Button\n" +
                 "            android:text=\"C\"\n" +
-                "            android:layout_width=\"wrap_content\"\n" +
-                "            android:layout_height=\"match_parent\"\n" +
                 "            android:id=\"2\"\n" +
                 "            android:layout_weight=\"1\" />\n" +
                 "    </LinearLayout>\n" +
@@ -78,12 +69,12 @@ public class ExampleServer implements NetworkDataSink, ButtonListener, ClientLis
      * onData is called whenever new data is to be processed
      *
      * @param origin          the network device which sent the data
-     * @param sensorData            the sensor data
+     * @param sensorData      the sensor data
      * @param userSensitivity the sensitivity the user requested in his app settings for the sensor
      */
     @Override
     public void onData(NetworkDevice origin, SensorData sensorData, float userSensitivity) {
-        System.out.println(Arrays.toString(sensorData.data));
+        //System.out.println(Arrays.toString(sensorData.data));
     }
 
     /**

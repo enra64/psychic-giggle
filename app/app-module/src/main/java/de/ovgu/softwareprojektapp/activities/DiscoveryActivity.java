@@ -20,7 +20,6 @@ import java.security.InvalidParameterException;
 import java.util.LinkedList;
 import java.util.List;
 
-import de.ovgu.softwareprojekt.SensorType;
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
 import de.ovgu.softwareprojekt.discovery.OnDiscoveryListener;
 import de.ovgu.softwareprojekt.misc.ExceptionListener;
@@ -30,7 +29,7 @@ import de.ovgu.softwareprojektapp.UiUtil;
 import de.ovgu.softwareprojektapp.networking.DiscoveryClient;
 
 import static de.ovgu.softwareprojektapp.activities.send.SendActivity.RESULT_SERVER_CONNECTION_TIMED_OUT;
-import static de.ovgu.softwareprojektapp.activities.send.SendActivity.RESULT_SERVER_NOT_LISTENING_ON_PORT;
+import static de.ovgu.softwareprojektapp.activities.send.SendActivity.RESULT_SERVER_SEEMS_TO_BE_OFFLINE;
 import static de.ovgu.softwareprojektapp.activities.send.SendActivity.RESULT_SERVER_NOT_RESPONDING_TO_REQUEST;
 import static de.ovgu.softwareprojektapp.activities.send.SendActivity.RESULT_SERVER_REFUSED;
 
@@ -148,7 +147,7 @@ public class DiscoveryActivity extends AppCompatActivity implements OnDiscoveryL
             case RESULT_SERVER_REFUSED:
                 UiUtil.showAlert(this, "Connection failed", "Server refused connection");
                 break;
-            case RESULT_SERVER_NOT_LISTENING_ON_PORT:
+            case RESULT_SERVER_SEEMS_TO_BE_OFFLINE:
                 UiUtil.showAlert(this, "Connection failed", "Server seems to be offline");
                 break;
             case RESULT_SERVER_CONNECTION_TIMED_OUT:

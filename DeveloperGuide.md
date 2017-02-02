@@ -12,18 +12,16 @@
 * das bild für das linearlayout ist nicht wie erwartet
 
 # Developer Guide für das Psychic-Framework
-Das Psychic-Framework bezeichnet eine Kombination aus einer App und einem Serverframework mit einem gemeinsamen Kern. Dieses Framework dient der schnellen und einfachen Entwicklung von
-PC-Applikationen, die Sensordaten von Android-Geräten verwenden möchten.
+Das Psychic-Framework bezeichnet eine Kombination aus einer App und einem Serverframework mit einem gemeinsamen Kern. Dieses Framework dient der schnellen und einfachen Entwicklung von PC-Applikationen, die Sensordaten von Android-Geräten verwenden möchten.
 
 # Inhaltsverzeichnis
 * [Developer Guide für das Psychic-Framework](#developer-guide-für-das-psychic-framework)
 * [JavaDoc](#javadoc)
 * [Grundlegende Verwendung:](#grundlegende-verwendung)
-* [Sensoren](#sensoren)
-    * [Maximalwerte](#maximalwerte)
-    * [Update-Frequenz](#update-frequenz)
-    * [Beschreibungen anzeigen](#beschreibungen-anzeigen)
+    * [~~Pizza~~ Daten bestellen](#~~pizza~~-daten-bestellen)
+    * [Daten abbestellen](#daten-abbestellen)
 * [Verwendung von Buttons](#verwendung-von-buttons)
+    * [Buttons zur Runtime anfordern](#buttons-zur-runtime-anfordern)
     * [Layouts laden](#layouts-laden)
         * [Einschränkungen für die Layout-Dateien](#einschränkungen-für-die-layout-dateien)
 * [Verwaltung von Clients](#verwaltung-von-clients)
@@ -37,11 +35,14 @@ PC-Applikationen, die Sensordaten von Android-Geräten verwenden möchten.
 * [Exceptionhandling](#exceptionhandling)
 * [Resetevents](#resetevents)
     * [Reset-Button deaktivieren](#reset-button-deaktivieren)
-* [Entfernen einer NetworkDataSink](#entfernen-einer-networkdatasink)
 * [Daten-Pipeline](#daten-pipeline)
     * [Format der Sensordaten: SensorData](#format-der-sensordaten-sensordata)
     * [NetworkDataSink](#networkdatasink)
     * [NetworkDataSource](#networkdatasource)
+    * [Sensoren](#sensoren)
+        * [Maximalwerte](#maximalwerte)
+        * [Update-Frequenz](#update-frequenz)
+        * [Beschreibungen anzeigen](#beschreibungen-anzeigen)
     * [Filter](#filter)
         * [onData](#ondata)
         * [Beispiel](#beispiel)
@@ -131,33 +132,24 @@ Es werden nur ```LinearLayout```- und ```Button```-Objekte unterstützt. Ein Bei
 ```Java
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:orientation="horizontal">
 
     <Button
         android:text="A"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
         android:id="0"
-        android:layout_weight="2"/>
+        android:layout_weight="3"/>
 
     <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="2">
+        android:orientation="vertical"
+        android:layout_weight="5">
 
         <Button
             android:text="B"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
             android:id="1"
-            android:layout_weight="1" />
+            android:layout_weight="2" />
 
         <Button
             android:text="C"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
             android:id="2"
             android:layout_weight="1" />
     </LinearLayout>

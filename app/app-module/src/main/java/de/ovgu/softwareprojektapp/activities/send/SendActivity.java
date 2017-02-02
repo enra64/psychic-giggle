@@ -19,10 +19,10 @@ import android.view.WindowManager;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 
+import java.io.IOException;
 import java.net.ConnectException;
 import java.net.InetAddress;
 import java.net.SocketException;
-import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Timer;
@@ -73,7 +73,7 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
     public static final int
             RESULT_SERVER_REFUSED = -1,
             RESULT_USER_STOPPED = 0,
-            RESULT_SERVER_NOT_LISTENING_ON_PORT = -2,
+            RESULT_SERVER_SEEMS_TO_BE_OFFLINE = -2,
             RESULT_SERVER_CONNECTION_TIMED_OUT = -3,
             RESULT_SERVER_NOT_RESPONDING_TO_REQUEST = -4;
 
@@ -429,13 +429,13 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
 
         // this exception is thrown when we send commands, but the server has closed its command port
         if (exception instanceof ConnectException && (exception.getMessage().contains("ECONNREFUSED") || exception.getMessage().contains("Connection refused")))
-            closeActivity(RESULT_SERVER_NOT_LISTENING_ON_PORT);
+            closeActivity(RESULT_SERVER_SEEMS_TO_BE_OFFLINE);
         else if (exception instanceof ConnectException && exception.getMessage().contains("ETIMEDOUT"))
             closeActivity(RESULT_SERVER_CONNECTION_TIMED_OUT);
-        else if (exception instanceof ConnectException && exception.getMessage().contains("Socket is closed"))
-            closeActivity(RESULT_SERVER_NOT_LISTENING_ON_PORT);
+        else if (exception instanceof IOException && exception.getMessage().contains("Socket is closed"))
+            closeActivity(RESULT_SERVER_SEEMS_TO_BE_OFFLINE);
         else if (exception instanceof SocketException && info.contains("could not send SensorData object"))
-            closeActivity(RESULT_SERVER_NOT_LISTENING_ON_PORT);
+            closeActivity(RESULT_SERVER_SEEMS_TO_BE_OFFLINE);
         else {
             Log.w("spapp", "UNHANDLED EXCEPTION SENDACTIVITY:");
             exception.printStackTrace();
