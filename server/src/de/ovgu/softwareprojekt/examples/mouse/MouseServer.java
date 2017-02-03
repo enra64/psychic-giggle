@@ -49,10 +49,10 @@ public class MouseServer extends AbstractPsychicServer {
 
         // this is how we define a filter pipeline:
         FilterPipelineBuilder builder = new FilterPipelineBuilder();
-        builder.append(new ScalingFilter(20, 5));
+        builder.append(new ScalingFilter(8, 5));
         builder.append(new UserSensitivityMultiplicator());
         builder.append(new AveragingFilter(3));
-        builder.append(new DifferenceThresholdFilter(.1f));
+        builder.append(new DifferenceThresholdFilter(.4f));
 
         // register our mouse mover to receive gyroscope data
         registerDataSink(builder.build(mMouseMover), SensorType.Gyroscope);
@@ -61,7 +61,7 @@ public class MouseServer extends AbstractPsychicServer {
         addButton("left click", LEFT_MOUSE_BUTTON);
         addButton("right click", RIGHT_MOUSE_BUTTON);
 
-        // set a maximum client count
+        // set a maximum client count of 1
         setClientMaximum(1);
     }
 
