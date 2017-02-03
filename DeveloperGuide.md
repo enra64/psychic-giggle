@@ -1,4 +1,5 @@
 # TODO
+* UseCaseDiagramm in Einleitungs
 * packagenamen ändern!
 * übersetzungen möglich machen
 * bilder hinzufügen
@@ -7,9 +8,6 @@
 * wo packen wir so allgemeines zeug wie NetworkDataSink, SensorData, NetworkDevice etc hin?
 * alle registrierten sinks in splittern schliessen???
 * javadoc ist teilweise horribly out of date. wir müssen zumindest bei dem kram den die potenziell angucken korrigieren!
-* hold sensors erklären
-* haben wir die icons erklärt? also dc, options
-* evtl statt dem exampleserver einfach das interface nennen?
 * wie soll man das common-package ohne android studio compilen? iwie müssen wir das noch anders lösen.
 
 # Developer Guide für das Psychic-Framework
@@ -68,7 +66,7 @@ Eine komplette JavaDoc ist verfügbar unter TODO
 # Grundlegende Verwendung:
 Es gibt zwei Möglichkeiten einen Server zu implementieren: Entweder wird ```AbstractPsychicServer``` erweitert, oder ein ```PsychicServer``` wird instanziiert.
 
-Wenn ```AbstractPsychicServer``` erweitert wurde, müssen folgende Interfaces implementiert werden: 
+Wenn ```AbstractPsychicServer``` erweitert wurde, müssen folgende Interfaces implementiert werden:
 * [ButtonListener](#verwendung-von-buttons)
 * [ClientListener](#verwaltung-von-clients)
 * [ResetListener](#resetevents)
@@ -80,11 +78,12 @@ Wenn ein ```PsychicServer``` instanziiert wurde, kann gewählt werden welche Int
 * ```setResetListener(ResetListener)```
 * ```setExceptionListener(ExceptionListener)```
 
+
 Nachdem ein Server mit ```start()``` gestartet wurde, können sich Clients verbinden. Wird ein Server mit ```close()``` geschlossen werden alle Clients getrennt. Die Instanz kann nicht wieder verwendet werden, ein weiterer Aufruf von ```start()``` wird eine Exception erzeugen.
 
 > Hinweis: Falls nicht anders angegeben, befinden sich alle nachfolgend genannten Funktionen im ```AbstractPsychicServer```, sind also auch im ```PsychicServer``` verfügbar.
 
-Sind die Interfaces implementiert, fehlt noch der eigentlich wichtigste Schritt: Es müssen Daten von den Clients angefragt werden. 
+Sind die Interfaces implementiert, fehlt noch der eigentlich wichtigste Schritt: Es müssen Daten von den Clients angefragt werden.
 
 ## Daten bestellen
 Das Kernthema des Psychic-Frameworks sind Sensordaten. Diese werden zuerst an eine ```NetworkDataSink``` geleitet, und werden mit der ```registerDataSink(NetworkDataSink, SensorType)```-Funktion angefordert. Die übergebene ```NetworkDataSink``` wird dann die unveränderten Daten von dem durch den ```SensorType```-Parameter angegebenen Sensor erhalten. [Die Verwendung von ```NetworkDataSink``` wird hier genauer beschrieben.](#networkdatasink)
@@ -92,6 +91,24 @@ Das Kernthema des Psychic-Frameworks sind Sensordaten. Diese werden zuerst an ei
 Sollen nur Daten eines einzelnen Clients an eine Datensenke gelangen, steht ```registerDataSink(NetworkDataSink, NetworkDevice, SensorData)``` zur Verfügung. Wird diese Funktion genutzt, werden nur Daten vom spezifizierten ```NetworkDevice``` an der übergebenen ```NetworkDataSink``` ankommen.
 
 Sensordaten lassen sich mit dem Psychic-Framework am besten mithilfe der [Daten-Pipeline](#daten-pipeline) bearbeiten, bis sie der Anwendung genügen.
+
+### Beispiel einer Serverinstanziierung
+```Java
+public class ExampleServer implements NetworkDataSink {
+    public ExampleServer() throws IOException {
+        Server server = new Server();
+        server.start();
+        server.registerDataSink(this, SensorType.Gyroscope);
+    }
+
+    public void onData(NetworkDevice origin, SensorData sensorData, float userSensitivity){
+      System.out.println("received" + Arrays.toString(sensorData.data));
+    }
+
+    public void close(){
+    }
+}
+```
 
 ## Daten abbestellen
 Wenn eine ```NetworkDataSink``` nicht mehr benötigt wird, zum Beispiel weil der entsprechende Client getrennt wurde, kann sie mit ```unregisterDataSink(NetworkDataSink)``` von allen Sensoren abgemeldet werden, und mit  ```unregisterDataSink(NetworkDataSink, SensorType)``` von bestimmten Sensoren abgemeldet werden. Danach erhält die ```NetworkDataSink``` keine Daten mehr vom Server.
@@ -106,7 +123,7 @@ void onButtonClick(ButtonClick click, NetworkDevice origin) {
 ```
 
 Um über Knopfdrücke informiert zu werden, muss ein ```ButtonListener``` registriert werden. Der ```Server``` hat dafür die ```setButtonListener(ButtonListener)```-Funktion.  
-Unterklassen des ```AbstractPsychicServer``` müssen das Interface ohnehin implementieren. 
+Unterklassen des ```AbstractPsychicServer``` müssen das Interface ohnehin implementieren.
 
 Innerhalb der ```onButtonClick(ButtonClick, NetworkDevice)``` kann der Button mithilfe von ```click.getId()``` identifiziert werden, und ```click.isPressed()``` ist ```true``` wenn der Button gedrückt und ```false``` wenn der Button losgelassen wurde.
 
@@ -122,9 +139,9 @@ Eine Alternative ist die Verwendung von ```setButtonLayout(String)```. Hierbei k
 ### Einschränkungen für die Layout-Dateien
 Es werden nur ```LinearLayout```- und ```Button```-Objekte unterstützt. Ein Beispiel für einen unterstützten XML-String ist das folgende Snippet:
 
-```Java
+```xml
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout 
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal">
 
@@ -352,6 +369,18 @@ Vorhandene Implementierungen:
 
 ## Pipeline-Builder
 Mit einer ```FilterPipelineBuilder```-Instanz lassen sich Filterpipelines einfach erstellen.
+```Java
+// this is how we define a filter pipeline:
+FilterPipelineBuilder builder = new FilterPipelineBuilder();
+builder.append(new ScalingFilter(20, 5));
+builder.append(new UserSensitivityMultiplicator());
+builder.append(new AveragingFilter(3));
+builder.append(new DifferenceThresholdFilter(0.1f));
+
+// register our pipeline to receive gyroscope data
+registerDataSink(builder.build(new MyNetworkDataSink()), SensorType.Gyroscope);
+```
+
 
 ### Elemente hinzufügen
 Es gibt drei Methoden um ein neues Element in die Pipeline einzubauen: ```prepend(AbstractFilter)```, um ein Element an den Anfang zu setzen; ```append(AbstractFilter)```, um ein Element ans Ende der Pipeline zu setzen, und ```append(AbstractFilter, int)``` um ein Filterelement in eine beliebige Position der Pipeline zu setzen.
