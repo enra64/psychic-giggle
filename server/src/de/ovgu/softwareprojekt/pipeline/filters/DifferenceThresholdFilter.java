@@ -58,14 +58,19 @@ public class DifferenceThresholdFilter extends AbstractFilter {
         if (mLastValue == null)
             mLastValue = new float[sensorData.data.length];
 
+        System.out.println(Arrays.toString(sensorData.data));
+
         // if the change does not meet the set minimum, overwrite the new data with our old, unchanged data
-        if (calculateChange(sensorData.data, mLastValue) < mMinimumChange)
+        if (calculateChange(sensorData.data, mLastValue) < mMinimumChange) {
             Arrays.fill(sensorData.data, 0);
+        }
             // if the change does meet the minimum, copy over the new values
         else {
             //System.out.println(calculateChange(sensorData.data, mLastValue));
             System.arraycopy(sensorData.data, 0, mLastValue, 0, mLastValue.length);
         }
+
+
         // notify attached sink of new data
         forwardData(origin, sensorData, userSensitivity);
     }

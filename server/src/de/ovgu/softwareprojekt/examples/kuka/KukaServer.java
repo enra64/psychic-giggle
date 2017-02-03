@@ -49,11 +49,6 @@ public class KukaServer extends AbstractPsychicServer {
     private MarbleLabyrinthControl mMarbleLabyrinthControl;
 
     /**
-     * The control mode that should currently be notified of reset events
-     */
-    private ResetListener mCurrentControl;
-
-    /**
      * Create a new {@link KukaServer}
      * @throws IOException if communication with a device fails
      */
@@ -65,9 +60,9 @@ public class KukaServer extends AbstractPsychicServer {
 
         createButtons();
 
-        // create both control instances
+        // create both control instances, reset robot to marble control
         mMarbleLabyrinthControl = new MarbleLabyrinthControl(mRobotInterface);
-        mCurrentControl = mMarbleLabyrinthControl;
+        mMarbleLabyrinthControl.onResetPosition(null);
         mJointControl = new JointControl(mRobotInterface);
 
         // create a new data switch
@@ -77,17 +72,16 @@ public class KukaServer extends AbstractPsychicServer {
 
         registerDataSink(mModeDataSwitch, SensorType.Gravity);
 
-        mCurrentControl.onResetPosition(null);
+
+        // hide the reset button, since we
+        hideResetButton(true);
     }
 
     /**
-     * Reset robot position. Appropriate target state is determined by current control class.
-     *
-     * @param origin the device that sent the data
+     * Ignored; reset button is hidden.
      */
     @Override
     public void onResetPosition(NetworkDevice origin) {
-        mCurrentControl.onResetPosition(origin);
     }
 
     /**
@@ -184,10 +178,10 @@ public class KukaServer extends AbstractPsychicServer {
                 mIsInMarbleMode = !mIsInMarbleMode;
 
                 // update current control instance
-                mCurrentControl = mIsInMarbleMode ? mMarbleLabyrinthControl : mJointControl;
+                ResetListener currentControl = mIsInMarbleMode ? mMarbleLabyrinthControl : mJointControl;
 
                 // reset the joints
-                mCurrentControl.onResetPosition(null);
+                currentControl.onResetPosition(null);
 
                 // notify the pipeline switch of the new data destination
                 mModeDataSwitch.routeToFirst(mIsInMarbleMode);

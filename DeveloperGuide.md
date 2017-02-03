@@ -11,6 +11,8 @@
 * haben wir die icons erklärt? also dc, options
 * evtl statt dem exampleserver einfach das interface nennen?
 * wie soll man das common-package ohne android studio compilen? iwie müssen wir das noch anders lösen.
+* how to use framework mit intellij
+* round-trip-time + graph
 
 # Developer Guide für das Psychic-Framework
 Das Psychic-Framework bezeichnet eine Kombination aus einer App und einem Serverframework mit einem gemeinsamen Kern. Dieses Framework dient der schnellen und einfachen Entwicklung von PC-Applikationen, die Sensordaten von Android-Geräten verwenden möchten.
