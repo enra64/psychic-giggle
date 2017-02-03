@@ -19,7 +19,7 @@ Das Psychic-Framework bezeichnet eine Kombination aus einer App und einem Server
 * [Developer Guide für das Psychic-Framework](#developer-guide-für-das-psychic-framework)
 * [JavaDoc](#javadoc)
 * [Grundlegende Verwendung:](#grundlegende-verwendung)
-    * [~~Pizza~~ Daten bestellen](#~~pizza~~-daten-bestellen)
+    * [Daten bestellen](#Daten-bestellen)
     * [Daten abbestellen](#daten-abbestellen)
 * [Verwendung von Buttons](#verwendung-von-buttons)
     * [Buttons zur Runtime anfordern](#buttons-zur-runtime-anfordern)
@@ -86,8 +86,8 @@ Nachdem ein Server mit ```start()``` gestartet wurde, können sich Clients verbi
 
 Sind die Interfaces implementiert, fehlt noch der eigentlich wichtigste Schritt: Es müssen Daten von den Clients angefragt werden. 
 
-## ~~Pizza~~ Daten bestellen
-Das eigentliche Kernthema des Psychic-Frameworks sind ja Sensordaten. Diese werden zuerst immer an eine ```NetworkDataSink``` geleitet, und werden mit der ```registerDataSink(NetworkDataSink, SensorType)```-Funktion angefordert. Die übergebene ```NetworkDataSink``` wird dann die unveränderten Daten von dem durch den ```SensorType```-Parameter angegebenen Sensor erhalten. [Die Verwendung von ```NetworkDataSink``` wird hier genauer beschrieben.](#networkdatasink)
+## Daten bestellen
+Das Kernthema des Psychic-Frameworks sind Sensordaten. Diese werden zuerst an eine ```NetworkDataSink``` geleitet, und werden mit der ```registerDataSink(NetworkDataSink, SensorType)```-Funktion angefordert. Die übergebene ```NetworkDataSink``` wird dann die unveränderten Daten von dem durch den ```SensorType```-Parameter angegebenen Sensor erhalten. [Die Verwendung von ```NetworkDataSink``` wird hier genauer beschrieben.](#networkdatasink)
 
 Sollen nur Daten eines einzelnen Clients an eine Datensenke gelangen, steht ```registerDataSink(NetworkDataSink, NetworkDevice, SensorData)``` zur Verfügung. Wird diese Funktion genutzt, werden nur Daten vom spezifizierten ```NetworkDevice``` an der übergebenen ```NetworkDataSink``` ankommen.
 
@@ -105,17 +105,19 @@ void onButtonClick(ButtonClick click, NetworkDevice origin) {
 }
 ```
 
-Um über Knopfdrücke informiert zu werden, muss ein ```ButtonListener``` registriert werden. Der ```Server``` hat dafür die ```setButtonListener(ButtonListener)```-Funktion, Unterklassen des ```AbstractPsychicServer``` müssen das Interface ohnehin implementieren. 
+Um über Knopfdrücke informiert zu werden, muss ein ```ButtonListener``` registriert werden. Der ```Server``` hat dafür die ```setButtonListener(ButtonListener)```-Funktion.  
+Unterklassen des ```AbstractPsychicServer``` müssen das Interface ohnehin implementieren. 
 
-Innerhalb der ```onButtonClick(ButtonClick, NetworkDevice)``` kann der Button mithilfe von ```click.getId()``` identifiziert werden, und ```click.isPressed()``` ist ```true``` wenn der Button gedrückt wurde, und ```false``` wenn der Button losgelassen wurde.
+Innerhalb der ```onButtonClick(ButtonClick, NetworkDevice)``` kann der Button mithilfe von ```click.getId()``` identifiziert werden, und ```click.isPressed()``` ist ```true``` wenn der Button gedrückt und ```false``` wenn der Button losgelassen wurde.
 
 Buttons werden immer auf allen verbundenen Clients angezeigt.
 
 ## Buttons zur Runtime anfordern
-Buttons können mit ```addButton(String, int)``` hinzugefügt werden. Der ```String``` ist der Text den der Button anzeigt, der ```int``` ist die ID, die beim Drücken des Buttons an den Server gesendet wird. Zum Entfernen einzelner Buttons kann ```removeButtons(int)``` verwendet werden. Ein Aufruf von ```setButtonLayout(String)``` wird alle mit ```addButton``` hinzugefügten Knöpfe entfernen.
+Buttons können mit ```addButton(String, int)``` hinzugefügt werden. Der ```String``` ist der Text, den der Button anzeigt, der ```int``` ist die ID, die beim Drücken des Buttons an den Server gesendet wird. Zum Entfernen einzelner Buttons kann ```removeButtons(int)``` verwendet werden.
+Ein Aufruf von ```setButtonLayout(String)``` oder ```clearButtons()``` wird alle mit ```addButton``` hinzugefügten Knöpfe entfernen.
 
 ## Layouts laden
-Eine Alternative ist die Verwendung von ```setButtonLayout(String)```. Hierbei kann eine eigene Android XML Layout Datei als ```String``` übergeben werden.  Bei Verwendung von ```addButton(String, int)``` wird das durch ```setButtonLayout``` erstellte Layout entfernt.
+Eine Alternative ist die Verwendung von ```setButtonLayout(String)```. Hierbei kann eine eigene Android-XML-Layout-Datei als ```String``` übergeben werden.  
 
 ### Einschränkungen für die Layout-Dateien
 Es werden nur ```LinearLayout```- und ```Button```-Objekte unterstützt. Ein Beispiel für einen unterstützten XML-String ist das folgende Snippet:
@@ -153,7 +155,7 @@ Layout-String, wie er in der App angezeigt wird:
 
 ```Button```-Elemente unterstützen ausschließlich die folgenden Attribute:
 * ```android:text=""``` enthält den vom Button dargestellten Text
-* ```android:id=""``` ist die ID die an den Server übertragen wird, und dort mithilfe von ```ButtonClick.getId()``` abgefragt werden kann
+* ```android:id=""``` ist die ID, die an den Server übertragen wird, und dort mithilfe von ```ButtonClick.getId()``` abgefragt werden kann
 * ```android:layout_weight=""``` wird direkt für den Button gesetzt. Genaue Informationen sind in der [Android-Dokumentation](https://developer.android.com/guide/topics/ui/layout/linear.html#Weight) zu finden.
 
 ```LinearLayout```-Elemente unterstützen ausschließlich die folgenden Attribute:
@@ -186,7 +188,7 @@ void onClientAccepted(NetworkDevice connectedClient){
 
 ## Callbacks
 ### acceptClient
-```acceptClient(NetworkDevice)``` wird immer dann aufgerufen, wenn ein neuer Client, nämlich das übergebene ```NetworkDevice```, versucht sich mit dem Server zu verbinden. Die Addresse des Clients und sein Name sind mit ```newClient.getInetAddress()``` und ```newClient.name``` verfügbar.
+```acceptClient(NetworkDevice)``` wird immer dann aufgerufen, wenn ein neuer Client, nämlich das übergebene ```NetworkDevice```, versucht sich mit dem Server zu verbinden. Die Adresse des Clients und sein Name sind mit ```newClient.getInetAddress()``` und ```newClient.name``` verfügbar.
 Wenn ```acceptClient(NetworkDevice)``` ```true``` zurückgibt, wird der Client angenommen; gibt es ```false``` zurück, wird der Client abgelehnt.
 
 ### onClientDisconnected
@@ -206,10 +208,10 @@ Wenn ```NetworkDevice.equals(NetworkDevice)``` ```true``` zurückgibt, dann hand
 
 
 ## Maximale Anzahl Clients
-Die maximale Anzahl von Clients ist beschränkt auf ```Integer.INT_MAX```. Ein nutzerdefiniertes Maximum kann mithilfe von ```setClientMaximum(int)``` gesetzt werden, mit ```getClientMaximum()``` abgefragt werden und mit ```removeClientMaximum()``` entfernt werden.
+Die maximale Anzahl von Clients ist beschränkt auf ```Integer.INT_MAX```. Ein nutzerdefiniertes Maximum kann mithilfe von ```setClientMaximum(int)``` gesetzt, mit ```getClientMaximum()``` abgefragt und mit ```removeClientMaximum()``` entfernt werden.
 
 # Exceptionhandling
-Um alle Exceptions die in verschiedenen Threads auftreten aufzufangen muss ein ```ExceptionListener``` registriert werden. ```onException(Object, Exception, String)``` wird dann aufgerufen, falls eine Exception auftritt, die nicht intern behandelt werden kann.
+Um alle Exceptions, die in verschiedenen Threads auftreten, aufzufangen, muss ein ```ExceptionListener``` registriert werden. ```onException(Object, Exception, String)``` wird dann aufgerufen, falls eine Exception auftritt, die nicht intern behandelt werden kann.
 
 Beispiel-Implementation:
 ```Java
@@ -225,14 +227,14 @@ Beispiel-Implementation:
 Der ```origin```-Parameter gibt das Ursprungsobjekt (oder ein übergeordnetes, falls das Ursprungsobjekt dem Nutzer nicht bekannt ist) an, der ```exception```-Parameter gibt die Exception on, und der ```info```-Parameter enthält weitere Informationen zu der Exception und ihrem Grund.
 
 # Resetevents
-ResetEvents werden durch den von anderen Buttons separaten Reset-Button hervorgerufen. Im ```PsychicServer``` wird das Event wird an den ```ResetListener``` geleitet, der mit ```setResetListener(ResetListener)``` registriert wurde, im ```AbstractPsychicServer``` wird die Implementation erzwungen.
+ResetEvents werden durch den, von anderen Buttons separaten, Reset-Button hervorgerufen. Im ```PsychicServer``` wird das Event an den ```ResetListener``` geleitet, der mit ```setResetListener(ResetListener)``` registriert wurde. Im ```AbstractPsychicServer``` wird die Implementation erzwungen.
 ```Java
 public void onResetPosition(NetworkDevice origin) {
     // pseudo-code!
     mouse.centerOnCurrentScreen();
 }
 ```
-Wenn ein Client den "Reset"-Button auf seinem Handy benutzt, wird die ```onResetPosition(NetworkDevice)``` aufgerufen. Dann sollte der derzeitige Status des Handys zurückgesetzt werden, bei der Beispielimplementation ```MouseServer``` wird der Mauszeiger in die Mitte des Bildschirms gesetzt.
+Wenn ein Client den "Reset"-Button auf seinem Handy benutzt, wird die ```onResetPosition(NetworkDevice)``` aufgerufen. Dann sollte der derzeitige Status des Handys zurückgesetzt werden. Bei der Beispielimplementation ```MouseServer``` wird der Mauszeiger in die Mitte des Bildschirms gesetzt.
 
 ## Reset-Button deaktivieren
 Es wird empfohlen den Reset-Button zu implementieren. Er gewährleistet, dass der Nutzer mit einem einfachen, nie wechselndem Button jederzeit in einen Zustand zurückkehren kann, in dem die Anwendung bedienbar ist. Solche Zustände können zum Beispiel durch nicht korrigierten Gyroskop-Drift entstehen. Es ist jedoch möglich, den Reset-Knopf zu deaktivieren, indem die ```hideResetButton(boolean)```-Funktion des Servers aufgerufen wird. Ist der Parameter ```true```, wird der Button versteckt; ist er ```false```, wird der Button angezeigt.
@@ -252,7 +254,7 @@ Alle Daten werden in ```SensorData```-Objekten transportiert. In ```SensorData``
 Das ```NetworkDataSink```-Interface muss implementiert werden, wenn eine Klasse Daten aus der Pipeline erhalten soll. Es beinhaltet zwei Funktionen:
 
 * ```close()```: Die Instanz wird nicht mehr benötigt, und sollte alle Ressourcen schließen.
-* ```onData(NetworkDevice, SensorData, float)```: wird immer dann aufgerufen wenn die Daten die Pipeline bis zu dieser Senke durchlaufen haben.
+* ```onData(NetworkDevice, SensorData, float)```: wird immer dann aufgerufen, wenn die Daten die Pipeline bis zu dieser Senke durchlaufen haben.
   * Der erste Parameter, ```origin```, spezifiziert das ```NetworkDevice```, also den Client, der diese Daten gesendet hat.
   * Der zweite Parameter, ```sensorData```, enthält die [Sensordaten](#format-der-sensordaten-sensordata).
   * Der dritte Parameter, ```userSensitivity```, spezifiziert die Sensitivität die in der App für den Sensor eingestellt wurde. Der Wert liegt standardmäßig bei ```50```, und es gilt ```0 <= userSensitivity <= 100```.
@@ -339,14 +341,14 @@ class UserSensitivityMultiplicator extends AbstractFilter {
 * ```UserSensitivityMultiplicator```: Multipliziert die Daten mit dem ```userSensitivity```-Faktor und ersetzt diesen durch ```1f```.
 
 ## Daten-Splitter
-Splitter sind Klassen, die ```NetworkDataSink``` implementieren, und die erhaltenen Daten an verschiedene ```NetworkDataSink```s weiterleiten.
+Splitter sind Klassen, die ```NetworkDataSink``` implementieren, und die erhaltenen Daten an verschiedene ```NetworkDataSink```-Interfaces weiterleiten.
 
 Vorhandene Implementierungen:
 * ```ClientSensorSplitter```: Nur Daten, für deren Client und Sensor eine ```NetworkDataSink``` registriert wurde, werden an diese weitergeleitet
 * ```ClientSplitter```: Nur Daten, für deren Client eine ```NetworkDataSink``` registriert wurde, werden an diese weitergeleitet
 * ```SensorSplitter```: Nur Daten, für deren Sensor eine ```NetworkDataSink``` registriert wurde, werden an diese weitergeleitet.
 * ```PipelineDuplication```: Alle Daten werden dupliziert und an alle registrierten ```NetworkDataSink```s weitergeleitet.
-* ```Switch```: Die Daten werden an eine von zwei ```NetworkDataSink```s weitergeleitet
+* ```Switch```: Die Daten werden an eine von zwei ```NetworkDataSink```-Interfaces weitergeleitet
 
 ## Pipeline-Builder
 Mit einer ```FilterPipelineBuilder```-Instanz lassen sich Filterpipelines einfach erstellen.
