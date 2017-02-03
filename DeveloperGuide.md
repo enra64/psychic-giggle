@@ -19,7 +19,7 @@ Das Psychic-Framework bezeichnet eine Kombination aus einer App und einem Server
 * [Developer Guide für das Psychic-Framework](#developer-guide-für-das-psychic-framework)
 * [JavaDoc](#javadoc)
 * [Grundlegende Verwendung:](#grundlegende-verwendung)
-    * [Daten bestellen](#Daten-bestellen)
+    * [Daten bestellen](#daten-bestellen)
     * [Daten abbestellen](#daten-abbestellen)
 * [Verwendung von Buttons](#verwendung-von-buttons)
     * [Buttons zur Runtime anfordern](#buttons-zur-runtime-anfordern)
