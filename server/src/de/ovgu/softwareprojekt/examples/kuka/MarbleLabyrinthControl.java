@@ -70,7 +70,7 @@ public class MarbleLabyrinthControl implements NetworkDataSink, ResetListener, B
     @Override
     public void onData(NetworkDevice origin, SensorData data, float userSensitivity) {
         float rollValue = KukaUtil.clampToJointRange(data.data[ROLL_AXIS] * userSensitivity * .03f, mRobotRollMaximum);
-        float pitchValue = KukaUtil.clampToJointRange(data.data[PITCH_AXIS] * userSensitivity * .03f, mRobotPitchMaximum);
+        float pitchValue = KukaUtil.clampToJointRange(data.data[PITCH_AXIS] * userSensitivity * .03f, mRobotPitchMaximum - 1);
 
         if(mRotatorIsFlipped)
             rollValue *= -1;
