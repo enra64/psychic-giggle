@@ -1,11 +1,12 @@
 # TODO
-* UseCaseDiagramm in Einleitungs
+* UseCaseDiagramm in Einleitungstext
 * packagenamen ändern!
 * übersetzungen möglich machen
 * bilder hinzufügen
 * JavaDoc einbauen
 * onData muss an zwei stellen beschrieben werden: bei der pipeline, und bei der grundlegenden verwendung
-* wo packen wir so allgemeines zeug wie NetworkDataSink, SensorData, NetworkDevice etc hin?
+* wo packen wir so allgemeines zeug wie NetworkDataSink, SensorData, NetworkDevice etc hin? BEARBEITET: habe jetzt noch sehr kurze Erklärung fast ganz an den anfang mit links gepackt.
+* PLAY STORE
 * alle registrierten sinks in splittern schliessen???
 * javadoc ist teilweise horribly out of date. wir müssen zumindest bei dem kram den die potenziell angucken korrigieren!
 * wie soll man das common-package ohne android studio compilen? iwie müssen wir das noch anders lösen.
@@ -24,20 +25,22 @@ Das Psychic-Framework bezeichnet eine Kombination aus einer App und einem Server
 * [Developer Guide für das Psychic-Framework](#developer-guide-für-das-psychic-framework)
 * [JavaDoc](#javadoc)
 * [Grundlegende Verwendung:](#grundlegende-verwendung)
+    * [Wichtige Hilfsklassen](#wichtige-hilfsklassen)
     * [Daten bestellen](#daten-bestellen)
+        * [Beispiel einer Serverinstanziierung](#beispiel-einer-serverinstanziierung)
     * [Daten abbestellen](#daten-abbestellen)
 * [Verwendung von Buttons](#verwendung-von-buttons)
     * [Buttons zur Runtime anfordern](#buttons-zur-runtime-anfordern)
     * [Layouts laden](#layouts-laden)
         * [Einschränkungen für die Layout-Dateien](#einschränkungen-für-die-layout-dateien)
 * [Verwaltung von Clients](#verwaltung-von-clients)
+    * [NetworkDevice](#networkdevice)
     * [Callbacks](#callbacks)
         * [acceptClient](#acceptclient)
         * [onClientDisconnected](#onclientdisconnected)
         * [onClientTimeout](#onclienttimeout)
         * [onClientAccepted](#onclientaccepted)
-    * [Repräsentation von Clients: NetworkDevice](#repräsentation-von-clients-networkdevice)
-    * [Maximale Anzahl Clients](#maximale-anzahl-clients)
+    * [Clientanzahl begrenzen](#clientanzahl-begrenzen)
 * [Exceptionhandling](#exceptionhandling)
 * [Resetevents](#resetevents)
     * [Reset-Button deaktivieren](#reset-button-deaktivieren)
@@ -58,14 +61,13 @@ Das Psychic-Framework bezeichnet eine Kombination aus einer App und einem Server
         * [Elemente hinzufügen](#elemente-hinzufügen)
         * [Elemente entfernen](#elemente-entfernen)
         * [Pipeline abschließen](#pipeline-abschließen)
+    * [Temporärer Stopp des Datenflusses](#temporärer-stopp-des-datenflusses)
 * [Notifications anzeigen](#notifications-anzeigen)
 * [Netzwerkverbindung](#netzwerkverbindung)
     * [Server-Discovery](#server-discovery)
     * [Datenverbindung](#datenverbindung)
     * [Kontrollverbindung](#kontrollverbindung)
 * [License](#license)
-
-
 
 # JavaDoc
 Eine komplette JavaDoc ist verfügbar unter TODO
@@ -91,6 +93,14 @@ Nachdem ein Server mit ```start()``` gestartet wurde, können sich Clients verbi
 > Hinweis: Falls nicht anders angegeben, befinden sich alle nachfolgend genannten Funktionen im ```AbstractPsychicServer```, sind also auch im ```PsychicServer``` verfügbar.
 
 Sind die Interfaces implementiert, fehlt noch der eigentlich wichtigste Schritt: Es müssen Daten von den Clients angefragt werden.
+
+## Wichtige Hilfsklassen
+Weil viele der folgenden Erklärungen diese Klassen benutzen, werden sie hier kurz erwähnt:
+* ```SensorType```-Enum: Alle unterstützten Sensoren. [Dokumentation](#sensoren)
+* ```NetworkDevice```: Identifiziert einen Client. [Dokumentation](#networkdevice)
+  - ```getName()```: Name des Clients
+  - ```getAddress()```: IP-Adresse des Clients
+* ```NetworkDataSink```: Dieses Interface ermöglicht implementierenden Klassen, Sensordaten anzunehmen. [Dokumentation](#networkdatasink)
 
 ## Daten bestellen
 Das Kernthema des Psychic-Frameworks sind Sensordaten. Diese werden zuerst an eine ```NetworkDataSink``` geleitet, und werden mit der ```registerDataSink(NetworkDataSink, SensorType)```-Funktion angefordert. Die übergebene ```NetworkDataSink``` wird dann die unveränderten Daten von dem durch den ```SensorType```-Parameter angegebenen Sensor erhalten. [Die Verwendung von ```NetworkDataSink``` wird hier genauer beschrieben.](#networkdatasink)
@@ -210,10 +220,14 @@ void onClientAccepted(NetworkDevice connectedClient){
 }
 ```
 
+## NetworkDevice
+Clients werden als ```NetworkDevice``` angegeben. Mit ```getInetAddress()``` kann die aktuelle IP-Adresse als ```InetAddress``` abgefragt werden und unter ```getName()``` ist der Name des ```NetworkDevice``` verfügbar. Im ```NetworkDevice``` ist auch die Portkonfiguration jedes Clients gespeichert.
+
+Wenn ```NetworkDevice.equals(NetworkDevice)``` ```true``` zurückgibt, dann handelt es sich um denselben Client.
+
 ## Callbacks
 ### acceptClient
-```acceptClient(NetworkDevice)``` wird immer dann aufgerufen, wenn ein neuer Client, nämlich das übergebene ```NetworkDevice```, versucht sich mit dem Server zu verbinden. Die Adresse des Clients und sein Name sind mit ```newClient.getInetAddress()``` und ```newClient.name``` verfügbar.
-Wenn ```acceptClient(NetworkDevice)``` ```true``` zurückgibt, wird der Client angenommen; gibt es ```false``` zurück, wird der Client abgelehnt.
+```acceptClient(NetworkDevice)``` wird immer dann aufgerufen, wenn ein neuer Client, nämlich das übergebene ```NetworkDevice```, versucht sich mit dem Server zu verbinden. Wenn ```acceptClient(NetworkDevice)``` ```true``` zurückgibt, wird der Client angenommen; gibt es ```false``` zurück, wird der Client abgelehnt.
 
 ### onClientDisconnected
 ```onClientDisconnected(NetworkDevice)``` wird aufgerufen, wenn der übergebene Client die Verbindung beendet hat oder nicht mehr erreichbar ist. Der Client ist zum Zeitpunkt des Aufrufs nicht mehr über den Server verfügbar.
@@ -224,14 +238,7 @@ Wenn ```acceptClient(NetworkDevice)``` ```true``` zurückgibt, wird der Client a
 ### onClientAccepted
 ```onClientAccepted(NetworkDevice)``` wird aufgerufen wenn die Kommunikation zwischen Server und dem übergebenen neuen Client funktioniert. Diese Funktion wird nur dann aufgerufen, wenn ```acceptClient(NetworkDevice)``` ```true``` für das entsprechende ```NetworkDevice``` zurückgegeben hat.
 
-
-## Repräsentation von Clients: NetworkDevice
-Clients werden als ```NetworkDevice``` angegeben. Mit ```getInetAddress()``` kann die aktuelle IP-Adresse als ```InetAddress``` abgefragt werden und unter ```getName()``` ist der Name des ```NetworkDevice``` verfügbar.
-
-Wenn ```NetworkDevice.equals(NetworkDevice)``` ```true``` zurückgibt, dann handelt es sich um einen Client an der selben Adresse.
-
-
-## Maximale Anzahl Clients
+## Clientanzahl begrenzen
 Die maximale Anzahl von Clients ist beschränkt auf ```Integer.INT_MAX```. Ein nutzerdefiniertes Maximum kann mithilfe von ```setClientMaximum(int)``` gesetzt, mit ```getClientMaximum()``` abgefragt und mit ```removeClientMaximum()``` entfernt werden.
 
 # Exceptionhandling
