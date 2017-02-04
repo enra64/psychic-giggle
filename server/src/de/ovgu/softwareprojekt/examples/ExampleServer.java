@@ -6,6 +6,7 @@ import de.ovgu.softwareprojekt.callback_interfaces.ButtonListener;
 import de.ovgu.softwareprojekt.callback_interfaces.ClientListener;
 import de.ovgu.softwareprojekt.callback_interfaces.ResetListener;
 import de.ovgu.softwareprojekt.control.commands.ButtonClick;
+import de.ovgu.softwareprojekt.control.commands.SetSensorSpeed;
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
 import de.ovgu.softwareprojekt.misc.ExceptionListener;
 import de.ovgu.softwareprojekt.networking.AbstractPsychicServer;
@@ -18,6 +19,10 @@ import java.io.IOException;
  * An example server.
  */
 public class ExampleServer implements NetworkDataSink, ButtonListener, ClientListener, ExceptionListener, ResetListener {
+    private long lastSensorTs = 0, lastServerTs = 0;
+
+    private static final boolean LOG_TIMES = false, FIVE_SENSORS = false;
+
     public ExampleServer() throws IOException {
         PsychicServer server = new PsychicServer();
         server.start();
@@ -52,7 +57,17 @@ public class ExampleServer implements NetworkDataSink, ButtonListener, ClientLis
                 "    </LinearLayout>\n" +
                 "</LinearLayout>");
 
+
         server.registerDataSink(this, SensorType.LinearAcceleration);
+
+        if(FIVE_SENSORS){
+            server.registerDataSink(this, SensorType.Gyroscope);
+            server.registerDataSink(this, SensorType.Accelerometer);
+            server.registerDataSink(this, SensorType.Gravity);
+            server.registerDataSink(this, SensorType.MagneticField);
+        }
+
+        //server.setSensorSpeed(SensorType.LinearAcceleration, SetSensorSpeed.SensorSpeed.SENSOR_DELAY_FASTEST);
     }
 
     /**
@@ -74,6 +89,27 @@ public class ExampleServer implements NetworkDataSink, ButtonListener, ClientLis
     @Override
     public void onData(NetworkDevice origin, SensorData sensorData, float userSensitivity) {
         //System.out.println(Arrays.toString(sensorData.data));
+        // we want the following information:
+        // time since last data package, receipt timestamp, server timestamp
+
+        if(LOG_TIMES && sensorData.sensorType == SensorType.LinearAcceleration){
+            long nowTsServer = System.nanoTime();
+            long nowTsSensor = sensorData.timestamp;
+
+            long timeDiffServer = nowTsServer - lastServerTs;
+            lastServerTs = nowTsServer;
+
+            long timeDiffSensor = nowTsSensor - lastSensorTs;
+            lastSensorTs = nowTsSensor;
+
+            long tsDiff = Math.abs(nowTsSensor - nowTsServer);
+
+            // print local ts, local ts diff, remote ts, remote ts diff, diff between local/remote
+            System.out.printf("%d,%d,%d,%d,%d", nowTsServer, timeDiffServer, nowTsSensor, timeDiffSensor, tsDiff);
+            System.out.println();
+        }
+
+        // TODO: also, we want the round trip time for the connection watch data
     }
 
     /**

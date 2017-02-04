@@ -20,6 +20,7 @@ import java.security.InvalidParameterException;
 import java.util.LinkedList;
 import java.util.List;
 
+import de.ovgu.softwareprojekt.SensorType;
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
 import de.ovgu.softwareprojekt.discovery.OnDiscoveryListener;
 import de.ovgu.softwareprojekt.misc.ExceptionListener;
@@ -28,6 +29,8 @@ import de.ovgu.softwareprojektapp.activities.send.SendActivity;
 import de.ovgu.softwareprojektapp.UiUtil;
 import de.ovgu.softwareprojektapp.networking.DiscoveryClient;
 
+import static de.ovgu.softwareprojektapp.activities.send.SendActivity.EXTRA_RESULT_MISSING_SENSOR;
+import static de.ovgu.softwareprojektapp.activities.send.SendActivity.RESULT_SENSOR_MISSING;
 import static de.ovgu.softwareprojektapp.activities.send.SendActivity.RESULT_SERVER_CONNECTION_TIMED_OUT;
 import static de.ovgu.softwareprojektapp.activities.send.SendActivity.RESULT_SERVER_SEEMS_TO_BE_OFFLINE;
 import static de.ovgu.softwareprojektapp.activities.send.SendActivity.RESULT_SERVER_NOT_RESPONDING_TO_REQUEST;
@@ -122,8 +125,6 @@ public class DiscoveryActivity extends AppCompatActivity implements OnDiscoveryL
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.menu_settings) {
-
-
             //create intent to open OptionsActivity with extra information about activeSensors-status
             Intent intent = new Intent(DiscoveryActivity.this, OptionsActivity.class);
             DiscoveryActivity.this.startActivity(intent);
@@ -155,6 +156,11 @@ public class DiscoveryActivity extends AppCompatActivity implements OnDiscoveryL
                 break;
             case RESULT_SERVER_NOT_RESPONDING_TO_REQUEST:
                 UiUtil.showAlert(this, "Connection failed", "The server did not respond to the connection request in time. Please try again!");
+                break;
+            case RESULT_SENSOR_MISSING:
+                SensorType missingSensor = (SensorType) data.getSerializableExtra(EXTRA_RESULT_MISSING_SENSOR);
+                UiUtil.showAlert(this, getString(R.string.sensor_activation_error_title), getString(R.string.sensor_activation_error_body) + missingSensor.name());
+                break;
         }
     }
 

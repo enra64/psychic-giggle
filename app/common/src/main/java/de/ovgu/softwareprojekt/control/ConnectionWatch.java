@@ -23,6 +23,10 @@ import java.util.TimerTask;
  */
 public class ConnectionWatch extends TimerTask {
     /**
+     * Set this variable true to print the round trip times to System.out
+     */
+    private static final boolean CONNECTION_TIMES_LOG = false;
+    /**
      * This ConnectionWatch watches the connection to this remote
      */
     private NetworkDevice mRemote;
@@ -178,6 +182,10 @@ public class ConnectionWatch extends TimerTask {
             else if (mOutConnection.isRunningAndConfigured()) {
                 // send next connection check
                 mOutConnection.sendCommand(new ConnectionAliveCheck(mSelf));
+
+                // possibly print round trip time
+                if(CONNECTION_TIMES_LOG)
+                    System.out.println(mLastRequestTimestamp + "," + (mLastCheckEventTimestamp - mLastRequestTimestamp));
 
                 // update the request timestamp
                 mLastRequestTimestamp = System.currentTimeMillis();

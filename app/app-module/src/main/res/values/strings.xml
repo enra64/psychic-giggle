@@ -27,4 +27,6 @@
     <string name="sensor_proximity">Proximity</string>
     <string name="sensor_relative_humidity">Relative humidity</string>
     <string name="sensor_rotation_vector">Rotation vector</string>
+    <string name="sensor_activation_error_title">Sensor activation error</string>
+    <string name="sensor_activation_error_body">"This device misses at least one required Sensor: "</string>
 </resources>

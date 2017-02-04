@@ -12,8 +12,8 @@
 * how to use framework mit intellij
 * round-trip-time + graph
 * architekturübersicht
-    - discovery beschreiben
-    - kommunikation beschreiben
+    - discoverybeschreibung verbessern
+    - kommunikation verbessern; hübsche bildchen?
     - app beschreiben
     - server beschreiben
 

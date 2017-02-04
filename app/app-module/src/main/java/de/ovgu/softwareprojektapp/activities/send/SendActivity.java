@@ -64,6 +64,7 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
             EXTRA_SERVER_PORT_DATA = "DataPort",
             EXTRA_SELF_NAME = "SelfName",
             EXTRA_ACTIVE_SENSORS = "ActiveSensor",
+            EXTRA_RESULT_MISSING_SENSOR = "MissingSensor",
             EXTRA_SENSOR_DESCRIPTIONS = "SensorDescription";
 
     /**
@@ -75,7 +76,8 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
             RESULT_USER_STOPPED = 0,
             RESULT_SERVER_SEEMS_TO_BE_OFFLINE = -2,
             RESULT_SERVER_CONNECTION_TIMED_OUT = -3,
-            RESULT_SERVER_NOT_RESPONDING_TO_REQUEST = -4;
+            RESULT_SERVER_NOT_RESPONDING_TO_REQUEST = -4,
+            RESULT_SENSOR_MISSING = -5;
 
     /**
      * The network client organises all our communication with the server
@@ -241,14 +243,25 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
     /**
      * Sets activity result, closes connections and closes the activity
      *
-     * @param result one of {@link #RESULT_USER_STOPPED} or {@link #RESULT_SERVER_REFUSED}
+     * @param result one of the RESULT_... codes, see {@link #RESULT_USER_STOPPED}
      */
     private void closeActivity(int result) {
+        closeActivity(result, null);
+    }
+
+    /**
+     * Sets activity result, closes connections and closes the activity
+     *
+     * @param result       one of the RESULT_... codes, see {@link #RESULT_USER_STOPPED}
+     * @param resultIntent a result intent if you want to pass one back, or null.
+     */
+    private void closeActivity(int result, @Nullable Intent resultIntent) {
         // set result of activity
-        setResult(result);
+        if (resultIntent != null) setResult(result, resultIntent);
+        else setResult(result);
 
         // close connection dialog if it was still open
-        if(mConnectionProgressDialog != null)
+        if (mConnectionProgressDialog != null)
             mConnectionProgressDialog.cancel();
 
         // stop generating sensor data
@@ -271,7 +284,9 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
         try {
             mSensorHandler.setRunning(requiredSensors);
         } catch (SensorNotFoundException e) {
-            UiUtil.showAlert(this, "Sensor activation error", "This device does not contain a required sensor: " + e.getMissingSensor().name());
+            Intent missingSensorIntent = new Intent();
+            missingSensorIntent.putExtra(EXTRA_RESULT_MISSING_SENSOR, e.getMissingSensor());
+            closeActivity(RESULT_SENSOR_MISSING, missingSensorIntent);
         }
     }
 
@@ -407,6 +422,7 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
 
     /**
      * Sets the visibility of Reset Button
+     *
      * @param isHidden
      */
     void setResetButtonVisibility(final boolean isHidden) {
@@ -496,7 +512,7 @@ public class SendActivity extends AppCompatActivity implements OnCommandListener
 
         // add sensor activation map
         HashMap<SensorType, Boolean> sensorActivationMap = new HashMap<>();
-        for(SensorType sensor : SensorType.values())
+        for (SensorType sensor : SensorType.values())
             sensorActivationMap.put(sensor, mSensorHandler.isRegistered(sensor));
         intent.putExtra(EXTRA_ACTIVE_SENSORS, sensorActivationMap);
 
