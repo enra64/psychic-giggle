@@ -88,8 +88,8 @@ public abstract class AbstractPsychicServer implements
 
         mDataMapper.setConnectionHandler(mClientManager);
 
-        // SIGTERM -> close all clients, stop discovery server
-        //Runtime.getRuntime().addShutdownHook(new Thread(this::close));
+        // SIGTERM -> closeAndSignalClient all clients, stop discovery server
+        //Runtime.getRuntime().addShutdownHook(new Thread(this::closeAndSignalClient));
         //System.out.println("AbstractPsychicServer started, shutdown runtime hook online");
     }
 
@@ -263,9 +263,9 @@ public abstract class AbstractPsychicServer implements
      * @param client the client to be removed
      * @return false if client could not be found, true otherwise
      */
-    public boolean disconnectClient(NetworkDevice client) {
+    public boolean disconnectClient(NetworkDevice client) throws IOException {
         mDataMapper.onClientRemoved(client);
-        return mClientManager.close(client);
+        return mClientManager.closeAndSignalClient(client);
     }
 
     /**
@@ -280,14 +280,14 @@ public abstract class AbstractPsychicServer implements
     }
 
     /**
-     * Register a new data sink to be included in the data stream
+     * Register a new data sink to be included in the data stream. Only data from a single client and sensor will arrive.
      *
      * @param dataSink        where new data from the sensor should go
      * @param origin          the network device which is allowed to send to this sink
      * @param requestedSensor which sensor events are relevant
      * @throws IOException if a client could not be notified of the sensor change
      */
-    protected void registerDataSink(NetworkDataSink dataSink, NetworkDevice origin, SensorType requestedSensor) throws IOException {
+    public void registerDataSink(NetworkDataSink dataSink, NetworkDevice origin, SensorType requestedSensor) throws IOException {
         mDataMapper.registerDataSink(requestedSensor, origin, dataSink);
     }
 
@@ -303,7 +303,7 @@ public abstract class AbstractPsychicServer implements
     }
 
     /**
-     * Unregister a data sink from all sensors
+     * Unregister a data sink from a single sensor
      *
      * @param dataSink which data sink to remove
      * @param sensor   the sensor for which the data sink was registered
@@ -439,12 +439,13 @@ public abstract class AbstractPsychicServer implements
     }
 
     /**
-     * Hides Reset Button if not in use
-     * @param isHidden
+     * Hide the reset button on all clients
+     *
+     * @param hide true if the button should be hidden
      * @throws IOException is thrown if command could not be sent
      */
-    public void hideResetButton(boolean isHidden)throws IOException {
-        mClientManager.hideResetButton(isHidden);
+    public void hideResetButton(boolean hide)throws IOException {
+        mClientManager.hideResetButton(hide);
     }
 
     /**

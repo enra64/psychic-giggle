@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.function.Predicate;
 
 /**
- * This class is designed to forwardData data to NetworkDataSinks.
+ * This class is designed to forward data to NetworkDataSinks.
  * <p>
  * It supports mapping them from (SensorType, NetworkDevice) tuples or from SensorType to NetworkDataSink.
  */
@@ -25,19 +25,32 @@ class DataMapper implements NetworkDataSink {
      */
     private ClientConnectionManager mConnectionHandler;
 
+    /**
+     * Set the ClientConnectionManager notified of potentially required sensor requirement changes
+     *
+     * @param connectionHandler the ClientConnectionManager notified of potentially required sensor requirement changes
+     */
     void setConnectionHandler(ClientConnectionManager connectionHandler) {
         mConnectionHandler = connectionHandler;
     }
 
     /**
-     * Stores all known data sinks
+     * Stores all known data sinks. Since they are mapped to their sensor, this also stores the currently required sensors as its keyset.
      * <p>
      * This variable is an EnumMap, so iterations over the keys should be quite fast. The sinks are stored in a
      * HashSet for each sensor, so no sink can occur twice for one sensor type.
      */
     private EnumMap<SensorType, HashSet<SinkOriginFilter>> mDataSinks = new EnumMap<>(SensorType.class);
 
-    public void registerDataSink(SensorType sensorType, @Nullable NetworkDevice dataOrigin, NetworkDataSink dataSink) throws IOException {
+    /**
+     * Register a new data sink to be included in the data stream. Only data from a single client and sensor will arrive.
+     *
+     * @param dataSink   where new data from the sensor should go
+     * @param dataOrigin the network device which is allowed to send to this sink, or null, if any devices data shall be accepted
+     * @param sensorType which sensor should be activated, and reach the given NetworkDataSink
+     * @throws IOException if a client could not be notified of the sensor change
+     */
+    void registerDataSink(SensorType sensorType, @Nullable NetworkDevice dataOrigin, NetworkDataSink dataSink) throws IOException {
         // dataSink *must not* be this, as that would lead to infinite recursion
         if (this == dataSink)
             throw new InvalidParameterException("DataMapper must not register itself as data sink to avoid infinite recursion.");
@@ -53,33 +66,59 @@ class DataMapper implements NetworkDataSink {
         mConnectionHandler.updateSensors(mDataSinks.keySet());
     }
 
+    /**
+     * Register a new data sink to be included in the data stream. Only data from a single sensor will arrive.
+     *
+     * @param dataSink   where new data from the sensor should go
+     * @param sensorType which sensor should be activated, and reach the given NetworkDataSink
+     * @throws IOException if a client could not be notified of the sensor change
+     */
     void registerDataSink(SensorType sensorType, NetworkDataSink dataSink) throws IOException {
         registerDataSink(sensorType, null, dataSink);
     }
 
-    void onClientRemoved(NetworkDevice client) {
+    /**
+     * Called to notify of the loss of a client. That client will be removed from internal lists.
+     *
+     * @param client the lost client
+     * @throws IOException if another client could not be notified of changed sensor requirements
+     */
+    void onClientRemoved(NetworkDevice client) throws IOException {
         // remove all instances of the given client
         removeIf(filter -> client.equals(filter.mOrigin), null);
     }
 
-    void unregisterDataSink(NetworkDataSink dataSink) {
+    /**
+     * Removes a NetworkDataSink from this data mapper, so that it no longer receives data
+     *
+     * @param dataSink the data sink that should no longer be used
+     * @throws IOException if another client could not be notified of changed sensor requirements
+     */
+    void unregisterDataSink(NetworkDataSink dataSink) throws IOException {
         // remove all instances of the given data sink
         removeIf(filter -> dataSink.equals(filter.mSink), null);
     }
 
-    public void unregisterDataSink(NetworkDataSink dataSink, SensorType sensor) {
+    /**
+     * Unregister a data sink from a single sensor
+     *
+     * @param dataSink which data sink to remove
+     * @param sensor   the sensor for which the data sink was registered
+     */
+    void unregisterDataSink(NetworkDataSink dataSink, SensorType sensor) throws IOException {
         // remove all instances of the given data sink
         removeIf(filter -> dataSink.equals(filter.mSink), sensor);
     }
 
     /**
-     * Remove all SinkOriginFilters where the given lambda returns true
+     * Remove all SinkOriginFilters where the given lambda returns true.
      *
      * @param sensor    a {@link SensorType} if only sinks registered for that type should be removed, or null, if all sinks
      *                  where the predicate returns true should be removed
      * @param predicate returns true for all SinkOriginFilters that should be removed
+     * @throws IOException if a client could not be notified of updated sensor requirements
      */
-    private void removeIf(Predicate<SinkOriginFilter> predicate, SensorType sensor) {
+    private void removeIf(Predicate<SinkOriginFilter> predicate, @Nullable SensorType sensor) throws IOException {
         // remove all instances of the given network device
         Iterator<Map.Entry<SensorType, HashSet<SinkOriginFilter>>> sensorIterator = mDataSinks.entrySet().iterator();
         while (sensorIterator.hasNext()) {
@@ -93,6 +132,9 @@ class DataMapper implements NetworkDataSink {
             if (pair.getValue().size() == 0)
                 sensorIterator.remove();
         }
+
+        // force resetting the sensors on the client
+        mConnectionHandler.updateSensors(mDataSinks.keySet());
     }
 
     /**
@@ -146,17 +188,33 @@ class DataMapper implements NetworkDataSink {
             mOrigin = origin;
         }
 
+        /**
+         * Forwards data if no specific origin is required, or the data is from the correct client
+         *
+         * @param origin          the network device which sent the data
+         * @param data            the sensor data
+         * @param userSensitivity the sensitivity the user requested in his app settings for the sensor
+         *                        the data is from
+         */
         @Override
-        public void onData(NetworkDevice networkDevice, SensorData sensorData, float v) {
+        public void onData(NetworkDevice origin, SensorData data, float userSensitivity) {
             // only forwardData the data if all-forwardData is enabled (origin null) or the data is from the correct device
-            if (mOrigin == null || mOrigin == networkDevice)
-                mSink.onData(networkDevice, sensorData, v);
+            if (mOrigin == null || mOrigin == origin)
+                mSink.onData(origin, data, userSensitivity);
         }
 
+        /**
+         * No implementation necessary
+         */
         @Override
         public void close() {
         }
 
+        /**
+         * hashCode implementation that identifies two DataMapper instances as the same if the sink and origin is the same
+         *
+         * @return a hashcode as specified above
+         */
         @Override
         public int hashCode() {
             return mSink.hashCode() + (mOrigin == null ? 0 : mOrigin.hashCode());

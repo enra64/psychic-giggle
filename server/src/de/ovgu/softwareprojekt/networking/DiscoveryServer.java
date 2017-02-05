@@ -32,7 +32,7 @@ class DiscoveryServer extends DiscoveryThread {
      * @param localCommandPort   this port will be announced to any potential remote in the discovery phase. The correct
      *                           parameter can be most easily retrieved by requesting {@link CommandConnection#getLocalPort()}
      * @param localDataPort      this port will be announced to any potential remote in the discovery phase. The correct
-     *                           parameter can be most easily retrieved via {@link UdpDataConnection#getLocalPort()}.
+     *                           parameter can be most easily retrieved via {@link DataConnection#getLocalPort()}.
      * @param selfName           how to announce this server to any remotes
      * @param exceptionListener  the listener for exceptions that could not be handled internally
      */
@@ -57,7 +57,7 @@ class DiscoveryServer extends DiscoveryThread {
             // timeout to allow for stopping the server
             getSocket().setSoTimeout(20);
 
-            // continue running until close() is called
+            // continue running until closeAndSignalClient() is called
             while (isRunning()) {
                 try {
                     listen();

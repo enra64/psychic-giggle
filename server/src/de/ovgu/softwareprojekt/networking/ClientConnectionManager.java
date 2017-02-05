@@ -273,7 +273,7 @@ class ClientConnectionManager implements ClientListener, UnexpectedClientListene
      * @param client the NetworkDevice that is no longer required
      * @return true if the client was found
      */
-    boolean close(NetworkDevice client) {
+    boolean closeAndSignalClient(NetworkDevice client) {
         ClientConnection connectionHandler = getClientHandler(client);
 
         // return false if no matching client could be found
@@ -285,7 +285,7 @@ class ClientConnectionManager implements ClientListener, UnexpectedClientListene
             mClientConnections.remove(connectionHandler);
         }
 
-        // close the client connection
+        // closeAndSignalClient the client connection
         connectionHandler.closeAndSignalClient();
         return true;
     }
@@ -442,14 +442,15 @@ class ClientConnectionManager implements ClientListener, UnexpectedClientListene
     }
 
     /**
-     * Hides Reset Button if not in use
-     * @param isHidden
+     * Hide the reset button on all clients
+     *
+     * @param hide true if the button should be hidden
      * @throws IOException is thrown if command could not be sent
      */
-    public void hideResetButton(boolean isHidden) throws IOException{
+    public void hideResetButton(boolean hide) throws IOException{
         synchronized (mClientConnections) {
             for (ClientConnection con : mClientConnections)
-                con.hideResetButton(isHidden);
+                con.hideResetButton(hide);
         }
     }
 

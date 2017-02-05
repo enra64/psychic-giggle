@@ -49,7 +49,7 @@ class ClientConnection implements OnCommandListener, NetworkDataSink, Connection
     /**
      * Useful when you want to receive SensorData
      */
-    private UdpDataConnection mDataConnection;
+    private DataConnection mDataConnection;
 
     /**
      * Two-way communication for basically everything non-data, like enabling sensors or requesting connections
@@ -67,7 +67,7 @@ class ClientConnection implements OnCommandListener, NetworkDataSink, Connection
     private NetworkDevice mClient;
 
     /**
-     * This class handles scaling the data of each sensor
+     * This class stores the user sensitivity and the sensor ranges
      */
     private DataScalingHandler mDataScalingHandler;
 
@@ -90,11 +90,11 @@ class ClientConnection implements OnCommandListener, NetworkDataSink, Connection
      * Create a new client connection handler, which will immediately begin listening on random ports. They may be retrieved
      * using {@link #getCommandPort()} and {@link #getDataPort()}.
      *
-     * @param serverName        how the client connection should identify the server
-     * @param exceptionListener Who to notify about unhandleable exceptions
-     * @param commandListener   Who to notify about commands
-     * @param dataSink          Where to put data
-     * @param clientListener who to notify of client events
+     * @param serverName               how the client connection should identify the server
+     * @param exceptionListener        Who to notify about unhandleable exceptions
+     * @param commandListener          Who to notify about commands
+     * @param dataSink                 Where to put data
+     * @param clientListener           who to notify of client events
      * @param unexpectedClientListener Who to notify if commands arrive from a foreign client
      * @throws IOException when the listening process could not be started
      */
@@ -141,7 +141,7 @@ class ClientConnection implements OnCommandListener, NetworkDataSink, Connection
                     if (mIsConnected)
                         mClientListener.onClientDisconnected(mClient);
 
-                    // close self
+                    // closeAndSignalClient self
                     close();
                 }
             }
@@ -271,7 +271,7 @@ class ClientConnection implements OnCommandListener, NetworkDataSink, Connection
      */
     private void initialiseDataConnection() throws SocketException {
         // begin a new data connection
-        mDataConnection = new UdpDataConnection(mExceptionListener);
+        mDataConnection = new DataConnection(mExceptionListener);
 
         // register a callback for data objects
         mDataConnection.setDataSink(mDataSink);
@@ -334,9 +334,9 @@ class ClientConnection implements OnCommandListener, NetworkDataSink, Connection
     }
 
     /**
-     * Get the port the {@link UdpDataConnection} is listening on
+     * Get the port the {@link DataConnection} is listening on
      *
-     * @return the port the {@link UdpDataConnection} is listening on
+     * @return the port the {@link DataConnection} is listening on
      */
     int getDataPort() {
         return mDataConnection.getLocalPort();
@@ -415,9 +415,9 @@ class ClientConnection implements OnCommandListener, NetworkDataSink, Connection
     /**
      * this method sends a notification to the device which is then displayed
      *
-     * @param id        NotificationID: should start at 0 and increase with each new notification while device is connected
-     * @param title     title of the notification
-     * @param content   content of the notification
+     * @param id      NotificationID: should start at 0 and increase with each new notification while device is connected
+     * @param title   title of the notification
+     * @param content content of the notification
      * @throws IOException if the command could not be sent
      */
     void displayNotification(int id, String title, String content) throws IOException {
@@ -426,7 +426,8 @@ class ClientConnection implements OnCommandListener, NetworkDataSink, Connection
 
     /**
      * sends a description for the sensortype
-     * @param type affected sensor
+     *
+     * @param type        affected sensor
      * @param description description for the affected sensor
      * @throws IOException if the sensor description could not be sent
      */
@@ -435,11 +436,12 @@ class ClientConnection implements OnCommandListener, NetworkDataSink, Connection
     }
 
     /**
-     * Hides Reset Button if not in use
-     * @param isHidden
+     * Hide the reset button on the client managed by this instance
+     *
+     * @param isHidden true if the button should be hidden
      * @throws IOException is thrown if command could not be sent
      */
-    void hideResetButton(boolean isHidden)throws IOException{
+    void hideResetButton(boolean isHidden) throws IOException {
         sendCommand(new HideReset(isHidden));
     }
 }

@@ -15,7 +15,7 @@ import java.net.SocketException;
  * This class listens for udp packets containing {@link SensorData} objects, and notifies a listener of new data.
  * The listener must be
  */
-class UdpDataConnection extends Thread implements NetworkDataSource {
+class DataConnection extends Thread implements NetworkDataSource {
     /**
      * Incoming sensor data will be forwarded here
      */
@@ -43,26 +43,26 @@ class UdpDataConnection extends Thread implements NetworkDataSource {
 
 
     /**
-     * Create a new UdpDataConnection that will start listening after {@link #start()} is called.
+     * Create a new DataConnection that will start listening after {@link #start()} is called.
      *
      * @param exceptionListener the {@link ExceptionListener} called when a (possibly threaded) exception occurs
      * @throws SocketException if no free port could be found
      */
-    UdpDataConnection(ExceptionListener exceptionListener) throws SocketException {
-        super("UdpDataConnection: unbound");
+    DataConnection(ExceptionListener exceptionListener) throws SocketException {
+        super("DataConnection: unbound");
         mLocalPort = findFreePort();
         mExceptionListener = exceptionListener;
     }
 
     /**
-     * Set the client that sends data to this {@link UdpDataConnection}
+     * Set the client that sends data to this {@link DataConnection}
      * @param client the client that should send its data here
      */
     void setClient(NetworkDevice client) {
         mClient = client;
 
         // update thread name
-        setName("UdpDataConnection for " + mClient);
+        setName("DataConnection for " + mClient);
     }
 
     /**
@@ -79,9 +79,9 @@ class UdpDataConnection extends Thread implements NetworkDataSource {
     }
 
     /**
-     * Returns the port this UdpDataConnection is listening on
+     * Returns the port this DataConnection is listening on
      *
-     * @return the port this {@link UdpDataConnection} listens on
+     * @return the port this {@link DataConnection} listens on
      */
     int getLocalPort() {
         return mLocalPort;
@@ -111,7 +111,7 @@ class UdpDataConnection extends Thread implements NetworkDataSource {
             e.printStackTrace();
         } catch (NullPointerException e) {
             mExceptionListener.onException(
-                    UdpDataConnection.this,
+                    DataConnection.this,
                     e,
                     "A NullPointerException was encountered when data arrived.");
         }

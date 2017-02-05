@@ -1,17 +1,17 @@
 # TODO
 * UseCaseDiagramm in Einleitungstext
 * packagenamen ändern!
-* übersetzungen möglich machen
 * bilder hinzufügen
 * JavaDoc einbauen
 * onData muss an zwei stellen beschrieben werden: bei der pipeline, und bei der grundlegenden verwendung
 * wo packen wir so allgemeines zeug wie NetworkDataSink, SensorData, NetworkDevice etc hin? BEARBEITET: habe jetzt noch sehr kurze Erklärung fast ganz an den anfang mit links gepackt.
 * PLAY STORE
+* requirement: möglichst cross-platform, android-verbreitung zitieren -> Java
 * alle registrierten sinks in splittern schliessen???
 * javadoc ist teilweise horribly out of date. wir müssen zumindest bei dem kram den die potenziell angucken korrigieren!
 * wie soll man das common-package ohne android studio compilen? iwie müssen wir das noch anders lösen.
 * how to use framework mit intellij
-* round-trip-time + graph
+* round-trip-time + graph: erstellt, einbauen?...
 * architekturübersicht
     - discoverybeschreibung verbessern
     - kommunikation verbessern; hübsche bildchen?

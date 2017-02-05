@@ -37,7 +37,6 @@ class DataScalingHandler implements NetworkDataSink {
 
         for (SensorType sensorType : SensorType.values())
             mUserSensitivity.put(sensorType, 50f);
-
     }
 
     /**
@@ -46,7 +45,6 @@ class DataScalingHandler implements NetworkDataSink {
      * @param sensorType  the sensor that shall be affected
      * @param sensitivity sensitivity factor. applied before normalization
      */
-
     void setSensorUserSensitivity(SensorType sensorType, float sensitivity) {
         // get the normalization filter configured for this sensor
         mUserSensitivity.put(sensorType, sensitivity);
@@ -58,7 +56,6 @@ class DataScalingHandler implements NetworkDataSink {
      * @param sensor      the sensor of which the source range should be modified
      * @param sourceRange maximum and -minimum of the incoming range for this sensor
      */
-
     void setSensorRange(SensorType sensor, float sourceRange) {
         mSensorRange.put(sensor, sourceRange);
     }
