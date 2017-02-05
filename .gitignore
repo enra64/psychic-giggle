@@ -20,3 +20,4 @@ server/out/*
 **/uiDesigner.xml
 **/*.iml
 
+**/.~lock.*
