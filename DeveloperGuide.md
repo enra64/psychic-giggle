@@ -17,6 +17,7 @@
     - kommunikation verbessern; hübsche bildchen?
     - app beschreiben
     - server beschreiben
+      + daten-pipeline beschreiben
 
 # Developer Guide für das Psychic-Framework
 Das Psychic-Framework bezeichnet eine Kombination aus einer App und einem Serverframework mit einem gemeinsamen Kern. Dieses Framework dient der schnellen und einfachen Entwicklung von PC-Applikationen, die Sensordaten von Android-Geräten verwenden möchten.
