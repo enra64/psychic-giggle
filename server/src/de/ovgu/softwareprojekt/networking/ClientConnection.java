@@ -67,11 +67,6 @@ class ClientConnection implements OnCommandListener, NetworkDataSink, Connection
     private NetworkDevice mClient;
 
     /**
-     * This class stores the user sensitivity and the sensor ranges
-     */
-    private DataScalingHandler mDataScalingHandler;
-
-    /**
      * False until {@link #onClientAccepted(NetworkDevice)} has run successfully, and after {@link #close()} was called
      */
     private volatile boolean mIsConnected = false;
@@ -80,6 +75,16 @@ class ClientConnection implements OnCommandListener, NetworkDataSink, Connection
      * Used to keep track of the connection health
      */
     private final ConnectionWatch mConnectionWatch;
+
+    /**
+     * Contains the scaling filters that have to be applied for each sensors
+     */
+    private EnumMap<SensorType, Float> mUserSensitivity = new EnumMap<>(SensorType.class);
+
+    /**
+     * Contains the scaling filters that have to be applied for each sensors
+     */
+    private EnumMap<SensorType, Float> mSensorRange = new EnumMap<>(SensorType.class);
 
     /**
      * The InetAddress of our client, saved to avoid constant conversions
@@ -105,15 +110,18 @@ class ClientConnection implements OnCommandListener, NetworkDataSink, Connection
             ClientListener clientListener,
             NetworkDataSink dataSink,
             UnexpectedClientListener unexpectedClientListener) throws IOException {
+        // store arguments
         mExceptionListener = exceptionListener;
         mCommandListener = commandListener;
         mClientListener = clientListener;
+        mDataSink = dataSink;
         mUnexpectedClientListener = unexpectedClientListener;
 
-        // this is our sink for everything to be able to do customized scaling for any sensor type
-        mDataScalingHandler = new DataScalingHandler(dataSink);
-        mDataSink = mDataScalingHandler;
+        // store default sensitivity for all sensors
+        for (SensorType sensorType : SensorType.values())
+            mUserSensitivity.put(sensorType, 50f);
 
+        // init connection classes
         initialiseCommandConnection();
         initialiseDataConnection();
 
@@ -182,7 +190,10 @@ class ClientConnection implements OnCommandListener, NetworkDataSink, Connection
 
     @Override
     public void onData(NetworkDevice origin, SensorData sensorData, float userSensitivity) {
-        mDataSink.onData(origin, sensorData, userSensitivity);
+        // get the user sensitivity configured for this sensor
+        float sensorSensitivity = mUserSensitivity.get(sensorData.sensorType);
+
+        mDataSink.onData(origin, sensorData, sensorSensitivity);
     }
 
     /**
@@ -359,11 +370,15 @@ class ClientConnection implements OnCommandListener, NetworkDataSink, Connection
             case ChangeSensorSensitivity:
                 // update the sensitivity for the given sensor
                 ChangeSensorSensitivity sensorChangeCommand = (ChangeSensorSensitivity) command;
-                mDataScalingHandler.setSensorUserSensitivity(sensorChangeCommand.sensorType, sensorChangeCommand.sensitivity);
+
+                // update user sensitivity
+                mUserSensitivity.put(sensorChangeCommand.sensorType, (float) sensorChangeCommand.sensitivity);
                 break;
             case SensorRangeNotification:
                 SensorRangeNotification notification = (SensorRangeNotification) command;
-                mDataScalingHandler.setSensorRange(notification.type, notification.range);
+
+                // update sensor range
+                mSensorRange.put(notification.type, notification.range);
                 break;
             case ConnectionAliveCheck:
                 mConnectionWatch.onCheckEvent();
@@ -385,7 +400,7 @@ class ClientConnection implements OnCommandListener, NetworkDataSink, Connection
      * @return the sensor range as reported by android for the sensor
      */
     float getSensorMaximumRange(SensorType sensor) {
-        return mDataScalingHandler.getSensorRange(sensor);
+        return mSensorRange.get(sensor);
     }
 
     /**
