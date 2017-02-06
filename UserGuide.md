@@ -2,13 +2,14 @@
 
 Die Bedienung von App und Server wird aus Sicht unserer Beispielimplementation erläutert
 
-# Was man braucht: 
+# Was benötigt wird: 
 - Handy mit Android(mindestens 4.4) 
 - javafähiges Gerät(Java 8) um Server darzustellen
 - Server Jar auf Gerät, App auf Handy installiert
 
 # Server starten:
-- mittels Terminal Befehl „java –jar servername Anwendung“
+- mittels GUI
+      - alternativ: Terminal Befehl „java –jar servername Anwendung“
 
 # App starten:
 - App starten und auf Discovery (Server suchen) drücken
@@ -16,7 +17,7 @@ Die Bedienung von App und Server wird aus Sicht unserer Beispielimplementation e
 - gewünschten Server auswählen und verbinden
 
 <p align="Center">
-<img src="Screenshots/Discovery Activity.png" alt="Discovery Activity" Width="400px"/>
+<img src="Screenshots/Discovery Activity.png" alt="Discovery Activity" Width="300px"/>
 <br>
 1. Optionen<br>
 2. Server<br>
@@ -24,15 +25,32 @@ Die Bedienung von App und Server wird aus Sicht unserer Beispielimplementation e
 </p>
 
 # Einstellungen:
--hier lassen sich Name des Gerätes, benutzter Port und je nach gewählter Anwendung die Sensibilität der benutzbaren Sensoren des Handys einstellen (ist keine Anwendung gewählt, können alle Sensoren eingestellt werden)
+- hier lassen sich Name des Gerätes, benutzter Discovery Port und je nach gewählter Anwendung die Sensibilität der benutzbaren Sensoren des Handys einstellen (ist keine Anwendung gewählt, können alle Sensoren eingestellt werden)
+
 <p align="Center">
-<img src="Screenshots/Options Activity.png" alt="Options Activity Mouse Server" Width="400px"/>
+<img src="Screenshots/Options Activity.png" alt="Options Activity Mouse Server" Width="300px"/>
 <br>
 1. Handy Namen<br>
 2. Discovery Port<br>
 3. Sensorname und Empfindlichkeitsslider<br>
 4. Verwendungszweck des Sensors<br>
 5. Optionen verlassen<br>
+</p>
+
+# GUI:
+- Start durch Doppelklick
+    * alternativ: durch den Terminal Befehl: java –jar server.jar
+- diese GUI ist nur für die 3 implementierten Beispielanwendungen erstellt worden
+- Änderungen dieser, oder eine neue GUI können durch den Implementator erfolgen
+
+<p align="Center">
+<img src="Screenshots/GUI.png" alt="GUI" Width="500px"/>
+<br>
+1. Maus Server starten<br>
+2. Controller Server starten<br>
+3. Kuka Server starten<br>
+4. Aktuellen Server beenden<br>
+5. Feld für Serverinformationen<br>
 </p>
 
 # Anwendungen:
@@ -44,7 +62,7 @@ Terminal Befehl: java –jar server.jar mouse
 - „Sensor anhalten“ stoppt alle Bewegungen des Cursors (Cursor ist nicht mehr durch Handy steuerbar)
 
 <p align="Center">
-<img src="Screenshots/Send Activity.png" alt="Send Activity Mouse Server" Width="400px"/>
+<img src="Screenshots/Send Activity.png" alt="Send Activity Mouse Server" Width="300px"/>
 <br>
 1. Optionen<br>
 2. Verbindung trennen<br>
@@ -64,26 +82,27 @@ Terminal Befehl: java –jar server.jar nes
 -„zentrieren“ hat hier keine Funktion
 
 
-## 3) Robotersteuerung
+## 3) Kuka lbr iiwa 7 r800
 Terminal Befehl: java –jar server.jar vrep
--Kuka Roboter „Kuka lbr iiwa 7 r800“ oder entsprechende Simulationssoftware (vrep) ist erforderlich 
-- Marble-Labyrinth-Control: Robbi steht in vordefinierter Position, zu bewegen ist nur das vorderste Glied
-- alternativ: mit den Button „switch between marble labyrinth and joint control mode“ lässt sich jedes der Glieder auswählen und einzeln bewegen
+- Kuka Roboter „Kuka lbr iiwa 7 r800“ oder entsprechende Simulationssoftware (vrep) ist erforderlich 
+- Marble-Labyrinth-Control: Roboter steht in vordefinierter Position, zu bewegen ist nur das vorderste Gelenk
+- alternativ: mit den Button „Wechsel zwischen Murmelmodus und Gelenkkontrolle“ lässt sich jedes der Gelenke auswählen und einzeln bewegen
 
 ## 4) Weitere Anwendungen
 weitere Anwendungen und Tutorials können durch Implementator bereitgestellt werden
 
 # Bekannte Probleme:
 - benutzte Ports dürfen nicht von Firewall blockiert werden<br>
-Lösung: 
-neue Regel für die Firewall erstellen, in dem es erlaubt ist, über den Port zu kommunizieren<br>
-alternativ: Firewall deaktivieren<br>
+    - Lösung: neue Regel für die Firewall erstellen, in der es erlaubt ist, über den Port zu kommunizieren<br>
+    - alternativ: Firewall deaktivieren<br>
 
 - unerwartetes Verhalten der Sensoren<br>
-Lösung:
-die Handysensoren neu kalibrieren
+    - Lösung: die Handysensoren neu kalibrieren
 
--  Exception: "Address already in use: Cannot bind"<br>
-Lösung:
-anderen Discovery Port in den Einstellungen wählen
+- Exception: "Address already in use: Cannot bind"<br>
+    - Lösung: anderen Discovery Port in den Einstellungen wählen
+    
+- Handy kann nicht zu Server verbinden
+    - Lösung: im WLAN die Kommunikation zwischen Clients erlauben
+    - alternativ: eigenes WLAN durch Hotspot erstellen
 

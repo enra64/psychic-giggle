@@ -53,7 +53,7 @@ public class ButtonPanel extends JPanel implements ActionListener {
         //Setup layout and create close button
         closePan.add(new JLabel(" "));
 
-        closeBtn = new JButton("Close Servers");
+        closeBtn = new JButton("Server beenden");
 
         //This button should only close if a server is already running
         closeBtn.addActionListener(new ActionListener() {
@@ -84,15 +84,15 @@ public class ButtonPanel extends JPanel implements ActionListener {
         JPanel serverButtonPan = new JPanel(new GridLayout(1, 5));
 
         //Create buttons and setup layout
-        startMouseBtn = new JButton("Mouse");
+        startMouseBtn = new JButton("Maus");
         serverButtonPan.add(startMouseBtn);
         serverButtonPan.add(new JLabel(" "));
 
-        startNesBtn = new JButton("Nes");
+        startNesBtn = new JButton("Controller");
         serverButtonPan.add(startNesBtn);
         serverButtonPan.add(new JLabel(" "));
 
-        startKukaBtn = new JButton("kuka");
+        startKukaBtn = new JButton("Kuka");
         serverButtonPan.add(startKukaBtn);
 
         //Give buttons an actionlistener
