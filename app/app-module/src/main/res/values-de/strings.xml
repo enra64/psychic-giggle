@@ -28,6 +28,7 @@
     <string name="sensor_proximity">Näherungssensor</string>
     <string name="sensor_relative_humidity">Relative Luftfeuchtigkeit</string>
     <string name="sensor_rotation_vector">Rotationsvektor</string>
-    <string name="sensor_activation_error_body">"Dieses Gerät unterstützt mindestens einen benötigten Sensor nicht: "</string>
+    <string name="back">Zurück</string>
+    <string name="sensor_activation_error_body">\"Diesem Gerät fehlt mindestens ein benötigter Sensor:\"</string>
     <string name="sensor_activation_error_title">Sensoraktivierungsfehler</string>
 </resources>
