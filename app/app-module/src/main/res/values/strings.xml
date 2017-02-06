@@ -29,4 +29,5 @@
     <string name="sensor_rotation_vector">Rotation vector</string>
     <string name="sensor_activation_error_title">Sensor activation error</string>
     <string name="sensor_activation_error_body">"This device misses at least one required Sensor: "</string>
+    <string name="back">Back</string>
 </resources>
