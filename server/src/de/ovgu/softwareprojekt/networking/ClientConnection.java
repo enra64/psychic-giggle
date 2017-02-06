@@ -285,7 +285,7 @@ class ClientConnection implements OnCommandListener, NetworkDataSink, Connection
         mDataConnection = new DataConnection(mExceptionListener);
 
         // register a callback for data objects
-        mDataConnection.setDataSink(mDataSink);
+        mDataConnection.setDataSink(this);
 
         // begin listening for SensorData objects
         mDataConnection.start();
