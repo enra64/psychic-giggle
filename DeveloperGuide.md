@@ -4,12 +4,11 @@
     - JavaDoc einbauen
     - PLAY STORE: link zu release
     - javadoc ist teilweise horribly out of date. wir müssen zumindest bei dem kram den die potenziell angucken korrigieren!
-    - github release mit: framework code als zip, framework als jar, beispielserver gui als jar 
+    - github release mit: framework code als zip, framework als jar, beispielserver gui als jar
 * DeveloperGuide.md
     - how to use framework mit intellij
 * Einleitung.md
     - round-trip-time + graph einbauen?...
-    - UseCaseDiagramm in Einleitungstext
     - ll: das gewünschte deployment-format am anfang definieren?
     - requirement: möglichst cross-platform, android-verbreitung zitieren -> Java
 * Architektur.md
