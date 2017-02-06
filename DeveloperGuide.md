@@ -1,23 +1,21 @@
 # TODO
-* UseCaseDiagramm in Einleitungstext
-* bilder hinzufügen
-* JavaDoc einbauen
-* onData muss an zwei stellen beschrieben werden: bei der pipeline, und bei der grundlegenden verwendung
-* wo packen wir so allgemeines zeug wie NetworkDataSink, SensorData, NetworkDevice etc hin? BEARBEITET: habe jetzt noch sehr kurze Erklärung fast ganz an den anfang mit links gepackt.
-* PLAY STORE
-* requirement: möglichst cross-platform, android-verbreitung zitieren -> Java
-* alle registrierten sinks in splittern schliessen???
-* javadoc ist teilweise horribly out of date. wir müssen zumindest bei dem kram den die potenziell angucken korrigieren!
-* wie soll man das common-package ohne android studio compilen? iwie müssen wir das noch anders lösen.
-* how to use framework mit intellij
-* round-trip-time + graph: erstellt, einbauen?...
-* architekturübersicht
-    - discoverybeschreibung verbessern
-    - kommunikation verbessern; hübsche bildchen?
+* Sonstiges:
+    - bilder hinzufügen
+    - JavaDoc einbauen
+    - PLAY STORE: link zu release
+    - javadoc ist teilweise horribly out of date. wir müssen zumindest bei dem kram den die potenziell angucken korrigieren!
+    - github release mit: framework code als zip, framework als jar, beispielserver gui als jar 
+* DeveloperGuide.md
+    - how to use framework mit intellij
+* Einleitung.md
+    - round-trip-time + graph einbauen?...
+    - UseCaseDiagramm in Einleitungstext
+    - ll: das gewünschte deployment-format am anfang definieren?
+    - requirement: möglichst cross-platform, android-verbreitung zitieren -> Java
+* Architektur.md
     - app beschreiben
-    - server beschreiben
-      + daten-pipeline beschreiben
-* ll: das gewünschte deployment-format am anfang definieren?
+    - klassendiagramm anhängen
+
 
 # Developer Guide für das Psychic-Framework
 Das Psychic-Framework bezeichnet eine Kombination aus einer App und einem Serverframework mit einem gemeinsamen Kern. Dieses Framework dient der schnellen und einfachen Entwicklung von PC-Applikationen, die Sensordaten von Android-Geräten verwenden möchten.

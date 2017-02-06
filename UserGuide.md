@@ -15,8 +15,25 @@ Die Bedienung von App und Server wird aus Sicht unserer Beispielimplementation e
 - gegebenenfalls Port über Option einstellen (darf nicht in Benutzung sein)
 - gewünschten Server auswählen und verbinden
 
+<p align="Center">
+<img src="Screenshots/Discovery Activity.png" alt="Discovery Activity" Width="400px"/>
+<br>
+1. Optionen<br>
+2. Server<br>
+3. Server suchen<br>
+</p>
+
 # Einstellungen:
 -hier lassen sich Name des Gerätes, benutzter Port und je nach gewählter Anwendung die Sensibilität der benutzbaren Sensoren des Handys einstellen (ist keine Anwendung gewählt, können alle Sensoren eingestellt werden)
+<p align="Center">
+<img src="Screenshots/Options Activity.png" alt="Options Activity Mouse Server" Width="400px"/>
+<br>
+1. Handy Namen<br>
+2. Discovery Port<br>
+3. Sensorname und Empfindlichkeitsslider<br>
+4. Verwendungszweck des Sensors<br>
+5. Optionen verlassen<br>
+</p>
 
 # Anwendungen:
 ## 1) Maussteuerung:
@@ -25,6 +42,17 @@ Terminal Befehl: java –jar server.jar mouse
 - „Left Click“ und „Right Click“ verhalten sich wie Links- und Rechtsklick bei einer Maus
 - „Zentrieren“ setzt den Cursor auf die Mitte des aktuellen Monitors (auf dem der Cursor sich gerade befindet)
 - „Sensor anhalten“ stoppt alle Bewegungen des Cursors (Cursor ist nicht mehr durch Handy steuerbar)
+
+<p align="Center">
+<img src="Screenshots/Send Activity.png" alt="Send Activity Mouse Server" Width="400px"/>
+<br>
+1. Optionen<br>
+2. Verbindung trennen<br>
+3. Vom Server angeforderte Bedienelemente<br>
+4. Rücksetzfunktion<br>
+5. Datenübertragung pausieren<br>
+</p>
+
 
 ## 2) Controller:
 Terminal Befehl: java –jar server.jar nes
@@ -46,11 +74,16 @@ Terminal Befehl: java –jar server.jar vrep
 weitere Anwendungen und Tutorials können durch Implementator bereitgestellt werden
 
 # Bekannte Probleme:
-- benutzter Port darf nicht von Firewall blockiert werden
+- benutzte Ports dürfen nicht von Firewall blockiert werden<br>
 Lösung: 
-neue Regel für die Firewall erstellen, in dem es erlaubt ist, über den Port zu kommunizieren
+neue Regel für die Firewall erstellen, in dem es erlaubt ist, über den Port zu kommunizieren<br>
+alternativ: Firewall deaktivieren<br>
 
-- unerwartetes Verhalten der Sensoren
+- unerwartetes Verhalten der Sensoren<br>
 Lösung:
 die Handysensoren neu kalibrieren
+
+-  Exception: "Address already in use: Cannot bind"<br>
+Lösung:
+anderen Discovery Port in den Einstellungen wählen
 

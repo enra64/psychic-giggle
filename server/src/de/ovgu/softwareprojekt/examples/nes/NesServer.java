@@ -259,13 +259,11 @@ public class NesServer extends AbstractPsychicServer {
 
         try {
             //tells player which id they have
-            displayNotification(PLAYER_NUM_NOTIFICATION_ID, "Player " + playerID, "You are connected as player " + playerID, connectedClient);
+            displayNotification(PLAYER_NUM_NOTIFICATION_ID, "Spieler " + playerID, "Du bist verbunden als Spieler " + playerID, connectedClient);
 
             //Sensor descriptions
             sendSensorDescription(SensorType.Gravity, "Je höher die Empfindlichkeit, desto weiter muss das Gerät für eine Lenkaktion gedreht werden.");
-            sendSensorDescription(SensorType.Gravity, "A high sensitivity reduces the amount of rotation you need to do for steering.");
             sendSensorDescription(SensorType.LinearAcceleration, "Je höher die Empfindlichkeit, desto schwächer kann die Auslösebewegung sein.");
-
 
             //hide ResetButton because NES PsychicServer doesn´t support ResetButton
             hideResetButton(true);
