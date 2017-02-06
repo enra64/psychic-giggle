@@ -74,11 +74,16 @@ Terminal Befehl: java –jar server.jar vrep
 weitere Anwendungen und Tutorials können durch Implementator bereitgestellt werden
 
 # Bekannte Probleme:
-- benutzter Port darf nicht von Firewall blockiert werden
+- benutzte Ports dürfen nicht von Firewall blockiert werden<br>
 Lösung: 
-neue Regel für die Firewall erstellen, in dem es erlaubt ist, über den Port zu kommunizieren
+neue Regel für die Firewall erstellen, in dem es erlaubt ist, über den Port zu kommunizieren<br>
+alternativ: Firewall deaktivieren<br>
 
-- unerwartetes Verhalten der Sensoren
+- unerwartetes Verhalten der Sensoren<br>
 Lösung:
 die Handysensoren neu kalibrieren
+
+-  Exception: "Address already in use: Cannot bind"<br>
+Lösung:
+anderen Discovery Port in den Einstellungen wählen
 

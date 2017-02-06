@@ -58,8 +58,8 @@ public class MouseServer extends AbstractPsychicServer {
         registerDataSink(builder.build(mMouseMover), SensorType.Gyroscope);
 
         // add left- and right click buttons
-        addButton("left click", LEFT_MOUSE_BUTTON);
-        addButton("right click", RIGHT_MOUSE_BUTTON);
+        addButton("Linksklick", LEFT_MOUSE_BUTTON);
+        addButton("Rechtsklick", RIGHT_MOUSE_BUTTON);
 
         // set a maximum client count of 1
         setClientMaximum(1);
