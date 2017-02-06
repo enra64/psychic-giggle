@@ -149,17 +149,17 @@ public class KukaServer extends AbstractPsychicServer {
      */
     private void createButtons() throws IOException {
         clearButtons();
-        addButton("Switch between marble labyrinth and joint control mode", MODE_BUTTON);
+        addButton("Wechsel zwischen Murmelmodus und Gelenkkontrolle", MODE_BUTTON);
 
         // in marble mode, we want to be able to switch the movement directions
         if (mIsInMarbleMode) {
-            addButton("Flip rotator direction", MarbleLabyrinthControl.FLIP_ROTATOR_BUTTON);
-            addButton("Flip tilter direction", MarbleLabyrinthControl.FLIP_TILTER_BUTTON);
+            addButton("Invertiere Rotationsrichtung", MarbleLabyrinthControl.FLIP_ROTATOR_BUTTON);
+            addButton("Invertiere Neigungsrichtung", MarbleLabyrinthControl.FLIP_TILTER_BUTTON);
         // in joint control mode, three rotator/tilter pairs can be controlled
         } else {
-            addButton("Control base actor pair", JointControl.BASE_PAIR_BUTTON);
-            addButton("Control center actor pair", JointControl.CENTER_PAIR_BUTTON);
-            addButton("Control tool actor pair", JointControl.TOOL_PAIR_BUTTON);
+            addButton("Basisaktorenpaar steuern", JointControl.BASE_PAIR_BUTTON);
+            addButton("Mittelaktorenpaar steuern", JointControl.CENTER_PAIR_BUTTON);
+            addButton("Werkzeugaktorenpaar steuern", JointControl.TOOL_PAIR_BUTTON);
         }
     }
 
