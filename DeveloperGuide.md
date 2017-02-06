@@ -1,6 +1,5 @@
 # TODO
 * UseCaseDiagramm in Einleitungstext
-* packagenamen ändern!
 * bilder hinzufügen
 * JavaDoc einbauen
 * onData muss an zwei stellen beschrieben werden: bei der pipeline, und bei der grundlegenden verwendung
@@ -18,6 +17,7 @@
     - app beschreiben
     - server beschreiben
       + daten-pipeline beschreiben
+* ll: das gewünschte deployment-format am anfang definieren?
 
 # Developer Guide für das Psychic-Framework
 Das Psychic-Framework bezeichnet eine Kombination aus einer App und einem Serverframework mit einem gemeinsamen Kern. Dieses Framework dient der schnellen und einfachen Entwicklung von PC-Applikationen, die Sensordaten von Android-Geräten verwenden möchten.
@@ -104,7 +104,7 @@ Weil viele der folgenden Erklärungen diese Klassen benutzen, werden sie hier ku
 * ```NetworkDataSink```: Dieses Interface ermöglicht implementierenden Klassen, Sensordaten anzunehmen. [Dokumentation](#networkdatasink)
 
 ## Daten bestellen
-Das Kernthema des Psychic-Frameworks sind Sensordaten. Diese werden zuerst an eine ```NetworkDataSink``` geleitet, und werden mit der ```registerDataSink(NetworkDataSink, SensorType)```-Funktion angefordert. Die übergebene ```NetworkDataSink``` wird dann die unveränderten Daten von dem durch den ```SensorType```-Parameter angegebenen Sensor erhalten. [Die Verwendung von ```NetworkDataSink``` wird hier genauer beschrieben.](#networkdatasink)
+Das Kernthema des Psychic-Frameworks sind Sensordaten. Diese werden zuerst an eine ```NetworkDataSink``` geleitet, und werden mit der ```registerDataSink(NetworkDataSink, SensorType)```-Funktion angefordert. Die übergebene ```NetworkDataSink``` wird dann die unveränderten Daten von dem durch den ```SensorType```-Parameter angegebenen Sensor erhalten. [Die Verwendung von ```NetworkDataSink``` sowie die ```onData```-Funktion werden hier genauer beschrieben.](#networkdatasink)
 
 Sollen nur Daten eines einzelnen Clients an eine Datensenke gelangen, steht ```registerDataSink(NetworkDataSink, NetworkDevice, SensorData)``` zur Verfügung. Wird diese Funktion genutzt, werden nur Daten vom spezifizierten ```NetworkDevice``` an der übergebenen ```NetworkDataSink``` ankommen.
 
