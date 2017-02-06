@@ -8,7 +8,8 @@ Die Bedienung von App und Server wird aus Sicht unserer Beispielimplementation e
 - Server Jar auf Gerät, App auf Handy installiert
 
 # Server starten:
-- mittels Terminal Befehl „java –jar servername Anwendung“
+- mittels GUI
+      - alternativ: Terminal Befehl „java –jar servername Anwendung“
 
 # App starten:
 - App starten und auf Discovery (Server suchen) drücken
