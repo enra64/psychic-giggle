@@ -8,9 +8,6 @@
 * DeveloperGuide.md
     - how to use framework mit intellij
 * Einleitung.md
-    - round-trip-time + graph einbauen?...
-    - UseCaseDiagramm in Einleitungstext
-    - ll: das gewünschte deployment-format am anfang definieren?
     - requirement: möglichst cross-platform, android-verbreitung zitieren -> Java
 * Architektur.md
     - app beschreiben
