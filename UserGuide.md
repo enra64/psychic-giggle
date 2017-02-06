@@ -16,7 +16,7 @@ Die Bedienung von App und Server wird aus Sicht unserer Beispielimplementation e
 - gewünschten Server auswählen und verbinden
 
 <p align="Center">
-<img src="Screenshots/Discovery Activity.png" alt="Discovery Activity" Width="400px"/>
+<img src="Screenshots/Discovery Activity.png" alt="Discovery Activity" Width="300px"/>
 <br>
 1. Optionen<br>
 2. Server<br>
@@ -26,7 +26,7 @@ Die Bedienung von App und Server wird aus Sicht unserer Beispielimplementation e
 # Einstellungen:
 - hier lassen sich Name des Gerätes, benutzter Port und je nach gewählter Anwendung die Sensibilität der benutzbaren Sensoren des Handys einstellen (ist keine Anwendung gewählt, können alle Sensoren eingestellt werden)
 <p align="Center">
-<img src="Screenshots/Options Activity.png" alt="Options Activity Mouse Server" Width="400px"/>
+<img src="Screenshots/Options Activity.png" alt="Options Activity Mouse Server" Width="300px"/>
 <br>
 1. Handy Namen<br>
 2. Discovery Port<br>
@@ -42,7 +42,7 @@ Die Bedienung von App und Server wird aus Sicht unserer Beispielimplementation e
 - Änderungen dieser, oder eine neue GUI können durch den Implementator erfolgen
 
 <p align="Center">
-<img src="Screenshots/GUI.png" alt="GUI" Width="400px"/>
+<img src="Screenshots/GUI.png" alt="GUI" Width="500px"/>
 <br>
 1. Maus Server starten<br>
 2. Controller Server starten<br>
@@ -60,7 +60,7 @@ Terminal Befehl: java –jar server.jar mouse
 - „Sensor anhalten“ stoppt alle Bewegungen des Cursors (Cursor ist nicht mehr durch Handy steuerbar)
 
 <p align="Center">
-<img src="Screenshots/Send Activity.png" alt="Send Activity Mouse Server" Width="400px"/>
+<img src="Screenshots/Send Activity.png" alt="Send Activity Mouse Server" Width="300px"/>
 <br>
 1. Optionen<br>
 2. Verbindung trennen<br>
