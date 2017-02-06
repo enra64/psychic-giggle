@@ -98,6 +98,10 @@ weitere Anwendungen und Tutorials können durch Implementator bereitgestellt wer
 - unerwartetes Verhalten der Sensoren<br>
     - Lösung: die Handysensoren neu kalibrieren
 
--  Exception: "Address already in use: Cannot bind"<br>
+- Exception: "Address already in use: Cannot bind"<br>
     - Lösung: anderen Discovery Port in den Einstellungen wählen
+    
+- Handy kann nicht zu Server verbinden
+    - Lösung: im WLAN die Kommunikation zwischen Clients erlauben
+    - alternativ: eigenes WLAN durch Hotspot erstellen
 
