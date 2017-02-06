@@ -82,3 +82,7 @@ neue Regel für die Firewall erstellen, in dem es erlaubt ist, über den Port zu
 Lösung:
 die Handysensoren neu kalibrieren
 
+-  Exception: "Address already in use: Cannot bind"
+Lösung:
+anderen Discovery Port in den Einstellungen wählen
+
