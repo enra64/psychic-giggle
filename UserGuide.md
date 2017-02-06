@@ -2,7 +2,7 @@
 
 Die Bedienung von App und Server wird aus Sicht unserer Beispielimplementation erläutert
 
-# Was man braucht: 
+# Was man benötigt: 
 - Handy mit Android(mindestens 4.4) 
 - javafähiges Gerät(Java 8) um Server darzustellen
 - Server Jar auf Gerät, App auf Handy installiert
@@ -25,7 +25,7 @@ Die Bedienung von App und Server wird aus Sicht unserer Beispielimplementation e
 </p>
 
 # Einstellungen:
-- hier lassen sich Name des Gerätes, benutzter Port und je nach gewählter Anwendung die Sensibilität der benutzbaren Sensoren des Handys einstellen (ist keine Anwendung gewählt, können alle Sensoren eingestellt werden)
+- hier lassen sich Name des Gerätes, benutzter Discovery Port und je nach gewählter Anwendung die Sensibilität der benutzbaren Sensoren des Handys einstellen (ist keine Anwendung gewählt, können alle Sensoren eingestellt werden)
 <p align="Center">
 <img src="Screenshots/Options Activity.png" alt="Options Activity Mouse Server" Width="300px"/>
 <br>
