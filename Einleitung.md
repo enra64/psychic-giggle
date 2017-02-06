@@ -20,13 +20,21 @@ Die zur Demonstration dienenden Anwendungen stellen schwer zu definierende Anfor
 Für die Frequenz der Sensordaten haben wir uns an der Playstation 3 von Sony orientiert: Diese stellt die laufenden Spiele mit 24 Bildern pro Sekunde dar, ein Wert mit dem die meisten Menschen problemlos auch schnelle Actionspiele bedienen können. Daraus entstand für uns die Anforderung, mindestens 30 Updates der Sensordaten pro Sekunde unterstützen zu können.
 
 ## Latenz
-Eine akzeptable Grenze für die Latenz festzulegen war ebenfalls schwierig, da Latenzen im Millisekundenbereich nur schwerlich per Hand festzulegen sind. Wir haben daher versucht, uns über die Latenzen professionell hergestellter kabelloser Eingabegeräte zu informieren. Leider ist auch das schwierig, da Hersteller dazu meist keine Informationen veröffentlichen. Wir haben jedoch diesen Artikel von [www.eurogramer.net](http://www.eurogamer.net/articles/digitalfoundry-lag-factor-article?page=2) gefunden, die sich mit Input-Lag von Konsolen beschäftigt, und bei unterschiedlichen Spielen Unterschiede über 50ms gefunden. Da beide Spiele bedienbar sind, sollte eine Latenz unter diesem Wert keine Probleme verursachen.
+Eine akzeptable Grenze für die Latenz festzulegen war ebenfalls schwierig, da Latenzen im Millisekundenbereich nur schwerlich per Hand festzulegen sind. Wir haben daher versucht, uns über die Latenzen professionell hergestellter kabelloser Eingabegeräte zu informieren. Leider ist auch das schwierig, da Hersteller dazu meist keine Informationen veröffentlichen. Wir haben jedoch diesen Artikel von [www.eurogamer.net](http://www.eurogamer.net/articles/digitalfoundry-lag-factor-article?page=2) gefunden, die sich mit Input-Lag von Konsolen beschäftigt, und bei unterschiedlichen Spielen Unterschiede über 50ms gefunden. Da beide Spiele bedienbar sind, sollte eine Latenz unter diesem Wert keine Probleme verursachen.
 
 ## Jitter?
 
 ## Analyse des Ergebnisses
-![Ergebnisgraph](rtt graph.png)
-TODO jittergraph
+### Latenz
+![RTT-Ergebnisgraph](rtt graph.png)
+Die y-Achse ist in Millisekunden angegeben. Da sich die Timestamps des Handys und des Servers nie exakt synchronisieren lassen, haben wir die Round-Trip-Time gemessen. Wie zu sehen ist, liegt die durchschnittliche Round-Trip-Time bei 50ms; die Latenz zwischen Generierung der Sensordaten wird dementsprechend ungefähr bei 25 Millisekunden liegen. Wir sehen unsere Anforderung an die Latenz damit erfüllt.
+
+
+### Frequenz
+![Frequenz-Ergebnisgraph](sensor_frequency.png)
+Die y-Achse ist in Millisekunden angegeben. Da sich die Timestamps des Handys und des Servers nie exakt synchronisieren lassen, lässt sich hier nur die Differenz zwischen den Ankunftszeiten auf dem PC, und den Sensor-Event-Timestamps auf dem Handy berechnen. Wie zu sehen ist, ist der Durchschnitt der Abstände zwischen dem Ankommen von Sensordaten ungefähr 20ms, was in einer Frequenz von 50Hz resultiert. Da 50Hz unsere Anforderung von 30Hz deutlich überschreitet, sehen wir auch dieses Requirement als erfüllt an. 
+
+
 
 Für die Maussteuerung hatten wir uns folgende Requirements gesetzt: Die Steuerung sollte sehr direkt sein, damit sie die Hauptaufgaben einer Maus übernehmen kann. Das sind Rechts- und Linksklick, damit verbunden der Doppelklick und das Markieren und Bewegen von Dateien, sowie das Bedienen des Kontextmenüs.
 Für die Spielsteuerung haben wir einen SNES-Controller imitiert, mit dem wir das Spiel „Super Mario Kart“ spielen können. Unser Ziel war es auf der 1. Strecke mit der Gesamtzeit eines nativen Controller konkurrieren zu können. Nach einigen Tests ergab sich daraus eine Zeit von 1:20. Für den Mehrspielermodus brauchten wir dann eine Multiclientunterstützung. Um mehr Sensoren zu verwenden haben wir beschlossen die Item Mechanik durch einen weiteren Sensor zu steuern.
