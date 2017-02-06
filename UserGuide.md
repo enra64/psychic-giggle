@@ -2,7 +2,7 @@
 
 Die Bedienung von App und Server wird aus Sicht unserer Beispielimplementation erläutert
 
-# Was man benötigt: 
+# Was benötigt wird: 
 - Handy mit Android(mindestens 4.4) 
 - javafähiges Gerät(Java 8) um Server darzustellen
 - Server Jar auf Gerät, App auf Handy installiert
@@ -26,6 +26,7 @@ Die Bedienung von App und Server wird aus Sicht unserer Beispielimplementation e
 
 # Einstellungen:
 - hier lassen sich Name des Gerätes, benutzter Discovery Port und je nach gewählter Anwendung die Sensibilität der benutzbaren Sensoren des Handys einstellen (ist keine Anwendung gewählt, können alle Sensoren eingestellt werden)
+
 <p align="Center">
 <img src="Screenshots/Options Activity.png" alt="Options Activity Mouse Server" Width="300px"/>
 <br>
@@ -83,7 +84,7 @@ Terminal Befehl: java –jar server.jar nes
 
 ## 3) Kuka lbr iiwa 7 r800
 Terminal Befehl: java –jar server.jar vrep
--Kuka Roboter „Kuka lbr iiwa 7 r800“ oder entsprechende Simulationssoftware (vrep) ist erforderlich 
+- Kuka Roboter „Kuka lbr iiwa 7 r800“ oder entsprechende Simulationssoftware (vrep) ist erforderlich 
 - Marble-Labyrinth-Control: Roboter steht in vordefinierter Position, zu bewegen ist nur das vorderste Gelenk
 - alternativ: mit den Button „Wechsel zwischen Murmelmodus und Gelenkkontrolle“ lässt sich jedes der Gelenke auswählen und einzeln bewegen
 
