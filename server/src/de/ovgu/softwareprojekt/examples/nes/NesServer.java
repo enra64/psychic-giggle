@@ -262,8 +262,8 @@ public class NesServer extends AbstractPsychicServer {
             displayNotification(PLAYER_NUM_NOTIFICATION_ID, "Spieler " + playerID, "Du bist verbunden als Spieler " + playerID, connectedClient);
 
             //Sensor descriptions
-            sendSensorDescription(SensorType.Gravity, "Je höher die Empfindlichkeit, desto weiter muss das Gerät für eine Lenkaktion gedreht werden.");
-            sendSensorDescription(SensorType.LinearAcceleration, "Je höher die Empfindlichkeit, desto schwächer kann die Auslösebewegung sein.");
+            sendSensorDescription(SensorType.Gravity, "Je niedriger die Empfindlichkeit, desto weiter muss das Gerät für eine Lenkaktion gedreht werden.");
+            sendSensorDescription(SensorType.LinearAcceleration, "Je höher die Empfindlichkeit, dxesto schwächer kann die Auslösebewegung sein.");
 
             //hide ResetButton because NES PsychicServer doesn´t support ResetButton
             hideResetButton(true);

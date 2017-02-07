@@ -314,7 +314,7 @@ Die Update-Frequenz der Android-Sensoren kann mithilfe von ```setSensorSpeed()``
 ### Beschreibungen anzeigen
 Es ist mit ```sendSensorDescription(SensorType, String)``` möglich, erweiterte Beschriftungen für die Nutzung der Sensoren anzeigen zu lassen, um dem Nutzer die Zuordnung von Sensor zu Funktion zu vereinfachen.
 
-![Beispielhafte Beschreibung](sensor_description.png)
+![Beispielhafte Beschreibung](SensorDescription.png)
 
 
 ## Filter
