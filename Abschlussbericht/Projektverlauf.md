@@ -1,5 +1,5 @@
-# Projektverlauf
 
+# Projektverlauf
 
 ## Projektplan
 ![Entwicklungszeitstrahl](Timeline.png)

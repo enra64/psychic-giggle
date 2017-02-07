@@ -22,7 +22,7 @@ output:
     * [Robotersteuerung](#robotersteuerung)
     * [Framework](#framework)
     * [Bedienbarkeit](#bedienbarkeit)
-* [Analyse unser Ergebnisse](#analyse-unser-ergebnisse)
+* [Analyse unserer Ergebnisse](#analyse-unserer-ergebnisse)
     * [Framework](#framework)
     * [Bedienbarkeit der App](#bedienbarkeit-der-app)
     * [Latenz](#latenz)
@@ -74,7 +74,7 @@ output:
 
 \newpage
 # Ziel
-Das Ziel des Projekts war die Erstellung eines Frameworks zur Nutzung von Sensordaten von Androidgeräten auf javafähigen Endgeräten und die Demonstration der Funktionalität dieses Frameworks anhand von drei Beispielanwendungen, nämlich einer Maussteuerung, einer Spielsteuerung und die Bedienung eines Murmellabyrinthes mithilfe eines Roboters.
+Das Ziel des Projekts war die Erstellung eines Frameworks zur Nutzung von Sensordaten von Androidgeräten auf javafähigen PCs und die Demonstration der Funktionalität dieses Frameworks anhand von drei Beispielanwendungen, nämlich einer Maussteuerung, einer Spielsteuerung und die Bedienung eines Murmellabyrinthes mithilfe eines Roboters.
 Mit dem von uns erstellten Framework soll Drittpersonen die Umsetzung von Projekten mit Sensordaten erheblich erleichtert werden.
 
 
@@ -138,7 +138,7 @@ Außerdem wollten wir die Anforderungen an den PC für den Server und das Handy 
 Die App sollte möglichst benutzerfreundlich erstellt sein. Das bedeutete für uns, möglichst wenig Konfiguration vom Nutzer zu fordern.
 
 
-# Analyse unser Ergebnisse
+# Analyse unserer Ergebnisse
 
 ## Framework
 Letztlich ist es sehr einfach geworden, einen neuen Server zu implementieren.
@@ -177,8 +177,8 @@ Unsere Anforderungen an die Netzwerkverbindungsqualität haben die Mindestanford
 Es ist deutlich effektiver sich gemeinsam zu festen Zeiten zu treffen, um zusammen zu arbeiten als allein. Dadurch haben wir direktes Feedback zu neuen Ideen und deren Umsetzungen von den anderen Teammitgliedern bekommen. Pairprogramming erlaubt Diskussionen und konstruktive Lösungen von neuen Problemen durch andere zu erhalten.
 Uns fiel es schwer Grenzwerte für messbare Requirements zu erstellen, die das Projekt beschreiben.
 Ein frühzeitiges Festlegen des deployment formats verhindert die Benutzung von Softwarearchitekturen, die eine spätere Bereitstellung der Software erschweren.
-# Projektverlauf
 
+# Projektverlauf
 
 ## Projektplan
 ![Entwicklungszeitstrahl](Timeline.png)
@@ -211,6 +211,7 @@ Aus am Anfang erstellten Use Cases wurden benötigte Funktionen und Subfunktione
 Bei Auftreten eines Problems oder einer fehlenden Funktionalität wurde ein neuer Issue erstellt und hinzugefügt.
 
 Wir haben uns keine Aufteilung der Aufgaben festgelegt. Issues wurden nach ihrer Dringlichkeit im Projektverlauf und der Länge ihrer Bestandszeit geordnet abgearbeitet.
+
 # Architektur
 Das Psychic-Framework ist dreigeteilt in die App, den Server und einen gemeinsamen Kern. In dem Teil, der den Server enthält, befindet sich außerdem die Datenpipeline.
 

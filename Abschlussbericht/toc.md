@@ -9,7 +9,7 @@
     * [Robotersteuerung](#robotersteuerung)
     * [Framework](#framework)
     * [Bedienbarkeit](#bedienbarkeit)
-* [Analyse unser Ergebnisse](#analyse-unser-ergebnisse)
+* [Analyse unserer Ergebnisse](#analyse-unserer-ergebnisse)
     * [Framework](#framework)
     * [Bedienbarkeit der App](#bedienbarkeit-der-app)
     * [Latenz](#latenz)
