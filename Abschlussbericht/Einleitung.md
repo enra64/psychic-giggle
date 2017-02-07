@@ -40,7 +40,8 @@ Um die Itemmechanik von "Super Mario Kart" zu unterstützen, wollten wir lineare
 Außerdem besitzt das Spiel einen Mehrspielermodus, den wir ebenfalls unterstützen wollten, weshalb wir mehrere Clients zur gleichen Zeit annehmen können mussten.
 
 ## Robotersteuerung
-Die Robotersteuerung stellt keine Anforderungen, die nicht bereits durch die Maussteuerung und der Spielsteuerung gestellt wurden, da die Anforderungen an Latenz und Frequenz nicht höher sind, und Buttons auch schon von der Maus- und Spielsteuerung benötigt werden.
+Mit der Robotersteuerung sollte ein Murmellabyrinth gelöst werden können, allerding bietet die benutzte Simulationssoftware V-REP keine Möglichkeit dies zu testen.
+Des Weiteren stellt  die Robotersteuerung keine Anforderungen, die nicht bereits durch die Maussteuerung und der Spielsteuerung gestellt wurden, da die Anforderungen an Latenz und Frequenz nicht höher sind, und Buttons auch schon von der Maus- und Spielsteuerung benötigt werden.
 
 ## Framework
 Da wir ein entwicklerfreundliches Framework erstellen wollten, mussten wir darauf achten dass unser Projekt nicht nur für unsere Beispiele nutzbar ist.
