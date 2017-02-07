@@ -5,9 +5,9 @@ Mit dem von uns erstellten Framework soll Drittpersonen die Umsetzung von Projek
 # UseCase-Analyse
 ![UseCaseDiagramm](finalUse.png)
 
-Der AppBenutzer verwendet die App und einen vom Implementator vorgefertigten Server um Sensordaten auf eine bestimmte Art zu verwenden.
+Der AppBenutzer verwendet die App und einen vom Implementator vorgefertigten Server, um Sensordaten auf eine bestimmte Art zu verwenden.
 
-Der Implementator nutzt das Framework um einen Server mit gewünschter Funktionalität umzusetzen,
+Der Implementator nutzt das Framework, um einen Server mit gewünschter Funktionalität umzusetzen,
 der dann von AppBenutzern verwendet werden kann.
 Hierzu muss das Senden und Empfangen der Sensordaten über eine Verbindung zwischen App und Server, sowie das Verarbeiten dieser Daten berücksichtig werden.
 
@@ -72,6 +72,6 @@ Die y-Achse ist in Millisekunden angegeben. Da sich die Timestamps des Handys un
 Unsere Anforderungen an die Frequenz haben die Mindestanforderungen der drei Beispielimplementationen zumindest erreicht, da die Steuerungen keine Probleme mit schlechten Reaktionszeiten zeigen.
 
 # Lessons learned
-Es ist deutlich effektiver sich gemeinsam zu festen Zeiten zu treffen um zusammen zu arbeiten als allein. Dadurch haben wir direktes Feedback zu neuen Ideen und deren Umsetzungen von den anderen Teammitgliedern bekommen. Pairprogramming erlaubt Diskussionen und konstruktive Lösungen von neuen Problemen durch andere zu erhalten.
+Es ist deutlich effektiver sich gemeinsam zu festen Zeiten zu treffen, um zusammen zu arbeiten als allein. Dadurch haben wir direktes Feedback zu neuen Ideen und deren Umsetzungen von den anderen Teammitgliedern bekommen. Pairprogramming erlaubt Diskussionen und konstruktive Lösungen von neuen Problemen durch andere zu erhalten.
 Uns fiel es schwer Grenzwerte für messbare Requirements zu erstellen, die das Projekt beschreiben.
 Ein frühzeitiges Festlegen des deployment formats verhindert die Benutzung von Softwarearchitekturen, die eine spätere Bereitstellung der Software erschweren.
