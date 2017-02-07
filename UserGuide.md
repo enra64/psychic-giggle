@@ -49,7 +49,7 @@ Die Bedienung von App und Server wird aus Sicht unserer Beispielimplementation e
 <br>
 1. Maus Server starten<br>
 2. Controller Server starten<br>
-3. Kuka Server starten<br>
+3. KUKA Server starten<br>
 4. Aktuellen Server beenden<br>
 5. Feld für Serverinformationen<br>
 </p>
@@ -75,8 +75,8 @@ Terminal Befehl: java –jar server.jar mouse
 
 ### 2) Controller:
 Terminal Befehl: java –jar server.jar nes
-- Die Nutzung des Controllers ist hauptsächlich für die Emulation des Spieles "Super Mario Kart" gedacht aber kann, wenn die Steuerungseinstellungen der Anwendung richtig konfiguriert wurde, auch für andere Rennspiele genutzt werden. Die "keys.properties" Datei enthält alle Steuerungsbelegungen und orientiert sich dabei am SNES-Kontroller 
-- Für die Nutzung des Spieles "Super Mario Kart" wird am Besten der Emulator SNES9X verwendet. Die richtige Konfiguration des Emulators, für die Verwendung dieser Anwendung, befindet sich in der Datei snes9x.conf. Diese Datei muss sich lediglich im selben Ordner des Emulators befinden 
+- Die Nutzung des Controllers ist hauptsächlich für die Emulation des Spieles "Super Mario Kart" gedacht, aber kann, wenn die Steuerungseinstellungen der Anwendung richtig konfiguriert wurde, auch für andere Rennspiele genutzt werden. Die "keys.properties" Datei enthält alle Steuerungsbelegungen und orientiert sich dabei am SNES-Kontroller 
+- Für die Nutzung des Spieles "Super Mario Kart" wird am Besten der Emulator SNES9X verwendet. Die richtige Konfiguration des Emulators für die Verwendung dieser Anwendung befindet sich in der Datei snes9x.conf. Diese Datei muss sich lediglich im selben Ordner des Emulators befinden 
 - vor Benutzung sollte unbedingt die gewünschte Anwendung vorher gestartet sein, da sonst unerwünschte Zeichen und Cursorbewegungen die Folge sein können
 - zur Benutzung sollte das Handy um 90° nach links gekippt werden (wie ein Lenkrad)
 - Für eine Lenkbewegung wird das Handy nun nach links oder rechts gekippt
@@ -86,13 +86,13 @@ Terminal Befehl: java –jar server.jar nes
 - Das Menü kann mittels einer "Stoßbewegung" vom Körper weg ein höherer bzw. einer Bewegung zum Körper hin ein unterer Menüpunkt gewählt werden. Im Spiel kann mittels derselben Bewegung ein Item nach vorne oder nach hinten geworfen werden
       - Alternativ: Zur Benutzung eines Items kann ebenfalls der A-Button verwendet werden
 - Der Startbutton pausiert das Spiel
-- die Buttons der App emulieren, entsprechend der config Datei, Tasten von einer Tastatur
+- die Buttons der App emulieren entsprechend der config Datei Tasten von einer Tastatur
 - "Sensor anhalten" stoppt alle Sensordatenübertragungen 
 
 
-### 3) Kuka lbr iiwa 7 r800
+### 3) KUKA LBR iiwa 7 r800
 Terminal Befehl: java –jar server.jar vrep
-- Kuka Roboter "Kuka lbr iiwa 7 r800" oder entsprechende Simulationssoftware (vrep) ist erforderlich 
+- Kuka Roboter "KUKA LBR iiwa 7 r800" oder entsprechende Simulationssoftware (vrep) ist erforderlich 
 - Marble-Labyrinth-Control: Roboter steht in vordefinierter Position, zu bewegen ist nur das vorderste Gelenk
 - alternativ: mit den Button "Wechsel zwischen Murmelmodus und Gelenkkontrolle" lässt sich jedes der Gelenke auswählen und einzeln bewegen
 - "Sensor anhalten" stoppt alle Sensordatenübertragungen
