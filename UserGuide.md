@@ -76,6 +76,7 @@ Terminal Befehl: java –jar server.jar mouse
 ### 2) Controller:
 Terminal Befehl: java –jar server.jar nes
 - Die Nutzung des Controllers ist hauptsächlich für die Emulation des Spieles "Super Mario Kart" gedacht aber kann, wenn die Steuerungseinstellungen der Anwendung richtig konfiguriert wurde, auch für andere Rennspiele genutzt werden. Die "keys.properties" Datei enthält alle Steuerungsbelegungen und orientiert sich dabei am SNES-Kontroller 
+- Für die Nutzung des Spieles "Super Mario Kart" wird am Besten der Emulator SNES9X verwendet. Die richtige Konfiguration des Emulators, für die Verwendung dieser Anwendung, befindet sich in der Datei snes9x.conf. Diese Datei muss sich lediglich im selben Ordner des Emulators befinden 
 - vor Benutzung sollte unbedingt die gewünschte Anwendung vorher gestartet sein, da sonst unerwünschte Zeichen und Cursorbewegungen die Folge sein können
 - zur Benutzung sollte das Handy um 90° nach links gekippt werden (wie ein Lenkrad)
 - Für eine Lenkbewegung wird das Handy nun nach links oder rechts gekippt
