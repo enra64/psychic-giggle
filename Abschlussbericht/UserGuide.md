@@ -1,6 +1,5 @@
 # User-Guide
-
-Die Bedienung von App und Server wird aus Sicht unserer Beispielimplementation erläutert
+Die Bedienung von App und Server wird aus Sicht unserer Beispielimplementationen erläutert
 
 ## Was benötigt wird: 
 - Handy mit Android (__mindestens 4.4__) 
@@ -101,14 +100,14 @@ Terminal Befehl: java –jar server.jar vrep
 weitere Anwendungen und Tutorials können durch Implementatoren bereitgestellt werden
 
 ## Bekannte Probleme:
-- benutzte Ports dürfen nicht von der Firewall blockiert werden<br>
-    - Lösung: neue Regel für die Firewall erstellen, in der es erlaubt ist, über den Port zu kommunizieren<br>
-    - alternativ: Firewall deaktivieren<br>
+- benutzte Ports dürfen nicht von der Firewall blockiert werden
+    - Lösung: neue Regel für die Firewall erstellen, in der dem Server erlaubt wird, mit dem Netzwerk zu kommunizieren
+    - alternativ: Firewall deaktivieren
 
-- unerwartetes Verhalten der Sensoren<br>
+- unerwartetes Verhalten der Sensoren
     - Lösung: die Handysensoren neu kalibrieren
 
-- Exception: "Address already in use: Cannot bind"<br>
+- Exception: "Address already in use: Cannot bind"
     - Lösung: anderen Discovery Port in den Einstellungen wählen
     
 - Handy kann nicht zu Server verbinden
