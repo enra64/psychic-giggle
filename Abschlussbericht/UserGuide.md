@@ -1,6 +1,6 @@
 # User-Guide
+Die Bedienung von App und Server wird aus Sicht unserer Beispielimplementationen erläutert
 
-Die Bedienung von App und Server wird aus Sicht unserer Beispielimplementation erläutert
 
 ## Was benötigt wird: 
 - Handy mit Android (__mindestens 4.4__) 
@@ -8,9 +8,11 @@ Die Bedienung von App und Server wird aus Sicht unserer Beispielimplementation e
 - Server Jar befindet sich auf dem Gerät
 - Die App "PsychicSensors" ist auf dem Handy installiert
 
+
 ## Server starten:
 - mittels GUI
       - alternativ eine spezifische Anwendung ohne GUI starten: Terminal Befehl: "java –jar server.jar Anwendung"
+
 
 ## App starten:
 - App starten und auf Discovery (Server suchen) drücken
@@ -25,6 +27,7 @@ Die Bedienung von App und Server wird aus Sicht unserer Beispielimplementation e
 3. Server suchen<br>
 </p>
 
+
 ## Einstellungen:
 - hier lassen sich Name des Gerätes, benutzter Discovery Port und je nach gewählter Anwendung die Sensibilität der benutzbaren Sensoren des Handys einstellen (ist keine Anwendung gewählt, können alle Sensoren eingestellt werden)
 
@@ -37,6 +40,7 @@ Die Bedienung von App und Server wird aus Sicht unserer Beispielimplementation e
 4. Verwendungszweck des Sensors<br>
 5. Optionen verlassen<br>
 </p>
+
 
 ## GUI:
 - Start durch Doppelklick
@@ -54,7 +58,9 @@ Die Bedienung von App und Server wird aus Sicht unserer Beispielimplementation e
 5. Feld für Serverinformationen<br>
 </p>
 
+
 ## Anwendungen:
+
 ### 1) Maussteuerung:
 Terminal Befehl: java –jar server.jar mouse
 - das Handy verhält sich wie ein gedachter Laserpointer, womit der Mauszeiger bewegt werden kann. Idealerweise zeigt die Spitze des Handys bereits vor der Verbindung des Handys mit dem Server auf den Cursor.
@@ -71,6 +77,7 @@ Terminal Befehl: java –jar server.jar mouse
 4. Rücksetzfunktion<br>
 5. Sensordatenübertragung pausieren<br>
 </p>
+
 
 
 ### 2) Controller:
@@ -90,6 +97,7 @@ Terminal Befehl: java –jar server.jar nes
 - "Sensor anhalten" stoppt alle Sensordatenübertragungen 
 
 
+
 ### 3) KUKA LBR iiwa 7 r800
 Terminal Befehl: java –jar server.jar vrep
 - Kuka Roboter "KUKA LBR iiwa 7 r800" oder entsprechende Simulationssoftware (vrep) ist erforderlich 
@@ -97,18 +105,20 @@ Terminal Befehl: java –jar server.jar vrep
 - alternativ: mit den Button "Wechsel zwischen Murmelmodus und Gelenkkontrolle" lässt sich jedes der Gelenke auswählen und einzeln bewegen
 - "Sensor anhalten" stoppt alle Sensordatenübertragungen
 
+
 ### 4) Weitere Anwendungen
 weitere Anwendungen und Tutorials können durch Implementatoren bereitgestellt werden
 
-## Bekannte Probleme:
-- benutzte Ports dürfen nicht von der Firewall blockiert werden<br>
-    - Lösung: neue Regel für die Firewall erstellen, in der es erlaubt ist, über den Port zu kommunizieren<br>
-    - alternativ: Firewall deaktivieren<br>
 
-- unerwartetes Verhalten der Sensoren<br>
+## Bekannte Probleme:
+- benutzte Ports dürfen nicht von der Firewall blockiert werden
+    - Lösung: neue Regel für die Firewall erstellen, in der dem Server erlaubt wird, mit dem Netzwerk zu kommunizieren
+    - alternativ: Firewall deaktivieren
+
+- unerwartetes Verhalten der Sensoren
     - Lösung: die Handysensoren neu kalibrieren
 
-- Exception: "Address already in use: Cannot bind"<br>
+- Exception: "Address already in use: Cannot bind"
     - Lösung: anderen Discovery Port in den Einstellungen wählen
     
 - Handy kann nicht zu Server verbinden
