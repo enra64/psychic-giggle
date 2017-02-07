@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 
-File.open("Abschlussbericht/DeveloperGuide.md", 'r') do |f|
+File.open("Abschlussbericht/komplett.md", 'r') do |f|
   f.each_line do |line|
     forbidden_words = ['Table of contents', 'define', 'pragma', 'Inhaltsverzeichnis', 'TODO']
     next if !line.start_with?("#") || forbidden_words.any? { |w| line =~ /#{w}/ }

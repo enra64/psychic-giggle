@@ -12,58 +12,8 @@
     - klassendiagramm anhängen
 
 
-
 # Developer Guide für das Psychic-Framework
 Das Psychic-Framework bezeichnet eine Kombination aus einer App und einem Serverframework mit einem gemeinsamen Kern. Dieses Framework dient der schnellen und einfachen Entwicklung von PC-Applikationen, die Sensordaten von Android-Geräten verwenden möchten.
-
-
-# Inhaltsverzeichnis
-* [Developer Guide für das Psychic-Framework](#developer-guide-für-das-psychic-framework)
-* [JavaDoc](#javadoc)
-* [Grundlegende Verwendung:](#grundlegende-verwendung)
-    * [Wichtige Hilfsklassen](#wichtige-hilfsklassen)
-    * [Daten bestellen](#daten-bestellen)
-        * [Beispiel einer Serverinstanziierung](#beispiel-einer-serverinstanziierung)
-    * [Daten abbestellen](#daten-abbestellen)
-* [Verwendung von Buttons](#verwendung-von-buttons)
-    * [Buttons zur Runtime anfordern](#buttons-zur-runtime-anfordern)
-    * [Layouts laden](#layouts-laden)
-        * [Einschränkungen für die Layout-Dateien](#einschränkungen-für-die-layout-dateien)
-* [Verwaltung von Clients](#verwaltung-von-clients)
-    * [NetworkDevice](#networkdevice)
-    * [Callbacks](#callbacks)
-        * [acceptClient](#acceptclient)
-        * [onClientDisconnected](#onclientdisconnected)
-        * [onClientTimeout](#onclienttimeout)
-        * [onClientAccepted](#onclientaccepted)
-    * [Clientanzahl begrenzen](#clientanzahl-begrenzen)
-* [Exceptionhandling](#exceptionhandling)
-* [Resetevents](#resetevents)
-    * [Reset-Button deaktivieren](#reset-button-deaktivieren)
-* [Daten-Pipeline](#daten-pipeline)
-    * [Format der Sensordaten: SensorData](#format-der-sensordaten-sensordata)
-    * [NetworkDataSink](#networkdatasink)
-    * [NetworkDataSource](#networkdatasource)
-    * [Sensoren](#sensoren)
-        * [Maximalwerte](#maximalwerte)
-        * [Update-Frequenz](#update-frequenz)
-        * [Beschreibungen anzeigen](#beschreibungen-anzeigen)
-    * [Filter](#filter)
-        * [onData](#ondata)
-        * [Beispiel](#beispiel)
-        * [Vorhandene Filter](#vorhandene-filter)
-    * [Daten-Splitter](#daten-splitter)
-    * [Pipeline-Builder](#pipeline-builder)
-        * [Elemente hinzufügen](#elemente-hinzufügen)
-        * [Elemente entfernen](#elemente-entfernen)
-        * [Pipeline abschließen](#pipeline-abschließen)
-    * [Temporärer Stopp des Datenflusses](#temporärer-stopp-des-datenflusses)
-* [Notifications anzeigen](#notifications-anzeigen)
-* [Netzwerkverbindung](#netzwerkverbindung)
-    * [Server-Discovery](#server-discovery)
-    * [Datenverbindung](#datenverbindung)
-    * [Kontrollverbindung](#kontrollverbindung)
-* [License](#license)
 
 
 # JavaDoc
