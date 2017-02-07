@@ -2,14 +2,15 @@
 * Sonstiges:
     - bilder hinzufügen
     - JavaDoc einbauen
-    - PLAY STORE: link zu release
+    - PLAY STORE
+        + link zu release
+        + andere icon-farbe
     - javadoc ist teilweise horribly out of date. wir müssen zumindest bei dem kram den die potenziell angucken korrigieren!
     - github release mit: framework code als zip, framework als jar, beispielserver gui als jar
 * DeveloperGuide.md
     - how to use framework mit intellij
 * Einleitung.md
-    - requirement: möglichst cross-platform, android-verbreitung zitieren -> Java
-    - multiclient requirement
+    - jitter?
 * Architektur.md
     - app beschreiben
     - klassendiagramm anhängen
