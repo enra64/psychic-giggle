@@ -46,7 +46,7 @@ Die Bedienung von App und Server wird aus Sicht unserer Beispielimplementationen
 - Start durch Doppelklick
     * alternativ: durch den Terminal Befehl: java –jar server.jar
 - diese GUI ist nur für die 3 implementierten Beispielanwendungen erstellt worden
-- Änderungen dieser, oder eine neue GUI können durch den Implementator erfolgen
+- Änderungen dieser, oder eine neue GUI können durch den Implementierer erfolgen
 
 <p align="Center">
 <img src="Screenshots/GUI.png" alt="GUI" Width="500px"/>
@@ -107,7 +107,7 @@ Terminal Befehl: java –jar server.jar vrep
 
 
 ### 4) Weitere Anwendungen
-weitere Anwendungen und Tutorials können durch Implementatoren bereitgestellt werden
+weitere Anwendungen und Tutorials müssen durch die Entwickler, die das Psychic-Framework benutzen, bereitgestellt werden
 
 
 ## Bekannte Probleme:

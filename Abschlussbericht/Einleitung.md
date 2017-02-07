@@ -7,9 +7,9 @@ Mit dem von uns erstellten Framework soll Drittpersonen die Umsetzung von Projek
 # Usecase-Analyse
 ![Usecase-Diagramm](finalUse.png)
 
-Der AppBenutzer verwendet die App und einen vom Implementator vorgefertigten Server, um Sensordaten auf eine bestimmte Art zu verwenden.
+Der AppBenutzer verwendet die App und einen vom Implementierer vorgefertigten Server, um Sensordaten auf eine bestimmte Art zu verwenden.
 
-Der Implementator nutzt das Framework, um einen Server mit gewünschter Funktionalität umzusetzen,
+Der Implementierer nutzt das Framework, um einen Server mit gewünschter Funktionalität umzusetzen,
 der dann von AppBenutzern verwendet werden kann.
 Hierzu muss das Senden und Empfangen der Sensordaten über eine Verbindung zwischen App und Server, sowie das Verarbeiten dieser Daten berücksichtig werden.
 
@@ -27,8 +27,9 @@ Für die Frequenz der Sensordaten haben wir uns an der Playstation 3 von Sony or
 
 
 ### Latenz
-Eine akzeptable Grenze für die Latenz festzulegen war ebenfalls schwierig, da Latenzen im Millisekundenbereich nur schwerlich per Hand festzulegen sind. Wir haben daher versucht, uns über die Latenzen professionell hergestellter kabelloser Eingabegeräte zu informieren. Leider ist auch das schwierig, da Hersteller dazu meist keine Informationen veröffentlichen. Wir haben jedoch diesen Artikel von [www.eurogamer.net](http://www.eurogamer.net/articles/digitalfoundry-lag-factor-article?page=2) gefunden, die sich mit Input-Lag von Konsolen beschäftigt, und bei unterschiedlichen Spielen Unterschiede über 50ms gefunden. Da beide Spiele bedienbar sind, sollte eine Latenz unter diesem Wert keine Probleme verursachen.
+Eine akzeptable Grenze für die Latenz festzulegen war ebenfalls schwierig, da Latenzen im Millisekundenbereich nur schwerlich per Hand festzulegen sind. Wir haben daher versucht, uns über die Latenzen professionell hergestellter kabelloser Eingabegeräte zu informieren. Leider ist auch das schwierig, da Hersteller dazu meist keine Informationen veröffentlichen. Wir haben jedoch diesen Artikel von [www.eurogamer.net](http://www.eurogamer.net/articles/digitalfoundry-lag-factor-article?page=2)[^1] gefunden, die sich mit Input-Lag von Konsolen beschäftigt, und bei unterschiedlichen Spielen Unterschiede über 50ms gefunden. Da beide Spiele bedienbar sind, sollte eine Latenz unter diesem Wert keine Probleme verursachen.
 
+[^1]: http://www.eurogamer.net/articles/digitalfoundry-lag-factor-article?page=2
 
 ### Jitter
 Ein dritter Parameter für die Verbindungsqualität ist der Jitter, also wie sehr sich die Periodizität der ankommenden Sensordaten von der Periodizität der gesendeten Sensordaten unterscheidet. Je geringer der Jitter ist, desto besser ist die Verbindung. Unsere einzige Anforderung an diesen Aspekt der Verbindung war, dass sich kein Jitter bemerkbar macht.
@@ -64,12 +65,12 @@ Außerdem wollten wir die Anforderungen an den PC für den Server und das Handy 
 Die App sollte möglichst benutzerfreundlich erstellt sein. Das bedeutete für uns, möglichst wenig Konfiguration vom Nutzer zu fordern.
 
 
-# Analyse unserer Ergebnisse
+# Vorstellung unserer Ergebnisse
 
 ## Framework
 Letztlich ist es sehr einfach geworden, einen neuen Server zu implementieren.
 Mit unserer Unterstützung aller Sensoren, die kontinuierlich Daten schicken und bis API-Level 19 zu Android hinzugefügt wurden, können unterschiedlichste Anwendungen entwickelt werden.
-Mit unserer Unterstützung für vom Implementator festgelegte Buttonlayouts werden auch hier die möglichen Anwendungen möglichst wenig eingeschränkt. Mit unserer Wahl von Java als Implementationssprache laufen Server auf Windows, Linux und Apple-Geräten, die JDK 8 oder höher installiert haben. Um die Verbindung zu einem Handy aufzubauen, müssen sich Server und Client im gleichen WLAN-Netzwerk mit Zwischenclientkommunikation befinden, ein Zustand, der in den meisten Heimnetzwerken gegeben ist. Alle Android-Geräte mit Unterstützung für API-Level 19, also alle Geräte mit mindestens Android 4.4 können die PsychicSensors-App installieren, werden also als Client unterstützt.
+Mit unserer Unterstützung für vom Implementierer festgelegte Buttonlayouts werden auch hier die möglichen Anwendungen möglichst wenig eingeschränkt. Mit unserer Wahl von Java als Implementationssprache laufen Server auf Windows, Linux und Apple-Geräten, die JDK 8 oder höher installiert haben. Um die Verbindung zu einem Handy aufzubauen, müssen sich Server und Client im gleichen WLAN-Netzwerk mit Zwischenclientkommunikation befinden, ein Zustand, der in den meisten Heimnetzwerken gegeben ist. Alle Android-Geräte mit Unterstützung für API-Level 19, also alle Geräte mit mindestens Android 4.4 können die PsychicSensors-App installieren, werden also als Client unterstützt.
 
 
 ## Bedienbarkeit der App
