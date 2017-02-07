@@ -2,7 +2,7 @@
 
 
 ## Projektplan
-![timeline](Timeline.png)
+![Entwicklungszeitstrahl](Timeline.png)
 
 
 ### Prototyping
