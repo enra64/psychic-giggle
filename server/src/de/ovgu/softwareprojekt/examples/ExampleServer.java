@@ -109,7 +109,6 @@ public class ExampleServer implements NetworkDataSink, ButtonListener, ClientLis
             System.out.println();
         }
 
-        // TODO: also, we want the round trip time for the connection watch data
     }
 
     /**
@@ -126,7 +125,7 @@ public class ExampleServer implements NetworkDataSink, ButtonListener, ClientLis
      * or {@link AbstractPsychicServer#setButtonLayout(String) setButtonLayout(String)}
      *
      * @param click  event object specifying details like button id
-     * @param origin the network device that sent the button click
+     * @param origin thxe network device that sent the button click
      */
     @Override
     public void onButtonClick(ButtonClick click, NetworkDevice origin) {
@@ -137,7 +136,7 @@ public class ExampleServer implements NetworkDataSink, ButtonListener, ClientLis
      *
      * @param newClient the new clients identification
      * @return true if the client should be accepted, false otherwise
-     */
+x     */
     @Override
     public boolean acceptClient(NetworkDevice newClient) {
         return true;
