@@ -14,7 +14,6 @@
 ## TODO: bruder
 * Formalia: betreuer, professor, einfach mal template angucken
 
-* achsen beschriftungen!
 * deutsch/englisch -> deutsch, lizenz deutsch?
 
 * man braucht client server -> nicht bluetoothmaus?
