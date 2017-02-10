@@ -11,9 +11,6 @@
     - github release mit: framework code als zip, framework als jar, beispielserver gui als jar
 * DeveloperGuide.md
     - how to use framework mit intellij
-* Einleitung.md
-* Architektur.md
-    - klassendiagramm anhängen
 * bilder fixen 
 * userguide: jar verlinken
 
@@ -44,11 +41,11 @@
     - kurze einleitung, das ziel, wie folgt strukturiert mit sinn
 
 # Entwickleranleitung für das Psychic-Framework
-Das Psychic-Framework bezeichnet eine Kombination aus einer App und einem Serverframework mit einem gemeinsamen Kern. Dieses Framework dient der schnellen und einfachen Entwicklung von PC-Applikationen, die Sensordaten von Android-Geräten verwenden möchten.
+Das Psychic-Framework bezeichnet eine Kombination aus einer App und einem Serverframework mit einem gemeinsamen Kern. Dieses Framework dient der schnellen und einfachen Entwicklung von PC-Applikationen, die Sensordaten von Android-Geräten verwenden möchten. Im Folgenden stellen wir die wichtigsten Funktionen des Frameworks vor. 
 
 
 ## JavaDoc
-Eine komplette JavaDoc ist verfügbar unter TODO
+Eine komplette JavaDoc ist ebenfalls verfügbar unter TODO
 
 
 ## Grundlegende Verwendung:

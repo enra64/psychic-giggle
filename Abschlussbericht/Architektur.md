@@ -75,3 +75,12 @@ Da die Kontrollverbindung bidirektional ist, kann der Client auch ```AbstractCom
 
 ### Datenverbindung
 Nachdem der Nutzer sich mit einem Server verbunden hat, übermittelt dieser die aktuell benötigte Konfiguration. Nachdem die App diese umgesetzt hat, sind die benötigten Sensoren aktiviert. Alle generierten Daten werden ohne weitere Verarbeitung serialisiert und an den Datenport des Servers übermittelt, um den Rechenaufwand in der App möglichst gering zu halten. Die Übermittlung läuft über UDP, so dass kein expliziter Verbindungsaufbau für jedes Paket nötig ist.
+
+## Anhang: Klassendiagramme
+![Klassendiagramm des Servers](diagram.png)
+
+Server-Klassendiagramm auch unter [https://github.com/enra64/psychic-giggle/tree/master/Abschlussbericht/diagram.png](https://github.com/enra64/psychic-giggle/tree/master/Abschlussbericht/diagram.png)
+
+![Klassendiagramm der App](diagram_app.png)
+
+App-Klassendiagramm auch unter [https://github.com/enra64/psychic-giggle/tree/master/Abschlussbericht/diagram_app.png](https://github.com/enra64/psychic-giggle/tree/master/Abschlussbericht/diagram_app.png)
