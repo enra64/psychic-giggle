@@ -53,7 +53,8 @@ Außerdem besitzt das Spiel einen Mehrspielermodus, den wir ebenfalls unterstüt
 
 
 ## Robotersteuerung
-Die Robotersteuerung stellt keine Anforderungen, die nicht bereits durch die Maussteuerung und der Spielsteuerung gestellt wurden, da die Anforderungen an Latenz und Frequenz nicht höher sind, und Buttons auch schon von der Maus- und Spielsteuerung benötigt werden.
+Mit Hilfe der Robotersteuerung soll es möglich sein, ein Murmellabyrinth zu lösen.
+Des Weiteren stellt die Robotersteuerung keine Anforderungen, die nicht bereits durch die Maussteuerung und der Spielsteuerung gestellt wurden, da die Anforderungen an Latenz und Frequenz nicht höher sind, und Buttons auch schon von der Maus- und Spielsteuerung benötigt werden.
 
 
 ## Framework
