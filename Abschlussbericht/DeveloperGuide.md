@@ -36,8 +36,6 @@
 
 * generell: bei den first level headings beschreiben was jetzt kommt, damit der leser sich nicht selbst überlegen muss was als nächstes abgeht, sondern vorbereitet ist
     - projektverlauf: was kommt jetzt überhaupt
-    - devguide jetzt kommt der devguiide, hier gibts die javadoc
-    - vorstellung ergebnisse: high level übersicht: was ist entstanden
     - kurze einleitung, das ziel, wie folgt strukturiert mit sinn
 
 # Entwickleranleitung für das Psychic-Framework

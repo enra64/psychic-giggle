@@ -67,7 +67,8 @@ Außerdem wollten wir die Anforderungen an den PC für den Server und das Handy 
 Die App sollte möglichst benutzerfreundlich erstellt sein. Das bedeutete für uns, möglichst wenig Konfiguration vom Nutzer zu fordern.
 
 
-# Vorstellung unserer Ergebnisse
+# Analyse unserer Ergebnisse
+Aus den Requirements ist ein Client-Server-Framework entstanden. Die Clients laufen in einer App auf Android-Geräten, und die Server sind Java-Anwendungen auf PCs. Mit unserem Framework können andere Entwickler einfach Daten nutzen, die Sensoren von den Clients generieren und an die Server schicken. Im folgenden stellen wir unsere Ergebnisse kurz vor, und vergleichen sie mit den gestellten Requirements.
 
 ## Framework
 Letztlich ist es sehr einfach geworden, einen neuen Server zu implementieren.
