@@ -1,5 +1,5 @@
 # concat all docs
-cat titelseite.md Einleitung.md Projektverlauf.md Architektur.md UserGuide.md DeveloperGuide.md > komplett.md
+cat titelseite.md Einleitung.md Projektverlauf.md LessonsLearned.md Architektur.md UserGuide.md DeveloperGuide.md > komplett.md
 
 # create pdf from concatenated docs
 pandoc --number-sections --toc -Vlang=de-DE -Vgeometry:margin=1in komplett.md -o pdf.pdf
