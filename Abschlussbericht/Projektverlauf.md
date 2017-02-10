@@ -1,5 +1,6 @@
 
 # Projektverlauf
+In diesem Abschnitt beschreiben wir den Verlauf des Projektes und unseren Entwicklungsprozess.
 
 ## Projektplan
 ![Entwicklungszeitstrahl](Timeline.png)
