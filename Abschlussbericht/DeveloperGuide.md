@@ -112,6 +112,7 @@ Wenn eine ```NetworkDataSink``` nicht mehr benötigt wird, zum Beispiel weil der
 
 ## Daten-Pipeline
 ![Pipeline](pipeline.png)
+
 Das Psychic-Framework ist darauf ausgerichtet, dass Sensordaten mithilfe einer Pipeline benutzt werden die auf dem Handy mit dem Sensor beginnt und auf dem Server mit der Anwendung endet. Bis dahin können die Sensordaten flexibel mithilfe von ```AbstractFilter```, ```NetworkDataSource``` und ```NetworkDataSink``` gefiltert und weitergeleitet werden.
 
 
@@ -182,7 +183,6 @@ Die Update-Frequenz der Android-Sensoren kann mithilfe von ```setSensorSpeed()``
 Es ist mit ```sendSensorDescription(SensorType, String)``` möglich, erweiterte Beschriftungen für die Nutzung der Sensoren anzeigen zu lassen, um dem Nutzer die Zuordnung von Sensor zu Funktion zu vereinfachen.
 
 ![Beispielhafte Beschreibung](SensorDescription.png)
-
 
 ### Filter
 Filter sind Pipelineelemente, die erhaltene Daten bearbeiten und dann weiterleiten, zum Beispiel einen Tiefpassfilter. Um neue Filter zu erstellen sollte ```AbstractFilter``` erweitert werden; alle folgenden Beschreibungen beziehen sich auf diese Klasse.
@@ -436,7 +436,6 @@ Die ID aller Notifications darf sich mit keiner anderen überschneiden, die vom 
 Mit dem letzten Parameter lässt sich das ```NetworkDevice``` festlegen, auf dem die Notification angezeigt wird. Wird der Parameter ausgelassen, wird die Notification auf allen Geräten angezeigt.
 
 ![Ergebnis eines displayNotification-Calls](notification.png)
-
 
 ## Netzwerkverbindung
 
