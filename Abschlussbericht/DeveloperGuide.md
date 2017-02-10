@@ -11,35 +11,21 @@
     - github release mit: framework code als zip, framework als jar, beispielserver gui als jar
 * DeveloperGuide.md
     - how to use framework mit intellij
-* bilder fixen 
+* bilder fixen
 * userguide: jar verlinken
 
 ## TODO: bruder
 * Formalia: betreuer, professor, einfach mal template angucken
 
-* deutsch/englisch -> deutsch, lizenz deutsch?
-
-* man braucht client server -> nicht bluetoothmaus?
-* usability
-* wiederverwertbarkeit-> keine nativen implementation
-* wiederverwertbarkeit statt framework
-* wartbarkeit
 * aus den requirements alles rausziehen was eigentlich use case ist, die näher beschreiben
     - (maus, braucht zwei achsen, knöpfe)
     - use cases-> ausführen was das können muss
     - robotersteuerung use cases ausführen!
 * use case -> requirements
-* verbindungsqualität vor steuerungen?
-* ergebnisvorstellung
-    - gleiche reihenfolge
-    - framework in analyse
 
-* generell: bei den first level headings beschreiben was jetzt kommt, damit der leser sich nicht selbst überlegen muss was als nächstes abgeht, sondern vorbereitet ist
-    - projektverlauf: was kommt jetzt überhaupt
-    - kurze einleitung, das ziel, wie folgt strukturiert mit sinn
 
 # Entwickleranleitung für das Psychic-Framework
-Das Psychic-Framework bezeichnet eine Kombination aus einer App und einem Serverframework mit einem gemeinsamen Kern. Dieses Framework dient der schnellen und einfachen Entwicklung von PC-Applikationen, die Sensordaten von Android-Geräten verwenden möchten. Im Folgenden stellen wir die wichtigsten Funktionen des Frameworks vor. 
+Das Psychic-Framework bezeichnet eine Kombination aus einer App und einem Serverframework mit einem gemeinsamen Kern. Dieses Framework dient der schnellen und einfachen Entwicklung von PC-Applikationen, die Sensordaten von Android-Geräten verwenden möchten. Im Folgenden stellen wir die wichtigsten Funktionen des Frameworks vor.
 
 
 ## JavaDoc
@@ -457,8 +443,5 @@ Der Server und die App warten jeweils auf zufällig gewählten freien Port; dies
 
 # Lizenz
 Copyright (c) 2017 by the contributors. All rights reserved.
-
-# Eigenständigkeitserklärung
-Die Verfasser erklären, dass die vorliegende Arbeit von ihnen selbstständig, ohne fremde Hilfe und ohne die Benutzung anderer als der angegebenen Hilfsmittel angefertigt wurde.
 
 \listoffigures

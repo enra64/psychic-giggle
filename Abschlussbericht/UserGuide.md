@@ -120,3 +120,5 @@ Weitere Anwendungen und Tutorials müssen durch die Entwickler, die das Psychic-
 - Handy kann nicht zu Server verbinden
     - Lösung: im WLAN die Kommunikation zwischen Clients erlauben
     - alternativ: eigenes WLAN durch Hotspot erstellen
+
+\listoffigures

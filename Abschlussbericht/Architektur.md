@@ -47,7 +47,7 @@ Der Implementierer muss (oder kann, falls er die ```PsychicServer```-Klasse benu
 
 
 ## Daten-Pipeline
-Die sogenannte Daten-Pipeline ist die Implementation der Sensordatenverarbeitung im Psychic-Framework. Alle Sensordaten, die den Server erreichen, werden durch eine vom Implementierer erstellbare Pipeline verarbeitet. Um eine Pipeline-Stück zu erstellen, muss lediglich ```AbstractFilter``` erweitert werden. Mehrere dieser Stücke können dann miteinander verbunden werden, so dass alle Daten die komplette Pipeline durchlaufen. Damit können zum Beispiel Gyroskopdaten erst mit einem Filter integriert werden, um sie danach zu glätten. Das letzte Element der Pipeline vor der Verwendung könnte dann z.B. noch zu kleine Ausschläge ignorieren, bevor die Daten schlussendlich der Anwendung aufbereitet zugeführt werden. 
+Die sogenannte Daten-Pipeline ist die Implementation der Sensordatenverarbeitung im Psychic-Framework. Alle Sensordaten, die den Server erreichen, werden durch eine vom Implementierer erstellbare Pipeline verarbeitet. Um eine Pipeline-Stück zu erstellen, muss lediglich ```AbstractFilter``` erweitert werden. Mehrere dieser Stücke können dann miteinander verbunden werden, so dass alle Daten die komplette Pipeline durchlaufen. Damit können zum Beispiel Gyroskopdaten erst mit einem Filter integriert werden, um sie danach zu glätten. Das letzte Element der Pipeline vor der Verwendung könnte dann z.B. noch zu kleine Ausschläge ignorieren, bevor die Daten schlussendlich der Anwendung aufbereitet zugeführt werden.
 
 Die Pipeline unterstützt auch das Weiterleiten von Sensordaten an mehrere seperate weiterführende Pipelines.
 
@@ -76,7 +76,12 @@ Da die Kontrollverbindung bidirektional ist, kann der Client auch ```AbstractCom
 ### Datenverbindung
 Nachdem der Nutzer sich mit einem Server verbunden hat, übermittelt dieser die aktuell benötigte Konfiguration. Nachdem die App diese umgesetzt hat, sind die benötigten Sensoren aktiviert. Alle generierten Daten werden ohne weitere Verarbeitung serialisiert und an den Datenport des Servers übermittelt, um den Rechenaufwand in der App möglichst gering zu halten. Die Übermittlung läuft über UDP, so dass kein expliziter Verbindungsaufbau für jedes Paket nötig ist.
 
-## Anhang: Klassendiagramme
+
+# Eigenständigkeitserklärung
+Die Verfasser erklären, dass die vorliegende Arbeit von ihnen selbstständig,
+ohne fremde Hilfe und ohne die Benutzung anderer als der angegebenen Hilfsmittel angefertigt wurde.
+
+# Anhang: Klassendiagramme
 ![Klassendiagramm des Servers](diagram.png)
 
 Server-Klassendiagramm auch unter [https://github.com/enra64/psychic-giggle/tree/master/Abschlussbericht/diagram.png](https://github.com/enra64/psychic-giggle/tree/master/Abschlussbericht/diagram.png)
@@ -84,3 +89,5 @@ Server-Klassendiagramm auch unter [https://github.com/enra64/psychic-giggle/tree
 ![Klassendiagramm der App](diagram_app.png)
 
 App-Klassendiagramm auch unter [https://github.com/enra64/psychic-giggle/tree/master/Abschlussbericht/diagram_app.png](https://github.com/enra64/psychic-giggle/tree/master/Abschlussbericht/diagram_app.png)
+
+\listoffigures
