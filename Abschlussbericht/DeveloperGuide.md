@@ -10,11 +10,12 @@
 * Einleitung.md
 * Architektur.md
     - klassendiagramm anhängen
+* bilder fixen 
 
 ## TODO: bruder
 * Formalia: betreuer, professor, einfach mal template angucken
 
-* deutsch/englisch -> deutsch, lizenz deutsch?
+* deutsch/englisch -> deutsch
 
 * man braucht client server -> nicht bluetoothmaus?
 * usability
@@ -30,7 +31,6 @@
 * ergebnisvorstellung
     - gleiche reihenfolge
     - framework in analyse
-
 * generell: bei den first level headings beschreiben was jetzt kommt, damit der leser sich nicht selbst überlegen muss was als nächstes abgeht, sondern vorbereitet ist
     - projektverlauf: was kommt jetzt überhaupt
     - devguide jetzt kommt der devguiide, hier gibts die javadoc
@@ -109,164 +109,6 @@ public class ExampleServer implements NetworkDataSink {
 
 ### Daten abbestellen
 Wenn eine ```NetworkDataSink``` nicht mehr benötigt wird, zum Beispiel weil der entsprechende Client getrennt wurde, kann sie mit ```unregisterDataSink(NetworkDataSink)``` von allen Sensoren abgemeldet werden, und mit  ```unregisterDataSink(NetworkDataSink, SensorType)``` von bestimmten Sensoren abgemeldet werden. Danach erhält die ```NetworkDataSink``` keine Daten mehr vom Server.
-
-
-## Verwendung von Buttons
-```Java
-// aus dem ButtonListener Interface
-void onButtonClick(ButtonClick click, NetworkDevice origin) {
-    if(click.getId() == MY_BUTTON_ID)
-        System.out.println("Button MY_BUTTON is currently held: " + click.isPressed());
-}
-```
-
-Um über Knopfdrücke informiert zu werden, muss ein ```ButtonListener``` registriert werden. Der ```Server``` hat dafür die ```setButtonListener(ButtonListener)```-Funktion.  
-Unterklassen des ```AbstractPsychicServer``` müssen das Interface ohnehin implementieren.
-
-Innerhalb der ```onButtonClick(ButtonClick, NetworkDevice)``` kann der Button mithilfe von ```click.getId()``` identifiziert werden, und ```click.isPressed()``` ist ```true``` wenn der Button gedrückt und ```false``` wenn der Button losgelassen wurde.
-
-Buttons werden immer auf allen verbundenen Clients angezeigt.
-
-
-### Buttons zur Runtime anfordern
-Buttons können mit ```addButton(String, int)``` hinzugefügt werden. Der ```String``` ist der Text, den der Button anzeigt, der ```int``` ist die ID, die beim Drücken des Buttons an den Server gesendet wird. Zum Entfernen einzelner Buttons kann ```removeButtons(int)``` verwendet werden.
-Ein Aufruf von ```setButtonLayout(String)``` oder ```clearButtons()``` wird alle mit ```addButton``` hinzugefügten Knöpfe entfernen.
-
-
-### Layouts laden
-Eine Alternative ist die Verwendung von ```setButtonLayout(String)```. Hierbei kann eine eigene Android-XML-Layout-Datei als ```String``` übergeben werden.  
-
-
-#### Einschränkungen für die Layout-Dateien
-Es werden nur ```LinearLayout```- und ```Button```-Objekte unterstützt. Ein Beispiel für einen unterstützten XML-String ist das folgende Snippet:
-
-```xml
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="horizontal">
-
-    <Button
-        android:text="A"
-        android:id="0"
-        android:layout_weight="3"/>
-
-    <LinearLayout
-        android:orientation="vertical"
-        android:layout_weight="5">
-
-        <Button
-            android:text="B"
-            android:id="1"
-            android:layout_weight="2" />
-
-        <Button
-            android:text="C"
-            android:id="2"
-            android:layout_weight="1" />
-    </LinearLayout>
-</LinearLayout>
-```
-
-Layout-String, wie er in der App angezeigt wird:
-<p align="center"><img src="button_layout_result.png" width="300px"/></p>
-
-`Button`Elemente unterstützen ausschließlich die folgenden Attribute:
-
-* ```android:text=""``` enthält den vom Button dargestellten Text
-* ```android:id=""``` ist die ID, die an den Server übertragen wird, und dort mithilfe von ```ButtonClick.getId()``` abgefragt werden kann
-* ```android:layout_weight=""``` wird direkt für den Button gesetzt. Genaue Informationen sind in der [Android-Dokumentation](https://developer.android.com/guide/topics/ui/layout/linear.html#Weight) zu finden.
-
-`LinearLayout`Elemente unterstützen ausschließlich die folgenden Attribute:
-
-* ```android:layout_weight=""``` wird direkt für das Layout gesetzt. Genaue Informationen sind in der [Android-Dokumentation](https://developer.android.com/guide/topics/ui/layout/linear.html#Weight) zu finden.
-* ```android:orientation=""``` wird direkt für das Layout gesetzt. Genaue Informationen sind in der [Android-Dokumentation](https://developer.android.com/reference/android/widget/LinearLayout.html#attr_android:orientation) zu finden.
-
-Bei Verwendung von ```setButtonLayout(String)``` werden alle durch ```addButton(String, int)``` hinzugefügten Buttons entfernt und bei
-Verwendung von ```addButton(String, int)``` wird das durch ```setButtonLayout``` erstellte Layout entfernt.
-
-Um alle Buttons zu entfernen kann ```clearButtons()``` aufgerufen werden.
-
-
-## Verwaltung von Clients
-Um die verschiedenen Client-Events zu handeln, muss ein ```ClientListener``` gesetzt werden, der die Events empfängt. Die Server-Klasse hat dafür den ```setClientListener(ClientListener)```-Befehl.
-
-Beispiel-Implementationen der Funktionen aus dem ```ClientListener```-Interface:
-```Java
-boolean acceptClient(NetworkDevice newClient){
-    return true; // accept any client
-}
-void onClientDisconnected(NetworkDevice disconnectedClient){
-    System.out.println("Oh no! Client " + disconnectedClient.getName() + " has disconnected!")
-}
-void onClientTimeout(NetworkDevice timeoutClient){
-    System.out.println("Oh no! Client " + disconnectedClient.getName() + " had a timeout!")
-}
-void onClientAccepted(NetworkDevice connectedClient){
-    System.out.println("A new client, " + disconnectedClient.getName() + " has connected!")
-}
-```
-
-
-### NetworkDevice
-Clients werden als ```NetworkDevice``` angegeben. Mit ```getInetAddress()``` kann die aktuelle IP-Adresse als ```InetAddress``` abgefragt werden und unter ```getName()``` ist der Name des ```NetworkDevice``` verfügbar. Im ```NetworkDevice``` ist auch die Portkonfiguration jedes Clients gespeichert.
-
-Wenn ```NetworkDevice.equals(NetworkDevice)``` ```true``` zurückgibt, dann handelt es sich um denselben Client.
-
-
-### Callbacks
-
-#### acceptClient
-`acceptClient(NetworkDevice)` wird immer dann aufgerufen, wenn ein neuer Client, nämlich das übergebene ```NetworkDevice```, versucht sich mit dem Server zu verbinden. Wenn ```acceptClient(NetworkDevice)``` ```true``` zurückgibt, wird der Client angenommen; gibt es ```false``` zurück, wird der Client abgelehnt.
-
-
-#### onClientDisconnected
-`onClientDisconnected(NetworkDevice)` wird aufgerufen, wenn der übergebene Client die Verbindung beendet hat oder nicht mehr erreichbar ist. Der Client ist zum Zeitpunkt des Aufrufs nicht mehr über den Server verfügbar.
-
-
-#### onClientTimeout
-`onClientTimeout(NetworkDevice)` wird aufgerufen, wenn der übergebene Client eine Zeit lang nicht mehr reagiert. Der Client ist zum Zeitpunkt des Aufrufs nicht mehr über den Server verfügbar.
-
-
-#### onClientAccepted
-`onClientAccepted(NetworkDevice) wird aufgerufen wenn die Kommunikation zwischen Server und dem übergebenen neuen Client funktioniert. Diese Funktion wird nur dann aufgerufen, wenn ```acceptClient(NetworkDevice)``` ```true``` für das entsprechende ```NetworkDevice``` zurückgegeben hat.
-
-
-### Clientanzahl begrenzen
-Die maximale Anzahl von Clients ist beschränkt auf ```Integer.INT_MAX```. Ein nutzerdefiniertes Maximum kann mithilfe von ```setClientMaximum(int)``` gesetzt, mit ```getClientMaximum()``` abgefragt und mit ```removeClientMaximum()``` entfernt werden.
-
-
-## Exceptionhandling
-Um alle Exceptions, die in verschiedenen Threads auftreten, aufzufangen, muss ein ```ExceptionListener``` registriert werden. ```onException(Object, Exception, String)``` wird dann aufgerufen, falls eine Exception auftritt, die nicht intern behandelt werden kann.
-
-Beispiel-Implementation:
-```Java
-    public void onException(Object origin, Exception exception, String info) {
-      // print complete info before the stack trace
-      System.out.println("Exception in " + origin.getClass() + "; Info: " + info)
-      System.out.flush();
-
-      // print the stack trace
-      exception.printStackTrace();
-    }
-```
-Der ```origin```-Parameter gibt das Ursprungsobjekt (oder ein übergeordnetes, falls das Ursprungsobjekt dem Nutzer nicht bekannt ist) an, der ```exception```-Parameter gibt die Exception on, und der ```info```-Parameter enthält weitere Informationen zu der Exception und ihrem Grund.
-
-
-## Resetevents
-ResetEvents werden durch den, von anderen Buttons separaten, Reset-Button hervorgerufen. Im ```PsychicServer``` wird das Event an den ```ResetListener``` geleitet, der mit ```setResetListener(ResetListener)``` registriert wurde. Im ```AbstractPsychicServer``` wird die Implementation erzwungen.
-```Java
-public void onResetPosition(NetworkDevice origin) {
-    // pseudo-code!
-    mouse.centerOnCurrentScreen();
-}
-```
-Wenn ein Client den "Reset"-Button auf seinem Handy benutzt, wird die ```onResetPosition(NetworkDevice)``` aufgerufen. Dann sollte der derzeitige Status des Handys zurückgesetzt werden. Bei der Beispielimplementation ```MouseServer``` wird der Mauszeiger in die Mitte des Bildschirms gesetzt.
-
-
-### Reset-Button deaktivieren
-Es wird empfohlen den Reset-Button zu implementieren. Er gewährleistet, dass der Nutzer mit einem einfachen, nie wechselndem Button jederzeit in einen Zustand zurückkehren kann, in dem die Anwendung bedienbar ist. Solche Zustände können zum Beispiel durch nicht korrigierten Gyroskop-Drift entstehen. Es ist jedoch möglich, den Reset-Knopf zu deaktivieren, indem die ```hideResetButton(boolean)```-Funktion des Servers aufgerufen wird. Ist der Parameter ```true```, wird der Button versteckt; ist er ```false```, wird der Button angezeigt.
-
 
 ## Daten-Pipeline
 ![Pipeline](pipeline.png)
@@ -426,6 +268,161 @@ Die Pipeline kann mit ```build()``` abgeschlossen werden; dann ist der letzte ``
 
 ### Temporärer Stopp des Datenflusses
 Es ist dem Nutzer möglich, mithilfe der "Hold Sensors"-Checkbox das Senden von SensorDaten zu unterbinden.
+
+
+## Verwaltung von Clients
+Um die verschiedenen Client-Events zu handeln, muss ein ```ClientListener``` gesetzt werden, der die Events empfängt. Die Server-Klasse hat dafür den ```setClientListener(ClientListener)```-Befehl.
+
+Beispiel-Implementationen der Funktionen aus dem ```ClientListener```-Interface:
+```Java
+boolean acceptClient(NetworkDevice newClient){
+    return true; // accept any client
+}
+void onClientDisconnected(NetworkDevice disconnectedClient){
+    System.out.println("Oh no! Client " + disconnectedClient.getName() + " has disconnected!")
+}
+void onClientTimeout(NetworkDevice timeoutClient){
+    System.out.println("Oh no! Client " + disconnectedClient.getName() + " had a timeout!")
+}
+void onClientAccepted(NetworkDevice connectedClient){
+    System.out.println("A new client, " + disconnectedClient.getName() + " has connected!")
+}
+```
+
+
+### NetworkDevice
+Clients werden als ```NetworkDevice``` angegeben. Mit ```getInetAddress()``` kann die aktuelle IP-Adresse als ```InetAddress``` abgefragt werden und unter ```getName()``` ist der Name des ```NetworkDevice``` verfügbar. Im ```NetworkDevice``` ist auch die Portkonfiguration jedes Clients gespeichert.
+
+Wenn ```NetworkDevice.equals(NetworkDevice)``` ```true``` zurückgibt, dann handelt es sich um denselben Client.
+
+
+### Callbacks
+
+#### acceptClient
+`acceptClient(NetworkDevice)` wird immer dann aufgerufen, wenn ein neuer Client, nämlich das übergebene ```NetworkDevice```, versucht sich mit dem Server zu verbinden. Wenn ```acceptClient(NetworkDevice)``` ```true``` zurückgibt, wird der Client angenommen; gibt es ```false``` zurück, wird der Client abgelehnt.
+
+
+#### onClientDisconnected
+`onClientDisconnected(NetworkDevice)` wird aufgerufen, wenn der übergebene Client die Verbindung beendet hat oder nicht mehr erreichbar ist. Der Client ist zum Zeitpunkt des Aufrufs nicht mehr über den Server verfügbar.
+
+
+#### onClientTimeout
+`onClientTimeout(NetworkDevice)` wird aufgerufen, wenn der übergebene Client eine Zeit lang nicht mehr reagiert. Der Client ist zum Zeitpunkt des Aufrufs nicht mehr über den Server verfügbar.
+
+
+#### onClientAccepted
+`onClientAccepted(NetworkDevice) wird aufgerufen wenn die Kommunikation zwischen Server und dem übergebenen neuen Client funktioniert. Diese Funktion wird nur dann aufgerufen, wenn ```acceptClient(NetworkDevice)``` ```true``` für das entsprechende ```NetworkDevice``` zurückgegeben hat.
+
+
+### Clientanzahl begrenzen
+Die maximale Anzahl von Clients ist beschränkt auf ```Integer.INT_MAX```. Ein nutzerdefiniertes Maximum kann mithilfe von ```setClientMaximum(int)``` gesetzt, mit ```getClientMaximum()``` abgefragt und mit ```removeClientMaximum()``` entfernt werden.
+
+## Verwendung von Buttons
+```Java
+// aus dem ButtonListener Interface
+void onButtonClick(ButtonClick click, NetworkDevice origin) {
+    if(click.getId() == MY_BUTTON_ID)
+        System.out.println("Button MY_BUTTON is currently held: " + click.isPressed());
+}
+```
+
+Um über Knopfdrücke informiert zu werden, muss ein ```ButtonListener``` registriert werden. Der ```Server``` hat dafür die ```setButtonListener(ButtonListener)```-Funktion.  
+Unterklassen des ```AbstractPsychicServer``` müssen das Interface ohnehin implementieren.
+
+Innerhalb der ```onButtonClick(ButtonClick, NetworkDevice)``` kann der Button mithilfe von ```click.getId()``` identifiziert werden, und ```click.isPressed()``` ist ```true``` wenn der Button gedrückt und ```false``` wenn der Button losgelassen wurde.
+
+Buttons werden immer auf allen verbundenen Clients angezeigt.
+
+
+### Buttons zur Runtime anfordern
+Buttons können mit ```addButton(String, int)``` hinzugefügt werden. Der ```String``` ist der Text, den der Button anzeigt, der ```int``` ist die ID, die beim Drücken des Buttons an den Server gesendet wird. Zum Entfernen einzelner Buttons kann ```removeButtons(int)``` verwendet werden.
+Ein Aufruf von ```setButtonLayout(String)``` oder ```clearButtons()``` wird alle mit ```addButton``` hinzugefügten Knöpfe entfernen.
+
+
+### Layouts laden
+Eine Alternative ist die Verwendung von ```setButtonLayout(String)```. Hierbei kann eine eigene Android-XML-Layout-Datei als ```String``` übergeben werden.  
+
+
+#### Einschränkungen für die Layout-Dateien
+Es werden nur ```LinearLayout```- und ```Button```-Objekte unterstützt. Ein Beispiel für einen unterstützten XML-String ist das folgende Snippet:
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal">
+
+    <Button
+        android:text="A"
+        android:id="0"
+        android:layout_weight="3"/>
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_weight="5">
+
+        <Button
+            android:text="B"
+            android:id="1"
+            android:layout_weight="2" />
+
+        <Button
+            android:text="C"
+            android:id="2"
+            android:layout_weight="1" />
+    </LinearLayout>
+</LinearLayout>
+```
+
+Layout-String, wie er in der App angezeigt wird:
+<p align="center"><img src="button_layout_result.png" width="300px"/></p>
+
+`Button`Elemente unterstützen ausschließlich die folgenden Attribute:
+
+* ```android:text=""``` enthält den vom Button dargestellten Text
+* ```android:id=""``` ist die ID, die an den Server übertragen wird, und dort mithilfe von ```ButtonClick.getId()``` abgefragt werden kann
+* ```android:layout_weight=""``` wird direkt für den Button gesetzt. Genaue Informationen sind in der [Android-Dokumentation](https://developer.android.com/guide/topics/ui/layout/linear.html#Weight) zu finden.
+
+`LinearLayout`Elemente unterstützen ausschließlich die folgenden Attribute:
+
+* ```android:layout_weight=""``` wird direkt für das Layout gesetzt. Genaue Informationen sind in der [Android-Dokumentation](https://developer.android.com/guide/topics/ui/layout/linear.html#Weight) zu finden.
+* ```android:orientation=""``` wird direkt für das Layout gesetzt. Genaue Informationen sind in der [Android-Dokumentation](https://developer.android.com/reference/android/widget/LinearLayout.html#attr_android:orientation) zu finden.
+
+Bei Verwendung von ```setButtonLayout(String)``` werden alle durch ```addButton(String, int)``` hinzugefügten Buttons entfernt und bei
+Verwendung von ```addButton(String, int)``` wird das durch ```setButtonLayout``` erstellte Layout entfernt.
+
+Um alle Buttons zu entfernen kann ```clearButtons()``` aufgerufen werden.
+
+## Exceptionhandling
+Um alle Exceptions, die in verschiedenen Threads auftreten, aufzufangen, muss ein ```ExceptionListener``` registriert werden. ```onException(Object, Exception, String)``` wird dann aufgerufen, falls eine Exception auftritt, die nicht intern behandelt werden kann.
+
+Beispiel-Implementation:
+```Java
+    public void onException(Object origin, Exception exception, String info) {
+      // print complete info before the stack trace
+      System.out.println("Exception in " + origin.getClass() + "; Info: " + info)
+      System.out.flush();
+
+      // print the stack trace
+      exception.printStackTrace();
+    }
+```
+Der ```origin```-Parameter gibt das Ursprungsobjekt (oder ein übergeordnetes, falls das Ursprungsobjekt dem Nutzer nicht bekannt ist) an, der ```exception```-Parameter gibt die Exception on, und der ```info```-Parameter enthält weitere Informationen zu der Exception und ihrem Grund.
+
+
+## Resetevents
+ResetEvents werden durch den, von anderen Buttons separaten, Reset-Button hervorgerufen. Im ```PsychicServer``` wird das Event an den ```ResetListener``` geleitet, der mit ```setResetListener(ResetListener)``` registriert wurde. Im ```AbstractPsychicServer``` wird die Implementation erzwungen.
+```Java
+public void onResetPosition(NetworkDevice origin) {
+    // pseudo-code!
+    mouse.centerOnCurrentScreen();
+}
+```
+Wenn ein Client den "Reset"-Button auf seinem Handy benutzt, wird die ```onResetPosition(NetworkDevice)``` aufgerufen. Dann sollte der derzeitige Status des Handys zurückgesetzt werden. Bei der Beispielimplementation ```MouseServer``` wird der Mauszeiger in die Mitte des Bildschirms gesetzt.
+
+
+### Reset-Button deaktivieren
+Es wird empfohlen den Reset-Button zu implementieren. Er gewährleistet, dass der Nutzer mit einem einfachen, nie wechselndem Button jederzeit in einen Zustand zurückkehren kann, in dem die Anwendung bedienbar ist. Solche Zustände können zum Beispiel durch nicht korrigierten Gyroskop-Drift entstehen. Es ist jedoch möglich, den Reset-Knopf zu deaktivieren, indem die ```hideResetButton(boolean)```-Funktion des Servers aufgerufen wird. Ist der Parameter ```true```, wird der Button versteckt; ist er ```false```, wird der Button angezeigt.
 
 
 ## Notifications anzeigen
