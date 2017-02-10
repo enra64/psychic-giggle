@@ -1,3 +1,4 @@
+
 \newpage
 # Ziel
 Das Ziel des Projekts war die Erstellung eines Frameworks zur Nutzung von Sensordaten von Androidgeräten auf javafähigen PCs und die Demonstration der Funktionalität dieses Frameworks anhand von drei Beispielanwendungen, nämlich einer Maussteuerung, einer Spielsteuerung und die Bedienung eines Murmellabyrinthes mithilfe eines Roboters.
@@ -23,6 +24,9 @@ Die zur Demonstration dienenden Anwendungen stellen schwer zu definierende Anfor
 ## Verbindungsqualität
 
 ### Frequenz
+Um eine Mindestanforderung für die Frequenz der Übertragung 
+Die Mindestanforderung für die Übertragung der Sensordatenfrequenz haben wir 
+
 Für die Frequenz der Sensordaten haben wir uns an der Playstation 3 von Sony orientiert: Diese stellt die laufenden Spiele mit 24 Bildern pro Sekunde dar, ein Wert mit dem die meisten Menschen problemlos auch schnelle Actionspiele bedienen können. Daraus entstand für uns die Anforderung, mindestens 30 Updates der Sensordaten pro Sekunde unterstützen zu können.
 
 
@@ -32,7 +36,7 @@ Eine akzeptable Grenze für die Latenz festzulegen war ebenfalls schwierig, da L
 [^1]: http://www.eurogamer.net/articles/digitalfoundry-lag-factor-article?page=2
 
 ### Jitter
-Ein dritter Parameter für die Verbindungsqualität ist der Jitter, also wie sehr sich die Periodizität der ankommenden Sensordaten von der Periodizität der gesendeten Sensordaten unterscheidet. Je geringer der Jitter ist, desto besser ist die Verbindung. Unsere einzige Anforderung an diesen Aspekt der Verbindung war, dass sich kein Jitter bemerkbar macht.
+Ein dritter Parameter für die Verbindungsqualität ist der Jitter, das heißt wie sehr sich die Periodizität der ankommenden Sensordaten von der Periodizität der gesendeten Sensordaten unterscheidet. Je geringer der Jitter ist, desto besser ist die Verbindung. Unsere einzige Anforderung an diesen Aspekt der Verbindung war, dass sich kein Jitter bemerkbar macht.
 
 
 ## Maussteuerung
@@ -100,7 +104,6 @@ Die y-Achse ist in Millisekunden angegeben, die x-Achse gibt die Nummer der Mess
 
 ## Anforderungen der drei Steuerungen
 Unsere Anforderungen an die Netzwerkverbindungsqualität haben die Mindestanforderungen der drei Beispielimplementationen erreicht oder übertroffen, da die Steuerungen keine Probleme mit schlechten Reaktionszeiten zeigen.
-
 
 # Lessons learned
 Es ist deutlich effektiver sich gemeinsam zu festen Zeiten zu treffen, um zusammen zu arbeiten als allein. Dadurch haben wir direktes Feedback zu neuen Ideen und deren Umsetzungen von den anderen Teammitgliedern bekommen. Pairprogramming erlaubt Diskussionen und konstruktive Lösungen von neuen Problemen durch andere zu erhalten.
