@@ -9,7 +9,7 @@ Die Bedienung von App und Server wird aus Sicht unserer Beispielimplementationen
 ## Was benötigt wird: 
 
 - Handy mit Android (__mindestens 4.4__) 
-- javafähiges Gerät (__Java 8__) um Server darzustellen
+- javafähiges Gerät (__mindestens Java 8__) um Server darzustellen
 - Server-Jar befindet sich auf dem Gerät
 - Die App "PsychicSensors" ist auf dem Handy installiert
 - Netzwerkverbindung (WLAN) zwischen Server und App
@@ -29,7 +29,7 @@ Ein beliebiger Beispiel-Server kann mittels GUI gestartet werden. Alternativ kan
 ![Discovery-Activity](Screenshots/Discovery Activity.png){ width=300px }
 
 1. Optionen
-2. Serve
+2. Server
 3. Server suchen
 
 ## Einstellungen:
@@ -45,9 +45,7 @@ Hier lassen sich Name des Gerätes, benutzter Discovery Port und je nach gewähl
 
 
 ## GUI:
-Die GUI kann mit einem Doppelklick auf `server.jar` gestartet werden, alternativ auch über die Konsole mit
-`java –jar server.jar`. Die GUI ist nur für die 3 implementierten Beispielanwendungen erstellt worden. 
-Änderungen dieser, oder eine neue GUI können durch den Implementierer erfolgen
+Die GUI kann mit einem Doppelklick auf `server.jar` gestartet werden, alternativ auch über die Konsole mit `java –jar server.jar`. Die GUI ist nur für die 3 implementierten Beispielanwendungen erstellt worden, Nutzer unseres Frameworks müssen also eventuelle grafische Oberflächen selber implementieren.
 
 ![GUI](Screenshots/GUI.png){ width=300px }
 
