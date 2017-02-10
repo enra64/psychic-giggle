@@ -37,7 +37,7 @@
     - vorstellung ergebnisse: high level übersicht: was ist entstanden
     - kurze einleitung, das ziel, wie folgt strukturiert mit sinn
 
-# Developer Guide für das Psychic-Framework
+# Entwickleranleitung für das Psychic-Framework
 Das Psychic-Framework bezeichnet eine Kombination aus einer App und einem Serverframework mit einem gemeinsamen Kern. Dieses Framework dient der schnellen und einfachen Entwicklung von PC-Applikationen, die Sensordaten von Android-Geräten verwenden möchten.
 
 
@@ -128,7 +128,7 @@ Innerhalb der ```onButtonClick(ButtonClick, NetworkDevice)``` kann der Button mi
 Buttons werden immer auf allen verbundenen Clients angezeigt.
 
 
-### Buttons zur Runtime anfordern
+### Buttons zur Laufzeit anfordern
 Buttons können mit ```addButton(String, int)``` hinzugefügt werden. Der ```String``` ist der Text, den der Button anzeigt, der ```int``` ist die ID, die beim Drücken des Buttons an den Server gesendet wird. Zum Entfernen einzelner Buttons kann ```removeButtons(int)``` verwendet werden.
 Ein Aufruf von ```setButtonLayout(String)``` oder ```clearButtons()``` wird alle mit ```addButton``` hinzugefügten Knöpfe entfernen.
 
@@ -189,7 +189,7 @@ Um alle Buttons zu entfernen kann ```clearButtons()``` aufgerufen werden.
 
 
 ## Verwaltung von Clients
-Um die verschiedenen Client-Events zu handeln, muss ein ```ClientListener``` gesetzt werden, der die Events empfängt. Die Server-Klasse hat dafür den ```setClientListener(ClientListener)```-Befehl.
+Um die verschiedenen Client-Events zu händeln, muss ein ```ClientListener``` gesetzt werden, der die Events empfängt. Die Server-Klasse hat dafür den ```setClientListener(ClientListener)```-Befehl.
 
 Beispiel-Implementationen der Funktionen aus dem ```ClientListener```-Interface:
 ```Java
@@ -217,7 +217,7 @@ Wenn ```NetworkDevice.equals(NetworkDevice)``` ```true``` zurückgibt, dann hand
 ### Callbacks
 
 #### acceptClient
-`acceptClient(NetworkDevice)` wird immer dann aufgerufen, wenn ein neuer Client, nämlich das übergebene ```NetworkDevice```, versucht sich mit dem Server zu verbinden. Wenn ```acceptClient(NetworkDevice)``` ```true``` zurückgibt, wird der Client angenommen; gibt es ```false``` zurück, wird der Client abgelehnt.
+`acceptClient(NetworkDevice)` wird immer dann aufgerufen, wenn ein neuer Client, das übergebene ```NetworkDevice```, versucht sich mit dem Server zu verbinden. Wenn ```acceptClient(NetworkDevice)``` ```true``` zurückgibt, wird der Client angenommen; gibt es ```false``` zurück, wird der Client abgelehnt.
 
 
 #### onClientDisconnected
@@ -233,7 +233,7 @@ Wenn ```NetworkDevice.equals(NetworkDevice)``` ```true``` zurückgibt, dann hand
 
 
 ### Clientanzahl begrenzen
-Die maximale Anzahl von Clients ist beschränkt auf ```Integer.INT_MAX```. Ein nutzerdefiniertes Maximum kann mithilfe von ```setClientMaximum(int)``` gesetzt, mit ```getClientMaximum()``` abgefragt und mit ```removeClientMaximum()``` entfernt werden.
+Die maximale Anzahl von Clients ist beschränkt auf ```Integer.MAX_VALUE```. Ein nutzerdefiniertes Maximum kann mithilfe von ```setClientMaximum(int)``` gesetzt, mit ```getClientMaximum()``` abgefragt und mit ```removeClientMaximum()``` entfernt werden.
 
 
 ## Exceptionhandling
@@ -250,10 +250,10 @@ Beispiel-Implementation:
       exception.printStackTrace();
     }
 ```
-Der ```origin```-Parameter gibt das Ursprungsobjekt (oder ein übergeordnetes, falls das Ursprungsobjekt dem Nutzer nicht bekannt ist) an, der ```exception```-Parameter gibt die Exception on, und der ```info```-Parameter enthält weitere Informationen zu der Exception und ihrem Grund.
+Der ```origin```-Parameter gibt das Ursprungsobjekt (oder ein übergeordnetes, falls das Ursprungsobjekt dem Nutzer nicht bekannt ist) an, der ```exception```-Parameter gibt die Exception on, und der ```info```-Parameter enthält weitere Informationen zu der Exception und ihre Ursache.
 
 
-## Resetevents
+## ResetEvents
 ResetEvents werden durch den, von anderen Buttons separaten, Reset-Button hervorgerufen. Im ```PsychicServer``` wird das Event an den ```ResetListener``` geleitet, der mit ```setResetListener(ResetListener)``` registriert wurde. Im ```AbstractPsychicServer``` wird die Implementation erzwungen.
 ```Java
 public void onResetPosition(NetworkDevice origin) {
@@ -265,7 +265,7 @@ Wenn ein Client den "Reset"-Button auf seinem Handy benutzt, wird die ```onReset
 
 
 ### Reset-Button deaktivieren
-Es wird empfohlen den Reset-Button zu implementieren. Er gewährleistet, dass der Nutzer mit einem einfachen, nie wechselndem Button jederzeit in einen Zustand zurückkehren kann, in dem die Anwendung bedienbar ist. Solche Zustände können zum Beispiel durch nicht korrigierten Gyroskop-Drift entstehen. Es ist jedoch möglich, den Reset-Knopf zu deaktivieren, indem die ```hideResetButton(boolean)```-Funktion des Servers aufgerufen wird. Ist der Parameter ```true```, wird der Button versteckt; ist er ```false```, wird der Button angezeigt.
+Es wird empfohlen den Reset-Button zu implementieren. Er gewährleistet, dass der Nutzer mit einem einfachen, nie wechselndem Button jederzeit in einen Zustand zurückkehren kann, in dem die Anwendung bedienbar ist. Solche Zustände können zum Beispiel durch einen nicht korrigierten Gyroskop-Drift entstehen. Es ist jedoch möglich, den Reset-Knopf zu deaktivieren, indem die ```hideResetButton(boolean)```-Funktion des Servers aufgerufen wird. Ist der Parameter ```true```, wird der Button versteckt; ist er ```false```, wird der Button angezeigt.
 
 
 ## Daten-Pipeline
@@ -293,7 +293,7 @@ Das ```NetworkDataSink```-Interface muss implementiert werden, wenn eine Klasse 
 
 
 ### NetworkDataSource
-Das ```NetworkDataSource```-Interface muss von Klassen implementiert werden, die Daten in Pipeline-Element einspeisen möchte, zum Beispiel nachdem sie aus dem Netzwerk entnommen wurden. Es beinhaltet zwei Funktionen:
+Das ```NetworkDataSource```-Interface muss von Klassen implementiert werden, die Daten in Pipeline-Elemente einspeisen möchte, zum Beispiel nachdem sie aus dem Netzwerk entnommen wurden. Es beinhaltet zwei Funktionen:
 
 * ```close()```: Die Instanz wird nicht mehr benötigt, und sollte alle Ressourcen schließen.
 * ```setDataSink(NetworkDataSink)```: Alle Daten, die von der ```NetworkDataSource``` erzeugt wurden, müssen an die hier erhaltene ```NetworkDataSink``` geleitet werden.
@@ -343,7 +343,7 @@ Es ist mit ```sendSensorDescription(SensorType, String)``` möglich, erweiterte 
 
 
 ### Filter
-Filter sind Pipelineelemente, die erhaltene Daten bearbeiten und dann weiterleiten, zum Beispiel einen Tiefpassfilter. Um neue Filter zu erstellen sollte ```AbstractFilter``` erweitert werden; alle folgenden Beschreibungen beziehen sich auf diese Klasse.
+Filter sind Pipeline-Elemente, die erhaltene Daten bearbeiten und dann weiterleiten, zum Beispiel einen Tiefpassfilter. Um neue Filter zu erstellen sollte ```AbstractFilter``` erweitert werden; alle folgenden Beschreibungen beziehen sich auf diese Klasse.
 
 
 #### onData
@@ -417,11 +417,11 @@ Es gibt drei Methoden um ein neues Element in die Pipeline einzubauen: ```prepen
 
 
 #### Elemente entfernen
-Pipelineelemente können mit ```remove(int)``` oder ```remove(AbstractFilter)``` wieder entfernt werden.
+Pipeline-Elemente können mit ```remove(int)``` oder ```remove(AbstractFilter)``` wieder entfernt werden.
 
 
 #### Pipeline abschließen
-Die Pipeline kann mit ```build()``` abgeschlossen werden; dann ist der letzte ```AbstractFilter``` der ans Ende platziert wurde das letze Element in der Pipeline, und die Funktion gibt den Anfang der Pipeline zurück. Mithilfe von ```build(NetworkDataSink)``` kann das letzte Element auch eine ```NetworkDataSink``` sein, nützlich zum Beispiel wenn das letzte Pipelineelement die Daten nicht weiterleiten muss.
+Die Pipeline kann mit ```build()``` abgeschlossen werden; dann ist der letzte ```AbstractFilter``` der ans Ende platziert wurde das letze Element in der Pipeline, und die Funktion gibt den Anfang der Pipeline zurück. Mithilfe von ```build(NetworkDataSink)``` kann das letzte Element auch eine ```NetworkDataSink``` sein, nützlich zum Beispiel wenn das letzte Pipeline-Element die Daten nicht weiterleiten muss.
 
 
 ### Temporärer Stopp des Datenflusses
