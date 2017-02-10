@@ -1,3 +1,6 @@
+% Abschlussbericht Softwareprojekt: PsychicFramework
+% Ulrich Bätjer; André Henniger; Markus Hempel; Arne Herdick
+\newpage
 
 # Ziel
 Das Ziel des Projekts war die Erstellung eines Frameworks zur Nutzung von Sensordaten von Androidgeräten auf javafähigen PCs und die Demonstration der Funktionalität dieses Frameworks anhand von drei Beispielanwendungen, nämlich einer Maussteuerung, einer Spielsteuerung und die Bedienung eines Murmellabyrinthes mithilfe eines Roboters.
