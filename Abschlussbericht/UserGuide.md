@@ -7,7 +7,7 @@ Die Bedienung von App und Server wird aus Sicht unserer Beispielimplementationen
 ## Was benötigt wird: 
 
 - Handy mit Android (__mindestens 4.4__) 
-- javafähiges Gerät (__Java 8__) um Server darzustellen
+- javafähiges Gerät (__mindestens Java 8__) um Server darzustellen
 - Server-Jar befindet sich auf dem Gerät
 - Die App "PsychicSensors" ist auf dem Handy installiert
 - Netzwerkverbindung (WLAN) zwischen Server und App
