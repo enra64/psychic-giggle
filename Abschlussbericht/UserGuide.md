@@ -7,7 +7,6 @@ Die Bedienung von App und Server wird aus Sicht unserer Beispielimplementationen
 
 
 ## Was benötigt wird: 
-
 - Handy mit Android (__mindestens 4.4__) 
 - javafähiges Gerät (__mindestens Java 8__) um Server darzustellen
 - Server-Jar befindet sich auf dem Gerät

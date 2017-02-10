@@ -13,6 +13,7 @@
     - how to use framework mit intellij
 * bilder fixen
 * userguide: jar verlinken
+* zeiten in analyse requirements ok?
 
 ## TODO: bruder
 * Formalia: betreuer, professor, einfach mal template angucken
