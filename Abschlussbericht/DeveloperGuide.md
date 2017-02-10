@@ -11,6 +11,7 @@
 * Architektur.md
     - klassendiagramm anhängen
 * bilder fixen 
+* userguide: jar verlinken
 
 ## TODO: bruder
 * Formalia: betreuer, professor, einfach mal template angucken
