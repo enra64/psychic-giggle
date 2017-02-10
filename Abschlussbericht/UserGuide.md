@@ -1,4 +1,3 @@
-
 # User-Guide
 Die Bedienung von App und Server wird aus Sicht unserer Beispielimplementationen erläutert
 
