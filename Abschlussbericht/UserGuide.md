@@ -27,7 +27,7 @@ Ein beliebiger Beispiel-Server kann mittels GUI gestartet werden. Alternativ kan
 ![Discovery-Activity](Screenshots/Discovery Activity.png){ width=300px }
 
 1. Optionen
-2. Serve
+2. Server
 3. Server suchen
 
 ## Einstellungen:
@@ -43,9 +43,7 @@ Hier lassen sich Name des Gerätes, benutzter Discovery Port und je nach gewähl
 
 
 ## GUI:
-Die GUI kann mit einem Doppelklick auf `server.jar` gestartet werden, alternativ auch über die Konsole mit
-`java –jar server.jar`. Die GUI ist nur für die 3 implementierten Beispielanwendungen erstellt worden. 
-Änderungen dieser, oder eine neue GUI können durch den Implementierer erfolgen
+Die GUI kann mit einem Doppelklick auf `server.jar` gestartet werden, alternativ auch über die Konsole mit `java –jar server.jar`. Die GUI ist nur für die 3 implementierten Beispielanwendungen erstellt worden, Nutzer unseres Frameworks müssen also eventuelle grafische Oberflächen selber implementieren.
 
 ![GUI](Screenshots/GUI.png){ width=300px }
 
