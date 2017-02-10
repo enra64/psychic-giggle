@@ -1,3 +1,5 @@
+
+
 # User-Guide
 Die Bedienung von App und Server wird aus Sicht unserer Beispielimplementationen erläutert.
 
@@ -83,9 +85,7 @@ Terminal Befehl: `java –jar server.jar nes`
 - Für eine Lenkbewegung wird das Handy nun nach links oder rechts gekippt
 - In den Optionen kann die Lenkempfindlichkeit eingestellt werden
 - In Super Mario Kart wird mittels des B-Buttons etwas im Menü ausgewählt oder im Spiel beschleunigt
-      - Alternativ: Zum Auswählen eines Menüpunktes den Select-Button verwenden
-- Das Menü kann mittels einer "Stoßbewegung" vom Körper weg ein höherer bzw. einer Bewegung zum Körper hin ein unterer Menüpunkt gewählt werden. Im Spiel kann mittels derselben Bewegung ein Item nach vorne oder nach hinten geworfen werden
-      - Alternativ: Zur Benutzung eines Items kann ebenfalls der A-Button verwendet werden
+- Das Menü kann mittels einer "Stoßbewegung" vom Körper weg ein höherer bzw. einer Bewegung zum Körper hin ein unterer Menüpunkt gewählt werden. Im Spiel kann mittels derselben Bewegung ein Item nach vorne oder nach hinten geworfen werden, oder der A-Button betätigt werden
 - Der Startbutton pausiert das Spiel
 - die Buttons der App emulieren entsprechend der config Datei Tasten von einer Tastatur
 - "Sensor anhalten" stoppt alle Sensordatenübertragungen 
