@@ -16,7 +16,7 @@
 * zeiten in analyse requirements ok?
 
 ## TODO: bruder
-* Formalia: betreuer, professor, einfach mal template angucken
+* Formalia: betreuer, professor, einfach mal template angucken;
 
 * aus den requirements alles rausziehen was eigentlich use case ist, die näher beschreiben
     - (maus, braucht zwei achsen, knöpfe)
