@@ -1,4 +1,6 @@
-
+% Abschlussbericht Softwareprojekt: PsychicFramework
+% Ulrich Bätjer; André Henniger; Markus Hempel; Arne Herdick
+% 13.2.2017
 
 # User-Guide
 Die Bedienung von App und Server wird aus Sicht unserer Beispielimplementationen erläutert.

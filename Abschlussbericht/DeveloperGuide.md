@@ -1,3 +1,7 @@
+% Developer Guide PsychicFramework
+% Ulrich Bätjer; André Henniger; Markus Hempel; Arne Herdick
+% 13.2.2017
+
 # TODO
 * Sonstiges:
     - JavaDoc einbauen
@@ -10,11 +14,8 @@
 * Einleitung.md
 * Architektur.md
     - klassendiagramm anhängen
-<<<<<<< HEAD
 * bilder fixen 
 * userguide: jar verlinken
-=======
->>>>>>> a9bf98185013bf881bb186544793a64a2d9d2428
 
 ## TODO: bruder
 * Formalia: betreuer, professor, einfach mal template angucken
