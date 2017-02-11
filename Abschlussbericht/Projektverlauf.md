@@ -9,7 +9,7 @@ In diesem Abschnitt beschreiben wir den Verlauf des Projektes und unseren Entwic
 
 ### Prototyping
 Um eine geeignete Übertragungsart der Sensordaten zu finden und vertraut mit dem Server-Client-Konzept zu werden wurden Prototypen erstellt.
-Hierbei wurden mehrere Varianten getestet: zum einem ob es besser ist Daten mit TCP oder UDP zu senden und zum anderen wurde verglichen, ob es besser ist den Server auf dem Smartphone oder auf dem PC zu betreiben.
+Hierbei wurden mehrere Varianten getestet: zum einem ob es besser ist Daten mit TCP oder UDP zu senden und zum anderen wurde verglichen, ob es besser ist den Server auf dem Smartphone oder auf dem Gerät, dass die  zu betreiben.
 
 
 ### Mouseserver & Kommunikations-Backend

@@ -14,10 +14,6 @@
 
 projektverlauf vor analyse der ergebnisse
 vorstellung der ergebnisse architektur einbauen
-ziel ein bisschen einleitung zb was sind sensordaten
-def des appnutzers in usecase (brauch nix wissen)
-anforderung entwicklerfreundlich --> gute dokumentation architektur gut erweiterbar
-technische anforderung
 lessons learned hinter projektverlauf
 projektablauf statt plan
 testen bei entwicklungsprozess --> entwicklertests & debuggen

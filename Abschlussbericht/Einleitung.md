@@ -62,7 +62,7 @@ Es sollte mit der Robotersteuerung möglich sein, ein Murmellabyrinth zu lösen.
 ## Wiederverwendbarkeit
 Da wir ein entwicklerfreundliches Framework erstellen wollten, mussten wir darauf achten dass unser Projekt nicht nur für unsere Beispiele nutzbar ist. Es sollte nicht notwendig sein, die App zu verändern, um andere Applikationen zu entwickeln. Wichtig war auch, alle möglichen Anforderungen an die Nachbearbeitung der Daten auf dem Server unterstützen zu können.
 
-Außerdem wollten wir die Anforderungen an die Endgeräte für den Server und das Handy für die App möglichst gering halten.
+Außerdem wollten wir die technischen Anforderungen an die Hardware der Endgeräte für den Server und das Handy für die App möglichst gering halten.
 
 
 ## Bedienbarkeit der App
