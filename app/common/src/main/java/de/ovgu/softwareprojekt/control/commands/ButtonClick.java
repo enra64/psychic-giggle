@@ -1,7 +1,7 @@
 package de.ovgu.softwareprojekt.control.commands;
 
 /**
- * Command class for signalling button clicks
+ * Command class for signaling button clicks
  */
 public class ButtonClick extends AbstractCommand {
     /**

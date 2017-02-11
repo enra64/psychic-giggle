@@ -2,10 +2,8 @@ package de.ovgu.softwareprojekt.control.commands;
 
 
 /**
- * Created by André on 31.01.2017.
  * Command class for hiding the reset button in SendActivity
  */
-
 public class HideReset extends AbstractCommand {
 
     /**

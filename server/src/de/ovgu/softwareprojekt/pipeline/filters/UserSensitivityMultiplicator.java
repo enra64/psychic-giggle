@@ -6,7 +6,7 @@ import de.ovgu.softwareprojekt.SensorData;
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
 
 /**
- * This class multiplies the data by the incoming user sensitivity, and forwards the data with a user sensitivity of 1
+ * This class multiplies the data by the incoming user sensitivity, and forwards the data with a user sensitivity of 1f.
  */
 public class UserSensitivityMultiplicator extends AbstractFilter {
     /**

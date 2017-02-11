@@ -6,7 +6,7 @@ import de.ovgu.softwareprojekt.SensorData;
 import de.ovgu.softwareprojekt.discovery.NetworkDevice;
 
 /**
- * This filter integrates over all previous values by adding them
+ * This filter integrates over all previous values by adding them.
  */
 public class IntegratingFilter extends AbstractFilter {
     /**

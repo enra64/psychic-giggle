@@ -9,8 +9,7 @@ import de.ovgu.softwareprojekt.discovery.NetworkDevice;
 import static java.lang.Math.abs;
 
 /**
- * This filter ignores changes in sensor data up to a certain margin to avoid shaking when trying not to move,
- * for example when pointing with a mouse
+ * This filter ignores changes in sensor data up to a certain margin, for example to avoid shaking when trying not to move a mouse.
  */
 public class MinimumAmplitudeChangeFilter extends AbstractFilter {
     /**
@@ -25,7 +24,7 @@ public class MinimumAmplitudeChangeFilter extends AbstractFilter {
     private float[] mLastValue = null;
 
     /**
-     * Create a new minimum amplitude filter.
+     * Create a new MinimumAmplitudeChangeFilter
      *
      * @param dataSink      either a valid network data sink, or null. if null, {@link #setDataSink(NetworkDataSink)}
      *                      must be called prior to starting operations.
@@ -74,7 +73,7 @@ public class MinimumAmplitudeChangeFilter extends AbstractFilter {
         // calculate and return the sum of differences between both vectors
         float change = 0;
 
-        // we are checking for both A and B length. that is a dirty hack circumventing the problems we seem to have
+        // we are checking for both A and B length
         for (int i = 0; i < dataA.length && i < dataB.length; i++)
             change += abs(dataB[i] - dataA[i]);
         return change;

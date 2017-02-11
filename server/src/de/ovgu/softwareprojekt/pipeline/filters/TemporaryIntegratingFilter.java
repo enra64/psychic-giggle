@@ -14,12 +14,14 @@ public class TemporaryIntegratingFilter extends AbstractFilter {
     /**
      * Theses are storage variables, where the sum of al previous values is stored
      */
-    private float[][] mValueStorage;
+    private float[][] mValueStorage = null;
 
     /**
      * where should the next value be stored
      */
     private int mIndex = 0;
+
+    private final int mLength;
 
     /**
      * Create a new {@link TemporaryIntegratingFilter}
@@ -30,16 +32,22 @@ public class TemporaryIntegratingFilter extends AbstractFilter {
      */
     public TemporaryIntegratingFilter(@Nullable NetworkDataSink sink, int length) {
         super(sink);
-        mValueStorage = new float[length][3];
+        mLength = length;
     }
 
     /**
-     * Add current Values to the AXES_SUM and save them in the pipeline
+     * Add current values to the storage
      *
-     * @param data current values
+     * @param origin          the network device which sent the data
+     * @param data            the current sensor data
+     * @param userSensitivity the sensitivity the user requested in his app settings for the sensor
+     *                        the data is from
      */
     @Override
     public void onData(NetworkDevice origin, SensorData data, float userSensitivity) {
+        if(mValueStorage == null)
+            mValueStorage = new float[mLength][data.data.length];
+
         // store new data
         System.arraycopy(data.data, 0, mValueStorage[mIndex++], 0, data.data.length);
 

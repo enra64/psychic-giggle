@@ -167,7 +167,7 @@ public class ConnectionWatch extends TimerTask {
 
     /**
      * This runs a single iteration of the active mode:<br>
-     * Check whether the client answered within {@link #MAXIMUM_CLIENT_RESPONSE_DELAY}ms</li>
+     * Check whether the client answered within {@link #MAXIMUM_CLIENT_RESPONSE_DELAY}ms
      * <ul>
      * <li>if it did, send next {@link ConnectionAliveCheck}</li>
      * <li>if not, notify {@link #mTimeoutListener}</li>

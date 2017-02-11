@@ -4,15 +4,12 @@
 
 # TODO
 * Sonstiges:
-* 
-    - JavaDoc einbauen
-    - PLAY STORE
-        + link zu release
-    - javadoc ist teilweise horribly out of date. wir müssen zumindest bei dem kram den die potenziell angucken korrigieren!
-    - github release mit: framework code als zip, framework als jar, beispielserver gui als jar
+* JavaDoc einbauen
+* PLAY STORE
+    - link zu release
+* github release mit: framework code als zip, framework als jar, beispielserver gui als jar
 * DeveloperGuide.md
     - how to use framework mit intellij
-* bilder fixen
 * userguide: jar verlinken
 
 
@@ -100,7 +97,7 @@ Alle Daten werden in ```SensorData```-Objekten transportiert. In ```SensorData``
 
 * ```data```: Ein ```float```-Array, in dem die [Sensorwerte](https://developer.android.com/reference/android/hardware/SensorEvent.html#values)[^4] gespeichert sind.
 * ```sensorType```: Der ```SensorType``` des [Sensors](#sensoren), der diese Daten produziert hat
-* ```timestamp```: Der [Timestamp](https://developer.android.com/reference/android/hardware/SensorEvent.html#timestamp)[^5] der Sensordaten
+* ```timestamp```: Der [Timestamp](https://developer.android.com/reference/android/hardware/SensorEvent.html#timestamp)[^5] der Sensordaten (in ns)
 
 [^4]: https://developer.android.com/reference/android/hardware/SensorEvent.html#values
 [^5]: https://developer.android.com/reference/android/hardware/SensorEvent.html#timestamp

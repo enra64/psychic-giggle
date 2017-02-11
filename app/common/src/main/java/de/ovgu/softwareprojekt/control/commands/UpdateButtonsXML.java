@@ -2,7 +2,7 @@ package de.ovgu.softwareprojekt.control.commands;
 
 /**
  * This command is used to set the buttons displayed in the app using a subset of allowed android
- * layout resource files
+ * layout resource files. See the Psychic-Framework documentation.
  */
 public class UpdateButtonsXML extends AbstractCommand {
     /**

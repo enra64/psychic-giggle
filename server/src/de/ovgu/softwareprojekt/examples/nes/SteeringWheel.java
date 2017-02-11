@@ -22,7 +22,7 @@ public class SteeringWheel implements NetworkDataSink, AccelerationPhaseDetectio
     /**
      * Constants which describe which index of sensorData.data is responsible for which axis
      */
-    private final int XAXIS = 0, YAXIS = 1, ZAXIS = 2;
+    private final int YAXIS = 1;
 
     /**
      * This button config stores the awt buttons that should be pressed on certain app button

@@ -18,9 +18,11 @@ import java.util.HashMap;
 /**
  * This class encapsulates the whole server system:
  * <p>
- * 1) A DiscoveryServer used to make clients able to find us
- * 2) A CommandConnection to be able to reliable communicate about important stuff, like enabling sensors
- * 3) A DataConnection to rapidly transmit sensor data
+ * <ol>
+ * <li>A DiscoveryServer used to make clients able to find this server</li>
+ * <li>A CommandConnection to be able to reliable communicate about important stuff, like enabling sensors</li>
+ * <li>A DataConnection to rapidly transmit sensor data</li>
+ * </ol>
  */
 @SuppressWarnings({"unused", "WeakerAccess", "SameParameterValue"})
 public abstract class AbstractPsychicServer implements
@@ -164,7 +166,7 @@ public abstract class AbstractPsychicServer implements
      * @param command the command issued
      */
     @Override
-    public void onCommand(InetAddress origin, AbstractCommand command) {
+    public final void onCommand(InetAddress origin, AbstractCommand command) {
         ClientConnection fromClient = mClientManager.getClientHandler(origin);
 
         // decide what to do with the packet
@@ -217,7 +219,7 @@ public abstract class AbstractPsychicServer implements
 
     /**
      * Called when the client manager detects a client loss.
-     * We use it to re-check whether we need to advertise the server again
+     * Used to re-check whether the server must be advertised again. This function is not to be used out of AbstractPsychicServer or modified.
      */
     @Override
     public final void onClientLoss() {
@@ -316,7 +318,8 @@ public abstract class AbstractPsychicServer implements
     }
 
     /**
-     * Add a button to be displayed on the clients
+     * Add a button to be displayed on the clients. All buttons will be displayed with the same size in a vertical
+     * LinearLayout ordered by their ID. {@link #setButtonLayout(String)} can be used to display custom layouts.
      *
      * @param name text to be displayed on the button
      * @param id   id of the button. ids below zero are reserved.
@@ -327,7 +330,7 @@ public abstract class AbstractPsychicServer implements
     }
 
     /**
-     * Remove all buttons added to the app using eithr {@link #addButton(String, int)} or {@link #setButtonLayout(String)}.
+     * Removes all buttons added to the app using either {@link #addButton(String, int)} or {@link #setButtonLayout(String)}.
      *
      * @throws IOException if a client could not be notified of a no longer required button
      */
@@ -336,7 +339,7 @@ public abstract class AbstractPsychicServer implements
     }
 
     /**
-     * Remove a button from the clients
+     * Removes a button from the clients. Only supports buttons added with {@link #addButton(String, int)}.
      *
      * @param id id of the button
      * @throws IOException if a client could not be notified of a no longer required button
@@ -346,9 +349,9 @@ public abstract class AbstractPsychicServer implements
     }
 
     /**
-     * sets mButtonXML to an incoming XML-String
+     * Sets a button layout to be displayed on all clients
      *
-     * @param xml valid android XML layout using only linear layout and button
+     * @param xml valid android XML layout using only <code>LinearLayout</code> and <code>Button</code>.
      *            if string is null ButtonMap will be used
      * @throws IOException if a client could not be notified of the new button layout
      */
@@ -357,7 +360,7 @@ public abstract class AbstractPsychicServer implements
     }
 
     /**
-     * Change the speed of a sensor. The default speed is the GAME speed.
+     * Change the speed of a sensor. The default speed is the SENSOR_DELAY_GAME speed.
      *
      * @param sensor the sensor to change
      * @param speed  the speed to use for sensor
@@ -391,10 +394,10 @@ public abstract class AbstractPsychicServer implements
     /**
      * this method sends a notification to the device which is then displayed
      *
-     * @param id            - NotificationID: should start at 0 and increases with each new notification while device is connected
-     * @param title         - title of the notification
-     * @param content       - content of the notification
-     * @param device        -  device that shall display the notification
+     * @param id      NotificationID: should start at 0 and increases with each new notification while device is connected. Has to be unique.
+     * @param title   - title of the notification
+     * @param content - content of the notification
+     * @param device  -  device that shall display the notification
      * @throws IOException if a client could not be notified of the notification that should be displayed
      */
     public void displayNotification(int id, String title, String content, NetworkDevice device) throws IOException {
@@ -404,7 +407,7 @@ public abstract class AbstractPsychicServer implements
     /**
      * Send a notification to all known devices
      *
-     * @param id      notification id. must be unique on all devices
+     * @param id      NotificationID: should start at 0 and increases with each new notification while device is connected. Has to be unique.
      * @param title   the notification title
      * @param content the notification content
      * @throws IOException if a device could not be requested to display the notification
@@ -445,7 +448,7 @@ public abstract class AbstractPsychicServer implements
      * @param hide true if the button should be hidden
      * @throws IOException is thrown if command could not be sent
      */
-    public void hideResetButton(boolean hide)throws IOException {
+    public void hideResetButton(boolean hide) throws IOException {
         mClientManager.hideResetButton(hide);
     }
 

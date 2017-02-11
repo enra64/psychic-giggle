@@ -10,9 +10,8 @@ import de.ovgu.softwareprojekt.networking.NetworkDataSource;
 import java.io.IOException;
 
 /**
- * Created by Ulrich on 29.11.2016.
  * This abstract filter implements a lot of the interface methods used by the inherited classes and
- * provides the DataSink and axes
+ * provides the DataSink. Used to create a new filter usable by the data pipeline.
  */
 public abstract class AbstractFilter implements NetworkDataSink, NetworkDataSource {
     /**
@@ -75,7 +74,7 @@ public abstract class AbstractFilter implements NetworkDataSink, NetworkDataSour
      * @param origin      the network device which sent the data
      * @param data        the sensor data
      * @param sensitivity 0-100 inclusive. unless you consciously want to modify the user sensitivity (for example, because
-     *                    you modify the data to mirror the sensitivity setting) this should just forwardData the sensitivity.
+     *                    you modify the data to mirror the sensitivity setting) this should just forward the sensitivity parameter.
      * @return true if a next pipeline element was found.
      */
     protected boolean forwardData(NetworkDevice origin, SensorData data, float sensitivity) {

@@ -86,7 +86,7 @@ public class DifferenceThresholdFilter extends AbstractFilter {
         // calculate and return the sum of differences between both vectors
         float change = 0;
 
-        // we are checking for both A and B length. that is a dirty hack circumventing the problems we seem to have
+        // we are checking for both A and B length
         for (int i = 0; i < dataA.length && i < dataB.length; i++)
             change += abs(dataB[i] - dataA[i]);
         return change;

@@ -5,11 +5,8 @@ import java.util.EnumMap;
 import de.ovgu.softwareprojekt.SensorType;
 
 /**
- * Created by Ulrich
- *
  * This commands is responsible for displaying information about the sensor usage
  */
-
 public class SensorDescription extends AbstractCommand {
 
     /**

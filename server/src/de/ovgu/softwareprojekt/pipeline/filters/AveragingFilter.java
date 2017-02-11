@@ -18,7 +18,7 @@ public class AveragingFilter extends AbstractFilter {
     private RingBuffer<float[]> mBuffer;
 
     /**
-     * Create a new average movement filter without a configured data sink.
+     * Create a new {@link AveragingFilter}  without a configured data sink.
      * {@link #setDataSink(NetworkDataSink)} must be called before operations may begin
      *
      * @param avgSampSize how many values should be used to calculate the average
@@ -29,7 +29,7 @@ public class AveragingFilter extends AbstractFilter {
     }
 
     /**
-     * A filter that uses the Average movement in order to create a smooth movement
+     * Create a new {@link AveragingFilter} with a configured data sink.
      *
      * @param avgSampSize how many values should be used to calculate the average
      * @param dataSink    either a valid network data sink, or null. if null, {@link #setDataSink(NetworkDataSink)}

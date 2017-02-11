@@ -1,21 +1,20 @@
 package de.ovgu.softwareprojekt.pipeline;
 
-import com.sun.istack.internal.Nullable;
 import de.ovgu.softwareprojekt.networking.NetworkDataSink;
-import de.ovgu.softwareprojekt.networking.NetworkDataSource;
 import de.ovgu.softwareprojekt.pipeline.filters.AbstractFilter;
 
 import java.util.LinkedList;
-import java.util.List;
 
 /**
+ * A Builder class to easily create data pipelines of any length.
+ * <p>
  * This builder class can only handle {@link de.ovgu.softwareprojekt.pipeline.filters.AbstractFilter}
  * subclasses, for it shall have an unified interface to chain the elements.
  */
 @SuppressWarnings({"unused", "WeakerAccess"})
 public class FilterPipelineBuilder {
     /**
-     * This is where we store
+     * Pipeline element storage
      */
     private LinkedList<AbstractFilter> mPipelineElements = new LinkedList<>();
 
@@ -82,11 +81,15 @@ public class FilterPipelineBuilder {
     /**
      * Chain the listed {@link AbstractFilter} pipeline elements
      *
-     * @return head of the pipeline, or null if no elements were added
+     * @return head of the pipelinec
      */
     public NetworkDataSink build() {
         for (int i = 1; i < mPipelineElements.size(); i++)
             mPipelineElements.get(i - 1).setDataSink(mPipelineElements.get(i));
+
+        if(mPipelineElements.size() == 0)
+            return null;
+
         return mPipelineElements.get(0);
     }
 
@@ -94,11 +97,15 @@ public class FilterPipelineBuilder {
      * Chain the given pipeline elements, putting a {@link NetworkDataSink} as the last element
      *
      * @param lastElement the final element to receive data from this pipeline
-     * @return head of the pipeline
+     * @return head of the pipeline, or null if no elements were added
      */
     public NetworkDataSink build(NetworkDataSink lastElement) {
         for (int i = 1; i < mPipelineElements.size(); i++)
             mPipelineElements.get(i - 1).setDataSink(mPipelineElements.get(i));
+
+        if(mPipelineElements.size() == 0)
+            return null;
+
         mPipelineElements.getLast().setDataSink(lastElement);
         return mPipelineElements.get(0);
     }

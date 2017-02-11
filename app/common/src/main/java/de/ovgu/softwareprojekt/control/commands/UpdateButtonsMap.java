@@ -8,14 +8,14 @@ import java.util.Map;
  */
 public class UpdateButtonsMap extends AbstractCommand {
     /**
-     * The (psychic button id -> button text) mapping used for creating the buttons
+     * The (psychic button id {@literal ->} button text) mapping used for creating the buttons
      */
     public Map<Integer, String> buttons;
 
     /**
      * Create a new {@link UpdateButtonsMap} command
      *
-     * @param buttons the (psychic button id -> button text) mapping used for creating the buttons
+     * @param buttons the (psychic button id {@literal ->} button text) mapping used for creating the buttons
      */
     public UpdateButtonsMap(Map<Integer, String> buttons) {
         super(CommandType.UpdateButtonsMap);
