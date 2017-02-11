@@ -42,7 +42,7 @@ Eine akzeptable Grenze für die Latenz festzulegen war schwierig, da Latenzen im
 Ein dritter Parameter für die Verbindungsqualität ist der Jitter, das heißt wie sehr sich die Periodizität der ankommenden Sensordaten von der Periodizität der gesendeten Sensordaten unterscheidet. Je geringer der Jitter ist, desto besser ist die Verbindung. Unsere einzige Anforderung an diesen Aspekt der Verbindung war, dass sich kein Jitter bemerkbar macht.
 
 ## Maussteuerung
-Zusätzlich zu den Anforderungen an die Netzwerkparameter, die flüssige und direkte Steuerung des Cursors garantieren sollen, muss die Maus zumindest auch einen Links- und Rechtsklick zur Verfügung stellen, um eine normale Maus zu emulieren.
+Zusätzlich zu den Anforderungen an die Netzwerkparameter, die flüssige und direkte Bewegung des Cursors auf dem Bildschirm garantieren sollen, muss die Maus zumindest auch einen Links- und Rechtsklick zur Verfügung stellen, um eine normale Maus zu emulieren.
 
 ## Spielsteuerung
 Um die Anforderungen an die Spielbarkeit festzulegen, haben wir die Zeiten einiger Läufe mit nativen Controllern auf der ersten Karte des Spiels, "Mario Circuit 1", gemessen. Dadurch hatten wir einen Vergleichswert von 1:20, die wir mit unserem Controller mindestens erreichen wollten, so dass dieser einem nativen Controller ähnlich ist.
@@ -54,7 +54,7 @@ Um die Itemmechanik von "Super Mario Kart" zu unterstützen, wollten wir lineare
 Da wir den Mehrspielermodus des Spiels ebenfalls nutzen wollten, musste die Verbindung mehrerer Clients zur gleichen Zeit unterstützt werden.
 
 ## Robotersteuerung
-Die Robotersteuerung stellte keine Anforderungen, die nicht bereits durch die Maussteuerung und der Spielsteuerung gestellt wurden, da die Anforderungen an Latenz und Frequenz nicht höher sind, und Buttons auch schon von der Maus- und Spielsteuerung benötigt werden.
+Es sollte mit der Robotersteuerung möglich sein, ein Murmellabyrinth zu lösen. Abgesehen davon stellte die Steuerung keine Anforderungen, die nicht bereits durch die Maussteuerung und der Spielsteuerung gestellt wurden, da die Anforderungen an Latenz und Frequenz nicht höher sind, und Buttons auch schon von der Maus- und Spielsteuerung benötigt werden.
 
 
 ## Wiederverwendbarkeit
@@ -72,25 +72,23 @@ Aus den Requirements ist ein Client-Server-Framework entstanden. Die Clients lau
 
 \newpage
 ## Frequenz
-![Frequenz-Ergebnisgraph](frequenz_ergebnisgraph.png)
+![Frequenz-Ergebnisgraph (y-Achse in `ns`, x-Achse Messungen seit Beginn)](frequenz_ergebnisgraph.png)
 
-Die y-Achse ist in Nanosekunden angegeben, die x-Achse gibt die Nummer der Messung seit ihrem Beginn an. Die blaue Linie gibt die Differenz zwischen den Ankunftszeiten der Sensordaten auf dem Server an. Die gelbe Linie ist der Durchschnitt dieser Zeiten, und die rote Linie im Hintergrund ist die Differenz zwischen den Zeitstempeln der Sensordaten.
+Die blaue Linie gibt die Differenz zwischen den Ankunftszeiten der Sensordaten auf dem Server an. Die gelbe Linie ist der Durchschnitt dieser Zeiten, und die rote Linie im Hintergrund ist die Differenz zwischen den Zeitstempeln der Sensordaten.
 
 Wie zu sehen ist, beträgt der durchschnittliche zeitliche Abstand zwischen Sensordaten ungefähr 20ms, was in einer Frequenz von 50Hz resultiert. Da 50Hz unsere Anforderung von 30 Sensordaten pro Sekunde deutlich überschreitet, sehen wir unsere Anforderung an die Updatefrequenz als mehr als erfüllt an.
 
 \newpage
 ## Latenz
-![RTT-Ergebnisgraph](rtt_ergebnisgraph.png)
+![RTT-Ergebnisgraph (y-Achse in `ms`, x-Achse Messungen seit Beginn)](rtt_ergebnisgraph.png)
 
-Die y-Achse ist in Millisekunden angegeben, die x-Achse gibt die Nummer der Messung seit ihrem Beginn an. Die blaue Linie ist die Round-Trip-Time zwischen Server und Client für ein Kontrollpaket, dass vom Server geschickt wird und vom Client sofort beantwortet wird. Die gestrichelte grüne Linie ist der Mittelwert der RTTs. Wir haben die RTT als Messwert verwendet, damit wir uns nicht auf eine schwierige und potenziell ungenaue Uhrensynchronisation auf Server und Client verlassen müssen.
+Die blaue Linie ist die Round-Trip-Time zwischen Server und Client für ein Kontrollpaket, dass vom Server geschickt wird und vom Client sofort beantwortet wird. Die gestrichelte grüne Linie ist der Mittelwert der RTTs. Wir haben die RTT als Messwert verwendet, damit wir uns nicht auf eine schwierige und potenziell ungenaue Uhrensynchronisation auf Server und Client verlassen müssen.
 
 Wie zu sehen ist, liegt die durchschnittliche Round-Trip-Time bei 50ms; die Latenz zwischen Generierung der Sensordaten auf Clients und Eintreffem auf dem Server wird dementsprechend ungefähr bei 25 Millisekunden liegen. Wir sehen unsere Anforderung an die Latenz damit erfüllt.
 
 \newpage
 ## Jitter
-![Jitter](jitter_ergebnisgraph.png)
-
-Die y-Achse ist in Millisekunden angegeben. Die x-Achse gibt die Nummer der Messung seit ihrem Beginn an.
+![Jitter (y-Achse in `ms`, x-Achse Messungen seit Beginn)](jitter_ergebnisgraph.png)
 
 Die blaue Linie gibt den Betrag der Differenz zwischen den Periodizitäten der Sensordaten auf dem Server in Millisekunden an, die gestrichelte grüne Linie den durchschnittlichen Betrag des Jitters. Wie zu sehen ist, liegt der Betrag durchschnittlich bei ungefähr 3ms und zumeist unter 5ms.
 

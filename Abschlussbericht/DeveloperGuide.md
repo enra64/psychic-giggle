@@ -12,9 +12,6 @@
     - how to use framework mit intellij
 * userguide: jar verlinken
 
-institut
-titelseite ohne nummer mit logo
-keine 3 inhaltsverzeichnisunterpunkte
 projektverlauf vor analyse der ergebnisse
 vorstellung der ergebnisse architektur einbauen
 ziel: app ist bestandteil von framework
@@ -23,7 +20,6 @@ entwickler statt implementierer
 def des appnutzers in usecase (brauch nix wissen)
 statt lag verzögerung
 maus auf bildschirm bewegen bei maussteuerung
-robotetrsteuerung anforderung erwähnen was die tun soll
 anforderung entwicklerfreundlich --> gute dokumentation architektur gut erweiterbar
 technische anforderung 
 vlt nicht nur pc da ja auf allen javafähigen geräten
@@ -35,9 +31,8 @@ anforderungen an steuerung -->wurde erfolgreich umgesetzt
 projektablauf statt plan
 testen bei entwicklungsprozess --> entwicklertests & debuggen
 entwicklungsprozess in projektverlauf
-selbsorganisierendes team
+selbstorganisierendes team
 lessons learned ausformulieren auch gute erfahrungen zb auch ohne projektleiter etc oder mehr testen/architektur
-eigenständigkeitserklärung unterschrift
 
 
 # Entwickleranleitung für das Psychic-Framework
