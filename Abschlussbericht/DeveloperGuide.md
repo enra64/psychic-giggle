@@ -22,19 +22,19 @@ projektverlauf vor analyse der ergebnisse
 vorstellung der ergebnisse architektur einbauen
 ziel: app ist bestandteil von framework
 ziel ein bisschen einleitung zb was sind sensordaten und app einbauen
-entwickler statt implementierer
-def des appnutzers in usecase (brauch nix wissen)
-statt lag verzögerung
-maus auf bildschirm bewegen bei maussteuerung
-robotetrsteuerung anforderung erwähnen was die tun soll
+<del>entwickler statt implementierer</del>
+<del>def des appnutzers in usecase (brauch nix wissen)</del>
+<del>statt lag verzögerung</del>
+<del>maus auf bildschirm bewegen bei maussteuerung</del>
+<del>robotetrsteuerung anforderung erwähnen was die tun soll</del>
 anforderung entwicklerfreundlich --> gute dokumentation architektur gut erweiterbar
 technische anforderung 
 vlt nicht nur pc da ja auf allen javafähigen geräten
 lessons learned hinter projektverlauf
 screenshot bei bedienbarkeit
 einheiten an diagramme
-unterpunkt verbindungsqzualität in analyse
-anforderungen an steuerung -->wurde erfolgreich umgesetzt
+<del>unterpunkt verbindungsqzualität in analyse</del>
+<del>anforderungen an steuerung -->wurde erfolgreich umgesetzt</del>
 projektablauf statt plan
 testen bei entwicklungsprozess --> entwicklertests & debuggen
 entwicklungsprozess in projektverlauf
