@@ -10,7 +10,7 @@ Die Bedienung von App und Server wird aus Sicht unserer Beispielimplementationen
 - Handy mit Android (__mindestens 4.4__) und der [PsychicSensors-App](https://play.google.com/store/apps/details?id=de.ovgu.softwareprojektapp)[^1]
 - javafähiges Gerät (__mindestens JRE8__) um Server zu betreiben
 - Server-Jar befindet sich auf dem Gerät
-- Netzwerkverbindung (WLAN) zwischen Server und App
+- Netzwerkverbindung zwischen Server und App
 
 [^1]: https://play.google.com/store/apps/details?id=de.ovgu.softwareprojektapp
 
@@ -92,7 +92,7 @@ Terminal Befehl: `java –jar server.jar nes`
 ### KUKA LBR iiwa 7 r800
 Terminal Befehl: `java –jar server.jar vrep`
 
-- Kuka Roboter "KUKA LBR iiwa 7 r800" oder entsprechende Simulationssoftware (V-REP) ist erforderlich
+- Kuka Roboter "KUKA LBR iiwa 7 r800" oder entsprechende Simulationssoftware (V-REP) ist erforderlich und muss gestartet sein
 - Marble-Labyrinth-Control: Roboter steht in vordefinierter Position, zu bewegen ist nur das vorderste Gelenk
 - alternativ: mit den Button "Wechsel zwischen Murmelmodus und Gelenkkontrolle" lässt sich jedes der Gelenke auswählen und einzeln bewegen
 - "Sensor anhalten" stoppt alle Sensordatenübertragungen

@@ -3,53 +3,31 @@
 \newpage
 
 # TODO
-* Sonstiges:
-* 
-    - JavaDoc einbauen
-    - PLAY STORE
-        + link zu release
-    - javadoc ist teilweise horribly out of date. wir müssen zumindest bei dem kram den die potenziell angucken korrigieren!
-    - github release mit: framework code als zip, framework als jar, beispielserver gui als jar
+* PLAY STORE
+    - link zu release
+* github release mit: framework code als zip, framework als jar, beispielserver gui als jar
 * DeveloperGuide.md
     - how to use framework mit intellij
-* bilder fixen
 * userguide: jar verlinken
 
-institut
-titelseite ohne nummer mit logo
-keine 3 inhaltsverzeichnisunterpunkte
 projektverlauf vor analyse der ergebnisse
 vorstellung der ergebnisse architektur einbauen
-ziel: app ist bestandteil von framework
-ziel ein bisschen einleitung zb was sind sensordaten und app einbauen
-entwickler statt implementierer
-def des appnutzers in usecase (brauch nix wissen)
-statt lag verzögerung
-maus auf bildschirm bewegen bei maussteuerung
-robotetrsteuerung anforderung erwähnen was die tun soll
-anforderung entwicklerfreundlich --> gute dokumentation architektur gut erweiterbar
-technische anforderung 
-vlt nicht nur pc da ja auf allen javafähigen geräten
 lessons learned hinter projektverlauf
-screenshot bei bedienbarkeit
-einheiten an diagramme
-unterpunkt verbindungsqzualität in analyse
-anforderungen an steuerung -->wurde erfolgreich umgesetzt
 projektablauf statt plan
 testen bei entwicklungsprozess --> entwicklertests & debuggen
 entwicklungsprozess in projektverlauf
-selbsorganisierendes team
+selbstorganisierendes team
 lessons learned ausformulieren auch gute erfahrungen zb auch ohne projektleiter etc oder mehr testen/architektur
-eigenständigkeitserklärung unterschrift
 
 
 # Entwickleranleitung für das Psychic-Framework
-Das Psychic-Framework bezeichnet eine Kombination aus einer App und einem Serverframework mit einem gemeinsamen Kern. Dieses Framework dient der schnellen und einfachen Entwicklung von PC-Applikationen, die Sensordaten von Android-Geräten verwenden möchten. Im Folgenden stellen wir die wichtigsten Funktionen des Frameworks vor.
+Das Psychic-Framework bezeichnet eine Kombination aus einer App und einem Serverframework mit einem gemeinsamen Kern. Dieses Framework dient der schnellen und einfachen Entwicklung von Java-Applikationen, die Sensordaten von Android-Geräten verwenden möchten. Im Folgenden stellen wir die wichtigsten Funktionen des Frameworks vor.
 
 
 ## JavaDoc
-Eine komplette JavaDoc ist ebenfalls verfügbar unter TODO
+Eine komplette JavaDoc ist ebenfalls verfügbar unter `docs/docs server mit common` oder [in unserem GitHub-Repository](https://github.com/enra64/psychic-giggle/tree/master/abgabefolder/docs%20server%20mit%20common)[^22].
 
+[^22]: https://github.com/enra64/psychic-giggle/tree/master/abgabefolder/docs%20server%20mit%20common
 
 ## Grundlegende Verwendung:
 Es gibt zwei Möglichkeiten einen Server zu implementieren: Entweder wird ```AbstractPsychicServer``` erweitert, oder ein ```PsychicServer``` wird instanziiert.
@@ -127,7 +105,7 @@ Alle Daten werden in ```SensorData```-Objekten transportiert. In ```SensorData``
 
 * ```data```: Ein ```float```-Array, in dem die [Sensorwerte](https://developer.android.com/reference/android/hardware/SensorEvent.html#values)[^4] gespeichert sind.
 * ```sensorType```: Der ```SensorType``` des [Sensors](#sensoren), der diese Daten produziert hat
-* ```timestamp```: Der [Timestamp](https://developer.android.com/reference/android/hardware/SensorEvent.html#timestamp)[^5] der Sensordaten
+* ```timestamp```: Der [Timestamp](https://developer.android.com/reference/android/hardware/SensorEvent.html#timestamp)[^5] der Sensordaten (in ns)
 
 [^4]: https://developer.android.com/reference/android/hardware/SensorEvent.html#values
 [^5]: https://developer.android.com/reference/android/hardware/SensorEvent.html#timestamp

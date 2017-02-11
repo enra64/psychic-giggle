@@ -3,17 +3,11 @@
 # go to script folder so relative paths are ok
 cd "$(dirname "$0")"
 
-echo COPYING SOURCE
+mkdir release
 
-mkdir -p "release"
+echo COPYING jars
+cp *.jar release
 
-# 
+zip -r release/docs.zip "docs app mit common" "docs server mit common"
 
-mkdir -p "abgabe/source"
-
-# copy common to server
-rsync -a --progress ../app/common/src/main/java/de/ovgu/softwareprojekt/ abgabe/source/server/src/de/ovgu/softwareprojekt/ --exclude "*build*"
-
-# server without build files
-rsync -a --progress ../server abgabe/source/server --exclude "*build*"
-
+zip -r release/server.zip release_src

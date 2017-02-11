@@ -1,7 +1,6 @@
 
 # Lessons learned
-Es ist deutlich effektiver sich gemeinsam zu festen Zeiten zu treffen, um zusammen zu arbeiten als allein. 
-Dadurch haben wir direktes Feedback zu neuen Ideen und deren Umsetzungen von den anderen Teammitgliedern bekommen. 
-Pairprogramming erlaubt Diskussionen und konstruktive Lösungen von neuen Problemen durch andere zu erhalten.
-Uns fiel es schwer Grenzwerte für messbare Requirements zu erstellen, die das Projekt beschreiben.
-Ein frühzeitiges Festlegen des deployment formats verhindert die Benutzung von Softwarearchitekturen, die eine spätere Bereitstellung der Software erschweren.
+Uns ist aufgefallen, dass es deutlich effektiver ist sich gemeinsam zu festen Zeiten zu treffen, um gemeinsam zu arbeiten, als allein. 
+Da wir uns dazu entschieden haben, dieses Projekt als selbstorganisierendes Team ohne Projektleiter durchzuführen, war Pairprogramming sehr hilfreich um direktes Feedback zu neuen Ideen und deren Umsetzungen von den anderen Teammitgliedern zu bekommen.
+Vor Beginn des Projektes hätten wir uns mehr Gedanken über die Organisationsform und Beispielimplementationen machen sollen, damit dies nicht während der Bearbeitung geschieht.
+
