@@ -1,82 +1,83 @@
 % Abschlussbericht Softwareprojekt: PsychicFramework
-% Ulrich Bätjer; Markus Hempel; André Henniger; Arne Herdick
+% Ulrich BÃ¤tjer; Markus Hempel; AndrÃ© Henniger; Arne Herdick
 \newpage
 
 # Ziel
-Das Ziel des Projekts war die Erstellung eines Frameworks zur Nutzung von Sensordaten von Androidgeräten auf javafähigen Endgeräten. 
-Um dieses Ziel als erfüllt zu sehen, galt es, die Demonstration der Funktionalität dieses Frameworks anhand von drei Beispielanwendungen zu zeigen.
+Das Ziel des Projekts war die Erstellung eines Frameworks zur Nutzung von Sensordaten von AndroidgerÃ¤ten auf javafÃ¤higen EndgerÃ¤ten. 
+Um dieses Ziel als erfÃ¼llt zu sehen, galt es, die Demonstration der FunktionalitÃ¤t dieses Frameworks anhand von drei Beispielanwendungen zu zeigen.
 Bei den Beispielanwendungen handelt es sich um eine Maussteuerung, eine Spielsteuerung und die Bedienung eines Murmellabyrinthes mithilfe eines Roboters. 
-Damit die Sensordaten an einen Server, welcher unser Framework umsetzt, geschickt werden können, war es nötig eine App zu entwickeln.
-Bei den Sensordaten handelt es sich um unverarbeitete Daten, welche von Sensoren, wie dem Gyroskop oder dem Lichtsensor, Android-fähiger Handys erfasst werden können.
-Mit dem von uns erstellten Framework soll Drittpersonen die Umsetzung von Projekten, die Sensordaten auf Endgeräten benötigen, erheblich erleichtert werden.
+Damit die Sensordaten an einen Server, welcher unser Framework umsetzt, geschickt werden kÃ¶nnen, war es nÃ¶tig eine App zu entwickeln.
+Bei den Sensordaten handelt es sich um unverarbeitete Daten, welche von Sensoren, wie dem Gyroskop oder dem Lichtsensor, Android-fÃ¤higer Handys erfasst werden kÃ¶nnen.
+Mit dem von uns erstellten Framework soll Drittpersonen die Umsetzung von Projekten, die Sensordaten auf EndgerÃ¤ten benÃ¶tigen, erheblich erleichtert werden.
 
 
 # Usecase-Analyse
 ![Usecase-Diagramm](finalUse.png)
 
-Der App-Benutzer verwendet die App und einen vom Entwickler vorgefertigten Server, um Sensordaten auf eine bestimmte Art zu verwenden. Der Entwickler nutzt das Framework, um einen Server mit gewünschter Funktionalität umzusetzen, der dann von App-Benutzern verwendet werden kann. Hierzu muss das Senden und Empfangen der Sensordaten über eine Verbindung zwischen App und Server sowie das Verarbeiten dieser Daten berücksichtig werden. Zur Demonstration dienen eine Maussteuerung, eine Robotersteuerung und ein Gamepad zur Spielsteuerung.
-Der App-Benutzer benötigt lediglich die Psychic-Sensors App auf seinem Handy und muss sich um nichts weiter kümmern, außer des Startens eines Psychic-Servers auf einem Endgerät.
+Der App-Benutzer verwendet die App und einen vom Entwickler vorgefertigten Server, um Sensordaten auf eine bestimmte Art zu verwenden. Der Entwickler nutzt das Framework, um einen Server mit gewÃ¼nschter FunktionalitÃ¤t umzusetzen, der dann von App-Benutzern verwendet werden kann. Hierzu muss das Senden und Empfangen der Sensordaten Ã¼ber eine Verbindung zwischen App und Server sowie das Verarbeiten dieser Daten berÃ¼cksichtig werden. Zur Demonstration dienen eine Maussteuerung, eine Robotersteuerung und ein Gamepad zur Spielsteuerung.
+Der App-Benutzer benÃ¶tigt lediglich die Psychic-Sensors App auf seinem Handy und muss sich um nichts weiter kÃ¼mmern, auÃŸer des Startens eines Psychic-Servers auf einem EndgerÃ¤t.
 
-Die Maussteuerung soll eine normale Computer-Maus ersetzen können. Das beinhaltet das Bewegen des Cursors sowie Links- und Rechtsklick.
+Die Maussteuerung soll eine normale Computer-Maus ersetzen kÃ¶nnen. Das beinhaltet das Bewegen des Cursors sowie Links- und Rechtsklick.
 
-Die Robotersteuerung ist eine Proof-Of-Concept-Anwendung, die ermöglichen soll, mithilfe eines KUKA LBR iiwa 7 R800 ein Murmellabyrinth zu lösen. Ein Beispiel für ein solches Labyrinth findet man in der [Wikimedia Commons](https://de.wikipedia.org/wiki/Datei:PuzzleOfDexterity.jpg)[^1]. Das Murmellabyrinth soll dabei an der Werkzeugposition des Roboters befestigt sein, zum Beispiel mit einem Greifer. 
+Die Robotersteuerung ist eine Proof-Of-Concept-Anwendung, die ermÃ¶glichen soll, mithilfe eines KUKA LBR iiwa 7 R800 ein Murmellabyrinth zu lÃ¶sen. Ein Beispiel fÃ¼r ein solches Labyrinth findet man in der [Wikimedia Commons](https://de.wikipedia.org/wiki/Datei:PuzzleOfDexterity.jpg)[^1]. Das Murmellabyrinth soll dabei an der Werkzeugposition des Roboters befestigt sein, zum Beispiel mit einem Greifer. 
 
-Die Spielsteuerung sollte demonstrieren, dass es mit unserer Implementation möglich ist, Spiele zu steuern, die schnelle Reaktionen erfordern und dass unterschiedliche Sensortypen benutzt werden können. Wir haben uns für einen Controller für "Super Mario Kart" der Spielekonsole "Super Nintendo Entertainment System" entschieden. In diesem Spiel ist es erforderlich den gesteuerten Charakter nach Links und Rechts bewegen zu können. Außerdem gibt es die Möglichkeit Items zu werfen, und es gibt einen Mehrspielermodus. Wir haben uns für dieses Spiel aufgrund der geringen Zahl benötigter Buttons entschieden, weil es ohne haptisches Feedback schwierig ist Knöpfe zu treffen und sich auf das Spiel zu konzentrieren.
+Die Spielsteuerung sollte demonstrieren, dass es mit unserer Implementation mÃ¶glich ist, Spiele zu steuern, die schnelle Reaktionen erfordern und dass unterschiedliche Sensortypen benutzt werden kÃ¶nnen. Wir haben uns fÃ¼r einen Controller fÃ¼r "Super Mario Kart" der Spielekonsole "Super Nintendo Entertainment System" entschieden. In diesem Spiel ist es erforderlich den gesteuerten Charakter nach Links und Rechts bewegen zu kÃ¶nnen. AuÃŸerdem gibt es die MÃ¶glichkeit Items zu werfen, und es gibt einen Mehrspielermodus. Wir haben uns fÃ¼r dieses Spiel aufgrund der geringen Zahl benÃ¶tigter Buttons entschieden, weil es ohne haptisches Feedback schwierig ist KnÃ¶pfe zu treffen und sich auf das Spiel zu konzentrieren.
 
 
 [^1]: https://de.wikipedia.org/wiki/Datei:PuzzleOfDexterity.jpg
 
 
 # Anforderungen
-Die zur Demonstration dienenden Anwendungen stellen schwer zu definierende Anforderungen an die Latenz und Frequenz der Sensordaten. Wir haben versucht, uns beim Festlegen der Grenzwerte auf bekannte Geräte zu beziehen, die keine Probleme bei der Bedienbarkeit haben. Im folgenden werden die von uns aufgestellten Anforderungen definiert.
+Die zur Demonstration dienenden Anwendungen stellen schwer zu definierende Anforderungen an die Latenz und Frequenz der Sensordaten. Wir haben versucht, uns beim Festlegen der Grenzwerte auf bekannte GerÃ¤te zu beziehen, die keine Probleme bei der Bedienbarkeit haben. Im folgenden werden die von uns aufgestellten Anforderungen definiert.
 
 
-## Verbindungsqualität
+## VerbindungsqualitÃ¤t
 
 ### Frequenz
-Um eine Mindestanforderung für die Frequenz der Übertragung festzulegen, haben wir uns an Spielen für Konsolen orientiert, da diese vermutlich ähnliche Anforderungen an Reaktionsgeschwindigkeit stellen wie unsere Beispielimplementationen. Spiele scheinen auf aktuellen Konsolen, zum Beispiel der Xbox One und der PS4, mit mindestens 30 Bildern pro Sekunde zu laufen, siehe zum Beispiel [diese Publikation von Ubisoft](http://blog.ubi.com/watch-dogs-next-gen-game-resolution-dynamism/)[^2]. Deshalb haben wir die zu unterstützende Mindestfrequenz auf 30 Sensordaten pro Sekunde festgelegt.
+Um eine Mindestanforderung fÃ¼r die Frequenz der Ãœbertragung festzulegen, haben wir uns an Spielen fÃ¼r Konsolen orientiert, da diese vermutlich Ã¤hnliche Anforderungen an Reaktionsgeschwindigkeit stellen wie unsere Beispielimplementationen. Spiele scheinen auf aktuellen Konsolen, zum Beispiel der Xbox One und der PS4, mit mindestens 30 Bildern pro Sekunde zu laufen, siehe zum Beispiel [diese Publikation von Ubisoft](http://blog.ubi.com/watch-dogs-next-gen-game-resolution-dynamism/)[^2]. Deshalb haben wir die zu unterstÃ¼tzende Mindestfrequenz auf 30 Sensordaten pro Sekunde festgelegt.
 
 [^2]: http://blog.ubi.com/watch-dogs-next-gen-game-resolution-dynamism/
 
 ### Latenz
-Eine akzeptable Grenze für die Latenz festzulegen war schwierig, da Latenzen im Millisekundenbereich schwer zu messen sind und keine klare Grenze zu akzeptablen Latenzen existiert. Wir haben daher versucht, uns über die Latenzen professionell hergestellter kabelloser Eingabegeräte zu informieren. Leider ist auch das schwierig, da Hersteller dazu meist keine Informationen veröffentlichen. Um dennoch eine maximale Latenz festlegen zu können, haben wir die Eingabeverzögerung von Konsolen untersucht. In [diesem Artikel von www.eurogamer.net](http://www.eurogamer.net/articles/digitalfoundry-lag-factor-article?page=2)[^3] werden die in Spielen auftretenden Eingabeverzögerungen untersucht. Zwischen den Spielen wurde eine Differenz von mehr als 50ms festgestellt. Da auch die Spiele mit höherer Eingabeverzögerung bedienbar sind, sollte eine Latenz unter diesem Wert keine Probleme verursachen.
+Eine akzeptable Grenze fÃ¼r die Latenz festzulegen war schwierig, da Latenzen im Millisekundenbereich schwer zu messen sind und keine klare Grenze zu akzeptablen Latenzen existiert. Wir haben daher versucht, uns Ã¼ber die Latenzen professionell hergestellter kabelloser EingabegerÃ¤te zu informieren. Leider ist auch das schwierig, da Hersteller dazu meist keine Informationen verÃ¶ffentlichen. Um dennoch eine maximale Latenz festlegen zu kÃ¶nnen, haben wir die EingabeverzÃ¶gerung von Konsolen untersucht. In [diesem Artikel von www.eurogamer.net](http://www.eurogamer.net/articles/digitalfoundry-lag-factor-article?page=2)[^3] werden die in Spielen auftretenden EingabeverzÃ¶gerungen untersucht. Zwischen den Spielen wurde eine Differenz von mehr als 50ms festgestellt. Da auch die Spiele mit hÃ¶herer EingabeverzÃ¶gerung bedienbar sind, sollte eine Latenz unter diesem Wert keine Probleme verursachen.
 
 [^3]: http://www.eurogamer.net/articles/digitalfoundry-lag-factor-article?page=2
 
 ### Jitter
-Ein dritter Parameter für die Verbindungsqualität ist der Jitter, das heißt wie sehr sich die Periodizität der ankommenden Sensordaten von der Periodizität der gesendeten Sensordaten unterscheidet. Je geringer der Jitter ist, desto besser ist die Verbindung. Unsere einzige Anforderung an diesen Aspekt der Verbindung war, dass sich kein Jitter bemerkbar macht.
+Ein dritter Parameter fÃ¼r die VerbindungsqualitÃ¤t ist der Jitter, das heiÃŸt wie sehr sich die PeriodizitÃ¤t der ankommenden Sensordaten von der PeriodizitÃ¤t der gesendeten Sensordaten unterscheidet. Je geringer der Jitter ist, desto besser ist die Verbindung. Unsere einzige Anforderung an diesen Aspekt der Verbindung war, dass sich kein Jitter bemerkbar macht.
 
-## Maussteuerung
-Zusätzlich zu den Anforderungen an die Netzwerkparameter, die flüssige und direkte Bewegung des Maus-Cursors auf dem Bildschirm garantieren sollen, muss die Maus zumindest auch einen Links- und Rechtsklick zur Verfügung stellen, um eine normale Maus zu emulieren.
+## Anforderungen der Steuerungen
+### Maussteuerung
+ZusÃ¤tzlich zu den Anforderungen an die Netzwerkparameter, die flÃ¼ssige und direkte Bewegung des Maus-Cursors auf dem Bildschirm garantieren sollen, muss die Maus zumindest auch einen Links- und Rechtsklick zur VerfÃ¼gung stellen, um eine normale Maus zu emulieren.
 
-## Spielsteuerung
-Um die Anforderungen an die Spielbarkeit festzulegen, haben wir die Zeiten einiger Läufe mit nativen Controllern auf der ersten Karte des Spiels, "Mario Circuit 1", gemessen. Dadurch hatten wir einen Vergleichswert von 1:20, die wir mit unserem Controller mindestens erreichen wollten, so dass dieser einem nativen Controller ähnlich ist.
+### Spielsteuerung
+Um die Anforderungen an die Spielbarkeit festzulegen, haben wir die Zeiten einiger LÃ¤ufe mit nativen Controllern auf der ersten Karte des Spiels, "Mario Circuit 1", gemessen. Dadurch hatten wir einen Vergleichswert von 1:20, die wir mit unserem Controller mindestens erreichen wollten, so dass dieser einem nativen Controller Ã¤hnlich ist.
 
-Außerdem sollte die Anordnung der Buttons in etwa dem nativen Controller entsprechen, weshalb ein flexibles Layouting vom Server aus möglich sein muss.
+AuÃŸerdem sollte die Anordnung der Buttons in etwa dem nativen Controller entsprechen, weshalb ein flexibles Layouting vom Server aus mÃ¶glich sein muss.
 
-Um die Itemmechanik von "Super Mario Kart" zu unterstützen, wollten wir lineare Bewegungen in einer separaten Achse auswerten, was die gleichzeitige Nutzung mehrerer Sensoren erforderte.
+Um die Itemmechanik von "Super Mario Kart" zu unterstÃ¼tzen, wollten wir lineare Bewegungen in einer separaten Achse auswerten, was die gleichzeitige Nutzung mehrerer Sensoren erforderte.
 
-Da wir den Mehrspielermodus des Spiels ebenfalls nutzen wollten, musste die Verbindung mehrerer Clients zur gleichen Zeit unterstützt werden.
+Da wir den Mehrspielermodus des Spiels ebenfalls nutzen wollten, musste die Verbindung mehrerer Clients zur gleichen Zeit unterstÃ¼tzt werden.
 
-## Robotersteuerung
-Es sollte mit der Robotersteuerung möglich sein, ein Murmellabyrinth zu lösen. Abgesehen davon stellte die Steuerung keine Anforderungen, die nicht bereits durch die Maussteuerung und der Spielsteuerung gestellt wurden, da die Anforderungen an Latenz und Frequenz nicht höher sind, und Buttons auch schon von der Maus- und Spielsteuerung benötigt werden.
+### Robotersteuerung
+Es sollte mit der Robotersteuerung mÃ¶glich sein, ein Murmellabyrinth zu lÃ¶sen. Abgesehen davon stellte die Steuerung keine Anforderungen, die nicht bereits durch die Maussteuerung und der Spielsteuerung gestellt wurden, da die Anforderungen an Latenz und Frequenz nicht hÃ¶her sind, und Buttons auch schon von der Maus- und Spielsteuerung benÃ¶tigt werden.
 
 
 ## Wiederverwendbarkeit
-Da wir ein entwicklerfreundliches Framework erstellen wollten, mussten wir darauf achten dass unser Projekt nicht nur für unsere Beispiele nutzbar ist. Es sollte nicht notwendig sein, die App zu verändern, um andere Applikationen zu entwickeln. Wichtig war auch, alle möglichen Anforderungen an die Nachbearbeitung der Daten auf dem Server unterstützen zu können.
-Des Weiteren ist für die Entwicklerfreundlichkeit wichtig über eine gute Code-Dokumentation zu verfügen sowie die Software-Architektur leicht erweitern zu können.
+Da wir ein entwicklerfreundliches Framework erstellen wollten, mussten wir darauf achten dass unser Projekt nicht nur fÃ¼r unsere Beispiele nutzbar ist. Es sollte nicht notwendig sein, die App zu verÃ¤ndern, um andere Applikationen zu entwickeln. Wichtig war auch, alle mÃ¶glichen Anforderungen an die Nachbearbeitung der Daten auf dem Server unterstÃ¼tzen zu kÃ¶nnen.
+Des Weiteren ist fÃ¼r die Entwicklerfreundlichkeit wichtig Ã¼ber eine gute Code-Dokumentation zu verfÃ¼gen sowie die Software-Architektur leicht erweitern zu kÃ¶nnen.
 
-Außerdem wollten wir die Anforderungen an die Endgeräte für den Server und das Handy für die App möglichst gering halten.
+AuÃŸerdem wollten wir die Anforderungen an die EndgerÃ¤te fÃ¼r den Server und das Handy fÃ¼r die App mÃ¶glichst gering halten.
 
 
-## Bedienbarkeit
-Die App sollte möglichst benutzerfreundlich erstellt sein. Das bedeutete für uns, möglichst wenig Konfiguration vom Nutzer zu fordern.
+## Bedienbarkeit der App
+Die App sollte mÃ¶glichst benutzerfreundlich erstellt sein. Das bedeutete fÃ¼r uns, mÃ¶glichst wenig Konfiguration vom Nutzer zu fordern.
 
 
 # Analyse unserer Ergebnisse
-Aus den Requirements ist ein Client-Server-Framework entstanden. Die Clients laufen in einer App auf Android-Geräten, und die Server sind Java-Anwendungen auf Endgeräten. Mit unserem Framework können andere Entwickler einfach Daten nutzen, die die Clients mithilfe ihrer Sensoren generieren und dann an den Server schicken, indem sie eine Java-Klasse erweitern. Im Folgenden stellen wir unsere Ergebnisse kurz vor und vergleichen sie mit den gestellten Requirements.
+Aus den Requirements ist ein Client-Server-Framework entstanden. Die Clients laufen in einer App auf Android-GerÃ¤ten, und die Server sind Java-Anwendungen auf EndgerÃ¤ten. Mit unserem Framework kÃ¶nnen andere Entwickler einfach Daten nutzen, die die Clients mithilfe ihrer Sensoren generieren und dann an den Server schicken, indem sie eine Java-Klasse erweitern. Im Folgenden stellen wir unsere Ergebnisse kurz vor und vergleichen sie mit den gestellten Requirements.
 
-## Verbindungsqualität
+## VerbindungsqualitÃ¤t
 
 \newpage
 ### Frequenz
@@ -84,45 +85,45 @@ Aus den Requirements ist ein Client-Server-Framework entstanden. Die Clients lau
 
 Die blaue Linie gibt die Differenz zwischen den Ankunftszeiten der Sensordaten auf dem Server an. Die gelbe Linie ist der Durchschnitt dieser Zeiten, und die rote Linie im Hintergrund ist die Differenz zwischen den Zeitstempeln der Sensordaten.
 
-Wie zu sehen ist, beträgt der durchschnittliche zeitliche Abstand zwischen Sensordaten ungefähr 20ms, was in einer Frequenz von 50Hz resultiert. Da 50Hz unsere Anforderung von 30 Sensordaten pro Sekunde deutlich überschreitet, sehen wir unsere Anforderung an die Updatefrequenz als mehr als erfüllt an.
+Wie zu sehen ist, betrÃ¤gt der durchschnittliche zeitliche Abstand zwischen Sensordaten ungefÃ¤hr 20ms, was in einer Frequenz von 50Hz resultiert. Da 50Hz unsere Anforderung von 30 Sensordaten pro Sekunde deutlich Ã¼berschreitet, sehen wir unsere Anforderung an die Updatefrequenz als mehr als erfÃ¼llt an.
 
 \newpage
 ### Latenz
 ![RTT-Ergebnisgraph (y-Achse in `ms`, x-Achse Messungen seit Beginn)](rtt_ergebnisgraph.png)
 
-Die y-Achse ist in Millisekunden angegeben, die x-Achse gibt die Nummer der Messung seit ihrem Beginn an. Die blaue Linie ist die Round-Trip-Time zwischen Server und Client für ein Kontrollpaket, dass vom Server geschickt wird und vom Client sofort beantwortet wird. Die gestrichelte grüne Linie ist der Mittelwert der RTTs. Wir haben die RTT als Messwert verwendet, damit wir uns nicht auf eine schwierige und potenziell ungenaue Uhrensynchronisation auf Server und Client verlassen müssen.
+Die y-Achse ist in Millisekunden angegeben, die x-Achse gibt die Nummer der Messung seit ihrem Beginn an. Die blaue Linie ist die Round-Trip-Time zwischen Server und Client fÃ¼r ein Kontrollpaket, dass vom Server geschickt wird und vom Client sofort beantwortet wird. Die gestrichelte grÃ¼ne Linie ist der Mittelwert der RTTs. Wir haben die RTT als Messwert verwendet, damit wir uns nicht auf eine schwierige und potenziell ungenaue Uhrensynchronisation auf Server und Client verlassen mÃ¼ssen.
 
-Wie zu sehen ist, liegt die durchschnittliche Round-Trip-Time bei 50ms; die Latenz zwischen Generierung der Sensordaten auf Clients und Eintreffem auf dem Server wird dementsprechend ungefähr bei 25 Millisekunden liegen. Wir sehen unsere Anforderung an die Latenz damit erfüllt.
+Wie zu sehen ist, liegt die durchschnittliche Round-Trip-Time bei 50ms; die Latenz zwischen Generierung der Sensordaten auf Clients und Eintreffem auf dem Server wird dementsprechend ungefÃ¤hr bei 25 Millisekunden liegen. Wir sehen unsere Anforderung an die Latenz damit erfÃ¼llt.
 
 \newpage
 ### Jitter
 ![Jitter (y-Achse in `ms`, x-Achse Messungen seit Beginn)](jitter_ergebnisgraph.png)
 
-Die blaue Linie gibt den Betrag der Differenz zwischen den Periodizitäten der Sensordaten auf dem Server in Millisekunden an, die gestrichelte grüne Linie den durchschnittlichen Betrag des Jitters. Wie zu sehen ist, liegt der Betrag durchschnittlich bei ungefähr 3ms und zumeist unter 5ms.
+Die blaue Linie gibt den Betrag der Differenz zwischen den PeriodizitÃ¤ten der Sensordaten auf dem Server in Millisekunden an, die gestrichelte grÃ¼ne Linie den durchschnittlichen Betrag des Jitters. Wie zu sehen ist, liegt der Betrag durchschnittlich bei ungefÃ¤hr 3ms und zumeist unter 5ms.
 
-In der Praxis waren diese Differenzen sowie die seltenen Spitzen nie zu spüren. Da die Zeitstempel der Sensordaten ermöglichen es außerdem, verspätete Pakete zu ignorieren. Insofern stellt Jitter für uns kein Problem dar.
+In der Praxis waren diese Differenzen sowie die seltenen Spitzen nie zu spÃ¼ren. Da die Zeitstempel der Sensordaten ermÃ¶glichen es auÃŸerdem, verspÃ¤tete Pakete zu ignorieren. Insofern stellt Jitter fÃ¼r uns kein Problem dar.
 
-## Anforderungen der drei Steuerungen
+## Anforderungen der Steuerungen
 Alle von uns geplanten Steuerungen wurden erfolgreich umgesetzt.
-Unsere Anforderungen an die Netzwerkverbindungsqualität haben die Mindestanforderungen der drei Beispielimplementationen erreicht oder übertroffen, da die Steuerungen keine Probleme mit schlechten Reaktionszeiten zeigen.
+Unsere Anforderungen an die NetzwerkverbindungsqualitÃ¤t haben die Mindestanforderungen der drei Beispielimplementationen erreicht oder Ã¼bertroffen, da die Steuerungen keine Probleme mit schlechten Reaktionszeiten zeigen.
 
 ### Maussteuerung
-Mit den Buttons in der App ist es möglich, alle Funktionen einer einfachen Maus zu ersetzen: Man kann die Maus bewegen, auf Elemente des Bildschirms klicken, und klicken und ziehen, so dass auch das Scrollen durch Inhalte problemlos möglich ist. 
+Mit den Buttons in der App ist es mÃ¶glich, alle Funktionen einer einfachen Maus zu ersetzen: Man kann die Maus bewegen, auf Elemente des Bildschirms klicken, und klicken und ziehen, so dass auch das Scrollen durch Inhalte problemlos mÃ¶glich ist. 
 
 ### Spielsteuerung
-Nach ein wenig Eingewöhnungszeit ist es uns mit unserem Controller routinemäßig gelungen, die geforderten 1:20 zu unterbieten; es ist außerdem möglich, den Zwei-Spieler-Modus mit zwei Handys zu spielen. Die Itemwurfmechanik wird ebenfalls sowohl für rückwärts als auch für vorwärtsgewandte Würfe unterstützt. 
+Nach ein wenig EingewÃ¶hnungszeit ist es uns mit unserem Controller routinemÃ¤ÃŸig gelungen, die geforderten 1:20 zu unterbieten; es ist auÃŸerdem mÃ¶glich, den Zwei-Spieler-Modus mit zwei Handys zu spielen. Die Itemwurfmechanik wird ebenfalls sowohl fÃ¼r rÃ¼ckwÃ¤rts als auch fÃ¼r vorwÃ¤rtsgewandte WÃ¼rfe unterstÃ¼tzt. 
 
 ### Robotersteuerung
-Da wir unsere Steuerung leider nur in der Simulationsumgebung von V-REP testen können, können wir die erfolgreiche Lösung eines Murmellabyrinthes nicht testen. Wir gehen jedoch aufgrund unserer Erfahrungen mit der Maus- und Spielsteuerung sowie den Ergebnissen der Simulation davon aus, dass es möglich ist, ein Murmellabyrinth mit unserer Robotersteuerung zu lösen.
+Da wir unsere Steuerung leider nur in der Simulationsumgebung von V-REP testen kÃ¶nnen, kÃ¶nnen wir die erfolgreiche LÃ¶sung eines Murmellabyrinthes nicht testen. Wir gehen jedoch aufgrund unserer Erfahrungen mit der Maus- und Spielsteuerung sowie den Ergebnissen der Simulation davon aus, dass es mÃ¶glich ist, ein Murmellabyrinth mit unserer Robotersteuerung zu lÃ¶sen.
 
 ## Wiederverwendbarkeit
 Letztlich ist es sehr einfach geworden, einen neuen Server zu implementieren, und es existiert eine umfassende Dokumentation sowie drei Beispiele, die bei einer neuen Implementation zu Hilfe stehen.
-Mit unserer Unterstützung fast aller Sensoren sowie flexibler Buttonlayouts können unterschiedlichste Anwendungen entwickelt werden. Durch unsere Wahl Javas als Implementationssprache laufen Server auf Windows, Linux und Apple-Geräten, die JDK 8 oder höher installiert haben. Um die Verbindung zu einem Handy aufzubauen, müssen sich Server und Client im gleichen WLAN-Netzwerk mit Zwischenclientkommunikation befinden, ein Zustand, der in den meisten Heimnetzwerken gegeben ist. Alle Android-Geräte mit Unterstützung für API-Level 19, also Geräte mit mindestens Android 4.4 können die PsychicSensors-App installieren und werden somit als Client unterstützt.
+Mit unserer UnterstÃ¼tzung fast aller Sensoren sowie flexibler Buttonlayouts kÃ¶nnen unterschiedlichste Anwendungen entwickelt werden. Durch unsere Wahl Javas als Implementationssprache laufen Server auf Windows, Linux und Apple-GerÃ¤ten, die JDK 8 oder hÃ¶her installiert haben. Um die Verbindung zu einem Handy aufzubauen, mÃ¼ssen sich Server und Client im gleichen WLAN-Netzwerk mit Zwischenclientkommunikation befinden, ein Zustand, der in den meisten Heimnetzwerken gegeben ist. Alle Android-GerÃ¤te mit UnterstÃ¼tzung fÃ¼r API-Level 19, also GerÃ¤te mit mindestens Android 4.4 kÃ¶nnen die PsychicSensors-App installieren und werden somit als Client unterstÃ¼tzt.
 
-Da wir uns gegen eine native Implementation von Eingabemethoden, zum Beispiel über Blutooth HID-Profile, entschieden haben, ist der Entwickler nur durch die Java-Umgebung beschränkt, so lange er die gewünschten Funktionen nicht in einer nativen Programmiersprache umsetzt.
+Da wir uns gegen eine native Implementation von Eingabemethoden, zum Beispiel Ã¼ber Blutooth HID-Profile, entschieden haben, ist der Entwickler nur durch die Java-Umgebung beschrÃ¤nkt, so lange er die gewÃ¼nschten Funktionen nicht in einer nativen Programmiersprache umsetzt.
 
-Wir sehen daher unsere Anforderung an das Framework, nicht nur von uns genutzt werden zu können, als erfüllt an.
+Wir sehen daher unsere Anforderung an das Framework, nicht nur von uns genutzt werden zu kÃ¶nnen, als erfÃ¼llt an.
 
 ## Bedienbarkeit der App
 Das User Interface der App ist recht minimalistisch gehalten. Mit einem Knopfdruck werden Server gesucht, mit einem weiteren wird die Verbindung zu einem der gefundenen Server aufgebaut.
-Es ist dem Nutzer möglich, eine Empfindlichkeit für die Sensoren festzulegen, die der Server dann je nach Anwendung interpretieren kann. Falls der Standard-Discovery-Port auf dem Endgerät auf dem der Server läuft blockiert ist, kann dieser in der App geändert werden. Insgesamt erfüllt die App unsere Anforderungen an den Client, auch für gelegentliche Nutzer verständlich zu sein, sehr gut.
+Es ist dem Nutzer mÃ¶glich, eine Empfindlichkeit fÃ¼r die Sensoren festzulegen, die der Server dann je nach Anwendung interpretieren kann. Falls der Standard-Discovery-Port auf dem EndgerÃ¤t auf dem der Server lÃ¤uft blockiert ist, kann dieser in der App geÃ¤ndert werden. Insgesamt erfÃ¼llt die App unsere Anforderungen an den Client, auch fÃ¼r gelegentliche Nutzer verstÃ¤ndlich zu sein, sehr gut.
