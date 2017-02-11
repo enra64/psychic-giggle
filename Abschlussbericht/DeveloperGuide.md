@@ -16,22 +16,16 @@ projektverlauf vor analyse der ergebnisse
 vorstellung der ergebnisse architektur einbauen
 ziel: app ist bestandteil von framework
 ziel ein bisschen einleitung zb was sind sensordaten und app einbauen
-entwickler statt implementierer
-def des appnutzers in usecase (brauch nix wissen)
-statt lag verzögerung
-maus auf bildschirm bewegen bei maussteuerung
 anforderung entwicklerfreundlich --> gute dokumentation architektur gut erweiterbar
 technische anforderung 
 vlt nicht nur pc da ja auf allen javafähigen geräten
 lessons learned hinter projektverlauf
 screenshot bei bedienbarkeit
 einheiten an diagramme
-unterpunkt verbindungsqzualität in analyse
-anforderungen an steuerung -->wurde erfolgreich umgesetzt
 projektablauf statt plan
 testen bei entwicklungsprozess --> entwicklertests & debuggen
 entwicklungsprozess in projektverlauf
-selbstorganisierendes team
+selbsorganisierendes team
 lessons learned ausformulieren auch gute erfahrungen zb auch ohne projektleiter etc oder mehr testen/architektur
 
 

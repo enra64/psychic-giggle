@@ -10,7 +10,7 @@ Die Bedienung von App und Server wird aus Sicht unserer Beispielimplementationen
 - Handy mit Android (__mindestens 4.4__) und der [PsychicSensors-App](https://play.google.com/store/apps/details?id=de.ovgu.softwareprojektapp)[^1]
 - javafähiges Gerät (__mindestens JRE8__) um Server zu betreiben
 - Server-Jar befindet sich auf dem Gerät
-- Netzwerkverbindung (WLAN) zwischen Server und App
+- Netzwerkverbindung zwischen Server und App
 
 [^1]: https://play.google.com/store/apps/details?id=de.ovgu.softwareprojektapp
 
