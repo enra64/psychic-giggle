@@ -1,5 +1,5 @@
 % Anleitung für Nutzer des PsychicFramework
-% Ulrich Bätjer; André Henniger; Markus Hempel; Arne Herdick
+% Ulrich Bätjer; Markus Hempel; André Henniger; Arne Herdick
 \newpage
 
 # User-Guide
