@@ -27,7 +27,7 @@ ziel ein bisschen einleitung zb was sind sensordaten und app einbauen
 <del>statt lag verzögerung</del>
 <del>maus auf bildschirm bewegen bei maussteuerung</del>
 <del>robotetrsteuerung anforderung erwähnen was die tun soll</del>
-anforderung entwicklerfreundlich --> gute dokumentation architektur gut erweiterbar
+<del>anforderung entwicklerfreundlich --> gute dokumentation architektur gut erweiterbar</del>
 technische anforderung 
 vlt nicht nur pc da ja auf allen javafähigen geräten
 lessons learned hinter projektverlauf
