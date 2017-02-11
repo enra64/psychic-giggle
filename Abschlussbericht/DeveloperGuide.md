@@ -3,8 +3,6 @@
 \newpage
 
 # TODO
-* Sonstiges:
-* JavaDoc einbauen
 * PLAY STORE
     - link zu release
 * github release mit: framework code als zip, framework als jar, beispielserver gui als jar
@@ -27,8 +25,9 @@ Das Psychic-Framework bezeichnet eine Kombination aus einer App und einem Server
 
 
 ## JavaDoc
-Eine komplette JavaDoc ist ebenfalls verfügbar unter TODO
+Eine komplette JavaDoc ist ebenfalls verfügbar unter `docs/docs server mit common` oder [in unserem GitHub-Repository](https://github.com/enra64/psychic-giggle/tree/master/abgabefolder/docs%20server%20mit%20common)[^22].
 
+[^22]: https://github.com/enra64/psychic-giggle/tree/master/abgabefolder/docs%20server%20mit%20common
 
 ## Grundlegende Verwendung:
 Es gibt zwei Möglichkeiten einen Server zu implementieren: Entweder wird ```AbstractPsychicServer``` erweitert, oder ein ```PsychicServer``` wird instanziiert.
