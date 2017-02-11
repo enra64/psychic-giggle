@@ -1,9 +1,20 @@
 
 \newpage
-# Projektverlauf
-In diesem Abschnitt beschreiben wir den Verlauf des Projektes und unseren Entwicklungsprozess.
+# Projektverlauf & Entwicklungsprozess
+Zur Bearbeitung des Projekts haben wir uns als selbstorganisierenden Team zusammengefunden.
 
-## Projektplan
+Wir haben uns Meilensteine gesetzt, die das Gesamtprojekt in Etappen aufgeteilt haben.
+Aus den Use Cases der momentanen Projektetappe wurden nötige Funktionalitäten und Subfunktionalitäten abgeleitet.
+Diese wurden in anfangs in JIRA als Issues hinzugefügt. Hierbei waren Dringlichkeit im Projektverlauf und Länge der Bestandszeit Kriterien der Reihenfolge der Abarbeitung der Issues.
+Eine konkrete Aufteilung der Aufgaben gab es nicht. Jedes Teammitglied hat sich eine anstehende Aufgabe ausgesucht und diese dann bearbeitet.
+
+Kurz nachdem die Issues in für den dritten Meilenstein in JIRA eingetragen wurden, waren diese bereits abgearbeitet. 
+Danach wurden diese nur noch erweitert und stabilisiert, so dass die Organisation durch JIRA nicht mehr benötigt wurde.
+
+Die Funktionalität wurde durch Entwicklertests kontrolliert. Beim Auftreten von Fehlern wurden diese vermerkt und durch Debugging behoben.
+Fehlende Funktionalitäten wurden als Issue hinzugefügt und nach oben genannten Kriterien abgearbeitet.
+
+## Projektablauf
 ![Entwicklungszeitstrahl](Timeline.png)
 
 
@@ -27,10 +38,7 @@ Zur Lösung eines Murmellabyrinths mit Hilfe des Gravitationsensors des Smartpho
 
 
 
-## Entwicklungsprozess
+## Entwicklungswerkzeuge
 Zur Entwicklung der Applikation wurde Android Studio und zur Entwicklung des Servers wurde IntelliJ IDEA verwendet. Als Version Control System diente Git.
 
-Aus am Anfang erstellten Use Cases wurden benötigte Funktionen und Subfunktionen abgeleitet. Diese wurden anfangs in JIRA eingetragen und nach und nach abgearbeitet.
-Bei Auftreten eines Problems oder einer fehlenden Funktionalität wurde ein neuer Issue erstellt und hinzugefügt.
 
-Wir haben uns keine Aufteilung der Aufgaben festgelegt. Issues wurden nach ihrer Dringlichkeit im Projektverlauf und der Länge ihrer Bestandszeit geordnet abgearbeitet.
