@@ -1,4 +1,4 @@
-% Abschlussbericht Softwareprojekt: PsychicFramework
+% Anleitung für Nutzer des PsychicFramework
 % Ulrich Bätjer; André Henniger; Markus Hempel; Arne Herdick
 \newpage
 
@@ -7,18 +7,19 @@ Die Bedienung von App und Server wird aus Sicht unserer Beispielimplementationen
 
 
 ## Was benötigt wird: 
-- Handy mit Android (__mindestens 4.4__) 
-- javafähiges Gerät (__mindestens Java 8__) um Server darzustellen
+- Handy mit Android (__mindestens 4.4__) und der [PsychicSensors-App](https://play.google.com/store/apps/details?id=de.ovgu.softwareprojektapp)[^1]
+- javafähiges Gerät (__mindestens JRE8__) um Server zu betreiben
 - Server-Jar befindet sich auf dem Gerät
-- Die App "PsychicSensors" ist auf dem Handy installiert
 - Netzwerkverbindung (WLAN) zwischen Server und App
 
+[^1]: https://play.google.com/store/apps/details?id=de.ovgu.softwareprojektapp
 
 ## Server starten:
 Ein beliebiger Beispiel-Server kann mittels GUI gestartet werden. Alternativ kann auch ein spezifischer Beispiel-Server
 über die Konsole mittels `java –jar server.jar <mouse|kuka|nes>` gestartet werden.
 
 
+\newpage
 ## App starten:
 
 - App starten und auf "Server suchen" drücken
@@ -31,6 +32,7 @@ Ein beliebiger Beispiel-Server kann mittels GUI gestartet werden. Alternativ kan
 2. Server
 3. Server suchen
 
+\newpage
 ## Einstellungen:
 Hier lassen sich Name des Gerätes, benutzter Discovery Port und je nach gewählter Anwendung die Sensibilität der benutzbaren Sensoren des Handys einstellen (ist keine Anwendung gewählt, können alle Sensoren eingestellt werden).
 
@@ -42,21 +44,21 @@ Hier lassen sich Name des Gerätes, benutzter Discovery Port und je nach gewähl
 4. Verwendungszweck des Sensors
 5. Optionen verlassen
 
-
+\newpage
 ## GUI:
 Die GUI kann mit einem Doppelklick auf `server.jar` gestartet werden, alternativ auch über die Konsole mit `java –jar server.jar`. Die GUI ist nur für die 3 implementierten Beispielanwendungen erstellt worden, Nutzer unseres Frameworks müssen also eventuelle grafische Oberflächen selber implementieren.
 
 ![GUI](Screenshots/GUI.png){ width=300px }
 
-1. Maus Server starten
-2. Controller Server starten
-3. KUKA Server starten
+1. Maus-Server starten
+2. Controller-Server starten
+3. KUKA-Server-starten
 4. Aktuellen Server beenden
 5. Feld für Serverinformationen
 
 
+\newpage
 ## Anwendungen:
-
 ### Maussteuerung:
 Terminal Befehl: `java –jar server.jar mouse`
 
@@ -73,7 +75,6 @@ Terminal Befehl: `java –jar server.jar mouse`
 4. Rücksetzfunktion
 5. Sensordatenübertragung pausieren
 
-
 ### Controller:
 Terminal Befehl: `java –jar server.jar nes`
 
@@ -89,19 +90,17 @@ Terminal Befehl: `java –jar server.jar nes`
 - die Buttons der App emulieren entsprechend der config Datei Tasten von einer Tastatur
 - "Sensor anhalten" stoppt alle Sensordatenübertragungen 
 
-
-
 ### KUKA LBR iiwa 7 r800
 Terminal Befehl: `java –jar server.jar vrep`
 
-- Kuka Roboter "KUKA LBR iiwa 7 r800" oder entsprechende Simulationssoftware (vrep) ist erforderlich 
+- Kuka Roboter "KUKA LBR iiwa 7 r800" oder entsprechende Simulationssoftware (V-REP) ist erforderlich
 - Marble-Labyrinth-Control: Roboter steht in vordefinierter Position, zu bewegen ist nur das vorderste Gelenk
 - alternativ: mit den Button "Wechsel zwischen Murmelmodus und Gelenkkontrolle" lässt sich jedes der Gelenke auswählen und einzeln bewegen
 - "Sensor anhalten" stoppt alle Sensordatenübertragungen
 
 
 ### Weitere Anwendungen
-Weitere Anwendungen und Tutorials müssen durch die Entwickler, die das Psychic-Framework benutzen, bereitgestellt werden
+Weitere Anwendungen und deren Anleitungen müssen durch die Entwickler, die das Psychic-Framework benutzen, bereitgestellt werden.
 
 
 ## Bekannte Probleme:

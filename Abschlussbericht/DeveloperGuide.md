@@ -4,6 +4,7 @@
 
 # TODO
 * Sonstiges:
+* 
     - JavaDoc einbauen
     - PLAY STORE
         + link zu release
@@ -14,6 +15,7 @@
 * bilder fixen
 * userguide: jar verlinken
 * zeiten in analyse requirements ok?
+* murmellabyrinth-bild einbauen?
 
 ## TODO: bruder
 * Formalia: betreuer, professor, einfach mal template angucken;
@@ -163,12 +165,17 @@ Layout-String, wie er in der App angezeigt wird:
 
 * ```android:text=""``` enthält den vom Button dargestellten Text
 * ```android:id=""``` ist die ID, die an den Server übertragen wird, und dort mithilfe von ```ButtonClick.getId()``` abgefragt werden kann
-* ```android:layout_weight=""``` wird direkt für den Button gesetzt. Genaue Informationen sind in der [Android-Dokumentation](https://developer.android.com/guide/topics/ui/layout/linear.html#Weight) zu finden.
+* ```android:layout_weight=""``` wird direkt für den Button gesetzt. Genaue Informationen sind in der [Android-Dokumentation](https://developer.android.com/guide/topics/ui/layout/linear.html#Weight)[^1] zu finden.
+
+[^1]: https://developer.android.com/guide/topics/ui/layout/linear.html#Weight
 
 `LinearLayout`Elemente unterstützen ausschließlich die folgenden Attribute:
 
-* ```android:layout_weight=""``` wird direkt für das Layout gesetzt. Genaue Informationen sind in der [Android-Dokumentation](https://developer.android.com/guide/topics/ui/layout/linear.html#Weight) zu finden.
-* ```android:orientation=""``` wird direkt für das Layout gesetzt. Genaue Informationen sind in der [Android-Dokumentation](https://developer.android.com/reference/android/widget/LinearLayout.html#attr_android:orientation) zu finden.
+* ```android:layout_weight=""``` wird direkt für das Layout gesetzt. Genaue Informationen sind in der [Android-Dokumentation](https://developer.android.com/guide/topics/ui/layout/linear.html#Weight)[^2] zu finden.
+* ```android:orientation=""``` wird direkt für das Layout gesetzt. Genaue Informationen sind in der [Android-Dokumentation](https://developer.android.com/reference/android/widget/LinearLayout.html#attr_android:orientation)[^3] zu finden.
+
+[^2]: https://developer.android.com/guide/topics/ui/layout/linear.html#Weight
+[^3]: https://developer.android.com/reference/android/widget/LinearLayout.html#attr_android:orientation
 
 Bei Verwendung von ```setButtonLayout(String)``` werden alle durch ```addButton(String, int)``` hinzugefügten Buttons entfernt und bei
 Verwendung von ```addButton(String, int)``` wird das durch ```setButtonLayout``` erstellte Layout entfernt.
@@ -265,10 +272,12 @@ Das Psychic-Framework ist darauf ausgerichtet, dass Sensordaten mithilfe einer P
 ### Format der Sensordaten: SensorData
 Alle Daten werden in ```SensorData```-Objekten transportiert. In ```SensorData```-Objekten sind folgende Informationen enthalten:
 
-* ```data```: Ein ```float```-Array, in dem die [Sensorwerte](https://developer.android.com/reference/android/hardware/SensorEvent.html#values) gespeichert sind.
+* ```data```: Ein ```float```-Array, in dem die [Sensorwerte](https://developer.android.com/reference/android/hardware/SensorEvent.html#values)[^4] gespeichert sind.
 * ```sensorType```: Der ```SensorType``` des [Sensors](#sensoren), der diese Daten produziert hat
-* ```timestamp```: Der [Timestamp](https://developer.android.com/reference/android/hardware/SensorEvent.html#timestamp) der Sensordaten
+* ```timestamp```: Der [Timestamp](https://developer.android.com/reference/android/hardware/SensorEvent.html#timestamp)[^5] der Sensordaten
 
+[^4]: https://developer.android.com/reference/android/hardware/SensorEvent.html#values
+[^5]: https://developer.android.com/reference/android/hardware/SensorEvent.html#timestamp
 
 ### NetworkDataSink
 Das ```NetworkDataSink```-Interface muss implementiert werden, wenn eine Klasse Daten aus der Pipeline erhalten soll. Es beinhaltet zwei Funktionen:
@@ -286,7 +295,6 @@ Das ```NetworkDataSource```-Interface muss von Klassen implementiert werden, die
 
 * ```close()```: Die Instanz wird nicht mehr benötigt, und sollte alle Ressourcen schließen.
 * ```setDataSink(NetworkDataSink)```: Alle Daten, die von der ```NetworkDataSource``` erzeugt wurden, müssen an die hier erhaltene ```NetworkDataSink``` geleitet werden.
-
 
 ### Sensoren
 Folgende Sensoren werden unterstützt:
@@ -307,28 +315,37 @@ Folgende Sensoren werden unterstützt:
 * RelativeHumidity
 * RotationVector
 
-Diese Liste ist synonym mit dem ```SensorType```-Enum. Enthalten sind alle Sensoren, deren [reporting mode](https://source.android.com/devices/sensors/report-modes.html) ```continuous``` oder ```on-change``` ist und die bis spätestens API-Level 19 unterstützt wurden.
+Diese Liste ist synonym mit dem ```SensorType```-Enum. Enthalten sind alle Sensoren, deren [reporting mode](https://source.android.com/devices/sensors/report-modes.html)[^6] ```continuous``` oder ```on-change``` ist und die bis spätestens API-Level 19 unterstützt wurden.
 
+
+[^6]: https://source.android.com/devices/sensors/report-modes.html
 
 #### Maximalwerte
 Die Maximalwerte der Sensoren können mithilfe von ```getSensorMaximumRange(SensorType)``` für alle verbundenen Geräte oder mit ```getSensorMaximumRange(SensorType, NetworkDevice)``` für ein spezielles Gerät abgefragt werden.
 
-<a href="https://developer.android.com/reference/android/hardware/Sensor.html#getMaximumRange()">Siehe auch die Android-Dokumentation hierzu.</a>
+[Siehe auch die Android-Dokumentation hierzu.](https://developer.android.com/reference/android/hardware/Sensor.html#getMaximumRange())[^11]
+
+[^11]: https://developer.android.com/reference/android/hardware/Sensor.html#getMaximumRange()
 
 
 #### Update-Frequenz
 Die Update-Frequenz der Android-Sensoren kann mithilfe von ```setSensorSpeed()``` gesetzt werden, unterstützt sind die folgenden Werte:
 
-* [SENSOR_DELAY_FASTEST](https://developer.android.com/reference/android/hardware/SensorManager.html#SENSOR_DELAY_FASTEST)
-* [SENSOR_DELAY_GAME](https://developer.android.com/reference/android/hardware/SensorManager.html#SENSOR_DELAY_GAME)
-* [SENSOR_DELAY_NORMAL](https://developer.android.com/reference/android/hardware/SensorManager.html#SENSOR_DELAY_NORMAL)
-* [SENSOR_DELAY_UI](https://developer.android.com/reference/android/hardware/SensorManager.html#SENSOR_DELAY_UI)
+* [SENSOR_DELAY_FASTEST](https://developer.android.com/reference/android/hardware/SensorManager.html#SENSOR_DELAY_FASTEST)[^7]
+* [SENSOR_DELAY_GAME](https://developer.android.com/reference/android/hardware/SensorManager.html#SENSOR_DELAY_GAME)[^8]
+* [SENSOR_DELAY_NORMAL](https://developer.android.com/reference/android/hardware/SensorManager.html#SENSOR_DELAY_NORMAL)[^9]
+* [SENSOR_DELAY_UI](https://developer.android.com/reference/android/hardware/SensorManager.html#SENSOR_DELAY_UI)[^10]
+
+[^7]: https://developer.android.com/reference/android/hardware/SensorManager.html#SENSOR_DELAY_FASTEST
+[^8]: https://developer.android.com/reference/android/hardware/SensorManager.html#SENSOR_DELAY_GAME
+[^9]: https://developer.android.com/reference/android/hardware/SensorManager.html#SENSOR_DELAY_NORMAL
+[^10]: https://developer.android.com/reference/android/hardware/SensorManager.html#SENSOR_DELAY_UI
 
 
 #### Beschreibungen anzeigen
-Es ist mit ```sendSensorDescription(SensorType, String)``` möglich, erweiterte Beschriftungen für die Nutzung der Sensoren anzeigen zu lassen, um dem Nutzer die Zuordnung von Sensor zu Funktion zu vereinfachen.
+Es ist mit ```sendSensorDescription(SensorType, String)``` möglich, erweiterte Beschriftungen für die Nutzung der Sensoren anzeigen zu lassen, um dem Nutzer die Zuordnung von Sensor zu Funktion zu vereinfachen. In Abbildung \ref{ex_desc} ist das Ergebnis eines solchen Aufrufs dargestellt.
 
-![Beispielhafte Beschreibung](SensorDescription.png)
+![Beispielhafte Beschreibung\label{ex_desc}](SensorDescription.png)
 
 ### Filter
 Filter sind Pipeline-Elemente, die erhaltene Daten bearbeiten und dann weiterleiten, zum Beispiel einen Tiefpassfilter. Um neue Filter zu erstellen sollte ```AbstractFilter``` erweitert werden; alle folgenden Beschreibungen beziehen sich auf diese Klasse.
