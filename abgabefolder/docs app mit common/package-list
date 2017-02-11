@@ -1,0 +1,11 @@
+de.ovgu.softwareprojekt
+de.ovgu.softwareprojekt.control
+de.ovgu.softwareprojekt.control.commands
+de.ovgu.softwareprojekt.discovery
+de.ovgu.softwareprojekt.misc
+de.ovgu.softwareprojektapp
+de.ovgu.softwareprojektapp.activities
+de.ovgu.softwareprojektapp.activities.send
+de.ovgu.softwareprojektapp.networking
+de.ovgu.softwareprojektapp.sensors
+de.ovgu.softwareprojektapp.sensors.implementations

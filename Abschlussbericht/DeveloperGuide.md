@@ -4,43 +4,32 @@
 
 # TODO
 * Sonstiges:
-* 
-    - JavaDoc einbauen
-    - PLAY STORE
-        + link zu release
-    - javadoc ist teilweise horribly out of date. wir müssen zumindest bei dem kram den die potenziell angucken korrigieren!
-    - github release mit: framework code als zip, framework als jar, beispielserver gui als jar
+* JavaDoc einbauen
+* PLAY STORE
+    - link zu release
+* github release mit: framework code als zip, framework als jar, beispielserver gui als jar
 * DeveloperGuide.md
     - how to use framework mit intellij
-* bilder fixen
 * userguide: jar verlinken
 
-institut
-titelseite ohne nummer mit logo
-keine 3 inhaltsverzeichnisunterpunkte
 projektverlauf vor analyse der ergebnisse
 vorstellung der ergebnisse architektur einbauen
-ziel: app ist bestandteil von framework
-ziel ein bisschen einleitung zb was sind sensordaten und app einbauen
-<del>entwickler statt implementierer</del>
-<del>def des appnutzers in usecase (brauch nix wissen)</del>
-<del>statt lag verzögerung</del>
-<del>maus auf bildschirm bewegen bei maussteuerung</del>
-<del>robotetrsteuerung anforderung erwähnen was die tun soll</del>
+ziel ein bisschen einleitung zb was sind sensordaten
+def des appnutzers in usecase (brauch nix wissen)
+maus auf bildschirm bewegen bei maussteuerung
 <del>anforderung entwicklerfreundlich --> gute dokumentation architektur gut erweiterbar</del>
 technische anforderung 
 vlt nicht nur pc da ja auf allen javafähigen geräten
 lessons learned hinter projektverlauf
 screenshot bei bedienbarkeit
 einheiten an diagramme
-<del>unterpunkt verbindungsqzualität in analyse</del>
-<del>anforderungen an steuerung -->wurde erfolgreich umgesetzt</del>
+unterpunkt verbindungsqzualität in analyse
+anforderungen an steuerung -->wurde erfolgreich umgesetzt
 projektablauf statt plan
 testen bei entwicklungsprozess --> entwicklertests & debuggen
 entwicklungsprozess in projektverlauf
-selbsorganisierendes team
+selbstorganisierendes team
 lessons learned ausformulieren auch gute erfahrungen zb auch ohne projektleiter etc oder mehr testen/architektur
-eigenständigkeitserklärung unterschrift
 
 
 # Entwickleranleitung für das Psychic-Framework
@@ -127,7 +116,7 @@ Alle Daten werden in ```SensorData```-Objekten transportiert. In ```SensorData``
 
 * ```data```: Ein ```float```-Array, in dem die [Sensorwerte](https://developer.android.com/reference/android/hardware/SensorEvent.html#values)[^4] gespeichert sind.
 * ```sensorType```: Der ```SensorType``` des [Sensors](#sensoren), der diese Daten produziert hat
-* ```timestamp```: Der [Timestamp](https://developer.android.com/reference/android/hardware/SensorEvent.html#timestamp)[^5] der Sensordaten
+* ```timestamp```: Der [Timestamp](https://developer.android.com/reference/android/hardware/SensorEvent.html#timestamp)[^5] der Sensordaten (in ns)
 
 [^4]: https://developer.android.com/reference/android/hardware/SensorEvent.html#values
 [^5]: https://developer.android.com/reference/android/hardware/SensorEvent.html#timestamp
