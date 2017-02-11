@@ -1,5 +1,5 @@
 % Developer Guide PsychicFramework
-% Ulrich Bätjer; André Henniger; Markus Hempel; Arne Herdick
+% Ulrich Bätjer; Markus Hempel; André Henniger; Arne Herdick
 \newpage
 
 # TODO
