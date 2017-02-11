@@ -42,10 +42,11 @@ Eine akzeptable Grenze für die Latenz festzulegen war schwierig, da Latenzen im
 ### Jitter
 Ein dritter Parameter für die Verbindungsqualität ist der Jitter, das heißt wie sehr sich die Periodizität der ankommenden Sensordaten von der Periodizität der gesendeten Sensordaten unterscheidet. Je geringer der Jitter ist, desto besser ist die Verbindung. Unsere einzige Anforderung an diesen Aspekt der Verbindung war, dass sich kein Jitter bemerkbar macht.
 
-## Maussteuerung
+## Anforderungen der Steuerungen
+### Maussteuerung
 Zusätzlich zu den Anforderungen an die Netzwerkparameter, die flüssige und direkte Bewegung des Maus-Cursors auf dem Bildschirm garantieren sollen, muss die Maus zumindest auch einen Links- und Rechtsklick zur Verfügung stellen, um eine normale Maus zu emulieren.
 
-## Spielsteuerung
+### Spielsteuerung
 Um die Anforderungen an die Spielbarkeit festzulegen, haben wir die Zeiten einiger Läufe mit nativen Controllern auf der ersten Karte des Spiels, "Mario Circuit 1", gemessen. Dadurch hatten wir einen Vergleichswert von 1:20, die wir mit unserem Controller mindestens erreichen wollten, so dass dieser einem nativen Controller ähnlich ist.
 
 Außerdem sollte die Anordnung der Buttons in etwa dem nativen Controller entsprechen, weshalb ein flexibles Layouting vom Server aus möglich sein muss.
@@ -54,7 +55,7 @@ Um die Itemmechanik von "Super Mario Kart" zu unterstützen, wollten wir lineare
 
 Da wir den Mehrspielermodus des Spiels ebenfalls nutzen wollten, musste die Verbindung mehrerer Clients zur gleichen Zeit unterstützt werden.
 
-## Robotersteuerung
+### Robotersteuerung
 Es sollte mit der Robotersteuerung möglich sein, ein Murmellabyrinth zu lösen. Abgesehen davon stellte die Steuerung keine Anforderungen, die nicht bereits durch die Maussteuerung und der Spielsteuerung gestellt wurden, da die Anforderungen an Latenz und Frequenz nicht höher sind, und Buttons auch schon von der Maus- und Spielsteuerung benötigt werden.
 
 
@@ -64,7 +65,7 @@ Da wir ein entwicklerfreundliches Framework erstellen wollten, mussten wir darau
 Außerdem wollten wir die Anforderungen an die Endgeräte für den Server und das Handy für die App möglichst gering halten.
 
 
-## Bedienbarkeit
+## Bedienbarkeit der App
 Die App sollte möglichst benutzerfreundlich erstellt sein. Das bedeutete für uns, möglichst wenig Konfiguration vom Nutzer zu fordern.
 
 
@@ -97,7 +98,7 @@ Die blaue Linie gibt den Betrag der Differenz zwischen den Periodizitäten der S
 
 In der Praxis waren diese Differenzen sowie die seltenen Spitzen nie zu spüren. Da die Zeitstempel der Sensordaten ermöglichen es außerdem, verspätete Pakete zu ignorieren. Insofern stellt Jitter für uns kein Problem dar.
 
-## Anforderungen der drei Steuerungen
+## Anforderungen der Steuerungen
 Alle von uns geplanten Steuerungen wurden erfolgreich umgesetzt.
 Unsere Anforderungen an die Netzwerkverbindungsqualität haben die Mindestanforderungen der drei Beispielimplementationen erreicht oder übertroffen, da die Steuerungen keine Probleme mit schlechten Reaktionszeiten zeigen.
 
