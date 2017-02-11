@@ -3,8 +3,8 @@
 \newpage
 
 # Ziel
-Das Ziel des Projekts war die Erstellung eines Frameworks zur Nutzung von Sensordaten von Androidgeräten auf javafähigen PCs und die Demonstration der Funktionalität dieses Frameworks anhand von drei Beispielanwendungen, nämlich einer Maussteuerung, einer Spielsteuerung und die Bedienung eines Murmellabyrinthes mithilfe eines Roboters.
-Mit dem von uns erstellten Framework soll Drittpersonen die Umsetzung von Projekten, die Sensordaten auf PCs benötigen, erheblich erleichtert werden.
+Das Ziel des Projekts war die Erstellung eines Frameworks zur Nutzung von Sensordaten von Androidgeräten auf javafähigen Entgeräten und die Demonstration der Funktionalität dieses Frameworks anhand von drei Beispielanwendungen, nämlich einer Maussteuerung, einer Spielsteuerung und die Bedienung eines Murmellabyrinthes mithilfe eines Roboters. Um die Sensordaten des Handys an den Server zu schicken, haben wir uns entschieden, eine App zu entwickeln.
+Mit dem von uns erstellten Framework soll Drittpersonen die Umsetzung von Projekten, die Sensordaten auf ENdgeräten benötigen, erheblich erleichtert werden.
 
 
 # Usecase-Analyse
@@ -60,7 +60,7 @@ Die Robotersteuerung stellte keine Anforderungen, die nicht bereits durch die Ma
 ## Wiederverwendbarkeit
 Da wir ein entwicklerfreundliches Framework erstellen wollten, mussten wir darauf achten dass unser Projekt nicht nur für unsere Beispiele nutzbar ist. Es sollte nicht notwendig sein, die App zu verändern, um andere Applikationen zu entwickeln. Wichtig war auch, alle möglichen Anforderungen an die Nachbearbeitung der Daten auf dem Server unterstützen zu können.
 
-Außerdem wollten wir die Anforderungen an den PC für den Server und das Handy für die App möglichst gering halten.
+Außerdem wollten wir die Anforderungen an die ENdgeräte für den Server und das Handy für die App möglichst gering halten.
 
 
 ## Bedienbarkeit
@@ -68,7 +68,7 @@ Die App sollte möglichst benutzerfreundlich erstellt sein. Das bedeutete für u
 
 
 # Analyse unserer Ergebnisse
-Aus den Requirements ist ein Client-Server-Framework entstanden. Die Clients laufen in einer App auf Android-Geräten, und die Server sind Java-Anwendungen auf PCs. Mit unserem Framework können andere Entwickler einfach Daten nutzen, die die Clients mithilfe ihrer Sensoren generieren und dann an den Server schicken, indem sie eine Java-Klasse erweitern. Im Folgenden stellen wir unsere Ergebnisse kurz vor und vergleichen sie mit den gestellten Requirements.
+Aus den Requirements ist ein Client-Server-Framework entstanden. Die Clients laufen in einer App auf Android-Geräten, und die Server sind Java-Anwendungen auf Endgeräten. Mit unserem Framework können andere Entwickler einfach Daten nutzen, die die Clients mithilfe ihrer Sensoren generieren und dann an den Server schicken, indem sie eine Java-Klasse erweitern. Im Folgenden stellen wir unsere Ergebnisse kurz vor und vergleichen sie mit den gestellten Requirements.
 
 \newpage
 ## Frequenz
@@ -118,4 +118,4 @@ Wir sehen daher unsere Anforderung an das Framework, nicht nur von uns genutzt w
 
 ## Bedienbarkeit der App
 Das User Interface der App ist recht minimalistisch gehalten. Mit einem Knopfdruck werden Server gesucht, mit einem weiteren wird die Verbindung zu einem der gefundenen Server aufgebaut.
-Es ist dem Nutzer möglich, eine Empfindlichkeit für die Sensoren festzulegen, die der Server dann je nach Anwendung interpretieren kann. Falls der Standard-Discovery-Port auf dem PC auf dem der Server läuft blockiert ist, kann dieser in der App geändert werden. Insgesamt erfüllt die App unsere Anforderungen an den Client, auch für gelegentliche Nutzer verständlich zu sein, sehr gut.
+Es ist dem Nutzer möglich, eine Empfindlichkeit für die Sensoren festzulegen, die der Server dann je nach Anwendung interpretieren kann. Falls der Standard-Discovery-Port auf dem Endgerät auf dem der Server läuft blockiert ist, kann dieser in der App geändert werden. Insgesamt erfüllt die App unsere Anforderungen an den Client, auch für gelegentliche Nutzer verständlich zu sein, sehr gut.
