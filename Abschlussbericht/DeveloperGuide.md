@@ -10,16 +10,6 @@
     - how to use framework mit intellij
 * userguide: jar verlinken
 
-projektverlauf vor analyse der ergebnisse
-vorstellung der ergebnisse architektur einbauen
-lessons learned hinter projektverlauf
-projektablauf statt plan
-testen bei entwicklungsprozess --> entwicklertests & debuggen
-entwicklungsprozess in projektverlauf
-selbstorganisierendes team
-lessons learned ausformulieren auch gute erfahrungen zb auch ohne projektleiter etc oder mehr testen/architektur
-
-
 # Entwickleranleitung für das Psychic-Framework
 Das Psychic-Framework bezeichnet eine Kombination aus einer App und einem Serverframework mit einem gemeinsamen Kern. Dieses Framework dient der schnellen und einfachen Entwicklung von Java-Applikationen, die Sensordaten von Android-Geräten verwenden möchten. Im Folgenden stellen wir die wichtigsten Funktionen des Frameworks vor.
 

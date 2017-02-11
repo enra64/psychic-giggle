@@ -5,7 +5,7 @@ cd "$(dirname "$0")"
 
 printf "generating main pdf\n"
 # concat all docs
-cat Einleitung.md Projektverlauf.md LessonsLearned.md Architektur.md > komplett.md
+cat Einleitung.md Projektverlauf.md LessonsLearned.md ergebnisanalyse.md Architektur.md > komplett.md
 
 # create pdf from concatenated docs
 pandoc --number-sections --toc --toc-depth=2 --include-before=title.tex -Vlang=de-DE -Vgeometry:margin=1in komplett.md -o Abschlussbericht.pdf
