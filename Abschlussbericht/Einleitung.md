@@ -3,7 +3,11 @@
 \newpage
 
 # Ziel
-Das Ziel des Projekts war die Erstellung eines Frameworks zur Nutzung von Sensordaten von Androidgeräten auf javafähigen Endgeräten und die Demonstration der Funktionalität dieses Frameworks anhand von drei Beispielanwendungen, nämlich einer Maussteuerung, einer Spielsteuerung und die Bedienung eines Murmellabyrinthes mithilfe eines Roboters. Um die Sensordaten des Handys an den Server zu schicken, haben wir uns entschieden, eine App zu entwickeln.
+Das Ziel des Projekts war die Erstellung eines Frameworks zur Nutzung von Sensordaten von Androidgeräten auf javafähigen Endgeräten. 
+Um dieses Ziel als erfüllt zu sehen, galt es, die Demonstration der Funktionalität dieses Frameworks anhand von drei Beispielanwendungen zu zeigen.
+Bei den Beispielanwendungen handelt es sich um eine Maussteuerung, eine Spielsteuerung und die Bedienung eines Murmellabyrinthes mithilfe eines Roboters. 
+Damit die Sensordaten an einen Server, welcher unser Framework umsetzt, geschickt werden können, war es nötig eine App zu entwickeln.
+Bei den Sensordaten handelt es sich um unverarbeitete Daten, welche von Sensoren, wie dem Gyroskop oder dem Lichtsensor, Android-fähiger Handys erfasst werden können.
 Mit dem von uns erstellten Framework soll Drittpersonen die Umsetzung von Projekten, die Sensordaten auf Endgeräten benötigen, erheblich erleichtert werden.
 
 
@@ -61,6 +65,7 @@ Es sollte mit der Robotersteuerung möglich sein, ein Murmellabyrinth zu lösen.
 
 ## Wiederverwendbarkeit
 Da wir ein entwicklerfreundliches Framework erstellen wollten, mussten wir darauf achten dass unser Projekt nicht nur für unsere Beispiele nutzbar ist. Es sollte nicht notwendig sein, die App zu verändern, um andere Applikationen zu entwickeln. Wichtig war auch, alle möglichen Anforderungen an die Nachbearbeitung der Daten auf dem Server unterstützen zu können.
+Des Weiteren ist für die Entwicklerfreundlichkeit wichtig über eine gute Code-Dokumentation zu verfügen sowie die Software-Architektur leicht erweitern zu können.
 
 Außerdem wollten wir die technischen Anforderungen an die Hardware der Endgeräte für den Server und das Handy für die App möglichst gering halten.
 
