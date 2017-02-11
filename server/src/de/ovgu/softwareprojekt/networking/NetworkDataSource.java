@@ -14,12 +14,13 @@ public interface NetworkDataSource {
     /**
      * Save the data sink to be used for pushing new data
      *
-     * @param sink any implementation of the {@link de.ovgu.softwareprojekt.NetworkDataSink} interface
+     * @param sink any implementation of the {@link NetworkDataSink} interface
      */
     void setDataSink(NetworkDataSink sink);
 
     /**
      * Start sending data
+     * @throws IOException if the data source could not be started
      */
     void start() throws IOException;
 

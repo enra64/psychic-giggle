@@ -18,25 +18,22 @@ Die Bedienung von App und Server wird aus Sicht unserer Beispielimplementationen
 Ein beliebiger Beispiel-Server kann mittels GUI gestartet werden. Alternativ kann auch ein spezifischer Beispiel-Server
 über die Konsole mittels `java –jar server.jar <mouse|kuka|nes>` gestartet werden.
 
-
-\newpage
 ## App starten:
 
 - App starten und auf "Server suchen" drücken
 - gegebenenfalls Port über Option einstellen (darf nicht in Benutzung sein)
 - gewünschten Server auswählen und verbinden
 
-![Discovery-Activity](Screenshots/Discovery Activity.png){ width=300px }
+![Discovery-Activity](Screenshots/Discovery Activity.png){ width=200px }
 
 1. Optionen
 2. Server
 3. Server suchen
 
-\newpage
 ## Einstellungen:
 Hier lassen sich Name des Gerätes, benutzter Discovery Port und je nach gewählter Anwendung die Sensibilität der benutzbaren Sensoren des Handys einstellen (ist keine Anwendung gewählt, können alle Sensoren eingestellt werden).
 
-![Options-Activity](Screenshots/Options Activity.png){ width=300px }
+![Options-Activity](Screenshots/Options Activity.png){ width=200px }
 
 1. Client-Name
 2. Discoveryport
@@ -44,11 +41,11 @@ Hier lassen sich Name des Gerätes, benutzter Discovery Port und je nach gewähl
 4. Verwendungszweck des Sensors
 5. Optionen verlassen
 
-\newpage
+
 ## GUI:
 Die GUI kann mit einem Doppelklick auf `server.jar` gestartet werden, alternativ auch über die Konsole mit `java –jar server.jar`. Die GUI ist nur für die 3 implementierten Beispielanwendungen erstellt worden, Nutzer unseres Frameworks müssen also eventuelle grafische Oberflächen selber implementieren.
 
-![GUI](Screenshots/GUI.png){ width=300px }
+![GUI](Screenshots/GUI.png){ width=200px }
 
 1. Maus-Server starten
 2. Controller-Server starten
@@ -56,8 +53,6 @@ Die GUI kann mit einem Doppelklick auf `server.jar` gestartet werden, alternativ
 4. Aktuellen Server beenden
 5. Feld für Serverinformationen
 
-
-\newpage
 ## Anwendungen:
 ### Maussteuerung:
 Terminal Befehl: `java –jar server.jar mouse`
@@ -67,7 +62,7 @@ Terminal Befehl: `java –jar server.jar mouse`
 - "Reset" setzt den Cursor auf die Mitte des aktuellen Monitors (auf dem der Cursor sich gerade befindet)
 - "Sensor anhalten" stoppt alle Bewegungen des Cursors (Cursor ist nicht mehr durch Handy steuerbar)
 
-![Send-Activity](Screenshots/Send Activity.png){ width=300px }
+![Send-Activity](Screenshots/Send Activity.png){ width=200px }
 
 1. Optionen
 2. Verbindung trennen
@@ -75,20 +70,24 @@ Terminal Befehl: `java –jar server.jar mouse`
 4. Rücksetzfunktion
 5. Sensordatenübertragung pausieren
 
+
+\newpage
 ### Controller:
 Terminal Befehl: `java –jar server.jar nes`
 
-- Die Nutzung des Controllers ist hauptsächlich für die Emulation des Spieles "Super Mario Kart" gedacht, aber kann, wenn die Steuerungseinstellungen der Anwendung richtig konfiguriert wurde, auch für andere Rennspiele genutzt werden. Die "keys.properties" Datei enthält alle Steuerungsbelegungen und orientiert sich dabei am SNES-Kontroller 
-- Für die Nutzung des Spieles "Super Mario Kart" wird am Besten der Emulator SNES9X verwendet. Die richtige Konfiguration des Emulators für die Verwendung dieser Anwendung befindet sich in der Datei snes9x.conf. Diese Datei muss sich lediglich im selben Ordner des Emulators befinden 
-- vor Benutzung sollte unbedingt die gewünschte Anwendung vorher gestartet sein, da sonst unerwünschte Zeichen und Cursorbewegungen die Folge sein können
-- zur Benutzung sollte das Handy um 90° nach links gekippt werden (wie ein Lenkrad)
+- Die Nutzung des Controllers ist hauptsächlich für die Emulation des Spieles "Super Mario Kart" gedacht, aber kann, wenn die Steuerungseinstellungen der Anwendung richtig konfiguriert wurde, auch für andere Rennspiele genutzt werden. 
+- Die `keys.properties`-Datei legt die Tasten fest, die der Server sendet
+- Für die Nutzung des Spieles "Super Mario Kart" wird am Besten der Emulator [SNES9X](http://www.snes9x.com/downloads.php)[^2] verwendet. Die richtige Inputkonfiguration des Emulators für die Verwendung mit unserer `keys.properties` befindet sich in der Datei snes9x.conf. Diese Datei muss sich im Ordner des Emulators befinden.
+- vor Verbindung sollte unbedingt der Emulator gestartet und fokussiert werden, um unerwünschte Zeichen und Cursorbewegungen zu vermeiden
+- zur Benutzung sollte das Handy waagerecht gehalten werden
 - Für eine Lenkbewegung wird das Handy nun nach links oder rechts gekippt
 - In den Optionen kann die Lenkempfindlichkeit eingestellt werden
 - In Super Mario Kart wird mittels des B-Buttons etwas im Menü ausgewählt oder im Spiel beschleunigt
 - Das Menü kann mittels einer "Stoßbewegung" vom Körper weg ein höherer bzw. einer Bewegung zum Körper hin ein unterer Menüpunkt gewählt werden. Im Spiel kann mittels derselben Bewegung ein Item nach vorne oder nach hinten geworfen werden, oder der A-Button betätigt werden
 - Der Startbutton pausiert das Spiel
-- die Buttons der App emulieren entsprechend der config Datei Tasten von einer Tastatur
 - "Sensor anhalten" stoppt alle Sensordatenübertragungen 
+
+[^2]: http://www.snes9x.com/downloads.php
 
 ### KUKA LBR iiwa 7 r800
 Terminal Befehl: `java –jar server.jar vrep`
@@ -106,8 +105,7 @@ Weitere Anwendungen und deren Anleitungen müssen durch die Entwickler, die das 
 ## Bekannte Probleme:
 
 - benutzte Ports dürfen nicht von der Firewall blockiert werden
-    - Lösung: neue Regel für die Firewall erstellen, in der dem Server erlaubt wird, mit dem Netzwerk zu kommunizieren
-    - alternativ: Firewall deaktivieren
+    - Lösung: Dem Server Kommunikation durch die Firewall erlauben
 
 - unerwartetes Verhalten der Sensoren
     - Lösung: die Handysensoren neu kalibrieren

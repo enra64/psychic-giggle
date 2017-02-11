@@ -262,6 +262,7 @@ public abstract class AbstractPsychicServer implements
      *
      * @param client the client to be removed
      * @return false if client could not be found, true otherwise
+     * @throws IOException if the client could not receive the disconnect signal
      */
     public boolean disconnectClient(NetworkDevice client) throws IOException {
         mDataMapper.onClientRemoved(client);
