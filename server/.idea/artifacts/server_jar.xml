@@ -4,8 +4,6 @@
     <root id="archive" name="server.jar">
       <element id="module-output" name="server" />
       <element id="extracted-dir" path="$PROJECT_DIR$/../app/common/build/libs/common.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$APPLICATION_HOME_DIR$/plugins/junit/lib/junit-jupiter-api-5.0.0-M3.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$APPLICATION_HOME_DIR$/plugins/junit/lib/opentest4j-1.0.0-M1.jar" path-in-jar="/" />
     </root>
   </artifact>
 </component>
