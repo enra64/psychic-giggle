@@ -37,7 +37,7 @@ Nachdem ein Server mit ```start()``` gestartet wurde, können sich Clients verbi
 
 > Hinweis: Falls nicht anders angegeben, befinden sich alle nachfolgend genannten Funktionen im ```AbstractPsychicServer```, sind also auch im ```PsychicServer``` verfügbar.
 
-Sind die Interfaces implementiert, fehlt noch der eigentlich wichtigste Schritt: Es müssen Daten von den Clients angefragt werden.
+Sind die Interfaces implementiert, fehlt noch der wichtigste Schritt: Es müssen Daten von den Clients angefragt werden.
 
 
 ### Wichtige Hilfsklassen
