@@ -6,7 +6,7 @@
 Die Bedienung von App und Server wird aus Sicht unserer Beispielimplementationen erläutert.
 
 
-## Was benötigt wird: 
+## Was benötigt wird
 - Handy mit Android (__mindestens 4.4__) und der [PsychicSensors-App](https://play.google.com/store/apps/details?id=de.ovgu.softwareprojektapp)[^1]
 - javafähiges Gerät (__mindestens JRE8__) um Server zu betreiben
 - [`server.jar`](https://github.com/enra64/psychic-giggle/releases/latest)[^123] befindet sich auf dem Gerät
@@ -16,11 +16,11 @@ Die Bedienung von App und Server wird aus Sicht unserer Beispielimplementationen
 [^123]: https://github.com/enra64/psychic-giggle/releases/latest
 [^1]: https://play.google.com/store/apps/details?id=de.ovgu.softwareprojektapp
 
-## Server starten:
+## Server starten
 Ein beliebiger Beispiel-Server kann mittels GUI gestartet werden. Alternativ kann auch ein spezifischer Beispiel-Server
 über die Konsole mittels `java –jar server.jar <mouse|kuka|nes>` gestartet werden.
 
-## App starten:
+## App starten
 
 - App starten und auf "Server suchen" drücken
 - gegebenenfalls Port über Option einstellen (darf nicht in Benutzung sein)
@@ -32,7 +32,7 @@ Ein beliebiger Beispiel-Server kann mittels GUI gestartet werden. Alternativ kan
 2. Server
 3. Server suchen
 
-## Einstellungen:
+## Einstellungen
 Hier lassen sich Name des Gerätes, benutzter Discovery Port und je nach gewählter Anwendung die Sensibilität der benutzbaren Sensoren des Handys einstellen (ist keine Anwendung gewählt, können alle Sensoren eingestellt werden).
 
 ![Options-Activity](Screenshots/Options Activity.png){ width=200px }
@@ -44,7 +44,7 @@ Hier lassen sich Name des Gerätes, benutzter Discovery Port und je nach gewähl
 5. Optionen verlassen
 
 
-## GUI:
+## GUI
 Die GUI kann mit einem Doppelklick auf `server.jar` gestartet werden, alternativ auch über die Konsole mit `java –jar server.jar`. Die GUI ist nur für die 3 implementierten Beispielanwendungen erstellt worden, Nutzer unseres Frameworks müssen also eventuelle grafische Oberflächen selber implementieren.
 
 ![GUI](Screenshots/GUI.png){ width=200px }
@@ -55,8 +55,8 @@ Die GUI kann mit einem Doppelklick auf `server.jar` gestartet werden, alternativ
 4. Aktuellen Server beenden
 5. Feld für Serverinformationen
 
-## Anwendungen:
-### Maussteuerung:
+## Anwendungen
+### Maussteuerung
 Terminal Befehl: `java –jar server.jar mouse`
 
 - das Handy verhält sich wie ein gedachter Laserpointer, womit der Mauszeiger bewegt werden kann. Idealerweise zeigt die Spitze des Handys bereits vor der Verbindung des Handys mit dem Server auf den Cursor.
@@ -74,7 +74,7 @@ Terminal Befehl: `java –jar server.jar mouse`
 
 
 \newpage
-### Controller:
+### Controller
 Terminal Befehl: `java –jar server.jar nes`
 
 - Die Nutzung des Controllers ist hauptsächlich für die Emulation des Spieles "Super Mario Kart" gedacht, aber kann, wenn die Steuerungseinstellungen der Anwendung richtig konfiguriert wurde, auch für andere Rennspiele genutzt werden. 

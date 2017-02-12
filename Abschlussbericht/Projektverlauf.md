@@ -39,6 +39,6 @@ Zur Lösung eines Murmellabyrinths mit Hilfe des Gravitationsensors des Smartpho
 
 
 ## Entwicklungswerkzeuge
-Zur Entwicklung der Applikation wurde Android Studio und zur Entwicklung des Servers wurde IntelliJ IDEA verwendet. Als Version Control System diente Git.
+Zur Entwicklung der Applikation wurde Android Studio und zur Entwicklung des Servers wurde IntelliJ IDEA verwendet. Als Version Control System diente Git, das Repository war auf GitHub gespeichert.
 
 
