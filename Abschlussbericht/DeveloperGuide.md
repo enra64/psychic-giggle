@@ -2,17 +2,13 @@
 % Ulrich Bätjer; Markus Hempel; André Henniger; Arne Herdick
 \newpage
 
-# TODO
-* PLAY STORE
-    - link zu release
-* github release mit: framework code als zip, framework als jar, beispielserver gui als jar
-* DeveloperGuide.md
-    - how to use framework mit intellij
-* userguide: jar verlinken
-
 # Entwickleranleitung für das Psychic-Framework
 Das Psychic-Framework bezeichnet eine Kombination aus einer App und einem Serverframework mit einem gemeinsamen Kern. Dieses Framework dient der schnellen und einfachen Entwicklung von Java-Applikationen, die Sensordaten von Android-Geräten verwenden möchten. Im Folgenden stellen wir die wichtigsten Funktionen des Frameworks vor.
 
+## Arbeiten in IntelliJ
+Um mit Jetbrains IntelliJ IDEA einen neuen Server zu entwickeln, wird am besten [`server_development.zip`](https://github.com/enra64/psychic-giggle/releases/latest)[^123] aus dem aktuellen Release heruntergeladen. Nachdem der enthaltene Ordner extrahiert wurde, kann er mithilfe des Importdialoges von IntelliJ geöffnet werden. Das Projekt sollte vom vorhandenen Quellcode erstellt werden, nicht mithilfe des Gradle- oder Mavenmodells. Danach reicht es, `Weiter` zu wählen, bis das verwendete JDK ausgewählt werden soll, wo JDK 8 gewählt werden muss. Danach können neue Server einfach in einem separaten Package entwickelt werden.
+
+[^123]: https://github.com/enra64/psychic-giggle/releases/latest
 
 ## JavaDoc
 Eine komplette JavaDoc ist ebenfalls verfügbar unter `docs/docs server mit common` oder [in unserem GitHub-Repository](https://github.com/enra64/psychic-giggle/tree/master/abgabefolder/docs%20server%20mit%20common)[^22].

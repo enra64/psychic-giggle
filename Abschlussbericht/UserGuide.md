@@ -9,9 +9,11 @@ Die Bedienung von App und Server wird aus Sicht unserer Beispielimplementationen
 ## Was benötigt wird: 
 - Handy mit Android (__mindestens 4.4__) und der [PsychicSensors-App](https://play.google.com/store/apps/details?id=de.ovgu.softwareprojektapp)[^1]
 - javafähiges Gerät (__mindestens JRE8__) um Server zu betreiben
-- Server-Jar befindet sich auf dem Gerät
+- [`server.jar`](https://github.com/enra64/psychic-giggle/releases/latest)[^123] befindet sich auf dem Gerät
 - Netzwerkverbindung zwischen Server und App
 
+
+[^123]: https://github.com/enra64/psychic-giggle/releases/latest
 [^1]: https://play.google.com/store/apps/details?id=de.ovgu.softwareprojektapp
 
 ## Server starten:
