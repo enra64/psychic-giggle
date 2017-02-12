@@ -53,6 +53,6 @@ cp server.jar abgabe/binary
 echo COPYING README
 cp README.txt abgabe/
 
-zip -r psychic-frameworks-abgabe.zip abgabe
+zip -qr psychic-frameworks-abgabe.zip abgabe
 
 echo "FINISHED"
