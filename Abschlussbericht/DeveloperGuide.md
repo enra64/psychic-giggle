@@ -169,9 +169,9 @@ Filter sind Pipeline-Elemente, die erhaltene Daten bearbeiten und dann weiterlei
 
 
 #### onData
-`onData(NetworkDevice, SensorData, float` ist die interessanteste Funktion eines Filters. Sie wird immer dann aufgerufen wenn der Filter die Daten verarbeiten muss, nachdem das vorherige Element der Pipeline seine Verarbeitung abgeschlossen hat.
+`onData(NetworkDevice, SensorData, float)` ist die interessanteste Funktion eines Filters. Sie wird immer dann aufgerufen wenn der Filter die Daten verarbeiten muss, nachdem das vorherige Element der Pipeline seine Verarbeitung abgeschlossen hat.
 
-Nach der Verarbeitung der Daten müssen diese mit `forwardData(NetworkDevice, SensorData, float` an das nächste Element der Pipeline weitergeleitet werden. Wenn das nächste Element nicht festgelegt wurde, wird `forwardData` `false` zurückgeben ohne die Daten weiterleiten zu können bis `setDataSink(NetworkDataSink` aufgerufen wurde. Alternativ setzt auch der Konstruktor `AbstractFilter(NetworkDataSink` das nächste Element.
+Nach der Verarbeitung der Daten müssen diese mit `forwardData(NetworkDevice, SensorData, float)` an das nächste Element der Pipeline weitergeleitet werden. Wenn das nächste Element nicht festgelegt wurde, wird `forwardData` `false` zurückgeben ohne die Daten weiterleiten zu können bis `setDataSink(NetworkDataSink)` aufgerufen wurde. Alternativ setzt auch der Konstruktor `AbstractFilter(NetworkDataSink` das nächste Element.
 
 
 #### Beispiel
@@ -202,7 +202,7 @@ class UserSensitivityMultiplicator extends AbstractFilter {
 * ```MinimumAmplitudeChangeFilter```: Ersetzt den Wert durch den vorherigen Wert wenn die Differenz zwischen aufeinanderfolgenden Werten nicht groß genug ist
 * ```ScalingFilter```: Skaliert die Werte von ```-sourceRange``` bis ```+sourceRange``` zu ```-targetRange``` bis ```-targetRange```
 * ```TemporaryIntegratingFilter```: Bildet die Summe der letzten ```n``` Werte.
-* ```ThresholdingFilter```: Ersetzt die Werte durch ```0``` wenn die Amplitude nicht groß genug ist
+* ```ThresholdingFilter```: Ersetzt die Werte durch ```0```, wenn die Amplitude nicht groß genug ist
 * ```UserSensitivityMultiplicator```: Multipliziert die Daten mit dem ```userSensitivity```-Faktor und ersetzt diesen durch ```1f```.
 
 
