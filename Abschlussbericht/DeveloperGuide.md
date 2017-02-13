@@ -43,11 +43,11 @@ Sind die Interfaces implementiert, fehlt noch der wichtigste Schritt: Es müssen
 ### Wichtige Hilfsklassen
 Weil viele der folgenden Erklärungen diese Klassen benutzen, werden sie hier kurz erwähnt:
 
-* ```SensorType```-Enum: Alle unterstützten Sensoren. [Dokumentation](#sensoren)
-* ```NetworkDevice```: Identifiziert einen Client. [Dokumentation](#networkdevice)
+* ```SensorType```-Enum: Alle unterstützten Sensoren. [Siehe \ref{sssec:sensoren}](#sensoren)
+* ```NetworkDevice```: Identifiziert einen Client. [Siehe \ref{sssec:netdevice}](#networkdevice)
   - ```getName()```: Name des Clients
   - ```getAddress()```: IP-Adresse des Clients
-* ```NetworkDataSink```: Dieses Interface ermöglicht implementierenden Klassen, Sensordaten anzunehmen. [Dokumentation](#networkdatasink)
+* ```NetworkDataSink```: Dieses Interface ermöglicht implementierenden Klassen, Sensordaten anzunehmen. [Siehe \ref{sssec:netsink}](#networkdatasink)
 
 
 ### Daten bestellen
@@ -96,7 +96,7 @@ Alle Daten werden in ```SensorData```-Objekten transportiert. In ```SensorData``
 [^4]: https://developer.android.com/reference/android/hardware/SensorEvent.html#values
 [^5]: https://developer.android.com/reference/android/hardware/SensorEvent.html#timestamp
 
-### NetworkDataSink
+### NetworkDataSink \label{sssec:netsink}
 Das ```NetworkDataSink```-Interface muss implementiert werden, wenn eine Klasse Daten aus der Pipeline erhalten soll. Es beinhaltet zwei Funktionen:
 
 * ```close()```: Die Instanz wird nicht mehr benötigt, und sollte alle Ressourcen schließen.
@@ -113,7 +113,7 @@ Das ```NetworkDataSource```-Interface muss von Klassen implementiert werden, die
 * ```close()```: Die Instanz wird nicht mehr benötigt, und sollte alle Ressourcen schließen.
 * ```setDataSink(NetworkDataSink)```: Alle Daten, die von der ```NetworkDataSource``` erzeugt wurden, müssen an die hier erhaltene ```NetworkDataSink``` geleitet werden.
 
-### Sensoren
+### Sensoren \label{sssec:sensoren}
 Folgende Sensoren werden unterstützt:
 
 * Accelerometer
@@ -250,7 +250,7 @@ Die Pipeline kann mit ```build()``` abgeschlossen werden; dann ist der letzte ``
 Es ist dem Nutzer möglich, mithilfe der "Hold Sensors"-Checkbox das Senden von SensorDaten zu unterbinden.
 
 
-## Verwaltung von Clients
+## Verwaltung von Clients 
 Um die verschiedenen Client-Events zu händeln, muss ein ```ClientListener``` gesetzt werden, der die Events empfängt. Die Server-Klasse hat dafür den ```setClientListener(ClientListener)```-Befehl.
 
 Beispiel-Implementationen der Funktionen aus dem ```ClientListener```-Interface:
@@ -270,7 +270,7 @@ void onClientAccepted(NetworkDevice connectedClient){
 ```
 
 
-### NetworkDevice
+### NetworkDevice \label{sssec:netdevice}
 Clients werden als ```NetworkDevice``` angegeben. Mit ```getInetAddress()``` kann die aktuelle IP-Adresse als ```InetAddress``` abgefragt werden und unter ```getName()``` ist der Name des ```NetworkDevice``` verfügbar. Im ```NetworkDevice``` ist auch die Portkonfiguration jedes Clients gespeichert.
 
 Wenn ```NetworkDevice.equals(NetworkDevice)``` ```true``` zurückgibt, dann handelt es sich um denselben Client.
