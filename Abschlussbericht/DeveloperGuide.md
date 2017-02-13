@@ -439,6 +439,6 @@ Der Server und die App warten jeweils auf zufällig gewählten freien Port; dies
 
 
 # Lizenz
-Copyright (c) 2017 by the contributors. All rights reserved.
+Copyright © 2017 by the contributors. All rights reserved.
 
 \listoffigures
