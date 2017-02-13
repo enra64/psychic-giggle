@@ -13,10 +13,10 @@ mkdir -p "abgabe"
 mkdir -p "abgabe/source"
 
 # app without build files
-rsync -a --progress ../app abgabe/source/app --exclude "*build*"
+rsync -qa --progress ../app abgabe/source/app --exclude "*build*"
 
 # server without build files
-rsync -a --progress ../server abgabe/source/server --exclude "*build*" --exclude "*out*"
+rsync -qa --progress ../server abgabe/source/server --exclude "*build*" --exclude "*out*"
 
 
 
@@ -30,8 +30,8 @@ echo REGENERATING DOCS
 cp ../Abschlussbericht/*.pdf abgabe/.
 
 echo COPYING CLASS DIAGRAMS
-cp ../Abschlussbericht/diagram.png server-klassendiagramm.png
-cp ../Abschlussbericht/diagram_app.png app-klassendiagramm.png
+cp ../Abschlussbericht/diagram.png abgabe/server-klassendiagramm.png
+cp ../Abschlussbericht/diagram_app.png abgabe/app-klassendiagramm.png
 
 echo COPYING FILES FOR BINARIES
 
