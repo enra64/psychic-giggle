@@ -26,7 +26,7 @@ Hierbei wurden mehrere Varianten getestet: zum einem ob es besser ist Daten mit 
 ### Mouseserver & Kommunikations-Backend
 Es wurde das Kommunikations-Backend erstellt, das die Kommunikation zwischen Server und Clients sicherstellt. Aufgrund der Zeitkritikalität und Indifferenz gegenüber fehlenden Paketen der Sensordaten haben wir uns hier für UDP entschieden. Der Befehlsaustausch erfolgt über TCP.
 
-Parallel zur Fertigstellung des Kommunikations-Backends wurde eine Maussteuerung per Smartphone implementiert. Hierbei werden Gyroskopdaten verwendet und mit Hilfe der von Java vorgegebnen Robot-Klasse Inputs emuliert.
+Parallel zur Fertigstellung des Kommunikations-Backends wurde eine Maussteuerung per Smartphone implementiert. Hierbei werden Gyroskopdaten verwendet und mit Hilfe der von Java vorgegebenen Robot-Klasse Inputs emuliert.
 
 
 ### Spielsteuerung

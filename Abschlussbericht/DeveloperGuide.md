@@ -251,7 +251,7 @@ Es ist dem Nutzer möglich, mithilfe der "Hold Sensors"-Checkbox das Senden von 
 
 
 ## Verwaltung von Clients 
-Um die verschiedenen Client-Events zu händeln, muss ein ```ClientListener``` gesetzt werden, der die Events empfängt. Die Server-Klasse hat dafür den ```setClientListener(ClientListener)```-Befehl.
+Um die verschiedenen Client-Events zu verarbeiten, muss ein ```ClientListener``` gesetzt werden, der die Events empfängt. Die Server-Klasse hat dafür den ```setClientListener(ClientListener)```-Befehl.
 
 Beispiel-Implementationen der Funktionen aus dem ```ClientListener```-Interface:
 ```Java
@@ -295,7 +295,7 @@ Wenn ```NetworkDevice.equals(NetworkDevice)``` ```true``` zurückgibt, dann hand
 
 
 ### Clientanzahl begrenzen
-Die maximale Anzahl von Clients ist beschränkt auf ```Integer.MAX_VALUE```. Ein nutzerdefiniertes Maximum kann mithilfe von ```setClientMaximum(int)``` gesetzt, mit ```getClientMaximum()``` abgefragt und mit ```removeClientMaximum()``` entfernt werden.
+Die maximale Anzahl von Clients ist beschränkt auf ```Integer.MAX_VALUE```. Der Entwickler kann mithilfe von ```setClientMaximum(int)``` eine maximale Anzahl von Clients festsetzen. Mit ```getClientMaximum()``` kann dieses Maximum abgefragt und mit ```removeClientMaximum()``` entfernt werden.
 
 
 
@@ -412,22 +412,22 @@ Wenn ein Client den "Reset"-Button auf seinem Handy benutzt, wird die ```onReset
 Es wird empfohlen den Reset-Button zu implementieren. Er gewährleistet, dass der Nutzer mit einem einfachen, nie wechselndem Button jederzeit in einen Zustand zurückkehren kann, in dem die Anwendung bedienbar ist. Solche Zustände können zum Beispiel durch einen nicht korrigierten Gyroskop-Drift entstehen. Es ist jedoch möglich, den Reset-Knopf zu deaktivieren, indem die ```hideResetButton(boolean)```-Funktion des Servers aufgerufen wird. Ist der Parameter ```true```, wird der Button versteckt; ist er ```false```, wird der Button angezeigt.
 
 
-## Notifications anzeigen
-Das Framework erlaubt es, Notifications mit beliebigem Titel und Text anzeigen zu lassen.
+## Benachrichtigungen anzeigen
+Das Framework erlaubt es, Benachrichtigungen mit beliebigem Titel und Text anzeigen zu lassen.
 ```Java
 displayNotification(int id, String title, String text, NetworkDevice target)
 displayNotification(int id, String title, String text)
 ```
-Die ID aller Notifications darf sich mit keiner anderen überschneiden, die vom derzeitigen Server verwendet wird.
+Die ID der Benachrichtigungen darf sich nicht überschneiden.
 
-Mit dem letzten Parameter lässt sich das ```NetworkDevice``` festlegen, auf dem die Notification angezeigt wird. Wird der Parameter ausgelassen, wird die Notification auf allen Geräten angezeigt.
+Mit dem letzten Parameter lässt sich das ```NetworkDevice``` festlegen, auf dem die Benachrichtigung angezeigt wird. Wird der Parameter ausgelassen, wird sie auf allen Geräten angezeigt.
 
 ![Ergebnis eines displayNotification-Calls](notification.png)
 
 ## Netzwerkverbindung
 
 ### Server-Discovery
-Das Psychic-Framework nutzt UDP-Broadcasts der Clients bzw. der App, auf die der Server mit seiner Adresse antwortet. Der Port, auf dem der Server die Broadcasts erwartet, muss in der App eingegeben werden, falls nicht der Standardport ```8888``` verwendet wird. Alle Daten und Commands werden als serialisierte Java-Objekte übertragen.
+Das Psychic-Framework nutzt UDP-Broadcasts der Clients, also der App, auf die der Server mit seiner Adresse antwortet. Der Port, auf dem der Server die Broadcasts erwartet, muss in der App eingegeben werden, falls nicht der Standardport ```8888``` verwendet wird. Alle Daten und Kontrollnachrichten werden als serialisierte Java-Objekte übertragen.
 
 
 ### Datenverbindung

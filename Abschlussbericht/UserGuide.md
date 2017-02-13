@@ -39,7 +39,7 @@ Hier lassen sich Name des Gerätes, benutzter Discovery Port und je nach gewähl
 
 1. Client-Name
 2. Discoveryport
-3. Sensorname und Empfindlichkeitsslider
+3. Sensorname und Empfindlichkeitsschieberegler
 4. Verwendungszweck des Sensors
 5. Optionen verlassen
 
@@ -85,7 +85,7 @@ Terminal Befehl: `java –jar server.jar nes`
 - Für eine Lenkbewegung wird das Handy nun nach links oder rechts gekippt
 - In den Optionen kann die Lenkempfindlichkeit eingestellt werden
 - In Super Mario Kart wird mittels des B-Buttons etwas im Menü ausgewählt oder im Spiel beschleunigt
-- Das Menü kann mittels einer "Stoßbewegung" vom Körper weg ein höherer bzw. einer Bewegung zum Körper hin ein unterer Menüpunkt gewählt werden. Im Spiel kann mittels derselben Bewegung ein Item nach vorne oder nach hinten geworfen werden, oder der A-Button betätigt werden
+- Das Menü kann mittels einer "Stoßbewegung" vom Körper weg oder zum Körper hin bedient werden. Im Spiel kann mittels derselben Bewegung ein Item nach vorne oder nach hinten geworfen werden, oder der A-Button betätigt werden
 - Der Startbutton pausiert das Spiel
 - "Sensor anhalten" stoppt alle Sensordatenübertragungen 
 
