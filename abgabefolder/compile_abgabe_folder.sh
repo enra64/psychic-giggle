@@ -29,6 +29,9 @@ echo REGENERATING DOCS
 # copy over docs
 cp ../Abschlussbericht/*.pdf abgabe/.
 
+echo COPYING CLASS DIAGRAMS
+cp ../Abschlussbericht/diagram.png server-klassendiagramm.png
+cp ../Abschlussbericht/diagram_app.png app-klassendiagramm.png
 
 echo COPYING FILES FOR BINARIES
 
