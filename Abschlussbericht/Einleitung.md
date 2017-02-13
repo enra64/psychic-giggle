@@ -72,5 +72,5 @@ Außerdem wollten wir die technischen Anforderungen an die Hardware der Endgerä
 
 
 ## Bedienbarkeit der App
-Die App sollte möglichst benutzerfreundlich erstellt sein. Das bedeutete für uns, möglichst wenig Konfiguration vom Nutzer zu fordern.
+Die App sollte möglichst benutzerfreundlich erstellt sein. Das bedeutete für uns, möglichst wenig Konfiguration vom Nutzer zu fordern und die wichtigen Funktionen intuitiv zur Verfügung zu stellen.
 
