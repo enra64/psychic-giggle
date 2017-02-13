@@ -19,7 +19,7 @@ Fehlende Funktionalitäten wurden als Issue hinzugefügt und nach oben genannten
 
 
 ### Prototyping
-Um eine geeignete Übertragungsart der Sensordaten zu finden und vertraut mit dem Server-Client-Konzept zu werden wurden Prototypen erstellt.
+Um eine geeignete Übertragungsart der Sensordaten zu finden und vertraut mit dem Server-Client-Konzept zu werden, wurden Prototypen erstellt.
 Hierbei wurden mehrere Varianten getestet: zum einem ob es besser ist Daten mit TCP oder UDP zu senden und zum anderen wurde verglichen, ob es besser ist den Server auf dem Smartphone oder auf dem Gerät, welches die Daten erhält, zu betreiben.
 
 
